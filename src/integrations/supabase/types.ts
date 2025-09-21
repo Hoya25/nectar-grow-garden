@@ -134,6 +134,8 @@ export type Database = {
           description: string | null
           id: string
           is_active: boolean
+          max_per_status: number | null
+          min_status: string | null
           nctr_reward: number | null
           opportunity_type: string
           partner_logo_url: string | null
@@ -148,6 +150,8 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          max_per_status?: number | null
+          min_status?: string | null
           nctr_reward?: number | null
           opportunity_type: string
           partner_logo_url?: string | null
@@ -162,6 +166,8 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          max_per_status?: number | null
+          min_status?: string | null
           nctr_reward?: number | null
           opportunity_type?: string
           partner_logo_url?: string | null
@@ -285,6 +291,42 @@ export type Database = {
           },
         ]
       }
+      opportunity_status_levels: {
+        Row: {
+          benefits: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          max_opportunities: number | null
+          min_lock_duration: number
+          min_locked_nctr: number
+          reward_multiplier: number
+          status_name: string
+        }
+        Insert: {
+          benefits?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_opportunities?: number | null
+          min_lock_duration?: number
+          min_locked_nctr?: number
+          reward_multiplier?: number
+          status_name: string
+        }
+        Update: {
+          benefits?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_opportunities?: number | null
+          min_lock_duration?: number
+          min_locked_nctr?: number
+          reward_multiplier?: number
+          status_name?: string
+        }
+        Relationships: []
+      }
       partner_campaigns: {
         Row: {
           bonus_multiplier: number | null
@@ -376,11 +418,31 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_status_details: {
+        Row: {
+          current_locked_nctr: number | null
+          current_min_duration: number | null
+          next_required_duration: number | null
+          next_required_locked: number | null
+          next_status: string | null
+          opportunity_status: string | null
+          required_lock_duration: number | null
+          required_locked_nctr: number | null
+          reward_multiplier: number | null
+          status_benefits: string[] | null
+          status_description: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_sample_brands: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      calculate_user_status: {
+        Args: { user_id: string }
         Returns: string
       }
       check_user_is_admin: {
@@ -394,6 +456,10 @@ export type Database = {
       make_user_admin_by_email: {
         Args: { admin_role?: string; user_email: string }
         Returns: string
+      }
+      update_user_status: {
+        Args: { user_id: string }
+        Returns: Json
       }
     }
     Enums: {
