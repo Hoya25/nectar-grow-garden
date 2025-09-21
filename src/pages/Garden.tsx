@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut, Plus, ExternalLink, Copy } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, Plus, ExternalLink, Copy, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
+import ProfileModal from '@/components/ProfileModal';
 
 interface Portfolio {
   available_nctr: number;
@@ -157,10 +158,27 @@ const Garden = () => {
               {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
             </Badge>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-3">
+            <ProfileModal>
+              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Quick Profile
+              </Button>
+            </ProfileModal>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/profile')}
+              className="flex items-center gap-2"
+            >
+              <User className="w-4 h-4" />
+              Profile
+            </Button>
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 

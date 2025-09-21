@@ -2,11 +2,24 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
+import ProfileModal from "@/components/ProfileModal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, Settings } from "lucide-react";
 
 const Header = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
+
+  const getInitials = (email: string) => {
+    return email
+      .split('@')[0]
+      .split('.')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   const handleAuthAction = () => {
     if (user) {
@@ -75,6 +88,7 @@ const Header = () => {
               >
                 {user ? 'My Garden' : 'Enter The Garden'}
               </Button>
+              
               {isAdmin && (
                 <Button 
                   variant="outline"
@@ -84,6 +98,32 @@ const Header = () => {
                   Admin
                 </Button>
               )}
+
+              <ProfileModal>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src="" />
+                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                      {getInitials(user.email || 'User')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </ProfileModal>
+              
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/profile')}
+                className="flex items-center gap-2"
+              >
+                <User className="h-4 w-4" />
+                Profile
+              </Button>
+              
               <Button 
                 variant="outline"
                 onClick={handleSignOut}
@@ -95,9 +135,27 @@ const Header = () => {
         </nav>
 
         <div className="md:hidden">
-          <Button variant="ghost" size="sm" onClick={handleAuthAction}>
-            {user ? 'My Garden' : 'Sign In'}
-          </Button>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <ProfileModal>
+                <Button variant="ghost" size="sm">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src="" />
+                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                      {getInitials(user.email || 'User')}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </ProfileModal>
+              <Button variant="ghost" size="sm" onClick={handleAuthAction}>
+                Garden
+              </Button>
+            </div>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={handleAuthAction}>
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
     </header>
