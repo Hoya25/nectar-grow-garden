@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
   const handleAuthAction = () => {
@@ -51,7 +53,7 @@ const Header = () => {
               >
                 {user ? 'My Garden' : 'Enter The Garden'}
               </Button>
-              {user && (
+              {isAdmin && (
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/admin')}
@@ -73,7 +75,7 @@ const Header = () => {
               >
                 {user ? 'My Garden' : 'Enter The Garden'}
               </Button>
-              {user && (
+              {isAdmin && (
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/admin')}
