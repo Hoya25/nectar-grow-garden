@@ -393,6 +393,8 @@ export type Database = {
           updated_at: string
           user_id: string
           username: string | null
+          wallet_address: string | null
+          wallet_connected_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -403,6 +405,8 @@ export type Database = {
           updated_at?: string
           user_id: string
           username?: string | null
+          wallet_address?: string | null
+          wallet_connected_at?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -413,6 +417,8 @@ export type Database = {
           updated_at?: string
           user_id?: string
           username?: string | null
+          wallet_address?: string | null
+          wallet_connected_at?: string | null
         }
         Relationships: []
       }
@@ -448,6 +454,21 @@ export type Database = {
       check_user_is_admin: {
         Args: { check_user_id: string }
         Returns: boolean
+      }
+      get_user_status_details: {
+        Args: { user_id: string }
+        Returns: {
+          current_locked_nctr: number
+          current_min_duration: number
+          current_status: string
+          next_required_duration: number
+          next_required_locked: number
+          next_status: string
+          progress_to_next: number
+          reward_multiplier: number
+          status_benefits: string[]
+          status_description: string
+        }[]
       }
       is_admin: {
         Args: { user_id: string }
