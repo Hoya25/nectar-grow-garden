@@ -46,12 +46,20 @@ const Header = () => {
                 Sign Up
               </Button>
               <Button 
-                variant="default" 
-                className="bg-gradient-hero hover:opacity-90 transition-opacity"
+                className="bg-gradient-hero hover:opacity-90 text-white"
                 onClick={handleAuthAction}
               >
-                Enter The Garden
+                {user ? 'My Garden' : 'Enter The Garden'}
               </Button>
+              {user && (
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/admin')}
+                  className="ml-2"
+                >
+                  Admin
+                </Button>
+              )}
             </>
           ) : (
             <>
@@ -63,8 +71,17 @@ const Header = () => {
                 className="bg-gradient-hero hover:opacity-90 transition-opacity"
                 onClick={handleAuthAction}
               >
-                My Garden
+                {user ? 'My Garden' : 'Enter The Garden'}
               </Button>
+              {user && (
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/admin')}
+                  className="ml-2"
+                >
+                  Admin
+                </Button>
+              )}
               <Button 
                 variant="outline"
                 onClick={handleSignOut}

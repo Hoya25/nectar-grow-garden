@@ -14,6 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_log: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          resource_id: string | null
+          resource_type: string
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          resource_id?: string | null
+          resource_type: string
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          resource_id?: string | null
+          resource_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_activity_log_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          permissions: string[] | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permissions?: string[] | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permissions?: string[] | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      brands: {
+        Row: {
+          category: string | null
+          commission_rate: number | null
+          created_at: string
+          description: string | null
+          featured: boolean
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          loyalize_id: string | null
+          name: string
+          nctr_per_dollar: number | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          loyalize_id?: string | null
+          name: string
+          nctr_per_dollar?: number | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          loyalize_id?: string | null
+          name?: string
+          nctr_per_dollar?: number | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       earning_opportunities: {
         Row: {
           affiliate_link: string | null
@@ -172,6 +285,62 @@ export type Database = {
           },
         ]
       }
+      partner_campaigns: {
+        Row: {
+          bonus_multiplier: number | null
+          brand_id: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean
+          max_reward: number | null
+          min_purchase: number | null
+          start_date: string
+          terms_conditions: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bonus_multiplier?: number | null
+          brand_id: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          max_reward?: number | null
+          min_purchase?: number | null
+          start_date?: string
+          terms_conditions?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bonus_multiplier?: number | null
+          brand_id?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          max_reward?: number | null
+          min_purchase?: number | null
+          start_date?: string
+          terms_conditions?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_campaigns_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -210,7 +379,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
