@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import LockCommitmentModal from '@/components/LockCommitmentModal';
+import ReferralSystem from '@/components/ReferralSystem';
 
 interface Portfolio {
   available_nctr: number;
@@ -213,13 +215,53 @@ const Garden = () => {
 
           <TabsContent value="earn" className="space-y-4">
             <div className="grid gap-4">
-              <h3 className="text-xl font-semibold">Earning Opportunities</h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold">Earning Opportunities</h3>
+                <LockCommitmentModal 
+                  availableNCTR={portfolio?.available_nctr || 0}
+                  onLockCreated={fetchUserData}
+                />
+              </div>
+              
+              {/* Quick Actions */}
+              <div className="grid gap-4 md:grid-cols-2 mb-6">
+                <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold mb-1">Invite Friends</h4>
+                        <p className="text-sm text-muted-foreground">Earn 50 NCTR per referral</p>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Users className="w-4 h-4 mr-2" />
+                        Invite
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold mb-1">Shop & Earn</h4>
+                        <p className="text-sm text-muted-foreground">Get NCTR from purchases</p>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Gift className="w-4 h-4 mr-2" />
+                        Shop
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
               
               {opportunities.length === 0 ? (
                 <Card className="bg-card/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
-                    <p className="text-muted-foreground">No earning opportunities available right now.</p>
-                    <p className="text-sm text-muted-foreground mt-2">Check back soon for new ways to earn NCTR!</p>
+                    <Gift className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground mb-2">No brand partnerships available right now.</p>
+                    <p className="text-sm text-muted-foreground">We're working on bringing you amazing earning opportunities with top brands!</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -345,22 +387,7 @@ const Garden = () => {
 
           <TabsContent value="community" className="space-y-4">
             <h3 className="text-xl font-semibold">Grow The Community</h3>
-            <Card className="bg-card/80 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <Users className="h-12 w-12 text-primary" />
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold mb-2">Invite Friends</h4>
-                    <p className="text-muted-foreground mb-4">
-                      Earn NCTR for each friend you invite to The Garden
-                    </p>
-                    <Button className="bg-gradient-hero hover:opacity-90">
-                      Share Your Invite Link
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ReferralSystem />
           </TabsContent>
         </Tabs>
       </div>
