@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import { BrowserProvider } from 'ethers';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 
 interface WalletContextType {
@@ -33,7 +32,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   const [address, setAddress] = useState<string | null>(null);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
 
   // Initialize Coinbase Wallet SDK
@@ -42,20 +41,43 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
     appLogoUrl: '/favicon.ico'
   });
 
-  // Check for existing wallet connection on mount
+  // Get current user from Supabase auth
   useEffect(() => {
-    checkExistingConnection();
-  }, [user]);
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+    };
+    
+    getCurrentUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setCurrentUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Check for existing wallet connection when user changes
+  useEffect(() => {
+    if (currentUser) {
+      checkExistingConnection();
+    } else {
+      // Clear wallet state when user logs out
+      setAddress(null);
+      setIsConnected(false);
+      setProvider(null);
+    }
+  }, [currentUser]);
 
   const checkExistingConnection = async () => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       // Check if user has a wallet address in their profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('wallet_address')
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .maybeSingle();
 
       if (profile?.wallet_address) {
@@ -75,7 +97,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   };
 
   const connectWallet = async () => {
-    if (!user) {
+    if (!currentUser) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to connect your wallet",
@@ -129,11 +151,11 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
       const { error: updateError } = await supabase
         .from('profiles')
         .upsert({
-          user_id: user.id,
+          user_id: currentUser.id,
           wallet_address: walletAddress,
           wallet_connected_at: new Date().toISOString(),
-          email: user.email,
-          full_name: user.user_metadata?.full_name
+          email: currentUser.email,
+          full_name: currentUser.user_metadata?.full_name
         });
 
       if (updateError) {
@@ -162,7 +184,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   };
 
   const disconnectWallet = async () => {
-    if (!user) return;
+    if (!currentUser) return;
 
     try {
       // Remove wallet address from user profile
@@ -172,7 +194,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
           wallet_address: null, 
           wallet_connected_at: null 
         })
-        .eq('user_id', user.id);
+        .eq('user_id', currentUser.id);
 
       if (error) throw error;
 
