@@ -14,7 +14,197 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      earning_opportunities: {
+        Row: {
+          affiliate_link: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          nctr_reward: number | null
+          opportunity_type: string
+          partner_logo_url: string | null
+          partner_name: string | null
+          reward_per_dollar: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affiliate_link?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          nctr_reward?: number | null
+          opportunity_type: string
+          partner_logo_url?: string | null
+          partner_name?: string | null
+          reward_per_dollar?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affiliate_link?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          nctr_reward?: number | null
+          opportunity_type?: string
+          partner_logo_url?: string | null
+          partner_name?: string | null
+          reward_per_dollar?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nctr_locks: {
+        Row: {
+          created_at: string
+          id: string
+          lock_date: string
+          lock_type: string
+          nctr_amount: number
+          status: string
+          unlock_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lock_date?: string
+          lock_type: string
+          nctr_amount: number
+          status?: string
+          unlock_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lock_date?: string
+          lock_type?: string
+          nctr_amount?: number
+          status?: string
+          unlock_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nctr_portfolio: {
+        Row: {
+          available_nctr: number
+          created_at: string
+          id: string
+          opportunity_status: string
+          pending_nctr: number
+          total_earned: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_nctr?: number
+          created_at?: string
+          id?: string
+          opportunity_status?: string
+          pending_nctr?: number
+          total_earned?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_nctr?: number
+          created_at?: string
+          id?: string
+          opportunity_status?: string
+          pending_nctr?: number
+          total_earned?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nctr_transactions: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          nctr_amount: number
+          opportunity_id: string | null
+          partner_name: string | null
+          purchase_amount: number | null
+          status: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          nctr_amount: number
+          opportunity_id?: string | null
+          partner_name?: string | null
+          purchase_amount?: number | null
+          status?: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          nctr_amount?: number
+          opportunity_id?: string | null
+          partner_name?: string | null
+          purchase_amount?: number | null
+          status?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nctr_transactions_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "earning_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
