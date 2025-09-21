@@ -383,6 +383,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      check_user_is_admin: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
