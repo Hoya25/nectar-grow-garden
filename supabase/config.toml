@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.loyalize-affiliate]
 verify_jwt = true
+
+[functions.nctr-pricing]
+verify_jwt = false

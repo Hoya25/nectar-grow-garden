@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut, Plus } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, Plus, ExternalLink, Copy } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
@@ -41,6 +42,7 @@ interface EarningOpportunity {
 
 const Garden = () => {
   const { user, signOut } = useAuth();
+  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress } = useNCTRPrice();
   const navigate = useNavigate();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<LockCommitment[]>([]);
@@ -363,11 +365,37 @@ const Garden = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <Card className="bg-card/80 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>NCTR Price</CardTitle>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>NCTR Price</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigator.clipboard.writeText(contractAddress)}
+                      className="text-xs"
+                    >
+                      <Copy className="w-3 h-3 mr-1" />
+                      CA
+                    </Button>
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-primary mb-2">$0.00125</div>
-                  <div className="text-sm text-green-500">+2.4% (24h)</div>
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    ${formatPrice(currentPrice)}
+                  </div>
+                  <div className={`text-sm ${getChangeColor(priceChange24h)}`}>
+                    {formatChange(priceChange24h)} (24h)
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
+                    <span>Base Network</span>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => window.open(`https://basescan.org/token/${contractAddress}`, '_blank')}
+                      className="text-xs p-0 h-auto"
+                    >
+                      <ExternalLink className="w-3 h-3 ml-1" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
               
@@ -377,12 +405,37 @@ const Garden = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-primary mb-2">
-                    ${((portfolio?.available_nctr || 0) * 0.00125).toFixed(2)}
+                    ${calculatePortfolioValue(portfolio?.available_nctr || 0).toFixed(2)}
                   </div>
                   <div className="text-sm text-muted-foreground">Available balance</div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    Total Holdings: ${calculatePortfolioValue((portfolio?.available_nctr || 0) + (portfolio?.pending_nctr || 0)).toFixed(2)}
+                  </div>
                 </CardContent>
               </Card>
             </div>
+
+            <Card className="bg-card/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Token Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Network:</span>
+                    <p className="font-medium">Base (Chain ID: 8453)</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Contract:</span>
+                    <p className="font-medium font-mono text-xs break-all">{contractAddress}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Symbol:</span>
+                    <p className="font-medium">NCTR</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="community" className="space-y-4">
