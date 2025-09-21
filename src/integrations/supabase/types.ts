@@ -379,9 +379,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_sample_brands: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
+      }
+      make_user_admin_by_email: {
+        Args: { admin_role?: string; user_email: string }
+        Returns: string
       }
     }
     Enums: {
