@@ -1,0 +1,36 @@
+import { Button } from "@/components/ui/button";
+
+const Header = () => {
+  return (
+    <header className="w-full border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-sm">🌱</span>
+          </div>
+          <span className="text-xl font-bold text-primary">The Garden</span>
+        </div>
+        
+        <nav className="hidden md:flex items-center space-x-8">
+          <Button variant="ghost" className="text-foreground hover:text-primary">
+            Sign Up
+          </Button>
+          <Button variant="ghost" className="text-foreground hover:text-primary">
+            Refer a Friend
+          </Button>
+          <Button variant="default" className="bg-gradient-hero hover:opacity-90 transition-opacity">
+            Enter The Garden
+          </Button>
+        </nav>
+
+        <div className="md:hidden">
+          <Button variant="ghost" size="sm">
+            Menu
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
