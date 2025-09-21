@@ -12,7 +12,7 @@ import { Coins, TrendingUp, Gift, Users, LogOut, Plus, ExternalLink, Copy } from
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
-import WalletConnection from '@/components/WalletConnection';
+import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 
 interface Portfolio {
   available_nctr: number;
@@ -417,7 +417,7 @@ const Garden = () => {
             </div>
 
             {/* Wallet Connection */}
-            <WalletConnection />
+            <SimpleWalletConnection />
 
             <Card className="bg-card/80 backdrop-blur-sm">
               <CardHeader>
