@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
+import LoyalizeBrandSearch from './LoyalizeBrandSearch';
 import { 
   Plus, 
   Building2, 
@@ -259,7 +260,9 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
           <p className="text-muted-foreground">Manage brand partnerships and commission rates</p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <LoyalizeBrandSearch onBrandImported={fetchBrands} />
+          
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -464,9 +467,11 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
                       <Badge variant={brand.is_active ? 'default' : 'secondary'}>
                         {brand.is_active ? 'Active' : 'Inactive'}
                       </Badge>
-                      {brand.category && (
-                        <Badge variant="outline">{brand.category}</Badge>
-                      )}
+                    {brand.loyalize_id && (
+                      <Badge variant="outline" className="text-xs">
+                        Loyalize: {brand.loyalize_id.slice(0, 8)}...
+                      </Badge>
+                    )}
                     </div>
                   </div>
                   {brand.logo_url && (
