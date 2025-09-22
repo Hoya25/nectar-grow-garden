@@ -29,7 +29,7 @@ const NCTRTicker = ({ initialTotal, tokensPerSecond, className = "" }: NCTRTicke
 
   return (
     <div className={`flex items-center justify-center space-x-2 mb-2 ${className}`}>
-      <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent transition-all duration-300">
+      <div className="text-3xl font-bold text-primary transition-all duration-300">
         {formatNumber(currentTotal)}
       </div>
       <img 

@@ -36,7 +36,7 @@ const FAQ = () => {
           {/* Premium Header */}
           <div className="text-center mb-20 animate-fade-in-up">
             <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-              <span className="bg-gradient-premium bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_200%]">
+              <span className="text-primary animate-gradient-shift">
                 Frequently Asked
               </span>
               <br />

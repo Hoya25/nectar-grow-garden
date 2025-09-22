@@ -45,7 +45,7 @@ const FeatureSection = ({
             {/* Layered Content with Depth */}
             <div className="text-center space-y-8 animate-fade-in-up">
               <h2 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">
-                <span className="bg-gradient-premium bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_200%]">
+                <span className="text-primary animate-gradient-shift">
                   {title.split(' ').slice(0, 2).join(' ')}
                 </span>
                 {title.split(' ').length > 2 && (
