@@ -13,6 +13,7 @@ import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import UserAffiliateLinks from '@/components/UserAffiliateLinks';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
@@ -63,6 +64,7 @@ const Garden = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress } = useNCTRPrice();
+  const { getSetting } = useSiteSettings(['earning_opportunities_banner_title', 'earning_opportunities_banner_subtitle']);
   const navigate = useNavigate();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<LockCommitment[]>([]);
@@ -510,10 +512,10 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             <div data-earning-opportunities>
               <div className="mb-8 sm:mb-12 text-center">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 nctr-glow">
-                  Earning Opportunities
+                  {getSetting('earning_opportunities_banner_title', 'Earning Opportunities')}
                 </h1>
                 <p className="text-base sm:text-lg lg:text-xl text-section-text/90 max-w-2xl mx-auto px-4 sm:px-0">
-                  Support NCTR Alliance partners and earn NCTR with every transaction
+                  {getSetting('earning_opportunities_banner_subtitle', 'Support NCTR Alliance partners and earn NCTR with every transaction')}
                 </p>
               </div>
 

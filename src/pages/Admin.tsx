@@ -27,6 +27,7 @@ import LoyalizeBrandSync from '@/components/admin/LoyalizeBrandSync';
 import LoyalizeApiTester from '@/components/admin/LoyalizeApiTester';
 import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 import WebhookTester from '@/components/WebhookTester';
+import BannerEditor from '@/components/admin/BannerEditor';
 
 interface AdminStats {
   total_users: number;
@@ -281,6 +282,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
+            <BannerEditor />
             <Card className="bg-section-highlight border border-section-border">
               <CardHeader>
                 <CardTitle className="text-foreground">System Management</CardTitle>
