@@ -39,7 +39,7 @@ const Header = () => {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate('/')}>
-          <span className="text-2xl font-bold bg-gradient-premium bg-clip-text text-transparent group-hover:animate-gradient-shift bg-[length:200%_200%] transition-all duration-300">The Garden</span>
+          <span className="text-2xl font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300">The Garden</span>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
