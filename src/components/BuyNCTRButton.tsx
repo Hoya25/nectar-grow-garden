@@ -28,16 +28,8 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
   onPurchaseComplete
 }) => {
   const handleBuyClick = () => {
-    if (buyPageUrl) {
-      // When buy page URL is configured, redirect there
-      window.open(buyPageUrl, '_blank');
-    } else {
-      // Placeholder behavior until buy page is ready
-      toast({
-        title: "Buy NCTR Coming Soon!",
-        description: "The NCTR purchase page is being prepared. You'll be able to buy NCTR directly soon!",
-      });
-    }
+    const targetUrl = buyPageUrl || 'https://token.nctr.live/';
+    window.open(targetUrl, '_blank');
   };
 
   const defaultContent = (
@@ -57,11 +49,11 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
       <Button
         variant={variant}
         size={size}
-        className={`${className} ${!buyPageUrl ? 'cursor-pointer' : ''}`}
+        className={`${className}`}
         onClick={handleBuyClick}
       >
         {children || defaultContent}
-        {buyPageUrl && <ExternalLink className="w-3 h-3 ml-1" />}
+        <ExternalLink className="w-3 h-3 ml-1" />
       </Button>
       
       {showBadge && (
