@@ -161,7 +161,7 @@ const Garden = () => {
             <img 
               src={nctrLogo} 
               alt="NCTR" 
-              className="h-14 w-auto opacity-90 bg-white/80 rounded-lg px-2 py-1 shadow-soft"
+              className="h-14 w-auto opacity-90"
             />
             </div>
             <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0 neon-glow`}>
@@ -213,7 +213,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-5 w-auto opacity-70 bg-white/60 rounded px-1"
+                          className="h-5 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-xl font-bold nctr-text">
@@ -234,7 +234,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-5 w-auto opacity-70 bg-white/60 rounded px-1"
+                          className="h-5 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-xl font-bold text-warning animate-pulse">
@@ -255,7 +255,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-5 w-auto opacity-70 bg-white/60 rounded px-1"
+                          className="h-5 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-xl font-bold text-success">
@@ -404,7 +404,7 @@ const Garden = () => {
                               <img 
                                 src={nctrLogo} 
                                 alt="NCTR" 
-                                className="h-10 w-auto bg-white/80 rounded px-1"
+                                className="h-10 w-auto"
                               />
                             </div>
                             <div className="text-sm opacity-80">per $1 spent</div>
@@ -414,7 +414,7 @@ const Garden = () => {
                                 <img 
                                   src={nctrLogo} 
                                   alt="NCTR" 
-                                  className="h-5 w-auto bg-white/60 rounded px-1"
+                                  className="h-5 w-auto"
                                 />
                                 <span>signup bonus</span>
                               </div>
