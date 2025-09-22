@@ -66,7 +66,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     description: '',
     opportunity_type: 'shopping',
     nctr_reward: 0,
-      reward_per_dollar: 100.0, // Default 100 NCTR per $1 spent
+    reward_per_dollar: 10.0, // Default 10 NCTR per $1 spent (max: 99.9999)
     partner_name: '',
     partner_logo_url: '',
     affiliate_link: '',
