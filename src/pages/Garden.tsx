@@ -161,7 +161,7 @@ const Garden = () => {
             <img 
               src={nctrLogo} 
               alt="NCTR" 
-              className="h-6 w-auto opacity-90"
+              className="h-10 w-auto opacity-90"
             />
             </div>
             <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0`}>

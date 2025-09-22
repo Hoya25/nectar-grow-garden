@@ -36,7 +36,7 @@ const Footer = () => {
                 <img 
                   src={nctrLogo} 
                   alt="NCTR" 
-                  className="h-8 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                  className="h-14 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
                 />
               </div>
             </div>
@@ -74,7 +74,7 @@ const Footer = () => {
                     <img 
                       src={nctrLogo} 
                       alt="NCTR" 
-                      className="h-6 w-auto opacity-90"
+                      className="h-10 w-auto opacity-90"
                     />
                   </div>
                   <div className="text-background/80 font-medium">NCTR Distributed</div>
