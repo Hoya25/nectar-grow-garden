@@ -326,7 +326,6 @@ const Garden = () => {
                     alt="NCTR" 
                     className="h-22 w-auto"
                   />
-                  <p className="text-xs opacity-80">Price</p>
                 </div>
                 <p className="text-xl font-bold text-section-accent">${formatPrice(currentPrice)}</p>
                 <p className={`text-xs ${getChangeColor(priceChange24h)}`}>
