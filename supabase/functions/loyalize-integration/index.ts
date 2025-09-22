@@ -279,66 +279,102 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
 }
 
 async function syncSampleBrands(supabase: any, isFallback = false) {
-  console.log(isFallback ? '🔄 Using fallback sample data...' : '🔄 Using sample data (API key not configured)...')
+  console.log(isFallback ? '🔄 Using fallback gift card data...' : '🔄 Using sample gift card data (API key not configured)...')
   
-  const sampleBrands = [
+  const giftCardBrands = [
     {
-      loyalize_id: 'sample-fashion-1',
-      name: 'Premium Fashion Store',
-      description: 'High-end fashion retailer with sustainable and ethically-made clothing',
-      logo_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=100&h=100&fit=crop&crop=center',
-      commission_rate: 0.08,
-      nctr_per_dollar: 0.008,
-      category: 'Fashion & Apparel',
-      website_url: 'https://example-fashion.com',
+      loyalize_id: 'gc-amazon-001',
+      name: 'Amazon Gift Cards',
+      description: 'Digital and physical gift cards for the world\'s largest online retailer. Perfect for any occasion.',
+      logo_url: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.04,
+      nctr_per_dollar: 0.004,
+      category: 'Gift Cards',
+      website_url: 'https://amazon.com/gift-cards',
       is_active: true,
       featured: true,
     },
     {
-      loyalize_id: 'sample-tech-1', 
-      name: 'Tech Electronics Hub',
-      description: 'Latest gadgets, smartphones, and tech accessories with competitive prices',
-      logo_url: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=100&h=100&fit=crop&crop=center',
-      commission_rate: 0.05,
-      nctr_per_dollar: 0.005,
-      category: 'Electronics & Technology',
-      website_url: 'https://example-tech.com',
-      is_active: true,
-      featured: false,
-    },
-    {
-      loyalize_id: 'sample-home-1',
-      name: 'Home & Garden Plus',
-      description: 'Everything for your home improvement and gardening needs',  
-      logo_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=100&h=100&fit=crop&crop=center',
-      commission_rate: 0.06,
-      nctr_per_dollar: 0.006,
-      category: 'Home & Garden',
-      website_url: 'https://example-home.com',
-      is_active: true,
-      featured: false,
-    },
-    {
-      loyalize_id: 'sample-beauty-1',
-      name: 'Beauty & Wellness',
-      description: 'Premium beauty products and wellness essentials',
-      logo_url: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=100&h=100&fit=crop&crop=center',
-      commission_rate: 0.07,
-      nctr_per_dollar: 0.007,
-      category: 'Beauty & Personal Care',
-      website_url: 'https://example-beauty.com',
+      loyalize_id: 'gc-apple-001', 
+      name: 'Apple Store Gift Cards',
+      description: 'Gift cards for Apple products, apps, music, movies, and more from the App Store and iTunes.',
+      logo_url: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.035,
+      nctr_per_dollar: 0.0035,
+      category: 'Gift Cards',
+      website_url: 'https://apple.com/gift-cards',
       is_active: true,
       featured: true,
     },
     {
-      loyalize_id: 'sample-sports-1',
-      name: 'Active Sports Gear',
-      description: 'Sports equipment and athletic wear for all fitness levels',
-      logo_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop&crop=center',
+      loyalize_id: 'gc-target-001',
+      name: 'Target Gift Cards',
+      description: 'Versatile gift cards for retail shopping, groceries, and online purchases at Target.',  
+      logo_url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=100&h=100&fit=crop&crop=center',
       commission_rate: 0.055,
       nctr_per_dollar: 0.0055,
-      category: 'Sports & Fitness',
-      website_url: 'https://example-sports.com',
+      category: 'Gift Cards',
+      website_url: 'https://target.com/gift-cards',
+      is_active: true,
+      featured: false,
+    },
+    {
+      loyalize_id: 'gc-visa-001',
+      name: 'Visa Prepaid Cards',
+      description: 'Flexible prepaid Visa cards accepted everywhere Visa is accepted worldwide.',
+      logo_url: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.028,
+      nctr_per_dollar: 0.0028,
+      category: 'Gift Cards',
+      website_url: 'https://usa.visa.com/pay-with-visa/cards/prepaid-cards.html',
+      is_active: true,
+      featured: false,
+    },
+    {
+      loyalize_id: 'gc-steam-001',
+      name: 'Steam Gift Cards',
+      description: 'Digital gift cards for gaming, software, and entertainment content on the Steam platform.',
+      logo_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.062,
+      nctr_per_dollar: 0.0062,
+      category: 'Gift Cards',
+      website_url: 'https://store.steampowered.com/digitalgiftcards',
+      is_active: true,
+      featured: false,
+    },
+    {
+      loyalize_id: 'gc-walmart-001',
+      name: 'Walmart Gift Cards',
+      description: 'Gift cards for America\'s largest retailer - use in-store or online for groceries and more.',
+      logo_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.045,
+      nctr_per_dollar: 0.0045,
+      category: 'Gift Cards',
+      website_url: 'https://walmart.com/gift-cards',
+      is_active: true,
+      featured: true,
+    },
+    {
+      loyalize_id: 'gc-bestbuy-001',
+      name: 'Best Buy Gift Cards',
+      description: 'Electronics and tech gift cards for the latest gadgets, gaming, and home entertainment.',
+      logo_url: 'https://images.unsplash.com/photo-1518414881446-83681961ada4?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.038,
+      nctr_per_dollar: 0.0038,
+      category: 'Gift Cards',
+      website_url: 'https://bestbuy.com/gift-cards',
+      is_active: true,
+      featured: false,
+    },
+    {
+      loyalize_id: 'gc-starbucks-001',
+      name: 'Starbucks Gift Cards',
+      description: 'Perfect for coffee lovers - reload and use at any Starbucks location worldwide.',
+      logo_url: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.052,
+      nctr_per_dollar: 0.0052,
+      category: 'Gift Cards',
+      website_url: 'https://starbucks.com/gift-cards',
       is_active: true,
       featured: false,
     }
@@ -346,19 +382,19 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
   
   const { data: upsertData, error: upsertError } = await supabase
     .from('brands')
-    .upsert(sampleBrands, {
+    .upsert(giftCardBrands, {
       onConflict: 'loyalize_id',
       ignoreDuplicates: false
     })
   
   if (upsertError) {
-    console.error('Error upserting sample brands:', upsertError)
+    console.error('Error upserting gift card brands:', upsertError)
     throw upsertError
   }
   
   const message = isFallback 
-    ? `API unavailable, synced ${sampleBrands.length} fallback brands`
-    : `Successfully synced ${sampleBrands.length} sample brands (API key not configured)`
+    ? `API unavailable, synced ${giftCardBrands.length} fallback gift card offers`
+    : `Successfully synced ${giftCardBrands.length} gift card offers (API key not configured)`
   
   console.log(`✅ ${message}`)
   
@@ -366,9 +402,10 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
     JSON.stringify({
       success: true,
       message,
-      brands_count: sampleBrands.length,
+      brands_count: giftCardBrands.length,
       is_sample_data: !isFallback,
-      is_fallback_data: isFallback
+      is_fallback_data: isFallback,
+      brand_types: ['Gift Cards']
     }),
     { 
       headers: { 
