@@ -17,13 +17,15 @@ import {
   Settings,
   ArrowLeft,
   Shield,
-  Sparkles
+  Sparkles,
+  Webhook
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
 import UserManagement from '@/components/admin/UserManagement';
 import LoyalizeBrandSync from '@/components/admin/LoyalizeBrandSync';
 import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
+import WebhookTester from '@/components/WebhookTester';
 
 interface AdminStats {
   total_users: number;
@@ -216,7 +218,7 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="opportunities" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 bg-section-highlight">
+          <TabsList className="grid w-full grid-cols-4 bg-section-highlight">
             <TabsTrigger value="opportunities" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Gift className="w-4 h-4" />
               Create Opportunities
@@ -224,6 +226,10 @@ const Admin = () => {
             <TabsTrigger value="loyalize" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Sparkles className="w-4 h-4" />
               Find Brands
+            </TabsTrigger>
+            <TabsTrigger value="webhooks" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Webhook className="w-4 h-4" />
+              Webhooks
             </TabsTrigger>
             <TabsTrigger value="settings" className="text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Settings className="w-4 h-4 mr-2" />
@@ -257,6 +263,18 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="webhooks" className="space-y-6">
+            <Card className="bg-section-highlight border border-section-border">
+              <CardHeader>
+                <CardTitle className="text-foreground">Transaction Webhooks</CardTitle>
+                <p className="text-muted-foreground">Configure and test webhook endpoints for transaction notifications</p>
+              </CardHeader>
+              <CardContent>
+                <WebhookTester />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
