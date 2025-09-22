@@ -11,8 +11,8 @@ const Hero = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/50 to-background/80" />
-        <div className="absolute inset-0 bg-gradient-glow opacity-15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/90" />
+        <div className="absolute inset-0 bg-gradient-glow opacity-10" />
       </div>
       
       {/* Content with Premium Animations */}
@@ -43,7 +43,7 @@ const Hero = () => {
       
       {/* Enhanced Decorative Elements */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-glow/8 rounded-full blur-2xl animate-pulse-glow" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-glow/5 rounded-full blur-xl animate-pulse-glow" />
     </section>
   );
 };
