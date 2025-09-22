@@ -237,7 +237,7 @@ const Garden = () => {
                           className="h-10 w-auto opacity-70"
                         />
                       </div>
-                      <p className="text-xl font-bold text-warning">
+                      <p className="text-xl font-bold text-section-accent">
                         {formatNCTR(portfolio?.pending_nctr || 0)}
                       </p>
                     </div>
@@ -270,7 +270,7 @@ const Garden = () => {
           </div>
 
           {/* NCTR Price Info */}
-          <Card className="bg-gradient-depth shadow-medium">
+          <Card className="bg-white shadow-medium border border-section-border">
             <CardContent className="p-4">
               <div className="text-center text-foreground">
                 <div className="flex items-center justify-center space-x-2 mb-2">
@@ -281,7 +281,7 @@ const Garden = () => {
                   />
                   <p className="text-sm opacity-80">Price</p>
                 </div>
-                <p className="text-2xl font-bold">${formatPrice(currentPrice)}</p>
+                <p className="text-2xl font-bold text-section-accent">${formatPrice(currentPrice)}</p>
                 <p className={`text-sm ${getChangeColor(priceChange24h)}`}>
                   {formatChange(priceChange24h)} (24h)
                 </p>
@@ -291,9 +291,9 @@ const Garden = () => {
 
           {/* Lock Commitments Summary */}
           {locks.length > 0 && (
-            <Card className="bg-gradient-card shadow-soft">
+            <Card className="bg-white shadow-soft border border-section-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Lock Commitments</CardTitle>
+                <CardTitle className="text-base text-foreground">Lock Commitments</CardTitle>
               </CardHeader>
               <CardContent className="p-4 pt-0">
                 <div className="space-y-2">
@@ -307,8 +307,8 @@ const Garden = () => {
                     return (
                       <div key={lock.id} className="text-sm">
                         <div className="flex justify-between mb-1">
-                          <span>{lock.lock_type}</span>
-                          <span>{Math.round(progress)}%</span>
+                          <span className="text-foreground">{lock.lock_type}</span>
+                          <span className="text-section-accent font-bold">{Math.round(progress)}%</span>
                         </div>
                         <Progress value={progress} className="h-1" />
                       </div>

@@ -126,7 +126,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-hero hover:opacity-90">
+        <Button className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight shadow-soft">
           <Lock className="w-4 h-4 mr-2" />
           Create Lock Commitment
         </Button>
@@ -267,7 +267,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                 <Button 
                   onClick={handleCreateLock}
                   disabled={!isValidAmount || loading}
-                  className="flex-1 bg-gradient-hero hover:opacity-90"
+                  className="flex-1 bg-white border-2 border-primary text-foreground hover:bg-section-highlight"
                 >
                   {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Create Lock Commitment
