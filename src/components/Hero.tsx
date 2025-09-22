@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-garden.jpg";
 import nctrLogo from "@/assets/nctr-n-transparent.png";
+import nctrOverlay from "@/assets/nctr-n-overlay.png";
 
 const Hero = () => {
   return (
@@ -44,7 +45,47 @@ const Hero = () => {
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-glow/8 rounded-full blur-2xl animate-pulse-glow" />
       
-      {/* NCTR Logo Background */}
+      {/* NCTR Logo Overlays - Replacing Bitcoin B's */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Top left area */}
+        <img 
+          src={nctrOverlay} 
+          alt="NCTR Logo" 
+          className="absolute top-16 left-16 w-12 h-12 object-contain opacity-30"
+        />
+        {/* Top right area */}
+        <img 
+          src={nctrOverlay} 
+          alt="NCTR Logo" 
+          className="absolute top-20 right-24 w-16 h-16 object-contain opacity-25"
+        />
+        {/* Bottom left area */}
+        <img 
+          src={nctrOverlay} 
+          alt="NCTR Logo" 
+          className="absolute bottom-24 left-32 w-14 h-14 object-contain opacity-20"
+        />
+        {/* Center right area */}
+        <img 
+          src={nctrOverlay} 
+          alt="NCTR Logo" 
+          className="absolute top-32 right-16 w-10 h-10 object-contain opacity-35"
+        />
+        {/* Bottom right area */}
+        <img 
+          src={nctrOverlay} 
+          alt="NCTR Logo" 
+          className="absolute bottom-32 right-40 w-18 h-18 object-contain opacity-28"
+        />
+        {/* Center left area */}
+        <img 
+          src={nctrOverlay} 
+          alt="NCTR Logo" 
+          className="absolute top-40 left-20 w-8 h-8 object-contain opacity-40"
+        />
+      </div>
+      
+      {/* Main NCTR Logo Background */}
       <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none">
         <img 
           src={nctrLogo} 
