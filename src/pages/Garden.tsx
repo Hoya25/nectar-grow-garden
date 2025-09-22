@@ -376,105 +376,248 @@ const Garden = () => {
                   <p className="text-sm text-muted-foreground">Check back soon for exciting partnership launches.</p>
                 </CardContent>
               </Card>
-            ) : (
-              <div className="grid gap-6 md:grid-cols-2">
-                {opportunities.map((opportunity) => (
-                  <Card key={opportunity.id} className="bg-white border border-section-border shadow-soft hover:shadow-medium transition-all duration-300">
-                    <CardContent className="p-6">
-                      {/* Brand Header with Logo */}
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center space-x-3">
-                          {opportunity.partner_logo_url ? (
-                            <img 
-                              src={opportunity.partner_logo_url} 
-                              alt={`${opportunity.partner_name} logo`}
-                              className="w-12 h-12 rounded-lg object-cover"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 rounded-lg bg-section-highlight flex items-center justify-center">
-                              <Gift className="w-6 h-6 text-foreground" />
-                            </div>
-                          )}
-                          <div>
-                            <h3 className="text-lg font-bold text-foreground">{opportunity.title}</h3>
-                            {opportunity.partner_name && (
-                              <p className="text-sm text-muted-foreground">{opportunity.partner_name}</p>
-                            )}
-                          </div>
-                        </div>
-                        <Badge variant="secondary" className="bg-section-highlight text-foreground">
-                          {opportunity.opportunity_type.toUpperCase()}
+            ) : opportunities.length === 1 ? (
+              // Single opportunity - Featured layout
+              <Card className="bg-white border-2 border-primary shadow-large hover:shadow-glow-intense transition-all duration-500 max-w-4xl mx-auto">
+                <CardContent className="p-0">
+                  {opportunities[0].video_url && (
+                    <div className="relative">
+                      <video 
+                        className="w-full h-64 md:h-80 object-cover rounded-t-lg"
+                        controls
+                        poster={opportunities[0].partner_logo_url}
+                      >
+                        <source src={opportunities[0].video_url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                      <div className="absolute top-4 right-4">
+                        <Badge variant="secondary" className="bg-primary/90 text-primary-foreground border-0">
+                          FEATURED
                         </Badge>
                       </div>
+                    </div>
+                  )}
+                  
+                  <div className="p-8">
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center space-x-4">
+                        {opportunities[0].partner_logo_url && (
+                          <img 
+                            src={opportunities[0].partner_logo_url} 
+                            alt={`${opportunities[0].partner_name} logo`}
+                            className="w-16 h-16 rounded-xl object-cover shadow-soft"
+                          />
+                        )}
+                        <div>
+                          <h2 className="text-2xl font-bold text-foreground mb-1">{opportunities[0].title}</h2>
+                          {opportunities[0].partner_name && (
+                            <p className="text-lg text-muted-foreground">{opportunities[0].partner_name}</p>
+                          )}
+                          <Badge variant="outline" className="mt-2 bg-section-highlight">
+                            {opportunities[0].opportunity_type.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
 
-                      {/* Earning Rate - Clean Display */}
-                      <div className="bg-section-highlight rounded-lg p-4 mb-4">
-                        <div className="text-center">
-                          <div className="flex items-center justify-center space-x-2 mb-1">
-                            <div className="text-2xl font-bold text-section-accent">
-                              {formatNCTR(opportunity.reward_per_dollar || 0)}
+                    <div className="grid md:grid-cols-2 gap-6 mb-6">
+                      <div className="bg-section-highlight rounded-xl p-6 text-center">
+                        <div className="flex items-center justify-center space-x-2 mb-2">
+                          <div className="text-3xl font-bold text-section-accent">
+                            {formatNCTR(opportunities[0].reward_per_dollar || 0)}
+                          </div>
+                          <img 
+                            src={nctrLogo} 
+                            alt="NCTR" 
+                            className="h-12 w-auto"
+                          />
+                        </div>
+                        <div className="text-sm text-muted-foreground font-medium">per $1 spent</div>
+                      </div>
+                      
+                      {opportunities[0].nctr_reward > 0 && (
+                        <div className="bg-primary/10 rounded-xl p-6 text-center border border-primary/20">
+                          <div className="flex items-center justify-center space-x-2 mb-2">
+                            <div className="text-3xl font-bold text-primary">
+                              {formatNCTR(opportunities[0].nctr_reward)}
                             </div>
                             <img 
                               src={nctrLogo} 
                               alt="NCTR" 
-                              className="h-16 w-auto"
+                              className="h-12 w-auto"
                             />
                           </div>
-                          <div className="text-sm text-muted-foreground">per $1 spent</div>
-                          {opportunity.nctr_reward > 0 && (
-                            <div className="flex items-center justify-center space-x-1 text-xs text-muted-foreground mt-2">
-                              <span>+ {formatNCTR(opportunity.nctr_reward)}</span>
-                              <img 
-                                src={nctrLogo} 
-                                alt="NCTR" 
-                                className="h-8 w-auto"
-                              />
-                              <span>signup bonus</span>
-                            </div>
-                          )}
+                          <div className="text-sm text-primary font-medium">Welcome Bonus</div>
                         </div>
-                      </div>
+                      )}
+                    </div>
 
-                      {/* Content */}
-                      <div>
-                        {/* Video Section */}
+                    {opportunities[0].description && (
+                      <p className="text-foreground leading-relaxed mb-6 text-lg">
+                        {opportunities[0].description}
+                      </p>
+                    )}
+
+                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300">
+                      <ExternalLink className="w-5 h-5 mr-3" />
+                      Start Earning with {opportunities[0].partner_name || 'This Brand'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : opportunities.length <= 3 ? (
+              // Few opportunities - Showcase layout
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 mb-4">
+                    {opportunities.length} Exclusive Opportunities
+                  </Badge>
+                </div>
+                
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                  {opportunities.map((opportunity, index) => (
+                    <Card key={opportunity.id} className={`bg-white border shadow-soft hover:shadow-large transition-all duration-300 ${index === 0 ? 'border-primary border-2' : 'border-section-border'}`}>
+                      <CardContent className="p-0">
                         {opportunity.video_url && (
-                          <div className="mb-4">
-                            <div className="relative rounded-lg overflow-hidden">
-                              <video 
-                                className="w-full h-48 object-cover"
-                                controls
-                                poster={opportunity.partner_logo_url}
-                              >
-                                <source src={opportunity.video_url} type="video/mp4" />
-                                Your browser does not support the video tag.
-                              </video>
-                              {opportunity.video_title && (
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-                                  <p className="text-foreground font-medium text-sm">{opportunity.video_title}</p>
-                                </div>
-                              )}
-                            </div>
-                            {opportunity.video_description && (
-                              <p className="text-sm text-muted-foreground mt-2">{opportunity.video_description}</p>
+                          <div className="relative">
+                            <video 
+                              className="w-full h-48 object-cover rounded-t-lg"
+                              controls
+                              poster={opportunity.partner_logo_url}
+                            >
+                              <source src={opportunity.video_url} type="video/mp4" />
+                            </video>
+                            {index === 0 && (
+                              <div className="absolute top-3 right-3">
+                                <Badge className="bg-primary text-primary-foreground border-0 text-xs">
+                                  FEATURED
+                                </Badge>
+                              </div>
                             )}
                           </div>
                         )}
+                        
+                        <div className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center space-x-3">
+                              {opportunity.partner_logo_url && (
+                                <img 
+                                  src={opportunity.partner_logo_url} 
+                                  alt={`${opportunity.partner_name} logo`}
+                                  className="w-12 h-12 rounded-lg object-cover"
+                                />
+                              )}
+                              <div>
+                                <h3 className="font-bold text-foreground text-lg">{opportunity.title}</h3>
+                                {opportunity.partner_name && (
+                                  <p className="text-sm text-muted-foreground">{opportunity.partner_name}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
 
-                        {/* Description */}
-                        <p className="text-muted-foreground mb-4 leading-relaxed">
-                          {opportunity.description}
-                        </p>
+                          <div className="bg-section-highlight rounded-lg p-4 mb-4">
+                            <div className="text-center">
+                              <div className="flex items-center justify-center space-x-2 mb-1">
+                                <div className="text-2xl font-bold text-section-accent">
+                                  {formatNCTR(opportunity.reward_per_dollar || 0)}
+                                </div>
+                                <img src={nctrLogo} alt="NCTR" className="h-8 w-auto" />
+                              </div>
+                              <div className="text-sm text-muted-foreground">per $1 spent</div>
+                              {opportunity.nctr_reward > 0 && (
+                                <div className="text-xs text-primary font-medium mt-2">
+                                  + {formatNCTR(opportunity.nctr_reward)} NCTR bonus
+                                </div>
+                              )}
+                            </div>
+                          </div>
 
-                        {/* Action Button */}
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-white text-sm font-medium py-2 px-3 h-auto">
-                          <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
-                          <span className="truncate">Start Earning Now</span>
+                          {opportunity.description && (
+                            <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                              {opportunity.description}
+                            </p>
+                          )}
+
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-3 rounded-lg">
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Start Earning
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              // Many opportunities - Grid layout with filters
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="text-center sm:text-left">
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                      {opportunities.length} Opportunities Available
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex gap-2 flex-wrap">
+                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">All</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">Shopping</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">Partner</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">Bonus</Badge>
+                  </div>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {opportunities.map((opportunity, index) => (
+                    <Card key={opportunity.id} className="bg-white border border-section-border shadow-soft hover:shadow-medium transition-all duration-300 group">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            {opportunity.partner_logo_url ? (
+                              <img 
+                                src={opportunity.partner_logo_url} 
+                                alt={`${opportunity.partner_name} logo`}
+                                className="w-10 h-10 rounded-lg object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg bg-section-highlight flex items-center justify-center">
+                                <Gift className="w-5 h-5 text-foreground" />
+                              </div>
+                            )}
+                            <div>
+                              <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                                {opportunity.title}
+                              </h4>
+                              {opportunity.partner_name && (
+                                <p className="text-xs text-muted-foreground">{opportunity.partner_name}</p>
+                              )}
+                            </div>
+                          </div>
+                          {opportunity.video_url && (
+                            <div className="text-section-accent">
+                              <Play className="w-4 h-4" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="bg-section-highlight rounded-lg p-3 mb-4 text-center">
+                          <div className="flex items-center justify-center space-x-1 mb-1">
+                            <span className="text-lg font-bold text-section-accent">
+                              {formatNCTR(opportunity.reward_per_dollar || 0)}
+                            </span>
+                            <img src={nctrLogo} alt="NCTR" className="h-6 w-auto" />
+                          </div>
+                          <div className="text-xs text-muted-foreground">per $1</div>
+                        </div>
+
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 rounded-lg group-hover:shadow-medium transition-all duration-300">
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Earn Now
                         </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             )}
 
