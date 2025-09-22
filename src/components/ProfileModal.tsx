@@ -276,9 +276,9 @@ const ProfileModal = ({ children }: ProfileModalProps) => {
                 title="Change profile picture"
               >
                 {uploading ? (
-                  <Upload className="h-6 w-6 text-white animate-spin" />
+                  <Upload className="h-6 w-6 text-foreground animate-spin" />
                 ) : (
-                  <Camera className="h-6 w-6 text-white" />
+                  <Camera className="h-6 w-6 text-foreground" />
                 )}
               </button>
               <input
@@ -294,7 +294,7 @@ const ProfileModal = ({ children }: ProfileModalProps) => {
                 {profile?.full_name || profile?.username || 'Anonymous User'}
               </h4>
               <div className="flex items-center gap-2 mt-1">
-                <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0 text-xs`}>
+                <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0 text-xs`}>
                   {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
                 </Badge>
                 {isAdmin && (

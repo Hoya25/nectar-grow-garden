@@ -200,7 +200,7 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
                       />
                     ) : (
                       <div className="w-10 h-10 rounded bg-gradient-hero flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">
+                        <span className="text-foreground font-bold text-sm">
                           {brand.name.charAt(0)}
                         </span>
                       </div>

@@ -161,10 +161,10 @@ const Garden = () => {
             <img 
               src={nctrLogo} 
               alt="NCTR" 
-              className="h-14 w-auto opacity-90"
+              className="h-28 w-auto opacity-90"
             />
             </div>
-            <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0`}>
+            <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0`}>
               {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
             </Badge>
           </div>
@@ -213,7 +213,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-5 w-auto opacity-70"
+                          className="h-10 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-xl font-bold text-section-accent">
@@ -234,7 +234,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-5 w-auto opacity-70"
+                          className="h-10 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-xl font-bold text-warning">
@@ -255,7 +255,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-5 w-auto opacity-70"
+                          className="h-10 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-xl font-bold text-section-accent">
@@ -272,12 +272,12 @@ const Garden = () => {
           {/* NCTR Price Info */}
           <Card className="bg-gradient-depth shadow-medium">
             <CardContent className="p-4">
-              <div className="text-center text-white">
+              <div className="text-center text-foreground">
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-8 w-auto"
+                    className="h-16 w-auto"
                   />
                   <p className="text-sm opacity-80">Price</p>
                 </div>
@@ -367,8 +367,8 @@ const Garden = () => {
                 {opportunities.map((opportunity) => (
                   <Card key={opportunity.id} className="bg-card/90 backdrop-blur-sm shadow-medium hover:shadow-glow transition-all duration-300 animate-fade-in">
                     <CardContent className="p-0">
-                      {/* Brand Header with Logo */}
-                      <div className="bg-gradient-accent p-6 text-white">
+                       {/* Brand Header with Logo */}
+                      <div className="bg-gradient-accent p-6 text-foreground">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center space-x-3">
                             {opportunity.partner_logo_url ? (
@@ -389,7 +389,7 @@ const Garden = () => {
                               )}
                             </div>
                           </div>
-                          <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                          <Badge variant="secondary" className="bg-white/20 text-foreground border-0">
                             {opportunity.opportunity_type.toUpperCase()}
                           </Badge>
                         </div>
@@ -404,7 +404,7 @@ const Garden = () => {
                               <img 
                                 src={nctrLogo} 
                                 alt="NCTR" 
-                                className="h-10 w-auto"
+                                className="h-20 w-auto"
                               />
                             </div>
                             <div className="text-sm opacity-80">per $1 spent</div>
@@ -414,7 +414,7 @@ const Garden = () => {
                                 <img 
                                   src={nctrLogo} 
                                   alt="NCTR" 
-                                  className="h-5 w-auto"
+                                  className="h-10 w-auto"
                                 />
                                 <span>signup bonus</span>
                               </div>
@@ -439,7 +439,7 @@ const Garden = () => {
                               </video>
                               {opportunity.video_title && (
                                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-                                  <p className="text-white font-medium text-sm">{opportunity.video_title}</p>
+                                  <p className="text-foreground font-medium text-sm">{opportunity.video_title}</p>
                                 </div>
                               )}
                             </div>

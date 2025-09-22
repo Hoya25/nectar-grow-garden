@@ -361,7 +361,7 @@ const Profile = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Status Level</span>
-                    <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0`}>
+                    <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0`}>
                       {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
                     </Badge>
                   </div>

@@ -143,7 +143,7 @@ const Admin = () => {
                 </p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-gradient-hero text-white border-0">
+            <Badge variant="secondary" className="bg-gradient-hero text-foreground border-0">
               {adminUser?.role?.toUpperCase()}
             </Badge>
           </div>

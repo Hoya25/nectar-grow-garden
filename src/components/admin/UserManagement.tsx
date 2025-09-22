@@ -250,13 +250,13 @@ const UserManagement = () => {
                           {user.full_name || 'No name provided'}
                         </h4>
                         {user.is_admin && (
-                          <Badge variant="secondary" className="bg-gradient-hero text-white border-0">
+                          <Badge variant="secondary" className="bg-gradient-hero text-foreground border-0">
                             <Shield className="w-3 h-3 mr-1" />
                             Admin
                           </Badge>
                         )}
                         {user.portfolio && (
-                          <Badge className={`${getStatusColor(user.portfolio.opportunity_status)} text-white border-0`}>
+                          <Badge className={`${getStatusColor(user.portfolio.opportunity_status)} text-foreground border-0`}>
                             {user.portfolio.opportunity_status.toUpperCase()}
                           </Badge>
                         )}
