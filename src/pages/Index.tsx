@@ -18,7 +18,7 @@ const Index = () => {
 
 Step into The Garden and start earning NCTR —our next-generation rewards Alliance Token—simply by being yourself every day. Turn everyday moments into real crypto wins, like:"
         bulletPoints={[
-          "Shopping: Buy the things you need and want—from groceries to gadgets—and get NCTR back as rewards.",
+          "Shopping: Buy the things you need and want—from Uber to fashion—and get NCTR back as rewards.",
           "Inviting Friends: Share the opportunity with friends; each invite brings more NCTR your way."
         ]}
         buttonText="Enter The Garden →"
