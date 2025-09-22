@@ -29,8 +29,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
       duration: 90,
       title: '90LOCK - Standard Commitment',
       description: 'Build your Alliance foundation with a 90-day commitment to steady growth',
-      multiplier: '1.2x',
-      benefits: ['Enhanced earning rates', 'Access to partner brands', 'Alliance member benefits', 'Foundation for status building'],
+      benefits: ['Enhanced earning opportunities', 'Access to partner brands', 'Alliance member benefits', 'Foundation for status building'],
       color: 'bg-gradient-to-r from-blue-500 to-blue-600',
       textColor: 'text-blue-700',
       bgColor: 'bg-blue-50',
@@ -41,9 +40,8 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
       type: '360LOCK' as const,
       duration: 360,
       title: '360LOCK - Elite Commitment',
-      description: 'Maximum Alliance commitment for elite status, amplified earnings, and exclusive experiences',
-      multiplier: '5x',
-      benefits: ['Maximum earning amplification', 'Elite partner access', 'VIP experiences & events', 'Exclusive rewards program', 'Priority Alliance status'],
+      description: 'Maximum Alliance commitment for elite status qualification and exclusive experiences',
+      benefits: ['Qualifies for Member Status tiers', 'Elite partner access', 'VIP experiences & events', 'Exclusive rewards program', 'Priority Alliance status'],
       color: 'bg-gradient-to-r from-primary to-primary/80',
       textColor: 'text-primary',
       bgColor: 'bg-primary/5',
@@ -179,7 +177,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                       {option.title}
                     </CardTitle>
                     <Badge className={`${option.color} text-white border-0 shadow-sm`}>
-                      {option.multiplier} earnings
+                      {option.duration}D
                     </Badge>
                   </div>
                   <CardDescription className={option.textColor}>{option.description}</CardDescription>
@@ -264,10 +262,17 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                         </p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Reward Multiplier:</span>
-                        <p className="font-medium text-foreground">{selectedOption.multiplier}</p>
+                        <span className="text-muted-foreground">Commitment:</span>
+                        <p className="font-medium text-foreground">{selectedOption.type} Alliance</p>
                       </div>
                     </div>
+                    {selectedType === '360LOCK' && (
+                      <div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                        <p className="text-sm text-primary font-medium">
+                          💎 360LOCK qualifies for Member Status tiers with earning multipliers up to 2.0x!
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
