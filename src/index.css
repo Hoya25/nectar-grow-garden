@@ -2,78 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The Garden Design System - Inverted NCTR color scheme
-Green backgrounds with gunmetal grey text for better contrast and brand alignment
+/* The Garden Design System - Clean white/light site with green accents
+Gunmetal grey for NCTR elements, green as accent color
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    /* Base colors - Inverted scheme: green backgrounds with grey text */
-    --background: 75 100% 85%; /* Light green background */
+    /* Base colors - Clean white/light site with green accents */
+    --background: 0 0% 100%; /* Clean white background */
     --foreground: 0 0% 25%; /* Dark gunmetal grey text */
 
-    --card: 75 80% 90%; /* Lighter green for cards */
+    --card: 0 0% 98%; /* Very light grey for cards */
     --card-foreground: 0 0% 25%;
 
-    --popover: 75 80% 90%;
+    --popover: 0 0% 100%;
     --popover-foreground: 0 0% 25%;
 
-    /* NCTR theme - Inverted: green backgrounds, grey text */
-    --primary: 120 100% 30%; /* Darker green for primary elements */
-    --primary-foreground: 0 0% 95%; /* Light text on green */
-    --primary-glow: 120 80% 40%;
-    --primary-deep: 120 100% 25%;
-    --primary-light: 120 60% 50%;
+    /* NCTR theme - Gunmetal grey for NCTR elements */
+    --primary: 0 0% 25%; /* Gunmetal grey for NCTR elements */
+    --primary-foreground: 0 0% 100%; /* White text on gunmetal */
+    --primary-glow: 0 0% 35%;
+    --primary-deep: 0 0% 20%;
+    --primary-light: 0 0% 40%;
 
-    /* Secondary - Green tinted */
-    --secondary: 75 30% 85%;
+    /* Secondary - Light grey */
+    --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 25%;
-    --secondary-accent: 75 40% 80%;
+    --secondary-accent: 0 0% 94%;
 
-    /* Muted - Light green tones */
-    --muted: 75 25% 88%;
-    --muted-foreground: 0 0% 35%;
+    /* Muted - Light grey tones */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Accent - Complementary to green */
-    --accent: 300 65% 50%;
+    /* Accent - Green accent color */
+    --accent: 120 60% 50%; /* Green accent */
     --accent-foreground: 0 0% 100%;
-    --accent-light: 300 50% 65%;
+    --accent-light: 120 50% 60%;
 
-    /* Crypto premium metals - Green theme */
-    --crypto-gold: 50 75% 50%;
+    /* Crypto premium metals - Gunmetal theme */
+    --crypto-gold: 45 90% 60%;
     --crypto-gold-foreground: 0 0% 25%;
     --crypto-silver: 210 8% 75%;
     --crypto-platinum: 240 5% 85%;
-    --crypto-lime: 120 100% 30%;
+    --crypto-lime: 120 60% 50%; /* Green accent for crypto lime */
 
-    /* Status colors - Green theme */
-    --success: 120 100% 30%;
+    /* Status colors */
+    --success: 120 60% 50%; /* Green for success */
     --warning: 38 75% 50%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs - Green tinted */
-    --border: 75 20% 75%;
-    --input: 75 20% 80%;
-    --ring: 120 100% 30%;
+    /* Borders and inputs - Light grey */
+    --border: 0 0% 90%;
+    --input: 0 0% 96%;
+    --ring: 120 60% 50%; /* Green accent for focus rings */
 
-    /* Premium gradients - Green focused with grey accents */
-    --gradient-hero: linear-gradient(135deg, hsl(120 100% 30%) 0%, hsl(120 80% 35%) 35%, hsl(75 60% 50%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(120 100% 30%) 0%, hsl(75 80% 40%) 50%, hsl(120 70% 45%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(75 80% 90%) 0%, hsl(75 60% 85%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(120 100% 30%) 0%, hsl(75 60% 50%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(120 100% 30%) 0%, hsl(120 100% 25%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(120 100% 30% / 0.08) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(75 100% 85%) 0%, hsl(120 20% 80%) 50%, hsl(75 40% 88%) 100%);
+    /* Premium gradients - Clean with green accents */
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 50%, hsl(120 20% 96%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(0 0% 25%) 0%, hsl(120 60% 50%) 50%, hsl(0 0% 30%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(120 60% 50%) 0%, hsl(120 50% 60%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(0 0% 25%) 0%, hsl(0 0% 20%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(120 60% 50% / 0.08) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 50%, hsl(120 10% 96%) 100%);
     
-    /* Subtle shadows - using grey */
+    /* Subtle shadows - using grey and green accents */
     --shadow-minimal: 0 1px 3px hsl(0 0% 25% / 0.08);
     --shadow-soft: 0 2px 12px -2px hsl(0 0% 25% / 0.12);
     --shadow-medium: 0 8px 32px -8px hsl(0 0% 25% / 0.15);
     --shadow-large: 0 16px 48px -12px hsl(0 0% 25% / 0.20);
-    --shadow-glow: 0 0 20px hsl(120 100% 30% / 0.15);
-    --shadow-glow-intense: 0 0 30px hsl(120 100% 30% / 0.25);
+    --shadow-glow: 0 0 20px hsl(120 60% 50% / 0.15);
+    --shadow-glow-intense: 0 0 30px hsl(120 60% 50% / 0.25);
     --shadow-inset: inset 0 2px 8px hsl(0 0% 25% / 0.08);
     
     /* Premium transitions */
@@ -97,54 +97,54 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    --sidebar-background: 75 50% 88%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 25%;
-    --sidebar-primary: 120 100% 30%;
-    --sidebar-primary-foreground: 0 0% 95%;
-    --sidebar-accent: 75 30% 85%;
+    --sidebar-primary: 0 0% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
     --sidebar-accent-foreground: 0 0% 25%;
-    --sidebar-border: 75 20% 75%;
-    --sidebar-ring: 120 100% 30%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 120 60% 50%;
   }
 
   .dark {
-    --background: 120 100% 25%; /* Dark green background */
-    --foreground: 0 0% 90%; /* Light text on dark green */
+    --background: 0 0% 10%; /* Dark background */
+    --foreground: 0 0% 95%; /* Light text on dark background */
 
-    --card: 120 100% 25%;
-    --card-foreground: 0 0% 90%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 120 100% 25%;
-    --popover-foreground: 0 0% 90%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
 
-    /* Dark mode with inverted green theme */
-    --primary: 75 100% 85%;
-    --primary-foreground: 0 0% 25%;
+    /* Dark mode - Gunmetal grey for NCTR elements */
+    --primary: 0 0% 25%; /* Gunmetal grey stays consistent */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 120 20% 30%;
+    --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 90%;
 
-    --muted: 120 15% 35%;
+    --muted: 0 0% 25%;
     --muted-foreground: 0 0% 70%;
 
-    --accent: 300 65% 50%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 120 60% 50%; /* Green accent stays consistent */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 120 15% 35%;
-    --input: 120 15% 35%;
-    --ring: 75 100% 85%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 120 60% 50%;
     
-    --sidebar-background: 120 100% 25%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 75 100% 85%;
-    --sidebar-primary-foreground: 0 0% 25%;
-    --sidebar-accent: 120 20% 30%;
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 0% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 20%;
     --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 120 15% 35%;
-    --sidebar-ring: 75 100% 85%;
+    --sidebar-border: 0 0% 25%;
+    --sidebar-ring: 120 60% 50%;
   }
 }
 
