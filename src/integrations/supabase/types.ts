@@ -494,6 +494,15 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      get_public_profile: {
+        Args: { profile_user_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+          id: string
+          username: string
+        }[]
+      }
       get_user_status_details: {
         Args: { target_user_id?: string }
         Returns: {
