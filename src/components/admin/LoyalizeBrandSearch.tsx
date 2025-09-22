@@ -47,14 +47,23 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
   ];
 
   const searchBrands = async () => {
+    if (!searchTerm.trim()) {
+      toast({
+        title: "Search Required",
+        description: "Please enter a brand name to search.",
+      });
+      return;
+    }
+
     setLoading(true);
     
     try {
       const { data, error } = await supabase.functions.invoke('loyalize-brands', {
         body: {
+          action: 'search',
           query: searchTerm,
           category: selectedCategory === 'all' ? '' : selectedCategory,
-          limit: 20
+          limit: 50
         }
       });
 
@@ -65,7 +74,12 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
       if (data.brands?.length === 0) {
         toast({
           title: "No Results",
-          description: "No brands found matching your search criteria.",
+          description: `No brands found for "${searchTerm}". Try a different search term.`,
+        });
+      } else {
+        toast({
+          title: "Search Complete",
+          description: `Found ${data.brands?.length || 0} brands matching "${searchTerm}".`,
         });
       }
     } catch (error) {
@@ -157,20 +171,34 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
             <div className="flex-1 overflow-y-auto">
               {/* Search Controls */}
               <div className="space-y-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="search-term">Search Term</Label>
-                     <Input
-                      id="search-term"
-                      placeholder="Brand name, gift cards, or keywords..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && searchBrands()}
-                    />
+                    <Label htmlFor="search-term">Brand Name Search</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="search-term"
+                        placeholder="Type exact brand name (e.g., Amazon, Target, Nike)..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && searchBrands()}
+                        className="flex-1"
+                      />
+                      <Button 
+                        onClick={searchBrands} 
+                        disabled={loading || !searchTerm.trim()}
+                        className="bg-gradient-hero hover:opacity-90 px-6"
+                      >
+                        {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        Search
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Enter the exact brand name to find their commission rates and offerings
+                    </p>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
+                    <Label htmlFor="category">Filter by Category (Optional)</Label>
                     <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                       <SelectTrigger>
                         <SelectValue placeholder="All categories" />
@@ -186,25 +214,28 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
                     </Select>
                   </div>
                 </div>
-
-                <Button 
-                  onClick={searchBrands} 
-                  disabled={loading}
-                  className="w-full bg-gradient-hero hover:opacity-90"
-                >
-                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  Search Brands
-                </Button>
               </div>
 
               {/* Search Results */}
               {brands.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="font-semibold">Search Results ({brands.length} brands found)</h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold">Brand Offerings ({brands.length} found)</h4>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setBrands([]);
+                        setSearchTerm('');
+                      }}
+                    >
+                      Clear Results
+                    </Button>
+                  </div>
                   
                   <div className="grid gap-4 max-h-96 overflow-y-auto">
                     {brands.map((brand) => (
-                      <Card key={brand.id} className="bg-card/80 backdrop-blur-sm">
+                      <Card key={brand.id} className="bg-card/80 backdrop-blur-sm border-l-4 border-l-primary">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex items-start space-x-4 flex-1">
@@ -212,43 +243,63 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
                                 <img 
                                   src={brand.logo_url} 
                                   alt={brand.name}
-                                  className="w-12 h-12 object-contain rounded border"
+                                  className="w-16 h-16 object-contain rounded border bg-white"
                                 />
                               )}
                               
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h5 className="font-semibold truncate">{brand.name}</h5>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h5 className="font-bold text-lg">{brand.name}</h5>
                                   {brand.status === 'featured' && (
-                                    <Star className="w-4 h-4 text-yellow-500" />
+                                    <Star className="w-5 h-5 text-yellow-500" />
                                   )}
                                 </div>
                                 
-                                <div className="flex gap-2 mb-2">
-                                  <Badge variant="outline">
-                                    {brand.commission_rate}% Commission
-                                  </Badge>
-                                  {brand.category && (
-                                    <Badge variant="secondary">{brand.category}</Badge>
-                                  )}
+                                <div className="grid grid-cols-2 gap-4 mb-3">
+                                  <div className="space-y-1">
+                                    <Badge variant="outline" className="font-semibold">
+                                      {brand.commission_rate}% Commission
+                                    </Badge>
+                                    <p className="text-xs text-muted-foreground">
+                                      What we earn per sale
+                                    </p>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <Badge variant="secondary" className="font-semibold text-green-700 bg-green-100">
+                                      ~{(brand.commission_rate * 0.25).toFixed(3)} NCTR/$1
+                                    </Badge>
+                                    <p className="text-xs text-muted-foreground">
+                                      What users earn per dollar
+                                    </p>
+                                  </div>
                                 </div>
+
+                                {brand.category && (
+                                  <Badge variant="outline" className="mb-3">
+                                    {brand.category}
+                                  </Badge>
+                                )}
                                 
                                 {brand.description && (
-                                  <p className="text-sm text-muted-foreground line-clamp-2">
-                                    {brand.description}
-                                  </p>
+                                  <div className="mb-3">
+                                    <h6 className="font-semibold text-sm mb-1">Brand Overview:</h6>
+                                    <p className="text-sm text-muted-foreground line-clamp-3">
+                                      {brand.description}
+                                    </p>
+                                  </div>
                                 )}
                               </div>
                             </div>
 
-                            <div className="flex gap-2 ml-4">
+                            <div className="flex flex-col gap-2 ml-4">
                               {brand.website_url && (
                                 <Button 
                                   variant="outline" 
                                   size="sm"
                                   onClick={() => window.open(brand.website_url, '_blank')}
                                 >
-                                  <ExternalLink className="w-4 h-4" />
+                                  <ExternalLink className="w-4 h-4 mr-1" />
+                                  Visit Store
                                 </Button>
                               )}
                               
@@ -259,11 +310,14 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
                                 className="bg-gradient-hero hover:opacity-90"
                               >
                                 {importing === brand.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  <>
+                                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                                    Adding...
+                                  </>
                                 ) : (
                                   <>
                                     <Download className="w-4 h-4 mr-1" />
-                                    Import
+                                    Add Brand
                                   </>
                                 )}
                               </Button>
@@ -276,12 +330,34 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
                 </div>
               )}
 
+              {/* Empty State */}
               {brands.length === 0 && !loading && (
-                <div className="text-center py-8">
-                  <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Search for brands above to see available partnerships from Loyalize.
+                <div className="text-center py-12">
+                  <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold mb-2">Search for Brand Offerings</h4>
+                  <p className="text-muted-foreground mb-4">
+                    Enter a brand name above to see their commission rates, categories, and partnership details.
                   </p>
+                  <div className="text-sm text-muted-foreground">
+                    <p className="mb-1">Try searching for popular brands like:</p>
+                    <div className="flex flex-wrap justify-center gap-2 mt-2">
+                      {['Amazon', 'Target', 'Nike', 'Apple', 'Best Buy', 'Walmart'].map((suggestion) => (
+                        <Button
+                          key={suggestion}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSearchTerm(suggestion);
+                            // Auto-search after setting the term
+                            setTimeout(() => searchBrands(), 100);
+                          }}
+                          className="text-xs"
+                        >
+                          {suggestion}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
