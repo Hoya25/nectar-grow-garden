@@ -147,10 +147,10 @@ serve(async (req) => {
             description: brand.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`,
             opportunity_type,
             nctr_reward: custom_nctr_reward || 0,
-            reward_per_dollar: custom_reward_per_dollar || brand.nctr_per_dollar,
+            reward_per_dollar: custom_reward_per_dollar || 100.0, // Default 100 NCTR per $1, independent of commission
             partner_name: brand.name,
             partner_logo_url: brand.logo_url,
-            affiliate_link: brand.website_url,
+            affiliate_link: generateTrackingUrl(brand.website_url, 'USER_PLACEHOLDER', brand.loyalize_id),
             min_status,
             is_active: true
           })
@@ -334,8 +334,8 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         name: store.name || 'Unknown Store',
         description: store.description || `Shop with ${store.name} and earn NCTR rewards`,
         logo_url: logoData[storeId] || store.imageUrl || `https://api.loyalize.com/resources/stores/${storeId}/logo`,
-        commission_rate: Math.max(commissionRate, 0.01), // Minimum 1% commission
-        nctr_per_dollar: Math.max(commissionRate * 0.1, 0.001), // 10% of commission as NCTR
+        commission_rate: Math.max(commissionRate, 0.01), // Commission rate for brand tracking only
+        nctr_per_dollar: 100.0, // Fixed default rate, not tied to commission
         category: store.categories?.[0] || 'General',
         website_url: store.url || store.homePage || null,
         is_active: true,
@@ -398,7 +398,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Uber ride sharing and food delivery platform. Get rides, order food, and more with Uber services.',
       logo_url: 'https://logo.clearbit.com/uber.com',
       commission_rate: 0.045,
-      nctr_per_dollar: 0.0045,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Transportation',
       website_url: 'https://www.uber.com',
       is_active: true,
@@ -410,7 +410,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Food delivery service from Uber. Order from local restaurants and get delivery straight to your door.',
       logo_url: 'https://logo.clearbit.com/ubereats.com',
       commission_rate: 0.055,
-      nctr_per_dollar: 0.0055,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Food Delivery',
       website_url: 'https://www.ubereats.com',
       is_active: true,
@@ -422,7 +422,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Digital and physical gift cards for the world\'s largest online retailer. Perfect for any occasion.',
       logo_url: 'https://logo.clearbit.com/amazon.com',
       commission_rate: 0.04,
-      nctr_per_dollar: 0.004,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Gift Cards',
       website_url: 'https://amazon.com/gift-cards',
       is_active: true,
@@ -434,7 +434,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Gift cards for Apple products, apps, music, movies, and more from the App Store and iTunes.',
       logo_url: 'https://logo.clearbit.com/apple.com',
       commission_rate: 0.035,
-      nctr_per_dollar: 0.0035,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Gift Cards',
       website_url: 'https://apple.com/gift-cards',
       is_active: true,
@@ -446,7 +446,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Versatile gift cards for retail shopping, groceries, and online purchases at Target.',  
       logo_url: 'https://logo.clearbit.com/target.com',
       commission_rate: 0.055,
-      nctr_per_dollar: 0.0055,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Gift Cards',
       website_url: 'https://target.com/gift-cards',
       is_active: true,
@@ -458,7 +458,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Perfect for coffee lovers - reload and use at any Starbucks location worldwide.',
       logo_url: 'https://logo.clearbit.com/starbucks.com',
       commission_rate: 0.052,
-      nctr_per_dollar: 0.0052,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Gift Cards',
       website_url: 'https://starbucks.com/gift-cards',
       is_active: true,
@@ -470,7 +470,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Gift cards for America\'s largest retailer - use in-store or online for groceries and more.',
       logo_url: 'https://logo.clearbit.com/walmart.com',
       commission_rate: 0.045,
-      nctr_per_dollar: 0.0045,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Gift Cards',
       website_url: 'https://walmart.com/gift-cards',
       is_active: true,
@@ -482,7 +482,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Electronics and tech retailer with the latest gadgets, gaming, and home entertainment.',
       logo_url: 'https://logo.clearbit.com/bestbuy.com',
       commission_rate: 0.038,
-      nctr_per_dollar: 0.0038,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Electronics',
       website_url: 'https://bestbuy.com',
       is_active: true,
@@ -494,7 +494,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Athletic footwear, apparel, and equipment from the world\'s leading sports brand.',
       logo_url: 'https://logo.clearbit.com/nike.com',
       commission_rate: 0.065,
-      nctr_per_dollar: 0.0065,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Athletic',
       website_url: 'https://nike.com',
       is_active: true,
@@ -506,7 +506,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       description: 'Premium athletic wear and footwear for all sports and lifestyle activities.',
       logo_url: 'https://logo.clearbit.com/adidas.com',
       commission_rate: 0.062,
-      nctr_per_dollar: 0.0062,
+      nctr_per_dollar: 100.0, // Fixed default rate
       category: 'Athletic',
       website_url: 'https://adidas.com',
       is_active: true,
@@ -551,7 +551,23 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
   );
 }
 
-async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> {
+// Generate tracking URL with user tracking parameters
+function generateTrackingUrl(baseUrl: string, userId: string, brandId: string): string {
+  if (!baseUrl) return '';
+  
+  try {
+    const url = new URL(baseUrl);
+    url.searchParams.set('ref', 'nctr_platform');
+    url.searchParams.set('brand_id', brandId);
+    url.searchParams.set('user_id', userId); // Will be replaced with actual user ID
+    url.searchParams.set('tracking_id', `nctr_${Date.now()}`); // Will be replaced with actual tracking ID
+    return url.toString();
+  } catch (error) {
+    // If URL parsing fails, return the original URL with query parameters
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}ref=nctr_platform&brand_id=${brandId}&user_id=${userId}&tracking_id=nctr_${Date.now()}`;
+  }
+}
   console.log('🖼️ Fetching store logos from sku-details endpoint');
   
   try {

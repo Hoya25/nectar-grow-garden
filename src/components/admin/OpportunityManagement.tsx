@@ -66,7 +66,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     description: '',
     opportunity_type: 'shopping',
     nctr_reward: 0,
-    reward_per_dollar: 0.01,
+      reward_per_dollar: 100.0, // Default 100 NCTR per $1 spent
     partner_name: '',
     partner_logo_url: '',
     affiliate_link: '',
@@ -131,7 +131,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       description: '',
       opportunity_type: 'shopping',
       nctr_reward: 0,
-      reward_per_dollar: 0.01,
+      reward_per_dollar: 100.0, // Default 100 NCTR per $1 spent
       partner_name: '',
       partner_logo_url: '',
       affiliate_link: '',
@@ -165,12 +165,49 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   const handleBrandSelect = (brandId: string) => {
     const brand = brands.find(b => b.id === brandId);
     if (brand) {
-      setFormData({
-        ...formData,
-        partner_name: brand.name,
-        partner_logo_url: brand.logo_url || ''
+      // Get brand details including website URL for affiliate link
+      fetchBrandDetails(brandId).then((brandDetails) => {
+        const trackingLink = generateUserTrackingLink(brandDetails?.website_url || '', brand.name);
+        
+        setFormData({
+          ...formData,
+          partner_name: brand.name,
+          partner_logo_url: brand.logo_url || '',
+          affiliate_link: trackingLink,
+          title: `Shop with ${brand.name}`,
+          description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`
+        });
       });
     }
+  };
+
+  const fetchBrandDetails = async (brandId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('brands')
+        .select('*')
+        .eq('id', brandId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error fetching brand details:', error);
+      return null;
+    }
+  };
+
+  const generateUserTrackingLink = (baseUrl: string, brandName: string) => {
+    if (!baseUrl) return '';
+    
+    // Create a parameterized link that includes user tracking
+    const url = new URL(baseUrl);
+    url.searchParams.set('ref', 'nctr_platform');
+    url.searchParams.set('source', brandName.toLowerCase().replace(/\s+/g, '_'));
+    url.searchParams.set('user_id', '{{USER_ID}}'); // Placeholder for actual user ID
+    url.searchParams.set('tracking_id', '{{TRACKING_ID}}'); // Placeholder for tracking ID
+    
+    return url.toString();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -494,16 +531,19 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                 {/* Rewards */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reward_per_dollar">NCTR per $1 Spent</Label>
+                    <Label htmlFor="reward_per_dollar">NCTR per Dollar Spent *</Label>
                     <Input
                       id="reward_per_dollar"
                       type="number"
-                      step="0.0001"
+                      step="0.01"
                       min="0"
                       value={formData.reward_per_dollar}
-                      onChange={(e) => setFormData({...formData, reward_per_dollar: parseFloat(e.target.value) || 0})}
-                      placeholder="0.0150"
+                      onChange={(e) => setFormData({...formData, reward_per_dollar: parseFloat(e.target.value) || 100})}
+                      placeholder="100.00"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Default: 100 NCTR per $1 spent (independent of brand commission rates)
+                    </p>
                   </div>
                   
                   <div className="space-y-2">
@@ -569,14 +609,18 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                 {/* Links & Activation */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="affiliate_link">Shopping Link</Label>
+                    <Label htmlFor="affiliate_link">Affiliate Link *</Label>
                     <Input
                       id="affiliate_link"
                       type="url"
                       value={formData.affiliate_link}
                       onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
-                      placeholder="https://nike.com/affiliate/12345"
+                      placeholder="https://partner-tracking-url.com/?user_id={{USER_ID}}"
+                      required
                     />
+                    <p className="text-xs text-muted-foreground">
+                      ✅ Auto-populated from selected brand with user tracking. {'{USER_ID}'} and {'{TRACKING_ID}'} will be replaced dynamically.
+                    </p>
                   </div>
                   
                   <div className="flex items-center space-x-2">

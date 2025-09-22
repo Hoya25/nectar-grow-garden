@@ -234,12 +234,12 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
           description: storeData.description || storeData.tagline || '',
           logo_url: logoUrl || `https://api.loyalize.com/resources/stores/${brandId}/logo`,
           commission_rate: commissionRate,
-          nctr_per_dollar: nctrPerDollar,
+          nctr_per_dollar: 100.0, // Fixed default rate, independent of commission
           website_url: storeData.homePage || '',
           category: storeData.categories?.[0] || 'General',
           is_active: true,
           featured: false
-        }, { 
+        }, {
           onConflict: 'loyalize_id',
           ignoreDuplicates: false 
         })
@@ -276,12 +276,12 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
           description: mockBrand.description,
           logo_url: mockBrand.logo_url,
           commission_rate: mockBrand.commission_rate / 100,
-          nctr_per_dollar: nctrPerDollar,
+          nctr_per_dollar: 100.0, // Fixed default rate
           website_url: mockBrand.website_url,
           category: mockBrand.category,
           is_active: true,
           featured: false
-        }, { 
+        }, {
           onConflict: 'loyalize_id',
           ignoreDuplicates: false 
         })
@@ -352,7 +352,7 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
             .from('brands')
             .update({
               commission_rate: commissionRate,
-              nctr_per_dollar: calculateNCTRRate(commissionRate * 100),
+              nctr_per_dollar: 100.0, // Fixed default rate, independent of commission
               is_active: true,
               name: storeData.name,
               description: storeData.description || storeData.tagline,
@@ -525,9 +525,9 @@ function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
 }
 
 function calculateNCTRRate(commissionPercentage: number): number {
-  // Convert commission percentage to NCTR per dollar
-  // Example: 8% commission = 0.02 NCTR per dollar
-  return (commissionPercentage / 100) * 0.25;
+  // Fixed rate of 100 NCTR per dollar, independent of commission rates
+  // Commission rates are tracked separately for partner payouts
+  return 100.0;
 }
 
 async function fetchSingleStoreLogo(apiKey: string, storeId: string): Promise<string | null> {
