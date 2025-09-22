@@ -221,8 +221,8 @@ const Garden = () => {
               <Card className="bg-white shadow-soft border border-section-border/30">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
                         <p className="text-xs text-section-text/70">Available</p>
                         <img 
                           src={nctrLogo} 
@@ -234,7 +234,7 @@ const Garden = () => {
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
                     </div>
-                    <Coins className="h-6 w-6 text-foreground/60" />
+                    <Coins className="h-6 w-6 text-foreground/60 ml-2" />
                   </div>
                 </CardContent>
               </Card>
@@ -242,8 +242,8 @@ const Garden = () => {
               <Card className="bg-white shadow-soft border border-section-border/30">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
                         <p className="text-xs text-section-text/70">Pending</p>
                         <img 
                           src={nctrLogo} 
@@ -255,7 +255,7 @@ const Garden = () => {
                         {formatNCTR(portfolio?.pending_nctr || 0)}
                       </p>
                     </div>
-                    <TrendingUp className="h-6 w-6 text-warning/60" />
+                    <TrendingUp className="h-6 w-6 text-warning/60 ml-2" />
                   </div>
                 </CardContent>
               </Card>
@@ -263,8 +263,8 @@ const Garden = () => {
               <Card className="bg-white shadow-soft border border-section-border/30">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
                         <p className="text-xs text-section-text/70">Total Earned</p>
                         <img 
                           src={nctrLogo} 
@@ -276,7 +276,7 @@ const Garden = () => {
                         {formatNCTR(portfolio?.total_earned || 0)}
                       </p>
                     </div>
-                    <Gift className="h-6 w-6 text-success/60" />
+                    <Gift className="h-6 w-6 text-success/60 ml-2" />
                   </div>
                 </CardContent>
               </Card>
