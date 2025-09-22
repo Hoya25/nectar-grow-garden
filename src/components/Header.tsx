@@ -35,13 +35,13 @@ const Header = () => {
   };
 
   return (
-    <header className="w-full border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="w-full border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-minimal">
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div 
           className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate('/')}
         >
-          <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gradient-hero shadow-soft group-hover:shadow-glow transition-all duration-300">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gradient-hero shadow-soft group-hover:shadow-glow transition-all duration-500 group-hover:scale-105">
             <video 
               className="w-full h-full object-cover scale-150 translate-y-1"
               autoPlay
@@ -55,34 +55,36 @@ const Header = () => {
                 <span className="text-primary-foreground font-bold text-sm">🌱</span>
               </div>
             </video>
+            <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
           </div>
-          <span className="text-xl font-bold text-primary group-hover:text-primary-glow transition-colors duration-300">The Garden</span>
+          <span className="text-2xl font-bold bg-gradient-premium bg-clip-text text-transparent group-hover:animate-gradient-shift bg-[length:200%_200%] transition-all duration-300">The Garden</span>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
           {!user ? (
             <>
-              <Button variant="ghost" className="text-foreground hover:text-primary">
+              <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
                 Refer a Friend
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-foreground hover:text-primary"
+                className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6"
                 onClick={() => navigate('/auth')}
               >
                 Sign Up
               </Button>
               <Button 
-                className="bg-gradient-hero hover:opacity-90 text-white"
+                className="bg-gradient-hero hover:bg-gradient-depth text-white shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
                 onClick={handleAuthAction}
               >
-                {user ? 'My Garden' : 'Enter The Garden'}
+                <span className="relative z-10">{user ? 'My Garden' : 'Enter The Garden'}</span>
+                <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Button>
               {isAdmin && (
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/admin')}
-                  className="ml-2"
+                  className="ml-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 rounded-xl"
                 >
                   Admin
                 </Button>
@@ -90,22 +92,23 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" className="text-foreground hover:text-primary">
+              <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
                 Refer a Friend
               </Button>
               <Button 
                 variant="default" 
-                className="bg-gradient-hero hover:opacity-90 transition-opacity"
+                className="bg-gradient-hero hover:bg-gradient-depth text-white shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
                 onClick={handleAuthAction}
               >
-                {user ? 'My Garden' : 'Enter The Garden'}
+                <span className="relative z-10">{user ? 'My Garden' : 'Enter The Garden'}</span>
+                <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Button>
               
               {isAdmin && (
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/admin')}
-                  className="ml-2"
+                  className="ml-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 rounded-xl"
                 >
                   Admin
                 </Button>
@@ -115,11 +118,11 @@ const Header = () => {
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 hover:bg-primary-glow/10 transition-all duration-300 rounded-xl"
                 >
-                  <Avatar className="h-6 w-6">
+                  <Avatar className="h-8 w-8 ring-2 ring-primary-glow/20 transition-all duration-300 hover:ring-primary-glow/40">
                     <AvatarImage src="" />
-                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                    <AvatarFallback className="text-sm bg-gradient-hero text-white font-medium">
                       {getInitials(user.email || 'User')}
                     </AvatarFallback>
                   </Avatar>
@@ -130,7 +133,7 @@ const Header = () => {
               <Button 
                 variant="outline"
                 onClick={() => navigate('/profile')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 rounded-xl"
               >
                 <User className="h-4 w-4" />
                 Profile
@@ -139,6 +142,7 @@ const Header = () => {
               <Button 
                 variant="outline"
                 onClick={handleSignOut}
+                className="border-border/50 hover:border-destructive/50 hover:bg-destructive/5 hover:text-destructive transition-all duration-300 rounded-xl"
               >
                 Sign Out
               </Button>
@@ -148,23 +152,23 @@ const Header = () => {
 
         <div className="md:hidden">
           {user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <ProfileModal>
-                <Button variant="ghost" size="sm">
-                  <Avatar className="h-6 w-6">
+                <Button variant="ghost" size="sm" className="rounded-xl">
+                  <Avatar className="h-8 w-8 ring-2 ring-primary-glow/20">
                     <AvatarImage src="" />
-                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                    <AvatarFallback className="text-sm bg-gradient-hero text-white">
                       {getInitials(user.email || 'User')}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </ProfileModal>
-              <Button variant="ghost" size="sm" onClick={handleAuthAction}>
+              <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl">
                 Garden
               </Button>
             </div>
           ) : (
-            <Button variant="ghost" size="sm" onClick={handleAuthAction}>
+            <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl">
               Sign In
             </Button>
           )}

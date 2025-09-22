@@ -1,25 +1,91 @@
 const Footer = () => {
   return (
-    <footer className="bg-foreground text-background py-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-gradient-hero rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">🌱</span>
+    <footer className="relative bg-gradient-to-br from-foreground via-primary-deep to-foreground text-background py-24 overflow-hidden">
+      {/* Premium Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-primary-glow/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-accent/8 rounded-full blur-3xl animate-float [animation-delay:2s]" />
+        <div className="absolute inset-0 bg-gradient-glow opacity-20" />
+      </div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-6xl mx-auto">
+          {/* Premium Logo Section */}
+          <div className="text-center mb-16 animate-fade-in-up">
+            <div className="flex items-center justify-center space-x-4 mb-8 group">
+              <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-gradient-hero shadow-glow group-hover:shadow-glow-intense transition-all duration-500">
+                <video 
+                  className="w-full h-full object-cover scale-150 translate-y-1"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  disablePictureInPicture
+                >
+                  <source src="/assets/logo-animation.mp4" type="video/mp4" />
+                  <div className="w-full h-full bg-gradient-hero flex items-center justify-center">
+                    <span className="text-primary-foreground font-bold text-lg">🌱</span>
+                  </div>
+                </video>
+                <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
+              </div>
+              <span className="text-4xl font-bold bg-gradient-premium bg-clip-text text-transparent">The Garden</span>
             </div>
-            <span className="text-2xl font-bold">The Garden</span>
+            
+            {/* Premium Description */}
+            <p className="text-xl text-background/90 leading-relaxed mb-12 max-w-4xl mx-auto font-medium">
+              The Garden is an innovation from{" "}
+              <span className="bg-gradient-premium bg-clip-text text-transparent font-bold">
+                Project Butterfly
+              </span>
+              . A blockchain initiative creating an ecosystem to harness our buying power 
+              and influence to make a positive impact on our lives and the world.
+            </p>
+            
+            {/* Premium Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+              <div className="group">
+                <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
+                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">10,000+</div>
+                  <div className="text-background/80 font-medium">Community Members</div>
+                </div>
+              </div>
+              
+              <div className="group">
+                <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
+                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">500+</div>
+                  <div className="text-background/80 font-medium">Brand Partners</div>
+                </div>
+              </div>
+              
+              <div className="group">
+                <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
+                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">$2M+</div>
+                  <div className="text-background/80 font-medium">NCTR Distributed</div>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <p className="text-lg text-background/80 leading-relaxed mb-8 max-w-3xl mx-auto">
-            The Garden is an innovation from Project Butterfly. Project Butterfly is a blockchain 
-            initiative creating an ecosystem to harness our buying power and influence to make a 
-            positive impact on our lives and the world.
-          </p>
-          
-          <div className="border-t border-background/20 pt-8">
-            <p className="text-background/60">
-              © 2024 The Garden. All rights reserved.
-            </p>
+          {/* Premium Footer Bottom */}
+          <div className="border-t border-background/20 pt-12">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <p className="text-background/70 text-lg">
+                © 2024 The Garden. All rights reserved.
+              </p>
+              
+              <div className="flex items-center gap-6">
+                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300">
+                  Privacy Policy
+                </button>
+                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300">
+                  Terms of Service  
+                </button>
+                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300">
+                  Contact
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
