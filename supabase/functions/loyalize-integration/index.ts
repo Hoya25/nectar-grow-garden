@@ -227,17 +227,43 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     // First, try to get all stores with pagination
     while (hasMorePages) {
       const endpoint = `https://api.loyalize.com/v1/stores?page=${page}&size=${maxPageSize}`;
-      console.log(`🔄 Fetching page ${page} from: ${endpoint}`);
-      console.log(`🔑 Using API key: ${apiKey ? 'Present' : 'Missing'} (length: ${apiKey?.length || 0})`);
+      // Try different authentication methods common in affiliate APIs
+      const authHeaders: Record<string, any> = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      };
+
+      // Method 1: Bearer token (current)
+      if (page === 0) {
+        authHeaders['Authorization'] = `Bearer ${apiKey}`;
+        console.log(`🔑 Trying Bearer token authentication`);
+      }
       
-      const response = await fetch(endpoint, {
+      // Method 2: API Key header (common for affiliate APIs)
+      else if (page === 1) {
+        authHeaders['X-API-Key'] = apiKey;
+        console.log(`🔑 Trying X-API-Key header authentication`);
+      }
+      
+      // Method 3: Direct Authorization (some APIs)
+      else if (page === 2) {
+        authHeaders['Authorization'] = apiKey;
+        console.log(`🔑 Trying direct Authorization header authentication`);
+      }
+      
+      // Method 4: API key in URL (fallback)
+      const finalEndpoint = page <= 2 ? endpoint : `${endpoint}&api_key=${apiKey}`;
+      if (page === 3) {
+        console.log(`🔑 Trying API key in URL parameter`);
+      }
+      
+      console.log(`🔄 Fetching page ${page} from: ${finalEndpoint}`);
+      console.log(`🔑 Using API key: ${apiKey ? 'Present' : 'Missing'} (length: ${apiKey?.length || 0})`);
+      console.log(`🔑 Auth headers:`, authHeaders);
+      
+      const response = await fetch(finalEndpoint, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'X-API-Key': apiKey,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
+        headers: authHeaders
       });
       
       console.log(`📊 API response status: ${response.status}`);
@@ -247,16 +273,17 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         const errorText = await response.text().catch(() => 'Unknown error');
         console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
         console.error(`❌ Error response body:`, errorText);
-        console.error(`❌ Request URL:`, endpoint);
-        console.error(`❌ Request headers:`, { Authorization: `Bearer ${apiKey?.substring(0, 10)}...`, 'X-API-Key': `${apiKey?.substring(0, 10)}...` });
+        console.error(`❌ Request URL:`, finalEndpoint);
+        console.error(`❌ Auth method ${page + 1}/4:`, page === 0 ? 'Bearer' : page === 1 ? 'X-API-Key' : page === 2 ? 'Direct Auth' : 'URL Parameter');
         
-        if (page === 0) {
-          // If first page fails, throw error to trigger fallback
-          throw new Error(`Loyalize API error: ${response.status} - ${errorText || response.statusText}`);
+        // If this is not the last auth method to try, continue to next page/method
+        if (page < 3) {
+          console.log(`🔄 Trying next authentication method...`);
+          page++;
+          continue;
         } else {
-          // If subsequent pages fail, break and use what we got
-          console.log(`⚠️ Stopping pagination at page ${page} due to error`);
-          break;
+          // All auth methods failed, throw error for fallback
+          throw new Error(`All authentication methods failed. Last error: ${response.status} - ${errorText || response.statusText}`);
         }
       }
       
