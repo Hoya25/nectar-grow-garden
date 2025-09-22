@@ -119,7 +119,7 @@ const Garden = () => {
 
 Use my referral link to get started: ${getReferralLink()}
 
-We both earn 50 NCTR when you sign up!`;
+We both earn 1000 NCTR in 360LOCK when you sign up!`;
     
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
@@ -823,7 +823,7 @@ We both earn 50 NCTR when you sign up!`;
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <Share2 className="w-5 h-5 mr-2" />
-              🎉 Invite Friends & Earn 50 NCTR
+              🎉 Invite Friends & Earn 1000 NCTR in 360LOCK
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
