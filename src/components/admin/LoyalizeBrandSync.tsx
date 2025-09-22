@@ -52,18 +52,36 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
         throw new Error(data.error || 'Sync failed');
       }
 
+      let toastTitle = "Brands Synced Successfully";
+      let toastDescription = `${data.brands_count} brands have been synced`;
+      
+      if (data.is_sample_data) {
+        toastTitle = "Sample Brands Loaded";
+        toastDescription = `${data.brands_count} sample brands loaded (API key not configured)`;
+      } else if (data.is_fallback_data) {
+        toastTitle = "Fallback Brands Loaded";
+        toastDescription = `${data.brands_count} brands loaded (API temporarily unavailable)`;
+      } else {
+        toastDescription += " from Loyalize";
+      }
+
       toast({
-        title: "Brands Synced Successfully",
-        description: `${data.brands_count} brands have been synced from Loyalize`,
+        title: toastTitle,
+        description: toastDescription,
       });
 
       onBrandsUpdated();
       loadBrandOfferings();
     } catch (error) {
       console.error('Error syncing brands:', error);
+      
+      const isAuthError = error.message?.includes('401') || error.message?.includes('Unauthorized');
+      
       toast({
         title: "Sync Failed",
-        description: error.message || "Failed to sync brands from Loyalize",
+        description: isAuthError 
+          ? "Authentication failed. Please check the Loyalize API key configuration." 
+          : error.message || "Failed to sync brands from Loyalize",
         variant: "destructive",
       });
     } finally {
@@ -156,9 +174,13 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-4">
             Sync brand offerings from Loyalize API including logos, commission rates, and gift card offerings.
+            If the API key is not configured, sample brands will be loaded for testing.
           </p>
+          <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+            <strong>Note:</strong> Configure the LOYALIZE_API_KEY in Supabase Edge Function secrets to connect to the live Loyalize API.
+          </div>
         </CardContent>
       </Card>
 
