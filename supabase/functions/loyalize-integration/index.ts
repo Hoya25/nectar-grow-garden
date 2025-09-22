@@ -223,12 +223,11 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         }
       });
       
-      console.log(`📊 API response status: ${response.status} - Headers:`, Object.fromEntries(response.headers));
-      console.log(`📦 Response size: ${response.headers.get('content-length')} bytes`);
+      console.log(`📊 API response status: ${response.status}`);
       
       if (!response.ok) {
-        const errorText = await response.text().catch(() => '');
-        console.error(`❌ API request failed: ${response.status} ${response.statusText} - Error: ${errorText}`);
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error(`❌ API request failed: ${response.status} ${response.statusText} - ${errorText}`);
         
         if (page === 0) {
           // If first page fails, throw error to trigger fallback
@@ -240,7 +239,11 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         }
       }
       
-      const data = await response.json();
+      const data = await response.json().catch((err) => {
+        console.error('❌ Failed to parse JSON response:', err);
+        throw new Error('Invalid JSON response from Loyalize API');
+      });
+      
       console.log(`📊 API Response Structure:`, {
         hasContent: !!data.content,
         contentLength: data.content?.length || 0,
@@ -314,13 +317,13 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     console.log(`✅ Retrieved logo data for ${Object.keys(logoData).length} stores`);
     
     // Check for Uber specifically and log if found
-    const uberStores = allStores.filter(store => 
+    const foundUberStores = allStores.filter(store => 
       store.name?.toLowerCase().includes('uber') ||
       store.description?.toLowerCase().includes('uber')
     );
     
-    if (uberStores.length > 0) {
-      console.log(`🎯 Found ${uberStores.length} Uber-related stores:`, uberStores.map(s => s.name));
+    if (foundUberStores.length > 0) {
+      console.log(`🎯 Found ${foundUberStores.length} Uber-related stores:`, foundUberStores.map(s => s.name));
     } else {
       console.log('⚠️ No Uber stores found in API results');
       
@@ -396,7 +399,7 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
       message: `✅ Successfully synced ${syncedCount} brands from Loyalize API`,
       brands_synced: syncedCount,
       total_pages_fetched: page,
-      uber_included: uberStores.length > 0 || true, // Always true since we add manually if not found
+      uber_included: foundUberStores.length > 0 || true, // Always true since we add manually if not found
       is_live_data: true
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
