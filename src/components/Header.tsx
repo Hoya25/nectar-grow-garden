@@ -63,9 +63,9 @@ const Header = () => {
                   ) : (
                     <div className="text-center py-8">
                       <p className="text-muted-foreground mb-4">Sign up to access your referral program and start inviting friends!</p>
-                      <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90">
-                        Join The Garden
-                      </Button>
+              <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                Join The Garden
+              </Button>
                     </div>
                   )}
                 </DialogContent>
@@ -209,7 +209,7 @@ const Header = () => {
                   </DialogHeader>
                   <div className="text-center py-6">
                     <p className="text-muted-foreground mb-4 text-sm">Sign up to access your referral program!</p>
-                    <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 w-full">
+                    <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-primary-foreground w-full">
                       Join The Garden
                     </Button>
                   </div>

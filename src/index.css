@@ -23,11 +23,11 @@ All colors MUST be HSL to avoid yellow bug issues.
     --popover-foreground: 66 100% 85%;
     
     /* NCTR dark neon green - now used for text and accents */
-    --primary: 120 100% 35%;                  /* Dark neon green */
-    --primary-foreground: 240 12% 8%;         /* Dark background for neon text */
-    --primary-glow: 120 100% 45%;
-    --primary-deep: 120 100% 25%;
-    --primary-light: 120 80% 55%;
+    --primary: 120 100% 40%;                  /* Brighter dark neon green */
+    --primary-foreground: 0 0% 100%;          /* White text on primary buttons */
+    --primary-glow: 120 100% 50%;
+    --primary-deep: 120 100% 30%;
+    --primary-light: 120 80% 60%;
     
     /* Section styling */
     --section-bg: 0 0% 100%;                  /* White section backgrounds */
@@ -37,17 +37,17 @@ All colors MUST be HSL to avoid yellow bug issues.
     --section-highlight: 0 0% 96%;            /* Light grey highlight backgrounds */
     
     /* Secondary elements */
-    --secondary: 0 0% 95%;                    /* Light grey secondary */
-    --secondary-foreground: 0 0% 45%;         /* NCTR grey text */
-    --secondary-accent: 0 0% 90%;
+    --secondary: 0 0% 90%;                    /* Lighter grey secondary */
+    --secondary-foreground: 0 0% 10%;         /* Dark text on light secondary */
+    --secondary-accent: 0 0% 85%;
     
     --muted: 0 0% 95%;                        /* Light grey muted */
     --muted-foreground: 0 0% 60%;             /* Lighter grey text */
     
     /* Dark neon green accent */
-    --accent: 120 100% 35%;
-    --accent-foreground: 240 12% 8%;
-    --accent-light: 120 80% 55%;
+    --accent: 120 100% 40%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 120 80% 60%;
     
     /* Status colors */
     --success: 120 100% 35%;
@@ -56,9 +56,9 @@ All colors MUST be HSL to avoid yellow bug issues.
     --destructive-foreground: 0 0% 98%;
     
     /* Borders and inputs */
-    --border: 0 0% 85%;                       /* Light grey borders */
+    --border: 0 0% 80%;                       /* More visible borders */
     --input: 0 0% 100%;                       /* White inputs */
-    --ring: 120 100% 35%;                     /* Dark neon green focus rings */
+    --ring: 120 100% 40%;                     /* Brighter focus rings */
     
     /* Neon-focused gradients */
     --gradient-hero: linear-gradient(135deg, hsl(240 12% 8%) 0%, hsl(240 8% 15%) 35%, hsl(240 10% 10%) 100%);
@@ -147,6 +147,23 @@ All colors MUST be HSL to avoid yellow bug issues.
 }
 
 @layer components {
+  /* Button safety net - ensure no buttons are black */
+  .btn-ensure-visible {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+  
+  .btn-ensure-visible[data-variant="outline"] {
+    @apply bg-background text-primary border-2 border-primary hover:bg-primary/10;
+  }
+  
+  .btn-ensure-visible[data-variant="secondary"] {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+  
+  .btn-ensure-visible[data-variant="ghost"] {
+    @apply bg-transparent text-primary hover:bg-primary/10;
+  }
+  
   /* Section styling with subtle borders */
   .neon-section {
     @apply bg-gradient-section border border-section-border shadow-soft;
@@ -218,5 +235,14 @@ All colors MUST be HSL to avoid yellow bug issues.
 
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Ensure all buttons are visible - safety net */
+  button:not([class*="bg-"]):not([style*="background"]) {
+    @apply bg-primary text-primary-foreground;
+  }
+  
+  button[class*="bg-transparent"] {
+    @apply text-primary;
   }
 }
