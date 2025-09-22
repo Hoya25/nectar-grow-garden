@@ -50,6 +50,7 @@ export default {
         },
         "crypto-silver": "hsl(var(--crypto-silver))",
         "crypto-platinum": "hsl(var(--crypto-platinum))",
+        "crypto-lime": "hsl(var(--crypto-lime))",
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
         popover: {
@@ -78,6 +79,7 @@ export default {
         "gradient-accent": "var(--gradient-accent)",
         "gradient-depth": "var(--gradient-depth)",
         "gradient-glow": "var(--gradient-glow)",
+        "gradient-page": "var(--gradient-page)",
       },
       boxShadow: {
         minimal: "var(--shadow-minimal)",

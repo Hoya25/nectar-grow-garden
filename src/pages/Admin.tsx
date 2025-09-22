@@ -16,11 +16,13 @@ import {
   Activity, 
   Settings,
   ArrowLeft,
-  Shield
+  Shield,
+  Sparkles
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
 import UserManagement from '@/components/admin/UserManagement';
+import LoyalizeBrandSync from '@/components/admin/LoyalizeBrandSync';
 
 interface AdminStats {
   total_users: number;
@@ -212,13 +214,21 @@ const Admin = () => {
         </div>
 
         {/* Admin Tabs */}
-        <Tabs defaultValue="brands" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="loyalize" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="loyalize" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Loyalize
+            </TabsTrigger>
             <TabsTrigger value="brands">Brand Management</TabsTrigger>
             <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
             <TabsTrigger value="users">User Management</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="loyalize">
+            <LoyalizeBrandSync onBrandsUpdated={fetchAdminStats} />
+          </TabsContent>
 
           <TabsContent value="brands">
             <BrandManagement onStatsUpdate={fetchAdminStats} />
