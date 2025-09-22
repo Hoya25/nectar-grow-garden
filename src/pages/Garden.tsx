@@ -354,10 +354,10 @@ const Garden = () => {
             </div>
 
             {opportunities.length === 0 ? (
-              <Card className="bg-card/80 backdrop-blur-sm shadow-medium">
+              <Card className="bg-white border border-section-border shadow-soft">
                 <CardContent className="p-12 text-center">
                   <Gift className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-2">No Opportunities Available</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Opportunities Available</h3>
                   <p className="text-muted-foreground mb-4">We're working on bringing you amazing earning opportunities with top brands!</p>
                   <p className="text-sm text-muted-foreground">Check back soon for exciting partnership launches.</p>
                 </CardContent>
@@ -365,69 +365,67 @@ const Garden = () => {
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
                 {opportunities.map((opportunity) => (
-                  <Card key={opportunity.id} className="bg-card/90 backdrop-blur-sm shadow-medium hover:shadow-glow transition-all duration-300 animate-fade-in">
-                    <CardContent className="p-0">
-                       {/* Brand Header with Logo */}
-                      <div className="bg-white border-2 border-primary p-6 text-foreground">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            {opportunity.partner_logo_url ? (
-                              <img 
-                                src={opportunity.partner_logo_url} 
-                                alt={`${opportunity.partner_name} logo`}
-                                className="w-12 h-12 rounded-lg object-cover bg-white/10 p-2"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
-                                <Gift className="w-6 h-6" />
-                              </div>
-                            )}
-                            <div>
-                              <h3 className="text-lg font-bold">{opportunity.title}</h3>
-                              {opportunity.partner_name && (
-                                <p className="text-sm opacity-80">{opportunity.partner_name}</p>
-                              )}
+                  <Card key={opportunity.id} className="bg-white border border-section-border shadow-soft hover:shadow-medium transition-all duration-300">
+                    <CardContent className="p-6">
+                      {/* Brand Header with Logo */}
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center space-x-3">
+                          {opportunity.partner_logo_url ? (
+                            <img 
+                              src={opportunity.partner_logo_url} 
+                              alt={`${opportunity.partner_name} logo`}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-section-highlight flex items-center justify-center">
+                              <Gift className="w-6 h-6 text-foreground" />
                             </div>
+                          )}
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground">{opportunity.title}</h3>
+                            {opportunity.partner_name && (
+                              <p className="text-sm text-muted-foreground">{opportunity.partner_name}</p>
+                            )}
                           </div>
-                          <Badge variant="secondary" className="bg-white/20 text-foreground border-0">
-                            {opportunity.opportunity_type.toUpperCase()}
-                          </Badge>
                         </div>
+                        <Badge variant="secondary" className="bg-section-highlight text-foreground">
+                          {opportunity.opportunity_type.toUpperCase()}
+                        </Badge>
+                      </div>
 
-                        {/* Earning Rate - Prominent Display */}
-                        <div className="bg-white/10 border border-primary rounded-lg p-4">
-                          <div className="text-center">
-                            <div className="flex items-center justify-center space-x-2 mb-1">
-                              <div className="text-2xl font-bold text-section-accent">
-                                {formatNCTR(opportunity.reward_per_dollar || 0)}
-                              </div>
+                      {/* Earning Rate - Clean Display */}
+                      <div className="bg-section-highlight rounded-lg p-4 mb-4">
+                        <div className="text-center">
+                          <div className="flex items-center justify-center space-x-2 mb-1">
+                            <div className="text-2xl font-bold text-section-accent">
+                              {formatNCTR(opportunity.reward_per_dollar || 0)}
+                            </div>
+                            <img 
+                              src={nctrLogo} 
+                              alt="NCTR" 
+                              className="h-16 w-auto"
+                            />
+                          </div>
+                          <div className="text-sm text-muted-foreground">per $1 spent</div>
+                          {opportunity.nctr_reward > 0 && (
+                            <div className="flex items-center justify-center space-x-1 text-xs text-muted-foreground mt-2">
+                              <span>+ {formatNCTR(opportunity.nctr_reward)}</span>
                               <img 
                                 src={nctrLogo} 
                                 alt="NCTR" 
-                                className="h-20 w-auto"
+                                className="h-8 w-auto"
                               />
+                              <span>signup bonus</span>
                             </div>
-                            <div className="text-sm opacity-80">per $1 spent</div>
-                            {opportunity.nctr_reward > 0 && (
-                              <div className="flex items-center justify-center space-x-1 text-xs opacity-70 mt-2">
-                                <span>+ {formatNCTR(opportunity.nctr_reward)}</span>
-                                <img 
-                                  src={nctrLogo} 
-                                  alt="NCTR" 
-                                  className="h-10 w-auto"
-                                />
-                                <span>signup bonus</span>
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
 
                       {/* Content */}
-                      <div className="p-6">
+                      <div>
                         {/* Video Section */}
                         {opportunity.video_url && (
-                          <div className="mb-6">
+                          <div className="mb-4">
                             <div className="relative rounded-lg overflow-hidden">
                               <video 
                                 className="w-full h-48 object-cover"
@@ -450,12 +448,12 @@ const Garden = () => {
                         )}
 
                         {/* Description */}
-                        <p className="text-muted-foreground mb-6 leading-relaxed">
+                        <p className="text-muted-foreground mb-4 leading-relaxed">
                           {opportunity.description}
                         </p>
 
                         {/* Action Button */}
-                        <Button className="w-full bg-white border-2 border-primary text-foreground hover:bg-section-highlight text-lg py-3">
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-white text-lg py-3">
                           <ExternalLink className="w-5 h-5 mr-2" />
                           Start Earning Now
                         </Button>
