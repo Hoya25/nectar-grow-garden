@@ -40,6 +40,8 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
+  let requestBody: any = null;
+  
   try {
     const loyalizeApiKey = Deno.env.get('LOYALIZE_API_KEY')
     
@@ -48,7 +50,7 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
-    const requestBody = await req.json()
+    requestBody = await req.json()
     const { action } = requestBody
 
     switch (action) {
@@ -370,8 +372,8 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         name: store.name || 'Unknown Store',
         description: store.description || `Shop with ${store.name} and earn NCTR rewards`,
         logo_url: logoData[storeId] || store.imageUrl || `https://api.loyalize.com/resources/stores/${storeId}/logo`,
-        commission_rate: Math.max(commissionRate, 0.01), // Commission rate for brand tracking only
-        nctr_per_dollar: 100.0, // Fixed default rate, not tied to commission
+        commission_rate: Math.min(Math.max(commissionRate, 0.0001), 99.9999), // Constrain to database limits
+        nctr_per_dollar: Math.min(100.0, 999999.9999), // Ensure within database limits
         category: store.categories?.[0] || 'General',
         website_url: store.url || store.homePage || null,
         is_active: true,
@@ -434,8 +436,8 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       name: 'Uber Gift Cards',
       description: 'Purchase Uber gift cards for rides and food delivery. Get up to 1% cashback on gift card purchases through MyGiftCardsPlus.',
       logo_url: 'https://logo.clearbit.com/uber.com',
-      commission_rate: 0.01,
-      nctr_per_dollar: 10.0, // 1% cashback converted to NCTR
+      commission_rate: 0.0100, // Ensure proper decimal precision
+      nctr_per_dollar: 10.0000, // Ensure proper decimal precision
       category: 'Gift Cards',
       website_url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
       is_active: true,
