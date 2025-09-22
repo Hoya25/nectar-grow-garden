@@ -152,36 +152,36 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
       </div>
 
       {/* Referral Program Info */}
-      <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="w-5 h-5 mr-2" />
-            Referral Program
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <h4 className="font-semibold mb-2">How It Works</h4>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• Share your unique referral link</li>
-                <li>• Friends join The Garden using your link</li>
-                <li>• You both earn 1000 NCTR in 360LOCK when they sign up</li>
-                <li>• Earn 10% of their earning activity</li>
-              </ul>
+        <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Users className="w-5 h-5 mr-2" />
+              Referral Program
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <h4 className="font-semibold mb-2">How It Works</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Share your unique referral link</li>
+                  <li>• Friends join The Garden using your link</li>
+                  <li>• You both earn 1000 NCTR in 360LOCK when they sign up</li>
+                  <li>• Earn 10% of their earning activity</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">Lock System</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Referral rewards: Auto 360LOCK for max status</li>
+                  <li>• Daily bonuses: Auto 360LOCK for growth</li>
+                  <li>• Affiliate purchases: Default 90LOCK</li>
+                  <li>• Upgrade 90LOCK → 360LOCK anytime</li>
+                </ul>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2">Bonus Rewards</h4>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• 5 referrals: +100 NCTR bonus</li>
-                <li>• 10 referrals: +500 NCTR bonus</li>
-                <li>• 25 referrals: Opportunity status boost</li>
-                <li>• 50+ referrals: VIP partner benefits</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
       {/* Referral Link Section */}
       <Card className="bg-card/80 backdrop-blur-sm">

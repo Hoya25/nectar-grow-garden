@@ -37,6 +37,8 @@ interface LockCommitment {
   lock_date: string;
   unlock_date: string;
   status: string;
+  lock_category?: string;
+  can_upgrade?: boolean;
 }
 
 interface EarningOpportunity {
@@ -224,7 +226,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
     setInviteModalOpen(true);
     toast({
       title: "🎉 Invite Friends",
-      description: "Share your link and earn 50 NCTR for each friend who joins!",
+      description: "Share your link and earn 1000 NCTR in 360LOCK for each friend who joins!",
     });
   };
 
@@ -234,13 +236,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       navigate('/profile');
       toast({
         title: "Complete Your Profile",
-        description: "Fill out your profile to earn your bonus NCTR!",
+        description: "Fill out your profile to earn NCTR automatically locked in 360LOCK!",
       });
     } else if (opportunity.title.includes('Daily Check-in')) {
-      // Handle daily check-in
+      // Handle daily check-in with auto-lock
       await awardDailyBonus(opportunity);
     } else {
-      // Generic bonus handling
+      // Generic bonus handling with auto-lock
       await awardBonus(opportunity);
     }
   };
@@ -251,12 +253,12 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       window.open(opportunity.affiliate_link, '_blank');
       toast({
         title: "Redirecting...",
-        description: `Opening ${opportunity.partner_name || 'partner'} in a new tab!`,
+        description: `Opening ${opportunity.partner_name || 'partner'} - NCTR from purchases locked in 90LOCK (upgradeable to 360LOCK anytime)!`,
       });
     } else {
       toast({
         title: "Coming Soon!",
-        description: "This shopping opportunity will be available soon.",
+        description: "This shopping opportunity will be available soon. NCTR from purchases are locked in 90LOCK by default.",
       });
     }
   };
@@ -472,11 +474,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
         {/* Collapsible Dashboard */}
         <div className="lg:w-80 xl:w-96">
-          <CollapsibleDashboard 
-            portfolio={portfolio}
-            locks={locks}
-            onLockCreated={fetchUserData}
-          />
+        <CollapsibleDashboard 
+          portfolio={portfolio}
+          locks={locks as any} // Type compatibility fix
+          onLockCreated={fetchUserData}
+        />
         </div>
 
         {/* Main Content - Earning Opportunities with Wings */}

@@ -134,6 +134,7 @@ export type Database = {
         Row: {
           affiliate_link: string | null
           created_at: string
+          default_lock_type: string | null
           description: string | null
           id: string
           is_active: boolean
@@ -153,6 +154,7 @@ export type Database = {
         Insert: {
           affiliate_link?: string | null
           created_at?: string
+          default_lock_type?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -172,6 +174,7 @@ export type Database = {
         Update: {
           affiliate_link?: string | null
           created_at?: string
+          default_lock_type?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -192,6 +195,7 @@ export type Database = {
       }
       nctr_locks: {
         Row: {
+          can_upgrade: boolean | null
           commitment_days: number | null
           created_at: string
           id: string
@@ -199,11 +203,14 @@ export type Database = {
           lock_date: string
           lock_type: string
           nctr_amount: number
+          original_lock_type: string | null
           status: string
           unlock_date: string
+          upgraded_from_lock_id: string | null
           user_id: string
         }
         Insert: {
+          can_upgrade?: boolean | null
           commitment_days?: number | null
           created_at?: string
           id?: string
@@ -211,11 +218,14 @@ export type Database = {
           lock_date?: string
           lock_type: string
           nctr_amount: number
+          original_lock_type?: string | null
           status?: string
           unlock_date: string
+          upgraded_from_lock_id?: string | null
           user_id: string
         }
         Update: {
+          can_upgrade?: boolean | null
           commitment_days?: number | null
           created_at?: string
           id?: string
@@ -223,8 +233,10 @@ export type Database = {
           lock_date?: string
           lock_type?: string
           nctr_amount?: number
+          original_lock_type?: string | null
           status?: string
           unlock_date?: string
+          upgraded_from_lock_id?: string | null
           user_id?: string
         }
         Relationships: []
@@ -270,8 +282,10 @@ export type Database = {
       }
       nctr_transactions: {
         Row: {
+          auto_lock_type: string | null
           created_at: string
           description: string | null
+          earning_source: string | null
           id: string
           nctr_amount: number
           opportunity_id: string | null
@@ -282,8 +296,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auto_lock_type?: string | null
           created_at?: string
           description?: string | null
+          earning_source?: string | null
           id?: string
           nctr_amount: number
           opportunity_id?: string | null
@@ -294,8 +310,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          auto_lock_type?: string | null
           created_at?: string
           description?: string | null
+          earning_source?: string | null
           id?: string
           nctr_amount?: number
           opportunity_id?: string | null
@@ -482,6 +500,15 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      auto_lock_earned_nctr: {
+        Args: {
+          p_earning_source: string
+          p_nctr_amount: number
+          p_opportunity_type?: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       calculate_lock_balances: {
         Args: { user_id: string }
         Returns: {
@@ -572,6 +599,10 @@ export type Database = {
       }
       update_user_status: {
         Args: { user_id: string }
+        Returns: Json
+      }
+      upgrade_lock_to_360: {
+        Args: { p_lock_id: string }
         Returns: Json
       }
     }

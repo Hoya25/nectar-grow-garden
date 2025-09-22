@@ -19,6 +19,7 @@ import LockCommitmentModal from '@/components/LockCommitmentModal';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import { useNavigate } from 'react-router-dom';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
+import LockUpgradeModal from '@/components/LockUpgradeModal';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
@@ -35,6 +36,8 @@ interface Lock {
   lock_date: string;
   unlock_date: string;
   nctr_amount: number;
+  lock_category: string;
+  can_upgrade?: boolean;
 }
 
 interface CollapsibleDashboardProps {
@@ -203,7 +206,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         </CardContent>
       </Card>
 
-      {/* Lock Status Summary - Full */}
+      {/* Lock Status Summary - Mobile Optimized */}
       {(locks.length > 0 || (portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0) || (portfolio?.lock_360_nctr && portfolio.lock_360_nctr > 0)) && (
         <Card className="bg-white shadow-soft border border-section-border">
           <CardHeader className="pb-2">
@@ -217,11 +220,12 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-bold text-primary">360</span>
                       <Lock className="w-4 h-4 text-primary" />
-                      <span className="text-xs font-bold text-primary">LOCK Status</span>
+                      <span className="text-xs font-bold text-primary">LOCK Active</span>
                     </div>
-                    <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded">Elite Commitment</span>
+                    <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded">Elite Status</span>
                   </div>
                   <div className="text-base font-bold text-primary">{formatNCTR(portfolio.lock_360_nctr)} NCTR</div>
+                  <div className="text-xs text-primary/70 mt-1">Maximum alliance benefits</div>
                 </div>
               )}
               
@@ -233,9 +237,10 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                       <Lock className="w-4 h-4 text-blue-600" />
                       <span className="text-xs font-semibold text-blue-700">LOCK Active</span>
                     </div>
-                    <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Standard</span>
+                    <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Can Upgrade</span>
                   </div>
                   <div className="text-base font-bold text-blue-800">{formatNCTR(portfolio.lock_90_nctr)} NCTR</div>
+                  <div className="text-xs text-blue-600 mt-1">Upgrade to 360LOCK for max benefits</div>
                 </div>
               )}
               
@@ -246,6 +251,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 const elapsed = Date.now() - lockDate.getTime();
                 const progress = Math.min((elapsed / totalDuration) * 100, 100);
                 const isLongTerm = totalDuration >= (300 * 24 * 60 * 60 * 1000); // 300+ days
+                const canUpgrade = lock.can_upgrade === true && lock.lock_category === '90LOCK';
                 
                 return (
                   <div key={lock.id} className="text-xs">
@@ -255,6 +261,17 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                         <span>{isLongTerm ? '360' : '90'}</span>
                         <Lock className="w-3 h-3" />
                         <span>LOCK Progress</span>
+                        {canUpgrade && (
+                          <LockUpgradeModal lock={lock} onUpgradeComplete={() => window.location.reload()}>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-5 px-2 text-xs bg-primary/10 hover:bg-primary/20 text-primary"
+                            >
+                              Upgrade
+                            </Button>
+                          </LockUpgradeModal>
+                        )}
                       </div>
                     </span>
                       <span className={`font-bold ${isLongTerm ? 'text-primary' : 'text-blue-700'}`}>{Math.round(progress)}%</span>
