@@ -228,20 +228,27 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     while (hasMorePages) {
       const endpoint = `https://api.loyalize.com/v1/stores?page=${page}&size=${maxPageSize}`;
       console.log(`🔄 Fetching page ${page} from: ${endpoint}`);
+      console.log(`🔑 Using API key: ${apiKey ? 'Present' : 'Missing'} (length: ${apiKey?.length || 0})`);
       
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`, // Fixed: Added Bearer prefix
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${apiKey}`,
+          'X-API-Key': apiKey,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
       });
       
       console.log(`📊 API response status: ${response.status}`);
+      console.log(`📊 API response headers:`, Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
-        console.error(`❌ API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+        console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
+        console.error(`❌ Error response body:`, errorText);
+        console.error(`❌ Request URL:`, endpoint);
+        console.error(`❌ Request headers:`, { Authorization: `Bearer ${apiKey?.substring(0, 10)}...`, 'X-API-Key': `${apiKey?.substring(0, 10)}...` });
         
         if (page === 0) {
           // If first page fails, throw error to trigger fallback
