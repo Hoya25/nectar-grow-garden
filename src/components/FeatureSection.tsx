@@ -11,6 +11,7 @@ interface FeatureSectionProps {
   bulletPoints?: string[];
   titleColor?: string;
   simple?: boolean;
+  subtitle?: string;
 }
 
 const FeatureSection = ({ 
@@ -22,7 +23,8 @@ const FeatureSection = ({
   gradient = false,
   bulletPoints,
   titleColor,
-  simple = false
+  simple = false,
+  subtitle
 }: FeatureSectionProps) => {
   return (
     <section className={`py-32 relative overflow-hidden ${simple ? 'bg-background' : gradient ? 'neon-section animate-neon-pulse' : 'neon-section-subtle'}`}>
@@ -61,8 +63,13 @@ const FeatureSection = ({
                     {title.split(' ').slice(2).join(' ')}
                   </span>
                 )}
-              </h2>
+               </h2>
               
+              {subtitle && (
+                <h3 className="text-2xl md:text-3xl font-semibold text-center section-text/90 mb-6">
+                  {subtitle}
+                </h3>
+              )}
               
               <div className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed font-medium section-text/90 space-y-6">
                 <p>{description}</p>

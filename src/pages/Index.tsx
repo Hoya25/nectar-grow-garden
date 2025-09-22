@@ -14,9 +14,8 @@ const Index = () => {
       <FeatureSection
         title="Earn Crypto Effortlessly"
         titleColor="text-green-500"
-        description="Your Daily Habits, Rewarded in The Garden
-
-Step into The Garden and start earning NCTR —our next-generation rewards Alliance Token—simply by being yourself every day. Turn everyday moments into real crypto wins, like:"
+        subtitle="Your Daily Habits, Rewarded in The Garden"
+        description="Step into The Garden and start earning NCTR —our next-generation rewards Alliance Token—simply by being yourself every day. Turn everyday moments into real crypto wins, like:"
         bulletPoints={[
           "Shopping: Buy the things you need and want—from Uber to fashion—and get NCTR back as rewards.",
           "Inviting Friends: Share the opportunity with friends; each invite brings more NCTR your way."
