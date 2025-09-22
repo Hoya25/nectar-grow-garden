@@ -54,239 +54,20 @@ serve(async (req) => {
     switch (action) {
       case 'sync_brands': {
         console.log('Starting brand synchronization from Loyalize API')
+        console.log('API Key present:', loyalizeApiKey ? 'Yes' : 'No')
         
         // Check if API key is configured
-        if (!loyalizeApiKey) {
+        if (!loyalizeApiKey || loyalizeApiKey.trim() === '') {
           console.warn('LOYALIZE_API_KEY not configured, using sample data')
-          
-          // Use sample data for testing when API key is not available
-          const sampleBrands = [
-            {
-              id: 'sample-1',
-              name: 'Sample Fashion Store',
-              description: 'Premium fashion retailer with sustainable clothing options',
-              logo_url: 'https://via.placeholder.com/100x100?text=Fashion',
-              commission_rate: 8, // 8%
-              category: 'Fashion',
-              website_url: 'https://example-fashion.com',
-              featured: true,
-              affiliate_link: 'https://example-fashion.com/affiliate',
-              terms: 'Standard affiliate terms apply'
-            },
-            {
-              id: 'sample-2', 
-              name: 'Tech Electronics Hub',
-              description: 'Latest gadgets and electronics with competitive prices',
-              logo_url: 'https://via.placeholder.com/100x100?text=Tech',
-              commission_rate: 5, // 5%
-              category: 'Electronics',
-              website_url: 'https://example-tech.com',
-              featured: false,
-              affiliate_link: 'https://example-tech.com/affiliate',
-              terms: 'Electronics warranty included'
-            },
-            {
-              id: 'sample-3',
-              name: 'Home & Garden Plus',
-              description: 'Everything for your home improvement and gardening needs',
-              logo_url: 'https://via.placeholder.com/100x100?text=Home',
-              commission_rate: 6, // 6%
-              category: 'Home & Garden',
-              website_url: 'https://example-home.com',
-              featured: false,
-              affiliate_link: 'https://example-home.com/affiliate',
-              terms: 'Home delivery available'
-            }
-          ]
-          
-          // Transform sample brands
-          const transformedBrands = sampleBrands.map(brand => ({
-            loyalize_id: brand.id,
-            name: brand.name,
-            description: brand.description,
-            logo_url: brand.logo_url,
-            commission_rate: brand.commission_rate / 100, // Convert percentage to decimal
-            nctr_per_dollar: (brand.commission_rate / 100) * 0.1, // 10% of commission as NCTR
-            category: brand.category,
-            website_url: brand.website_url,
-            is_active: true,
-            featured: brand.featured,
-          }))
-          
-          // Upsert sample brands into the database
-          const { data: upsertData, error: upsertError } = await supabase
-            .from('brands')
-            .upsert(
-              transformedBrands,
-              {
-                onConflict: 'loyalize_id',
-                ignoreDuplicates: false
-              }
-            )
-          
-          if (upsertError) {
-            console.error('Error upserting sample brands:', upsertError)
-            throw upsertError
-          }
-          
-          console.log(`Successfully synced ${transformedBrands.length} sample brands`)
-          
-          return new Response(
-            JSON.stringify({
-              success: true,
-              message: `Successfully synced ${transformedBrands.length} sample brands (API key not configured)`,
-              brands_count: transformedBrands.length,
-              is_sample_data: true
-            }),
-            { 
-              headers: { 
-                ...corsHeaders,
-                'Content-Type': 'application/json'
-              }
-            }
-          )
+          return await syncSampleBrands(supabase)
         }
-        
-        // Try to fetch brands from Loyalize API
+
+        // Try to fetch from live API
         try {
-          const loyalizeResponse = await fetch('https://api.loyalize.com/v1/brands', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${loyalizeApiKey}`,
-              'Content-Type': 'application/json',
-            },
-          })
-          
-          if (!loyalizeResponse.ok) {
-            console.error('Failed to fetch from Loyalize API:', loyalizeResponse.status, loyalizeResponse.statusText)
-            const errorText = await loyalizeResponse.text()
-            console.error('Error response:', errorText)
-            throw new Error(`Loyalize API error: ${loyalizeResponse.status} - ${loyalizeResponse.statusText}`)
-          }
-          
-          const loyalizeData: LoyalizeApiResponse = await loyalizeResponse.json()
-          console.log(`Received ${loyalizeData.brands.length} brands from Loyalize API`)
-          
-          // Transform and sync brands to database
-          const transformedBrands: LoyalizeBrand[] = loyalizeData.brands.map(brand => ({
-            id: brand.id,
-            name: brand.name,
-            description: brand.description,
-            logo_url: brand.logo_url,
-            commission_rate: brand.commission_rate / 100, // Convert percentage to decimal
-            category: brand.category || 'General',
-            website_url: brand.website_url,
-            is_featured: brand.featured || false,
-            affiliate_link: brand.affiliate_link,
-            terms_conditions: brand.terms
-          }))
-          
-          // Upsert brands into the database
-          const { data: upsertData, error: upsertError } = await supabase
-            .from('brands')
-            .upsert(
-              transformedBrands.map(brand => ({
-                loyalize_id: brand.id,
-                name: brand.name,
-                description: brand.description,
-                logo_url: brand.logo_url,
-                commission_rate: brand.commission_rate,
-                nctr_per_dollar: brand.commission_rate * 0.1, // 10% of commission as NCTR
-                category: brand.category,
-                website_url: brand.website_url,
-                is_active: true,
-                featured: brand.is_featured,
-              })),
-              {
-                onConflict: 'loyalize_id',
-                ignoreDuplicates: false
-              }
-            )
-          
-          if (upsertError) {
-            console.error('Error upserting brands:', upsertError)
-            throw upsertError
-          }
-          
-          console.log(`Successfully synced ${transformedBrands.length} brands`)
-          
-          return new Response(
-            JSON.stringify({
-              success: true,
-              message: `Successfully synced ${transformedBrands.length} brands from Loyalize`,
-              brands_count: transformedBrands.length
-            }),
-            { 
-              headers: { 
-                ...corsHeaders,
-                'Content-Type': 'application/json'
-              }
-            }
-          )
+          return await syncFromLoyalizeAPI(loyalizeApiKey, supabase)
         } catch (apiError) {
-          console.error('Loyalize API call failed, falling back to sample data:', apiError)
-          
-          // Fallback to sample data if API fails
-          const sampleBrands = [
-            {
-              id: 'fallback-1',
-              name: 'Premium Fashion Outlet',
-              description: 'High-end fashion brands at discounted prices',
-              logo_url: 'https://via.placeholder.com/100x100?text=PF',
-              commission_rate: 7, 
-              category: 'Fashion',
-              website_url: 'https://example-premium-fashion.com',
-              featured: true,
-              affiliate_link: 'https://example-premium-fashion.com/affiliate',
-              terms: 'Premium member benefits included'
-            },
-            {
-              id: 'fallback-2',
-              name: 'Smart Home Devices',
-              description: 'Latest IoT and smart home technology',
-              logo_url: 'https://via.placeholder.com/100x100?text=SH',
-              commission_rate: 4,
-              category: 'Technology',
-              website_url: 'https://example-smarthome.com',
-              featured: false,
-              affiliate_link: 'https://example-smarthome.com/affiliate',
-              terms: 'Tech support included'
-            }
-          ]
-          
-          const transformedBrands = sampleBrands.map(brand => ({
-            loyalize_id: brand.id,
-            name: brand.name,
-            description: brand.description,
-            logo_url: brand.logo_url,
-            commission_rate: brand.commission_rate / 100,
-            nctr_per_dollar: (brand.commission_rate / 100) * 0.1,
-            category: brand.category,
-            website_url: brand.website_url,
-            is_active: true,
-            featured: brand.featured,
-          }))
-          
-          const { error: fallbackError } = await supabase
-            .from('brands')
-            .upsert(transformedBrands, { onConflict: 'loyalize_id' })
-          
-          if (fallbackError) throw fallbackError
-          
-          return new Response(
-            JSON.stringify({
-              success: true,
-              message: `API unavailable, synced ${transformedBrands.length} fallback brands`,
-              brands_count: transformedBrands.length,
-              is_fallback_data: true
-            }),
-            { 
-              headers: { 
-                ...corsHeaders,
-                'Content-Type': 'application/json'
-              }
-            }
-          )
+          console.error('Loyalize API failed, falling back to sample data:', apiError)
+          return await syncSampleBrands(supabase, true)
         }
       }
 
@@ -419,3 +200,219 @@ serve(async (req) => {
     )
   }
 })
+
+async function syncFromLoyalizeAPI(apiKey: string, supabase: any) {
+  console.log('Attempting to sync from live Loyalize API...')
+  
+  const possibleEndpoints = [
+    'https://api.loyalize.com/v1/brands',
+    'https://api.loyalize.com/v1/merchants', 
+    'https://api.loyalize.com/brands',
+    'https://loyalize.com/api/v1/brands',
+    'https://api.loyalize.com/v1/partners',
+    'https://api.loyalize.com/merchants'
+  ]
+  
+  let lastError = null
+  
+  for (const endpoint of possibleEndpoints) {
+    try {
+      console.log(`🔄 Trying endpoint: ${endpoint}`)
+      
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'NCTR-Loyalize-Integration/1.0'
+        },
+      })
+      
+      console.log(`📊 ${endpoint} status: ${response.status}`)
+      
+      if (response.ok) {
+        const data = await response.json()
+        console.log(`✅ Success! Response from ${endpoint}:`, Object.keys(data))
+        
+        // Try different possible data structures
+        let brands = null
+        if (data.brands && Array.isArray(data.brands)) {
+          brands = data.brands
+        } else if (data.merchants && Array.isArray(data.merchants)) {
+          brands = data.merchants
+        } else if (data.partners && Array.isArray(data.partners)) {
+          brands = data.partners  
+        } else if (Array.isArray(data)) {
+          brands = data
+        } else if (data.data && Array.isArray(data.data)) {
+          brands = data.data
+        }
+        
+        if (!brands || brands.length === 0) {
+          console.log(`⚠️ No brands found in response from ${endpoint}`)
+          continue
+        }
+        
+        console.log(`🎉 Found ${brands.length} brands from ${endpoint}`)
+        
+        // Transform brands to our format
+        const transformedBrands = brands.map((brand: any, index: number) => ({
+          loyalize_id: brand.id || brand.merchant_id || brand.partner_id || `loyalize-${index}`,
+          name: brand.name || brand.merchant_name || brand.partner_name || `Brand ${index}`,
+          description: brand.description || brand.summary || `Partner brand offering cashback rewards`,
+          logo_url: brand.logo_url || brand.logo || brand.image_url,
+          commission_rate: parseFloat(brand.commission_rate || brand.commission || brand.rate || '5') / 100,
+          nctr_per_dollar: parseFloat(brand.commission_rate || brand.commission || brand.rate || '5') / 100 * 0.1,
+          category: brand.category || brand.vertical || brand.industry || 'General',
+          website_url: brand.website_url || brand.url || brand.website || brand.link,
+          is_active: true,
+          featured: brand.featured || brand.is_featured || false,
+        }))
+        
+        // Upsert to database
+        const { data: upsertData, error: upsertError } = await supabase
+          .from('brands')
+          .upsert(transformedBrands, {
+            onConflict: 'loyalize_id',
+            ignoreDuplicates: false
+          })
+        
+        if (upsertError) {
+          console.error('Database upsert error:', upsertError)
+          throw upsertError
+        }
+        
+        console.log(`✅ Successfully synced ${transformedBrands.length} brands from Loyalize API`)
+        
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: `Successfully synced ${transformedBrands.length} brands from Loyalize API`,
+            brands_count: transformedBrands.length,
+            endpoint_used: endpoint,
+            is_live_data: true
+          }),
+          { 
+            headers: { 
+              ...corsHeaders,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+      } else {
+        const errorText = await response.text()
+        console.error(`❌ ${endpoint} failed: ${response.status} ${response.statusText}`)
+        console.error(`Error response: ${errorText}`)
+        lastError = new Error(`${endpoint}: ${response.status} - ${errorText}`)
+      }
+    } catch (error) {
+      console.error(`❌ Error with ${endpoint}:`, error)
+      lastError = error
+    }
+  }
+  
+  // All endpoints failed
+  throw lastError || new Error('All Loyalize API endpoints failed')
+}
+
+async function syncSampleBrands(supabase: any, isFallback = false) {
+  console.log(isFallback ? '🔄 Using fallback sample data...' : '🔄 Using sample data (API key not configured)...')
+  
+  const sampleBrands = [
+    {
+      loyalize_id: 'sample-fashion-1',
+      name: 'Premium Fashion Store',
+      description: 'High-end fashion retailer with sustainable and ethically-made clothing',
+      logo_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.08,
+      nctr_per_dollar: 0.008,
+      category: 'Fashion & Apparel',
+      website_url: 'https://example-fashion.com',
+      is_active: true,
+      featured: true,
+    },
+    {
+      loyalize_id: 'sample-tech-1', 
+      name: 'Tech Electronics Hub',
+      description: 'Latest gadgets, smartphones, and tech accessories with competitive prices',
+      logo_url: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.05,
+      nctr_per_dollar: 0.005,
+      category: 'Electronics & Technology',
+      website_url: 'https://example-tech.com',
+      is_active: true,
+      featured: false,
+    },
+    {
+      loyalize_id: 'sample-home-1',
+      name: 'Home & Garden Plus',
+      description: 'Everything for your home improvement and gardening needs',  
+      logo_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.06,
+      nctr_per_dollar: 0.006,
+      category: 'Home & Garden',
+      website_url: 'https://example-home.com',
+      is_active: true,
+      featured: false,
+    },
+    {
+      loyalize_id: 'sample-beauty-1',
+      name: 'Beauty & Wellness',
+      description: 'Premium beauty products and wellness essentials',
+      logo_url: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.07,
+      nctr_per_dollar: 0.007,
+      category: 'Beauty & Personal Care',
+      website_url: 'https://example-beauty.com',
+      is_active: true,
+      featured: true,
+    },
+    {
+      loyalize_id: 'sample-sports-1',
+      name: 'Active Sports Gear',
+      description: 'Sports equipment and athletic wear for all fitness levels',
+      logo_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop&crop=center',
+      commission_rate: 0.055,
+      nctr_per_dollar: 0.0055,
+      category: 'Sports & Fitness',
+      website_url: 'https://example-sports.com',
+      is_active: true,
+      featured: false,
+    }
+  ]
+  
+  const { data: upsertData, error: upsertError } = await supabase
+    .from('brands')
+    .upsert(sampleBrands, {
+      onConflict: 'loyalize_id',
+      ignoreDuplicates: false
+    })
+  
+  if (upsertError) {
+    console.error('Error upserting sample brands:', upsertError)
+    throw upsertError
+  }
+  
+  const message = isFallback 
+    ? `API unavailable, synced ${sampleBrands.length} fallback brands`
+    : `Successfully synced ${sampleBrands.length} sample brands (API key not configured)`
+  
+  console.log(`✅ ${message}`)
+  
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message,
+      brands_count: sampleBrands.length,
+      is_sample_data: !isFallback,
+      is_fallback_data: isFallback
+    }),
+    { 
+      headers: { 
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}
