@@ -9,80 +9,80 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Base colors - Deep charcoal with lime accents */
+    /* Base colors - Light theme with NCTR logo colors */
     --background: 0 0% 100%;
-    --foreground: 150 12% 8%;
+    --foreground: 0 0% 25%; /* Dark charcoal grey from NCTR logo */
 
     --card: 0 0% 100%;
-    --card-foreground: 150 12% 8%;
+    --card-foreground: 0 0% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 12% 8%;
+    --popover-foreground: 0 0% 25%;
 
-    /* NCTR lime theme - Subtle outline focused */
-    --primary: 82 60% 45%; /* Toned down NCTR lime */
-    --primary-foreground: 150 12% 8%;
-    --primary-glow: 82 40% 55%;
-    --primary-deep: 82 70% 30%;
-    --primary-light: 82 35% 65%;
+    /* NCTR lime theme - Matching logo colors */
+    --primary: 75 85% 75%; /* Bright lime-yellow from NCTR logo background */
+    --primary-foreground: 0 0% 25%; /* Dark charcoal from NCTR text */
+    --primary-glow: 75 70% 65%;
+    --primary-deep: 75 85% 55%;
+    --primary-light: 75 60% 85%;
 
-    /* Secondary - Modern charcoal grays */
+    /* Secondary - Subtle grays */
     --secondary: 210 8% 95%;
-    --secondary-foreground: 150 12% 8%;
+    --secondary-foreground: 0 0% 25%;
     --secondary-accent: 210 12% 88%;
 
-    /* Muted - Sophisticated grays */
+    /* Muted - Light grays */
     --muted: 210 8% 97%;
-    --muted-foreground: 210 10% 42%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Accent - Toned down blue for contrast */
+    /* Accent - Complementary to NCTR lime */
     --accent: 200 65% 50%;
     --accent-foreground: 0 0% 100%;
     --accent-light: 200 50% 65%;
 
-    /* Crypto premium metals - Subtle lime accent */
+    /* Crypto premium metals - NCTR lime focused */
     --crypto-gold: 50 75% 50%;
-    --crypto-gold-foreground: 150 12% 8%;
+    --crypto-gold-foreground: 0 0% 25%;
     --crypto-silver: 210 8% 75%;
     --crypto-platinum: 240 5% 85%;
-    --crypto-lime: 82 60% 45%;
+    --crypto-lime: 75 85% 75%;
 
-    /* Status colors - Subtle tones */
-    --success: 82 60% 45%; /* Use toned down NCTR lime */
+    /* Status colors - NCTR lime theme */
+    --success: 75 85% 75%; /* Use NCTR lime for success */
     --warning: 38 75% 50%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs - Subtle with lime hints */
+    /* Borders and inputs */
     --border: 210 12% 90%;
     --input: 210 12% 90%;
-    --ring: 82 60% 45%;
+    --ring: 75 85% 75%;
 
-    /* Premium gradients - Subtle outline focused */
-    --gradient-hero: linear-gradient(135deg, hsl(82 60% 45%) 0%, hsl(82 40% 55%) 35%, hsl(200 65% 50%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(82 60% 45%) 0%, hsl(50 75% 50%) 50%, hsl(200 65% 50%) 100%);
+    /* Premium gradients - NCTR logo inspired */
+    --gradient-hero: linear-gradient(135deg, hsl(75 85% 75%) 0%, hsl(75 70% 65%) 35%, hsl(200 65% 50%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(75 85% 75%) 0%, hsl(50 75% 50%) 50%, hsl(200 65% 50%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(82 60% 45%) 0%, hsl(200 65% 50%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(82 60% 45%) 0%, hsl(82 70% 30%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(82 60% 45% / 0.08) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(82 15% 98%) 50%, hsl(210 20% 98%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(75 85% 75%) 0%, hsl(200 65% 50%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(75 85% 75%) 0%, hsl(75 85% 55%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(75 85% 75% / 0.08) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(75 15% 98%) 50%, hsl(210 20% 98%) 100%);
     
-    /* Advanced shadows - Subtle outline system */
-    --shadow-minimal: 0 1px 3px hsl(150 12% 8% / 0.04);
-    --shadow-soft: 0 2px 12px -2px hsl(150 12% 8% / 0.08);
-    --shadow-medium: 0 8px 32px -8px hsl(150 12% 8% / 0.12);
-    --shadow-large: 0 16px 48px -12px hsl(150 12% 8% / 0.18);
-    --shadow-glow: 0 0 20px hsl(82 60% 45% / 0.12);
-    --shadow-glow-intense: 0 0 30px hsl(82 60% 45% / 0.18);
-    --shadow-inset: inset 0 2px 8px hsl(150 12% 8% / 0.06);
+    /* Subtle shadows - matching dark grey theme */
+    --shadow-minimal: 0 1px 3px hsl(0 0% 25% / 0.04);
+    --shadow-soft: 0 2px 12px -2px hsl(0 0% 25% / 0.08);
+    --shadow-medium: 0 8px 32px -8px hsl(0 0% 25% / 0.12);
+    --shadow-large: 0 16px 48px -12px hsl(0 0% 25% / 0.18);
+    --shadow-glow: 0 0 20px hsl(75 85% 75% / 0.12);
+    --shadow-glow-intense: 0 0 30px hsl(75 85% 75% / 0.18);
+    --shadow-inset: inset 0 2px 8px hsl(0 0% 25% / 0.06);
     
-    /* Premium transitions - Sophisticated timing */
+    /* Premium transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     --transition-elegant: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
 
-    /* Typography scale - Premium hierarchy */
+    /* Typography scale */
     --text-xs: 0.75rem;
     --text-sm: 0.875rem;
     --text-base: 1rem;
@@ -98,31 +98,31 @@ All colors MUST be HSL.
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-foreground: 0 0% 25%;
+    --sidebar-primary: 0 0% 25%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 0 0% 25%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 82 60% 45%;
+    --sidebar-ring: 75 85% 75%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 25%; /* Dark charcoal background */
+    --foreground: 75 85% 75%; /* NCTR lime text on dark */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 25%;
+    --card-foreground: 75 85% 75%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 25%;
+    --popover-foreground: 75 85% 75%;
 
-    /* Dark mode with toned down NCTR lime */
-    --primary: 82 60% 45%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Dark mode with NCTR logo colors inverted */
+    --primary: 75 85% 75%;
+    --primary-foreground: 0 0% 25%;
 
     --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 75 85% 75%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
@@ -135,16 +135,16 @@ All colors MUST be HSL.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 82 60% 45%;
+    --ring: 75 85% 75%;
     
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 82 60% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-background: 0 0% 25%;
+    --sidebar-foreground: 75 85% 75%;
+    --sidebar-primary: 75 85% 75%;
+    --sidebar-primary-foreground: 0 0% 25%;
     --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 75 85% 75%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 82 60% 45%;
+    --sidebar-ring: 75 85% 75%;
   }
 }
 
