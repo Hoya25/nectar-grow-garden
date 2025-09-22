@@ -425,6 +425,7 @@ const Garden = () => {
             <MemberStatusBanner 
               currentStatus={portfolio?.opportunity_status || 'starter'}
               current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
+              availableNCTR={portfolio?.available_nctr || 0}
               onUpgradeClick={() => {
                 // Scroll to lock commitment modal or trigger it
                 const lockButton = document.querySelector('[data-lock-commitment]');

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, Star, Crown, Diamond, Award, Zap, TrendingUp, Gift } from 'lucide-react';
+import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import nctrLogo from "@/assets/nctr-logo.png";
 
 interface StatusLevel {
@@ -225,7 +226,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
             
             <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-4 border border-primary/20">
               <h4 className="font-semibold text-primary mb-2">Unlock with {nextStatusData.status_name?.toUpperCase()}:</h4>
-              <div className="grid md:grid-cols-2 gap-2 text-sm">
+              <div className="grid md:grid-cols-2 gap-2 text-sm mb-3">
                 {nextStatusData.benefits?.slice(0, 4).map((benefit, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
@@ -233,9 +234,27 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
                   </div>
                 ))}
               </div>
+              
+              <div className="flex items-center justify-between">
+                {onUpgradeClick && current360NCTR >= nextStatusData.min_locked_nctr ? (
+                  <Button 
+                    onClick={onUpgradeClick}
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    Lock Available NCTR
+                  </Button>
+                ) : (
+                  <BuyNCTRUpgrade
+                    currentAmount={current360NCTR}
+                    targetAmount={nextStatusData.min_locked_nctr}
+                    targetStatus={nextStatusData.status_name}
+                  />
+                )}
+              </div>
             </div>
 
-            {onUpgradeClick && (
+            {onUpgradeClick && current360NCTR >= nextStatusData.min_locked_nctr && (
               <Button 
                 onClick={onUpgradeClick}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"

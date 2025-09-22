@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { Lock, TrendingUp, Calendar, Award, Loader2 } from 'lucide-react';
+import { BuyNCTRButton } from '@/components/BuyNCTRButton';
 
 interface LockCommitmentModalProps {
   availableNCTR: number;
@@ -153,8 +154,18 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
           {/* Available Balance */}
           <Alert>
             <TrendingUp className="h-4 w-4" />
-            <AlertDescription>
-              Available NCTR: <strong>{availableNCTR.toLocaleString()}</strong>
+            <AlertDescription className="flex items-center justify-between">
+              <span>Available NCTR: <strong>{availableNCTR.toLocaleString()}</strong></span>
+              {availableNCTR < 100 && (
+                <BuyNCTRButton 
+                  variant="outline" 
+                  size="sm"
+                  className="ml-4"
+                  suggestedAmount={1000}
+                >
+                  Buy More NCTR
+                </BuyNCTRButton>
+              )}
             </AlertDescription>
           </Alert>
 
@@ -232,12 +243,24 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                   </span>
                 </div>
                 {!isValidAmount && amount && (
-                  <p className="text-sm text-destructive">
-                    {numericAmount < (selectedOption?.minAmount || 0) 
-                      ? `Minimum amount is ${selectedOption?.minAmount.toLocaleString()} NCTR`
-                      : `Insufficient balance. Available: ${availableNCTR.toLocaleString()} NCTR`
-                    }
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-destructive">
+                      {numericAmount < (selectedOption?.minAmount || 0) 
+                        ? `Minimum amount is ${selectedOption?.minAmount.toLocaleString()} NCTR`
+                        : `Insufficient balance. Available: ${availableNCTR.toLocaleString()} NCTR`
+                      }
+                    </p>
+                    {numericAmount > availableNCTR && (
+                      <BuyNCTRButton 
+                        variant="outline"
+                        size="sm"
+                        suggestedAmount={Math.ceil((numericAmount - availableNCTR) / 100) * 100}
+                        className="text-primary border-primary"
+                      >
+                        Buy {(numericAmount - availableNCTR).toLocaleString()} More NCTR
+                      </BuyNCTRButton>
+                    )}
+                  </div>
                 )}
               </div>
 
