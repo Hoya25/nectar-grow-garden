@@ -189,8 +189,10 @@ export type Database = {
       }
       nctr_locks: {
         Row: {
+          commitment_days: number | null
           created_at: string
           id: string
+          lock_category: string | null
           lock_date: string
           lock_type: string
           nctr_amount: number
@@ -199,8 +201,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          commitment_days?: number | null
           created_at?: string
           id?: string
+          lock_category?: string | null
           lock_date?: string
           lock_type: string
           nctr_amount: number
@@ -209,8 +213,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          commitment_days?: number | null
           created_at?: string
           id?: string
+          lock_category?: string | null
           lock_date?: string
           lock_type?: string
           nctr_amount?: number
@@ -225,6 +231,8 @@ export type Database = {
           available_nctr: number
           created_at: string
           id: string
+          lock_360_nctr: number | null
+          lock_90_nctr: number | null
           opportunity_status: string
           pending_nctr: number
           total_earned: number
@@ -235,6 +243,8 @@ export type Database = {
           available_nctr?: number
           created_at?: string
           id?: string
+          lock_360_nctr?: number | null
+          lock_90_nctr?: number | null
           opportunity_status?: string
           pending_nctr?: number
           total_earned?: number
@@ -245,6 +255,8 @@ export type Database = {
           available_nctr?: number
           created_at?: string
           id?: string
+          lock_360_nctr?: number | null
+          lock_90_nctr?: number | null
           opportunity_status?: string
           pending_nctr?: number
           total_earned?: number
@@ -466,6 +478,13 @@ export type Database = {
       add_sample_brands: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      calculate_lock_balances: {
+        Args: { user_id: string }
+        Returns: {
+          lock_360_total: number
+          lock_90_total: number
+        }[]
       }
       calculate_user_status: {
         Args: { user_id: string }

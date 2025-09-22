@@ -27,21 +27,27 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
     {
       type: '90LOCK' as const,
       duration: 90,
-      title: '90-Day Lock',
-      description: 'Lock your NCTR for 90 days to start building your status',
+      title: '90LOCK - Standard Commitment',
+      description: 'Build your Alliance foundation with a 90-day commitment to steady growth',
       multiplier: '1.2x',
-      benefits: ['Increased earning potential', 'Access to basic opportunities', 'Status progression'],
-      color: 'bg-blue-500',
+      benefits: ['Enhanced earning rates', 'Access to partner brands', 'Alliance member benefits', 'Foundation for status building'],
+      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
+      textColor: 'text-blue-700',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
       minAmount: 100
     },
     {
       type: '360LOCK' as const,
       duration: 360,
-      title: '360-Day Lock',
-      description: 'Maximum commitment for maximum rewards and highest status',
-      multiplier: '2.5x',
-      benefits: ['Maximum earning potential', 'Premium opportunities', 'VIP status progression', 'Exclusive partner benefits'],
-      color: 'bg-purple-500',
+      title: '360LOCK - Elite Commitment',
+      description: 'Maximum Alliance commitment for elite status, amplified earnings, and exclusive experiences',
+      multiplier: '5x',
+      benefits: ['Maximum earning amplification', 'Elite partner access', 'VIP experiences & events', 'Exclusive rewards program', 'Priority Alliance status'],
+      color: 'bg-gradient-to-r from-primary to-primary/80',
+      textColor: 'text-primary',
+      bgColor: 'bg-primary/5',
+      borderColor: 'border-primary/30',
       minAmount: 500
     }
   ];
@@ -65,6 +71,8 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
         .insert({
           user_id: user.id,
           lock_type: selectedOption.type,
+          lock_category: selectedOption.type,
+          commitment_days: selectedOption.duration,
           nctr_amount: numericAmount,
           unlock_date: unlockDate.toISOString(),
         });
@@ -97,14 +105,14 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
           user_id: user.id,
           transaction_type: 'locked',
           nctr_amount: numericAmount,
-          description: `Locked ${numericAmount} NCTR for ${selectedOption.duration} days`,
+          description: `Committed ${numericAmount} NCTR to ${selectedOption.type} - ${selectedOption.duration} day Alliance membership`,
         });
 
       if (transactionError) throw transactionError;
 
       toast({
-        title: "Lock Created!",
-        description: `Successfully locked ${numericAmount} NCTR for ${selectedOption.duration} days.`,
+        title: selectedType === '360LOCK' ? "Elite Alliance Joined!" : "Alliance Joined!",
+        description: `Successfully committed ${numericAmount} NCTR to ${selectedOption.type}. Welcome to the Alliance!`,
       });
 
       setOpen(false);
@@ -126,18 +134,20 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight shadow-soft">
+        <Button 
+          className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-soft"
+        >
           <Lock className="w-4 h-4 mr-2" />
-          Create Lock Commitment
+          Join Alliance
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl bg-gradient-hero bg-clip-text text-transparent">
-            Lock Your NCTR
+          <DialogTitle className="text-2xl text-foreground">
+            Join The NCTR Alliance
           </DialogTitle>
           <p className="text-muted-foreground">
-            Lock your NCTR tokens to increase your opportunity status and earning potential
+            Choose your commitment level to unlock exclusive earning opportunities and Alliance benefits
           </p>
         </DialogHeader>
 
@@ -155,38 +165,45 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
             {lockOptions.map((option) => (
               <Card 
                 key={option.type}
-                className={`cursor-pointer transition-all hover:shadow-glow ${
+                className={`cursor-pointer transition-all hover:shadow-glow ${option.bgColor} ${option.borderColor} border-2 ${
                   selectedType === option.type 
-                    ? 'ring-2 ring-primary shadow-glow' 
-                    : 'hover:shadow-medium'
+                    ? 'ring-2 ring-primary shadow-glow-intense scale-[1.02]' 
+                    : 'hover:shadow-medium hover:scale-[1.01]'
                 }`}
                 onClick={() => setSelectedType(option.type)}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center">
-                      <div className={`w-3 h-3 rounded-full ${option.color} mr-2`} />
+                    <CardTitle className={`flex items-center ${option.textColor}`}>
+                      <div className={`w-4 h-4 rounded-full ${option.color} mr-3 shadow-sm`} />
                       {option.title}
                     </CardTitle>
-                    <Badge variant="secondary">{option.multiplier} rewards</Badge>
+                    <Badge className={`${option.color} text-white border-0 shadow-sm`}>
+                      {option.multiplier} earnings
+                    </Badge>
                   </div>
-                  <CardDescription>{option.description}</CardDescription>
+                  <CardDescription className={option.textColor}>{option.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center text-sm">
-                      <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
-                      {option.duration} days commitment
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className={`flex items-center ${option.textColor}`}>
+                        <Calendar className="w-4 h-4 mr-2" />
+                        {option.duration} days
+                      </div>
+                      <div className={`flex items-center ${option.textColor}`}>
+                        <Award className="w-4 h-4 mr-2" />
+                        Min. {option.minAmount.toLocaleString()} NCTR
+                      </div>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Award className="w-4 h-4 mr-2 text-muted-foreground" />
-                      Min. {option.minAmount.toLocaleString()} NCTR
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">Benefits:</p>
-                      <ul className="text-xs text-muted-foreground space-y-1">
+                    <div className="space-y-2">
+                      <p className={`text-sm font-semibold ${option.textColor}`}>Alliance Benefits:</p>
+                      <ul className={`text-xs space-y-1 ${option.textColor}/80`}>
                         {option.benefits.map((benefit, idx) => (
-                          <li key={idx}>• {benefit}</li>
+                          <li key={idx} className="flex items-start">
+                            <span className="mr-2">•</span>
+                            <span>{benefit}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -264,14 +281,14 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                 >
                   Cancel
                 </Button>
-                <Button 
-                  onClick={handleCreateLock}
-                  disabled={!isValidAmount || loading}
-                  className="flex-1 bg-white border-2 border-primary text-foreground hover:bg-section-highlight"
-                >
-                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  Create Lock Commitment
-                </Button>
+                  <Button 
+                    onClick={handleCreateLock}
+                    disabled={!isValidAmount || loading}
+                    className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-medium hover:shadow-large transition-all duration-300"
+                  >
+                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {selectedType === '360LOCK' ? 'Join Elite Alliance' : 'Join Standard Alliance'}
+                  </Button>
               </div>
             </div>
           )}

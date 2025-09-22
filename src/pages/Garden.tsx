@@ -20,6 +20,8 @@ interface Portfolio {
   pending_nctr: number;
   total_earned: number;
   opportunity_status: string;
+  lock_90_nctr: number;
+  lock_360_nctr: number;
 }
 
 interface LockCommitment {
@@ -71,7 +73,7 @@ const Garden = () => {
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
-        .select('*')
+        .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr')
         .eq('user_id', user?.id)
         .single();
 
@@ -84,7 +86,7 @@ const Garden = () => {
       // Fetch lock commitments
       const { data: locksData, error: locksError } = await supabase
         .from('nctr_locks')
-        .select('*')
+        .select('*, lock_category, commitment_days')
         .eq('user_id', user?.id)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
@@ -167,9 +169,9 @@ const Garden = () => {
               className="h-28 w-auto opacity-90"
             />
             </div>
-            <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0`}>
-              {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
-            </Badge>
+          <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0`}>
+            {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'} • {portfolio?.lock_360_nctr && parseFloat(portfolio.lock_360_nctr.toString()) > 0 ? '360LOCK MEMBER' : 'STANDARD'}
+          </Badge>
           </div>
           <div className="flex items-center gap-3">
             <ProfileModal>
@@ -233,29 +235,59 @@ const Garden = () => {
                       <p className="text-lg font-bold text-section-accent">
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
+                      <p className="text-xs text-muted-foreground">Ready to commit</p>
                     </div>
                     <Coins className="h-6 w-6 text-foreground/60 ml-2" />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white shadow-soft border border-section-border/30">
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 shadow-soft border border-blue-200">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-xs text-section-text/70">Pending</p>
-                        <img 
-                          src={nctrLogo} 
-                          alt="NCTR" 
-                          className="h-14 w-auto opacity-70"
-                        />
+                        <p className="text-xs font-semibold text-blue-700">90LOCK</p>
+                        <div className="flex items-center space-x-1">
+                          <img 
+                            src={nctrLogo} 
+                            alt="NCTR" 
+                            className="h-14 w-auto opacity-70"
+                          />
+                          <span className="text-xs text-blue-600 font-bold">90D</span>
+                        </div>
                       </div>
-                      <p className="text-lg font-bold text-section-accent">
-                        {formatNCTR(portfolio?.pending_nctr || 0)}
+                      <p className="text-lg font-bold text-blue-800">
+                        {formatNCTR(portfolio?.lock_90_nctr || 0)}
                       </p>
+                      <p className="text-xs text-blue-600">90 Day Commitment</p>
                     </div>
-                    <TrendingUp className="h-6 w-6 text-warning/60 ml-2" />
+                    <TrendingUp className="h-6 w-6 text-blue-600 ml-2" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-primary/10 to-primary/20 shadow-soft border border-primary/30">
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-bold text-primary">360LOCK</p>
+                        <div className="flex items-center space-x-1">
+                          <img 
+                            src={nctrLogo} 
+                            alt="NCTR" 
+                            className="h-14 w-auto opacity-90"
+                          />
+                          <span className="text-xs text-primary font-bold">360D</span>
+                        </div>
+                      </div>
+                      <p className="text-lg font-bold text-primary">
+                        {formatNCTR(portfolio?.lock_360_nctr || 0)}
+                      </p>
+                      <p className="text-xs text-primary/80">Alliance Status Builder</p>
+                    </div>
+                    <Gift className="h-6 w-6 text-primary ml-2" />
                   </div>
                 </CardContent>
               </Card>
@@ -275,8 +307,9 @@ const Garden = () => {
                       <p className="text-lg font-bold text-section-accent">
                         {formatNCTR(portfolio?.total_earned || 0)}
                       </p>
+                      <p className="text-xs text-muted-foreground">Lifetime earnings</p>
                     </div>
-                    <Gift className="h-6 w-6 text-success/60 ml-2" />
+                    <Users className="h-6 w-6 text-success/60 ml-2" />
                   </div>
                 </CardContent>
               </Card>
@@ -303,33 +336,56 @@ const Garden = () => {
             </CardContent>
           </Card>
 
-          {/* Lock Commitments Summary - Compact */}
-          {locks.length > 0 && (
+          {/* Lock Status Summary - Compact */}
+          {(locks.length > 0 || (portfolio?.lock_90_nctr || 0) > 0 || (portfolio?.lock_360_nctr || 0) > 0) && (
             <Card className="bg-white shadow-soft border border-section-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-foreground">Lock Status</CardTitle>
+                <CardTitle className="text-sm text-foreground">Alliance Commitments</CardTitle>
               </CardHeader>
               <CardContent className="p-3 pt-0">
                 <div className="space-y-2">
+                  {portfolio?.lock_360_nctr && parseFloat(portfolio.lock_360_nctr.toString()) > 0 && (
+                    <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-2 rounded-lg">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-bold text-primary">360LOCK Status</span>
+                        <span className="text-xs text-primary">Elite Commitment</span>
+                      </div>
+                      <div className="text-sm font-bold text-primary">{formatNCTR(parseFloat(portfolio.lock_360_nctr.toString()))} NCTR</div>
+                    </div>
+                  )}
+                  
+                  {portfolio?.lock_90_nctr && parseFloat(portfolio.lock_90_nctr.toString()) > 0 && (
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-2 rounded-lg">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-semibold text-blue-700">90LOCK Active</span>
+                        <span className="text-xs text-blue-600">Standard</span>
+                      </div>
+                      <div className="text-sm font-bold text-blue-800">{formatNCTR(parseFloat(portfolio.lock_90_nctr.toString()))} NCTR</div>
+                    </div>
+                  )}
+                  
                   {locks.slice(0, 1).map((lock) => {
                     const unlockDate = new Date(lock.unlock_date);
                     const lockDate = new Date(lock.lock_date);
                     const totalDuration = unlockDate.getTime() - lockDate.getTime();
                     const elapsed = Date.now() - lockDate.getTime();
                     const progress = Math.min((elapsed / totalDuration) * 100, 100);
+                    const isLongTerm = totalDuration >= (300 * 24 * 60 * 60 * 1000); // 300+ days
                     
                     return (
                       <div key={lock.id} className="text-xs">
                         <div className="flex justify-between mb-1">
-                          <span className="text-foreground">{lock.lock_type}</span>
-                          <span className="text-section-accent font-bold">{Math.round(progress)}%</span>
+                          <span className={`font-medium ${isLongTerm ? 'text-primary' : 'text-blue-700'}`}>
+                            {isLongTerm ? '360LOCK' : '90LOCK'} Progress
+                          </span>
+                          <span className={`font-bold ${isLongTerm ? 'text-primary' : 'text-blue-700'}`}>{Math.round(progress)}%</span>
                         </div>
                         <Progress value={progress} className="h-1" />
                       </div>
                     );
                   })}
                   {locks.length > 1 && (
-                    <p className="text-xs text-muted-foreground">+{locks.length - 1} more</p>
+                    <p className="text-xs text-muted-foreground">+{locks.length - 1} more commitments</p>
                   )}
                 </div>
               </CardContent>
@@ -342,9 +398,9 @@ const Garden = () => {
               availableNCTR={portfolio?.available_nctr || 0}
               onLockCreated={fetchUserData}
             />
-            <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => navigate('/profile')}>
+            <Button variant="outline" size="sm" className="w-full text-xs border-primary/50 text-primary hover:bg-primary/10" onClick={() => navigate('/profile')}>
               <User className="w-3 h-3 mr-2" />
-              Profile
+              Alliance Profile
             </Button>
           </div>
 
