@@ -492,18 +492,20 @@ export type Database = {
         Returns: boolean
       }
       get_user_status_details: {
-        Args: { user_id: string }
+        Args: { target_user_id?: string }
         Returns: {
           current_locked_nctr: number
           current_min_duration: number
-          current_status: string
           next_required_duration: number
           next_required_locked: number
           next_status: string
-          progress_to_next: number
+          opportunity_status: string
+          required_lock_duration: number
+          required_locked_nctr: number
           reward_multiplier: number
           status_benefits: string[]
           status_description: string
+          user_id: string
         }[]
       }
       is_admin: {
