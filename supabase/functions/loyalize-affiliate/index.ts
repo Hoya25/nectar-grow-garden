@@ -62,7 +62,7 @@ async function generateAffiliateLink(
   apiKey: string, 
   supabase: any
 ): Promise<Response> {
-  console.log('Generating affiliate link:', { brandId, userId, productUrl });
+  console.log('🔗 Generating affiliate link:', { brandId, userId, productUrl });
 
   try {
     // Get brand information from our database
@@ -77,6 +77,12 @@ async function generateAffiliateLink(
     if (!brand.loyalize_id) {
       throw new Error('Brand is not integrated with Loyalize');
     }
+
+    // Check if this is a gift card brand for special handling
+    const isGiftCard = brand.category?.toLowerCase().includes('gift') || 
+                       brand.name?.toLowerCase().includes('gift');
+    
+    console.log(`🎁 Gift card detected: ${isGiftCard ? 'Yes' : 'No'} for ${brand.name}`);
 
     // Generate tracking ID for this specific user/brand/product combination
     const trackingId = generateTrackingId(userId, brandId);
@@ -95,9 +101,73 @@ async function generateAffiliateLink(
           brand_id: brand.loyalize_id,
           product_url: productUrl,
           tracking_id: trackingId,
-          user_id: userId
+          user_id: userId,
+          campaign_type: isGiftCard ? 'gift_card' : 'standard'
         })
       });
+
+      if (response.ok) {
+        const data = await response.json();
+        affiliateData = {
+          link: data.affiliate_url || data.tracking_url,
+          tracking_id: trackingId,
+          brand_id: brandId,
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+        };
+        console.log('✅ Generated real Loyalize affiliate link');
+      } else {
+        throw new Error('Loyalize API unavailable');
+      }
+    } catch (error) {
+      console.log('⚠️ Using mock affiliate link generation');
+      affiliateData = generateMockAffiliateLink(brand, productUrl, trackingId);
+    }
+
+    // Store the pending transaction
+    const { error: transactionError } = await supabase
+      .from('nctr_transactions')
+      .insert({
+        user_id: userId,
+        transaction_type: 'pending',
+        brand_id: brandId,
+        tracking_id: trackingId,
+        nctr_amount: 0, // Will be updated when purchase is confirmed
+        description: `${isGiftCard ? 'Gift Card Purchase' : 'Purchase'} via ${brand.name}`,
+        status: 'pending',
+        earning_source: isGiftCard ? 'gift_card_affiliate' : 'affiliate_purchase'
+      });
+
+    if (transactionError) {
+      console.error('Failed to create transaction record:', transactionError);
+    }
+
+    return new Response(JSON.stringify({
+      success: true,
+      affiliate_link: affiliateData.link,
+      tracking_id: affiliateData.tracking_id,
+      brand: {
+        name: brand.name,
+        logo_url: brand.logo_url,
+        commission_rate: brand.commission_rate,
+        nctr_per_dollar: brand.nctr_per_dollar,
+        is_gift_card: isGiftCard
+      },
+      expires_at: affiliateData.expires_at
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    console.error('❌ Error generating affiliate link:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+}
 
       if (response.ok) {
         affiliateData = await response.json();

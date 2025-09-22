@@ -9,6 +9,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
 import LoyalizeBrandSearch from './LoyalizeBrandSearch';
 import BrandGiftCardSearch from './BrandGiftCardSearch';
+import GiftCardTester from './GiftCardTester';
 import { 
   Plus, 
   Building2, 
@@ -19,7 +20,8 @@ import {
   Loader2,
   Search,
   Filter,
-  CreditCard
+  CreditCard,
+  TestTube
 } from 'lucide-react';
 
 interface Brand {
@@ -45,7 +47,7 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
   const { logActivity } = useAdmin();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'search' | 'manage'>('search');
+  const [activeTab, setActiveTab] = useState<'search' | 'manage' | 'test'>('search');
   
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -213,6 +215,14 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
           >
             <Edit className="w-4 h-4" />
             Manage Existing
+          </Button>
+          <Button 
+            variant={activeTab === 'test' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('test')}
+            className="flex items-center gap-2"
+          >
+            <TestTube className="w-4 h-4" />
+            Test Partnerships
           </Button>
         </div>
       </div>
@@ -396,6 +406,11 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
               onBrandsUpdate={handleBrandsUpdate}
             />
           )}
+        </>
+      ) : activeTab === 'test' ? (
+        <>
+          {/* Gift Card Testing Section */}
+          <GiftCardTester />
         </>
       ) : (
         <>

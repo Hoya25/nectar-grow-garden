@@ -81,80 +81,118 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
   try {
     console.log(`🔍 Searching stores: query="${query}", category="${category}"`);
     
-    // Use the correct search endpoint according to API docs
-    const endpoint = 'https://api.loyalize.com/v1/stores/search';
-    const searchUrl = new URL(endpoint);
+    // For gift card searches, try multiple search variations
+    const searchTerms = [query];
+    if (query.toLowerCase().includes('gift')) {
+      searchTerms.push(`${query} gift card`, `${query} gift cards`);
+    }
+    if (query.toLowerCase() === 'uber') {
+      searchTerms.push('uber gift card', 'uber gift cards', 'uber eats gift card');
+    }
     
-    // Add query parameters according to API docs
-    if (query) searchUrl.searchParams.set('term', query); // Use 'term' instead of 'name'
-    searchUrl.searchParams.set('size', limit.toString());
-    searchUrl.searchParams.set('page', Math.floor(offset / limit).toString());
-    searchUrl.searchParams.set('countries', countries);
-
-    const response = await fetch(searchUrl.toString(), {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`, // Use Bearer token format
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log(`✅ Successfully fetched ${data.content?.length || 0} stores`);
+    let allResults: any[] = [];
+    
+    // Try each search term
+    for (const searchTerm of searchTerms) {
+      const endpoint = 'https://api.loyalize.com/v1/stores/search';
+      const searchUrl = new URL(endpoint);
       
-      // Transform stores to brand format with tracking URL
-      const brands = data.content?.map((store: any) => ({
+      // Add query parameters according to API docs
+      if (searchTerm) searchUrl.searchParams.set('term', searchTerm);
+      searchUrl.searchParams.set('size', limit.toString());
+      searchUrl.searchParams.set('page', Math.floor(offset / limit).toString());
+      searchUrl.searchParams.set('countries', countries);
+
+      const response = await fetch(searchUrl.toString(), {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Found ${data.content?.length || 0} stores for "${searchTerm}"`);
+        
+        if (data.content && data.content.length > 0) {
+          allResults = allResults.concat(data.content);
+        }
+      } else {
+        console.log(`⚠️ Search failed for "${searchTerm}": ${response.status}`);
+      }
+    }
+
+    // Remove duplicates based on store ID
+    const uniqueResults = Array.from(
+      new Map(allResults.map(store => [store.id, store])).values()
+    );
+
+    console.log(`🎯 Total unique results found: ${uniqueResults.length}`);
+
+    // Transform stores to brand format with enhanced gift card detection
+    const brands = uniqueResults.map((store: any) => {
+      const isGiftCard = 
+        store.name?.toLowerCase().includes('gift') ||
+        store.description?.toLowerCase().includes('gift card') ||
+        store.categories?.some((cat: string) => cat.toLowerCase().includes('gift')) ||
+        store.tagline?.toLowerCase().includes('gift');
+
+      return {
         id: store.id?.toString() || '',
         loyalize_id: store.id?.toString() || '',
         name: store.name || 'Unknown Store',
         logo_url: `https://api.loyalize.com/resources/stores/${store.id}/logo`,
         commission_rate: store.commissionRate || 0,
-        description: store.description || store.tagline || '',
+        description: store.description || store.tagline || `${store.name} - Shop and earn rewards`,
         website_url: store.homePage || '',
-        tracking_url: store.trackingUrl || '',
-        category: category || store.categories?.[0] || 'General',
+        tracking_url: store.trackingUrl || generateTrackingUrl(store.id, 'user_placeholder', 'nctr_platform'),
+        category: isGiftCard ? 'Gift Cards' : (category || store.categories?.[0] || 'General'),
         countries: store.countries || ['US'],
-        status: 'active'
-      })) || [];
-      
-      return new Response(JSON.stringify({
-        success: true,
-        brands: brands,
-        total: data.totalElements || 0,
-        page: data.number || 0,
-        totalPages: data.totalPages || 1
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    } else {
-      const errorText = await response.text().catch(() => '');
-      console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
-      console.error(`Error response: ${errorText}`);
-      
-      // If API fails, return mock data
-      console.log('🔄 API failed, using mock data');
-      const mockBrands = getMockBrands(query, category);
-      
-      return new Response(JSON.stringify({
-        success: true,
-        brands: mockBrands.slice(offset, offset + limit),
-        total: mockBrands.length,
-        note: 'Using mock data - API unavailable'
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+        status: 'active',
+        is_gift_card: isGiftCard
+      };
+    });
     
+    return new Response(JSON.stringify({
+      success: true,
+      brands: brands,
+      total: uniqueResults.length,
+      page: Math.floor(offset / limit),
+      totalPages: Math.ceil(uniqueResults.length / limit),
+      search_terms_used: searchTerms
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+
   } catch (error) {
     console.error('❌ Search brands error:', error);
     
-    // Fallback to mock data
+    // Enhanced fallback for gift card searches
     const mockBrands = getMockBrands(query, category);
+    
+    // Add Uber gift card to mock data if searching for Uber
+    if (query.toLowerCase().includes('uber')) {
+      const uberGiftCard = {
+        id: 'uber_gift_mock',
+        loyalize_id: 'uber_gift_mock',
+        name: 'Uber Gift Cards',
+        description: 'Uber gift cards for rides and food delivery. Perfect for gifting mobility and convenience.',
+        logo_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=100&h=100&fit=crop',
+        website_url: 'https://www.uber.com/gift-cards',
+        category: 'Gift Cards',
+        commission_rate: 4.5,
+        status: 'active',
+        is_gift_card: true
+      };
+      mockBrands.unshift(uberGiftCard);
+    }
+    
     return new Response(JSON.stringify({
       success: true,
       brands: mockBrands.slice(offset, offset + limit),
       total: mockBrands.length,
-      note: 'Using mock data - API error'
+      note: 'Using enhanced mock data with gift card support - API error',
+      error: error.message
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -355,6 +393,68 @@ function generateTrackingUrl(storeId: string, userId: string, loyalizeId: string
 
 function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
   const mockBrands = [
+    // Gift Card Brands - High Priority
+    {
+      id: 'uber_gift_cards',
+      name: 'Uber Gift Cards',
+      description: 'Uber gift cards for rides, food delivery, and grocery delivery. Perfect for gifting mobility and convenience.',
+      logo_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=100&h=100&fit=crop',
+      website_url: 'https://www.uber.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 4.5,
+      status: 'active'
+    },
+    {
+      id: 'amazon_gift_cards',
+      name: 'Amazon Gift Cards',
+      description: 'Digital and physical Amazon gift cards for the world\'s largest online retailer. Perfect for any occasion.',
+      logo_url: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=100&h=100&fit=crop',
+      website_url: 'https://amazon.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 4.0,
+      status: 'active'
+    },
+    {
+      id: 'target_gift_cards',
+      name: 'Target Gift Cards',
+      description: 'Target gift cards for retail shopping and online purchases. Great for home, clothing, and everyday essentials.',
+      logo_url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=100&h=100&fit=crop',
+      website_url: 'https://target.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 5.5,
+      status: 'active'
+    },
+    {
+      id: 'starbucks_gift_cards',
+      name: 'Starbucks Gift Cards',
+      description: 'Starbucks gift cards for coffee, food, and merchandise. Perfect for coffee lovers everywhere.',
+      logo_url: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=100&h=100&fit=crop',
+      website_url: 'https://starbucks.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 6.0,
+      status: 'active'
+    },
+    {
+      id: 'apple_gift_cards',
+      name: 'Apple Gift Cards',
+      description: 'Apple gift cards for products, apps, services, and more. Perfect for tech enthusiasts.',
+      logo_url: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=100&h=100&fit=crop',
+      website_url: 'https://apple.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 3.5,
+      status: 'active'
+    },
+    {
+      id: 'netflix_gift_cards',
+      name: 'Netflix Gift Cards',
+      description: 'Netflix gift cards for streaming entertainment. Give the gift of movies, shows, and original content.',
+      logo_url: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=100&h=100&fit=crop',
+      website_url: 'https://netflix.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 5.0,
+      status: 'active'
+    },
+    // Regular Brands
     {
       id: 'loy_fashion_001',
       name: 'Urban Style Co.',
@@ -394,79 +494,21 @@ function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
       category: 'Health & Fitness',
       commission_rate: 7.5,
       status: 'active'
-    },
-    {
-      id: 'loy_beauty_001',
-      name: 'Glow Beauty',
-      description: 'Natural skincare and cosmetics',
-      logo_url: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=100&h=100&fit=crop',
-      website_url: 'https://glowbeauty.com',
-      category: 'Beauty',
-      commission_rate: 9.2,
-      status: 'active'
-    },
-    {
-      id: 'loy_giftcard_001',
-      name: 'Amazon Gift Cards',
-      description: 'Digital and physical gift cards for the world\'s largest online retailer',
-      logo_url: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=100&h=100&fit=crop',
-      website_url: 'https://amazon.com/gift-cards',
-      category: 'Gift Cards',
-      commission_rate: 4.0,
-      status: 'active'
-    },
-    {
-      id: 'loy_giftcard_002',
-      name: 'Apple Store Gift Cards',
-      description: 'Gift cards for Apple products, apps, and services',
-      logo_url: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=100&h=100&fit=crop',
-      website_url: 'https://apple.com/gift-cards',
-      category: 'Gift Cards',
-      commission_rate: 3.5,
-      status: 'active'
-    },
-    {
-      id: 'loy_giftcard_003',
-      name: 'Target Gift Cards',
-      description: 'Versatile gift cards for retail shopping and online purchases',
-      logo_url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=100&h=100&fit=crop',
-      website_url: 'https://target.com/gift-cards',
-      category: 'Gift Cards',
-      commission_rate: 5.5,
-      status: 'active'
-    },
-    {
-      id: 'loy_giftcard_004',
-      name: 'Visa Prepaid Cards',
-      description: 'Flexible prepaid Visa cards accepted everywhere Visa is accepted',
-      logo_url: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=100&h=100&fit=crop',
-      website_url: 'https://usa.visa.com/pay-with-visa/cards/prepaid-cards.html',
-      category: 'Gift Cards',
-      commission_rate: 2.8,
-      status: 'active'
-    },
-    {
-      id: 'loy_giftcard_005',
-      name: 'Steam Gift Cards',
-      description: 'Digital gift cards for gaming, software, and entertainment on Steam',
-      logo_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&h=100&fit=crop',
-      website_url: 'https://store.steampowered.com/digitalgiftcards',
-      category: 'Gift Cards',
-      commission_rate: 6.2,
-      status: 'active'
     }
   ];
 
   let filtered = mockBrands;
   
   if (query) {
+    const searchQuery = query.toLowerCase();
     filtered = filtered.filter(brand => 
-      brand.name.toLowerCase().includes(query.toLowerCase()) ||
-      brand.description.toLowerCase().includes(query.toLowerCase())
+      brand.name.toLowerCase().includes(searchQuery) ||
+      brand.description.toLowerCase().includes(searchQuery) ||
+      brand.category.toLowerCase().includes(searchQuery)
     );
   }
   
-  if (category) {
+  if (category && category !== 'all') {
     filtered = filtered.filter(brand => 
       brand.category.toLowerCase() === category.toLowerCase()
     );
