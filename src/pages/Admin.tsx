@@ -24,6 +24,7 @@ import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
 import UserManagement from '@/components/admin/UserManagement';
 import LoyalizeBrandSync from '@/components/admin/LoyalizeBrandSync';
+import LoyalizeApiTester from '@/components/admin/LoyalizeApiTester';
 import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 import WebhookTester from '@/components/WebhookTester';
 
@@ -243,6 +244,8 @@ const Admin = () => {
 
           <TabsContent value="loyalize">
             <div className="space-y-6">
+              <LoyalizeApiTester />
+              
               <Card className="bg-section-highlight border border-section-border">
                 <CardHeader>
                   <CardTitle className="text-foreground">Find & Add Brands</CardTitle>

@@ -208,11 +208,11 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     let allStores: any[] = [];
     let page = 0;
     let hasMorePages = true;
-    const pageSize = 50; // Increase page size for efficiency
+    const maxPageSize = 200; // Increase from 50 to 200 for faster sync
     
     // First, try to get all stores with pagination
     while (hasMorePages) {
-      const endpoint = `https://api.loyalize.com/v1/stores?page=${page}&size=${pageSize}`;
+      const endpoint = `https://api.loyalize.com/v1/stores?page=${page}&size=${maxPageSize}&status=active`;
       console.log(`🔄 Fetching page ${page} from: ${endpoint}`);
       
       const response = await fetch(endpoint, {
@@ -223,15 +223,16 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         }
       });
       
-      console.log(`📊 API response status: ${response.status}`);
+      console.log(`📊 API response status: ${response.status} - Headers:`, Object.fromEntries(response.headers));
+      console.log(`📦 Response size: ${response.headers.get('content-length')} bytes`);
       
       if (!response.ok) {
         const errorText = await response.text().catch(() => '');
-        console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
+        console.error(`❌ API request failed: ${response.status} ${response.statusText} - Error: ${errorText}`);
         
         if (page === 0) {
           // If first page fails, throw error to trigger fallback
-          throw new Error(`Loyalize API error: ${response.status} - ${errorText}`);
+          throw new Error(`Loyalize API error: ${response.status} - ${errorText || response.statusText}`);
         } else {
           // If subsequent pages fail, break and use what we got
           console.log(`⚠️ Stopping pagination at page ${page} due to error`);
@@ -240,23 +241,68 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
       }
       
       const data = await response.json();
+      console.log(`📊 API Response Structure:`, {
+        hasContent: !!data.content,
+        contentLength: data.content?.length || 0,
+        isLast: data.last,
+        totalElements: data.totalElements,
+        totalPages: data.totalPages,
+        currentPage: data.number,
+        pageSize: data.size
+      });
+      
       const stores = data.content || [];
       
-      console.log(`✅ Retrieved ${stores.length} stores from page ${page}`);
+      console.log(`✅ Retrieved ${stores.length} stores from page ${page} (Total so far: ${allStores.length + stores.length})`);
       allStores = allStores.concat(stores);
       
-      // Check if there are more pages
-      hasMorePages = !data.last && stores.length === pageSize;
+      // Check if there are more pages - be more flexible with pagination detection
+      hasMorePages = !data.last && stores.length > 0 && (data.totalPages ? page < data.totalPages - 1 : stores.length === maxPageSize);
       page++;
       
+      // Log progress every 5 pages
+      if (page % 5 === 0) {
+        console.log(`🔄 Progress: Page ${page}, Total brands: ${allStores.length}`);
+      }
+      
       // Safety limit to prevent infinite loops
-      if (page > 20) {
-        console.log('⚠️ Reached maximum page limit (20), stopping pagination');
+      if (page > 50) {
+        console.log('⚠️ Reached maximum page limit (50), stopping pagination');
         break;
       }
     }
     
-    console.log(`📈 Total stores retrieved: ${allStores.length}`);
+    console.log(`🎯 FINAL RESULT: Retrieved ${allStores.length} total stores from ${page} pages`);
+    
+    // Also try to fetch gift card specific endpoint if available
+    try {
+      console.log('🎁 Attempting to fetch gift cards from dedicated endpoint...');
+      const giftCardResponse = await fetch('https://api.loyalize.com/v1/gift-cards?size=500', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (giftCardResponse.ok) {
+        const giftCardData = await giftCardResponse.json();
+        const giftCards = giftCardData.content || giftCardData || [];
+        console.log(`🎁 Found ${giftCards.length} additional gift cards`);
+        
+        // Transform gift cards to store format and add them
+        const transformedGiftCards = giftCards.map((gc: any) => ({
+          ...gc,
+          categories: [...(gc.categories || []), 'Gift Cards'],
+          name: gc.name + (gc.name.toLowerCase().includes('gift') ? '' : ' Gift Cards')
+        }));
+        
+        allStores = allStores.concat(transformedGiftCards);
+        console.log(`✅ Total after adding gift cards: ${allStores.length}`);
+      }
+    } catch (giftCardError) {
+      console.log('ℹ️ Gift card endpoint not available or failed:', giftCardError.message);
+    }
     
     if (allStores.length === 0) {
       throw new Error('No stores found in API response');
@@ -296,31 +342,6 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     
     if (allStores.length === 0) {
       throw new Error('No stores found in API response');
-    }
-    
-    // Check for Uber specifically and log if found
-    const uberStores = allStores.filter(store => 
-      store.name?.toLowerCase().includes('uber') ||
-      store.description?.toLowerCase().includes('uber')
-    );
-    
-    if (uberStores.length > 0) {
-      console.log(`🎯 Found ${uberStores.length} Uber-related stores:`, uberStores.map(s => s.name));
-    } else {
-      console.log('⚠️ No Uber stores found in API results');
-      
-       // Add Uber Gift Cards manually if not found
-       allStores.push({
-         id: 'uber-gift-cards-manual-002',
-         name: 'Uber Gift Cards',
-         description: 'Purchase Uber gift cards through MyGiftCardsPlus and earn up to 1% cashback. Perfect for rides and food delivery.',
-         imageUrl: 'https://logo.clearbit.com/uber.com',
-         commission: { value: 1.0, format: '%' },
-         categories: ['Gift Cards', 'Transportation'],
-         url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
-         homePage: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR'
-       });
-       console.log('✅ Added Uber Gift Cards manually to ensure availability');
     }
     
     // Transform store data to brand format
