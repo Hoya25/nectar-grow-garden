@@ -14,7 +14,7 @@ const FAQ = () => {
     },
     {
       question: "What is NCTR?",
-      answer: "NCTR (Nectar) is the primary token you earn by participating in opportunities curated in The Garden. You can stack NCTR in different commitment levels (90LOCK or 360LOCK) to unlock more opportunities and benefits across the crypto universe. Unlocked NCTR is yours to do with as you please, you can trade it for any other crypto you want, cash out or re-lock your NCTR to unlock more future earning and experiential opportunities.",
+      answer: "NCTR (Nectar) is the primary token you earn by participating in opportunities curated in The Garden. You can stack NCTR in different commitment levels (90LOCK or 360LOCK) to unlock more opportunities and benefits across the crypto universe. Unlocked NCTR is yours to do with as you please, you can trade it for any other crypto you want, cash out or re-lock your NCTR to unlock more future earning and experiential opportunities.\n\n⚠️ OFFICIAL CONTRACT ADDRESS: 0x973104fAa7F2B11787557e85953ECA6B4e262328\n\nThis is the ONLY official NCTR token contract. Do not confuse with any other crypto tokens that may have the same name. Always verify the contract address before any transactions.",
       icon: "🌾"
     },
     {

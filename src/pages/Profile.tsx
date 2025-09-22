@@ -624,6 +624,29 @@ const Profile = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* NCTR Contract Information */}
+            <Card className="bg-card/80 backdrop-blur-sm border-2 border-amber-500/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg text-amber-600">
+                  <Shield className="h-5 w-5" />
+                  Official NCTR Contract
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-2">
+                    ⚠️ OFFICIAL CONTRACT ADDRESS
+                  </p>
+                  <div className="bg-white dark:bg-gray-900 p-3 rounded border font-mono text-sm break-all">
+                    0x973104fAa7F2B11787557e85953ECA6B4e262328
+                  </div>
+                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                    This is the ONLY official NCTR token contract. Do not confuse with any other crypto tokens that may have the same name. Always verify the contract address before any transactions.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
