@@ -33,6 +33,9 @@ interface EarningOpportunity {
   partner_name: string;
   partner_logo_url: string;
   affiliate_link: string;
+  video_url?: string;
+  video_title?: string;
+  video_description?: string;
   is_active: boolean;
   created_at: string;
 }
@@ -65,6 +68,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     partner_name: '',
     partner_logo_url: '',
     affiliate_link: '',
+    video_url: '',
+    video_title: '',
+    video_description: '',
     is_active: true
   });
 
@@ -126,6 +132,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       partner_name: '',
       partner_logo_url: '',
       affiliate_link: '',
+      video_url: '',
+      video_title: '',
+      video_description: '',
       is_active: true
     });
     setEditingOpportunity(null);
@@ -142,6 +151,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       partner_name: opportunity.partner_name || '',
       partner_logo_url: opportunity.partner_logo_url || '',
       affiliate_link: opportunity.affiliate_link || '',
+      video_url: opportunity.video_url || '',
+      video_title: opportunity.video_title || '',
+      video_description: opportunity.video_description || '',
       is_active: opportunity.is_active
     });
     setModalOpen(true);
@@ -460,6 +472,42 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
                     placeholder="https://partner.com/affiliate/..."
                   />
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-foreground">Brand Video (Optional)</h4>
+                  <div className="space-y-2">
+                    <Label htmlFor="video_url">Video URL</Label>
+                    <Input
+                      id="video_url"
+                      type="url"
+                      value={formData.video_url}
+                      onChange={(e) => setFormData({...formData, video_url: e.target.value})}
+                      placeholder="https://example.com/brand-video.mp4"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="video_title">Video Title</Label>
+                      <Input
+                        id="video_title"
+                        value={formData.video_title}
+                        onChange={(e) => setFormData({...formData, video_title: e.target.value})}
+                        placeholder="About Our Brand"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="video_description">Video Description</Label>
+                      <Input
+                        id="video_description"
+                        value={formData.video_description}
+                        onChange={(e) => setFormData({...formData, video_description: e.target.value})}
+                        placeholder="Learn more about our mission"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-2">

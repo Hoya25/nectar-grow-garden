@@ -143,6 +143,9 @@ export type Database = {
           reward_per_dollar: number | null
           title: string
           updated_at: string
+          video_description: string | null
+          video_title: string | null
+          video_url: string | null
         }
         Insert: {
           affiliate_link?: string | null
@@ -159,6 +162,9 @@ export type Database = {
           reward_per_dollar?: number | null
           title: string
           updated_at?: string
+          video_description?: string | null
+          video_title?: string | null
+          video_url?: string | null
         }
         Update: {
           affiliate_link?: string | null
@@ -175,6 +181,9 @@ export type Database = {
           reward_per_dollar?: number | null
           title?: string
           updated_at?: string
+          video_description?: string | null
+          video_title?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
