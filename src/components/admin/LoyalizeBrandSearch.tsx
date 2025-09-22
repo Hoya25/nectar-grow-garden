@@ -35,7 +35,7 @@ interface LoyalizeBrandSearchProps {
 const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [brands, setBrands] = useState<LoyalizeBrand[]>([]);
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState<string | null>(null);
@@ -53,7 +53,7 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
       const { data, error } = await supabase.functions.invoke('loyalize-brands', {
         body: {
           query: searchTerm,
-          category: selectedCategory,
+          category: selectedCategory === 'all' ? '' : selectedCategory,
           limit: 20
         }
       });
@@ -176,7 +176,7 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
                         <SelectValue placeholder="All categories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Categories</SelectItem>
+                        <SelectItem value="all">All Categories</SelectItem>
                         {categories.map((category) => (
                           <SelectItem key={category} value={category}>
                             {category}
