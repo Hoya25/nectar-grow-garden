@@ -12,8 +12,15 @@ const Index = () => {
       
       {/* Earn Crypto Every Day Section */}
       <FeatureSection
-        title="Earn Crypto"
-        description="In The Garden you'll find opportunities to earn NCTR (nectar), the next generation rewards Alliance Token, by doing the simple things you do every day. Like shopping. Buy the things you need and want, and get NCTR in return."
+        title="Earn Crypto Effortlessly"
+        description="Your Daily Habits, Rewarded in The Garden
+
+Step into The Garden and start earning NCTR —our next-generation rewards Alliance Token—simply by being yourself every day. Turn everyday moments into real crypto wins, like:
+
+• Shopping: Buy the things you need and want—from groceries to gadgets—and get NCTR back as rewards.
+• Inviting Friends: Share the opportunity with friends; each invite brings more NCTR your way.
+
+It's all de-risked for you: safe, simple, and with no cost barriers, so you can grow your portfolio regardless of how much time or money you have."
         buttonText="Enter The Garden →"
         icon=""
       />
