@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-garden-new.jpg";
 import nctrLogo from "@/assets/nctr-n-transparent.png";
 import nctrOverlay from "@/assets/nctr-n-overlay.png";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
       {/* Background Image with Premium Overlay */}
@@ -33,7 +35,7 @@ const Hero = () => {
             <Button 
               size="lg" 
               className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight transition-all duration-500 hover:scale-105 text-lg px-8 py-6 shadow-large group relative overflow-hidden"
-              onClick={() => window.open('https://token.nctr.live/', '_blank')}
+              onClick={() => navigate('/auth')}
             >
               <span className="relative z-10">Enter The Garden →</span>
               <div className="absolute inset-0 bg-section-highlight opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

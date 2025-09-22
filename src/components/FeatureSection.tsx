@@ -61,11 +61,16 @@ const FeatureSection = ({
                 {description}
               </p>
               
+              {/* Premium CTA with Neon Effects */}
               <div className="pt-4">
                 <Button 
                   size="lg" 
                   className="bg-primary hover:bg-primary-glow text-primary-foreground text-xl px-12 py-8 rounded-2xl shadow-neon hover:shadow-glow-intense transition-all duration-500 hover:scale-105 hover:-translate-y-1 relative overflow-hidden group neon-glow"
-                  onClick={() => buttonHref && window.open(buttonHref, '_blank')}
+                  onClick={() => {
+                    if (buttonHref) {
+                      window.open(buttonHref, '_blank');
+                    }
+                  }}
                 >
                   <span className="relative z-10 flex items-center gap-3 font-bold">
                     {buttonText}
