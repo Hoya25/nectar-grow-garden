@@ -218,6 +218,9 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
       const storeData = await response.json();
       console.log(`✅ Successfully fetched store details: ${storeData.name}`);
       
+      // Fetch logo from sku-details endpoint
+      const logoUrl = await fetchSingleStoreLogo(apiKey, brandId);
+      
       // Calculate NCTR rate based on commission
       const commissionRate = storeData.commissionRate || 0.05;
       const nctrPerDollar = calculateNCTRRate(commissionRate * 100);
@@ -229,7 +232,7 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
           loyalize_id: brandId,
           name: storeData.name || 'Unknown Store',
           description: storeData.description || storeData.tagline || '',
-          logo_url: `https://api.loyalize.com/resources/stores/${brandId}/logo`,
+          logo_url: logoUrl || `https://api.loyalize.com/resources/stores/${brandId}/logo`,
           commission_rate: commissionRate,
           nctr_per_dollar: nctrPerDollar,
           website_url: storeData.homePage || '',
@@ -323,6 +326,10 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
 
     if (error) throw error;
 
+    // Fetch all logo data at once for efficiency
+    console.log('🖼️ Fetching logo data for all stores...');
+    const logoData = await fetchStoreLogos(apiKey);
+
     let updatedCount = 0;
     
     for (const brand of existingBrands) {
@@ -349,7 +356,7 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
               is_active: true,
               name: storeData.name,
               description: storeData.description || storeData.tagline,
-              logo_url: `https://api.loyalize.com/resources/stores/${brand.loyalize_id}/logo`,
+              logo_url: logoData[brand.loyalize_id] || `https://api.loyalize.com/resources/stores/${brand.loyalize_id}/logo`,
               website_url: storeData.homePage,
               category: storeData.categories?.[0] || 'General'
             })
@@ -521,4 +528,110 @@ function calculateNCTRRate(commissionPercentage: number): number {
   // Convert commission percentage to NCTR per dollar
   // Example: 8% commission = 0.02 NCTR per dollar
   return (commissionPercentage / 100) * 0.25;
+}
+
+async function fetchSingleStoreLogo(apiKey: string, storeId: string): Promise<string | null> {
+  console.log(`🖼️ Fetching logo for store: ${storeId}`);
+  
+  try {
+    const endpoint = `https://api.loyalize.com/v2/sku-details?storeId=${storeId}&size=1`;
+    
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`⚠️ Logo fetch failed for store ${storeId}: ${response.status}`);
+      return null;
+    }
+    
+    const data = await response.json();
+    const items = data.content || [];
+    
+    if (items.length > 0) {
+      const item = items[0];
+      const logoUrl = item.storeLogo || item.store_logo || item.merchant_logo;
+      
+      if (logoUrl) {
+        console.log(`✅ Found logo for store ${storeId}: ${logoUrl}`);
+        return logoUrl;
+      }
+    }
+    
+    console.log(`⚠️ No logo found for store ${storeId}`);
+    return null;
+    
+  } catch (error) {
+    console.error(`❌ Error fetching logo for store ${storeId}:`, error);
+    return null;
+  }
+}
+
+async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> {
+  console.log('🖼️ Fetching store logos from sku-details endpoint');
+  
+  try {
+    let logoMap: Record<string, string> = {};
+    let page = 0;
+    let hasMorePages = true;
+    const pageSize = 1000; // Maximum per API docs
+    
+    while (hasMorePages) {
+      const endpoint = `https://api.loyalize.com/v2/sku-details?page=${page}&size=${pageSize}`;
+      console.log(`🔄 Fetching logo page ${page} from: ${endpoint}`);
+      
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        console.log(`⚠️ Logo fetch failed for page ${page}: ${response.status}`);
+        break;
+      }
+      
+      const data = await response.json();
+      const items = data.content || [];
+      
+      console.log(`✅ Retrieved ${items.length} logo items from page ${page}`);
+      
+      // Extract store logos from sku details
+      items.forEach((item: any) => {
+        if (item.storeId && item.storeLogo) {
+          logoMap[item.storeId.toString()] = item.storeLogo;
+        }
+        // Also try alternative field names that might contain logo data
+        if (item.store_id && item.store_logo) {
+          logoMap[item.store_id.toString()] = item.store_logo;
+        }
+        if (item.merchant_id && item.merchant_logo) {
+          logoMap[item.merchant_id.toString()] = item.merchant_logo;
+        }
+      });
+      
+      // Check if there are more pages
+      hasMorePages = !data.last && items.length === pageSize;
+      page++;
+      
+      // Safety limit
+      if (page > 10) {
+        console.log('⚠️ Reached logo fetch page limit (10), stopping');
+        break;
+      }
+    }
+    
+    console.log(`🎯 Collected logos for ${Object.keys(logoMap).length} stores`);
+    return logoMap;
+    
+  } catch (error) {
+    console.error('❌ Error fetching store logos:', error);
+    return {};
+  }
 }
