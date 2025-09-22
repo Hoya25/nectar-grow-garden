@@ -460,23 +460,7 @@ export type Database = {
       }
     }
     Views: {
-      user_status_details: {
-        Row: {
-          current_locked_nctr: number | null
-          current_min_duration: number | null
-          next_required_duration: number | null
-          next_required_locked: number | null
-          next_status: string | null
-          opportunity_status: string | null
-          required_lock_duration: number | null
-          required_locked_nctr: number | null
-          reward_multiplier: number | null
-          status_benefits: string[] | null
-          status_description: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       add_sample_brands: {
