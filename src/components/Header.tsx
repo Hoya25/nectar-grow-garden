@@ -4,7 +4,9 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
 import ProfileModal from "@/components/ProfileModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Settings } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { User, Settings, Share2 } from "lucide-react";
+import ReferralSystem from "@/components/ReferralSystem";
 
 const Header = () => {
   const { user, signOut } = useAuth();
@@ -45,9 +47,29 @@ const Header = () => {
         <nav className="hidden md:flex items-center space-x-8">
           {!user ? (
             <>
-              <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
-                Invite a Friend
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Invite a Friend
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Invite Friends & Earn Together</DialogTitle>
+                  </DialogHeader>
+                  {user ? (
+                    <ReferralSystem />
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground mb-4">Sign up to access your referral program and start inviting friends!</p>
+                      <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90">
+                        Join The Garden
+                      </Button>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
               <Button 
                 variant="ghost" 
                 className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6"
@@ -74,9 +96,20 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
-                Invite a Friend
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Invite a Friend
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Invite Friends & Earn Together</DialogTitle>
+                  </DialogHeader>
+                  <ReferralSystem />
+                </DialogContent>
+              </Dialog>
               <Button 
                 variant="default" 
                 className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
