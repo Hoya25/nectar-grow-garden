@@ -240,16 +240,6 @@ const UserAffiliateLinks = () => {
                 </div>
               </div>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span>{brand.commission_rate}% Commission</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <User className="w-4 h-4 text-blue-500" />
-                  <span>{brand.nctr_per_dollar} NCTR per $1</span>
-                </div>
-              </div>
 
               <Button
                 onClick={() => generateAffiliateLink(brand)}
