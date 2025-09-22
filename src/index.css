@@ -2,67 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The Garden Design System - Nature-meets-crypto aesthetic 
+/* The Garden Design System - Premium 3D animated brand aesthetic 
+Sophisticated nature-meets-technology design language
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    /* Base colors - Clean whites and naturals */
+    /* Base colors - Premium whites with subtle warmth */
     --background: 0 0% 100%;
-    --foreground: 150 15% 15%;
+    --foreground: 150 12% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 150 15% 15%;
+    --card-foreground: 150 12% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 15% 15%;
+    --popover-foreground: 150 12% 12%;
 
-    /* Garden theme - Primary greens */
-    --primary: 140 45% 35%;
+    /* Garden theme - Sophisticated greens with depth */
+    --primary: 145 48% 32%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 140 55% 45%;
+    --primary-glow: 145 58% 42%;
+    --primary-deep: 145 65% 22%;
+    --primary-light: 145 35% 62%;
 
-    /* Secondary earth tones */
-    --secondary: 25 35% 92%;
-    --secondary-foreground: 150 15% 15%;
+    /* Secondary - Warm earth tones */
+    --secondary: 25 25% 95%;
+    --secondary-foreground: 150 12% 12%;
+    --secondary-accent: 28 45% 88%;
 
-    /* Muted naturals */
-    --muted: 60 10% 96%;
-    --muted-foreground: 150 8% 45%;
+    /* Muted - Sophisticated neutrals */
+    --muted: 150 8% 97%;
+    --muted-foreground: 150 10% 42%;
 
-    /* Accent - Trust blue */
-    --accent: 210 85% 65%;
+    /* Accent - Premium blues with energy */
+    --accent: 215 88% 62%;
     --accent-foreground: 0 0% 100%;
+    --accent-light: 215 65% 78%;
 
-    /* Crypto gold accents */
-    --crypto-gold: 45 95% 60%;
-    --crypto-gold-foreground: 150 15% 15%;
+    /* Crypto premium metals */
+    --crypto-gold: 42 88% 58%;
+    --crypto-gold-foreground: 150 12% 12%;
+    --crypto-silver: 210 8% 75%;
+    --crypto-platinum: 240 5% 85%;
 
-    /* Status colors */
-    --success: 140 65% 50%;
-    --warning: 35 85% 60%;
-    --destructive: 0 75% 55%;
+    /* Status colors - Enhanced vibrancy */
+    --success: 145 68% 48%;
+    --warning: 38 88% 58%;
+    --destructive: 0 78% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs */
-    --border: 150 15% 88%;
-    --input: 150 15% 88%;
-    --ring: 140 45% 35%;
+    /* Borders and inputs - Subtle definition */
+    --border: 150 12% 90%;
+    --input: 150 12% 90%;
+    --ring: 145 48% 32%;
 
-    /* Beautiful gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(140 45% 35%), hsl(140 55% 45%), hsl(210 85% 65%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(150 20% 98%));
-    --gradient-accent: linear-gradient(90deg, hsl(140 55% 45%), hsl(210 85% 65%));
+    /* Premium gradients - Multi-dimensional */
+    --gradient-hero: linear-gradient(135deg, hsl(145 48% 32%) 0%, hsl(145 58% 42%) 35%, hsl(215 88% 62%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(145 58% 42%) 0%, hsl(42 88% 58%) 50%, hsl(215 88% 62%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(150 15% 98%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(145 58% 42%) 0%, hsl(215 88% 62%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(145 48% 32%) 0%, hsl(145 65% 22%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(145 58% 42% / 0.15) 0%, transparent 70%);
     
-    /* Elegant shadows */
-    --shadow-soft: 0 2px 12px -2px hsl(150 15% 15% / 0.08);
-    --shadow-medium: 0 8px 32px -8px hsl(150 15% 15% / 0.12);
-    --shadow-glow: 0 0 40px hsl(140 55% 45% / 0.2);
+    /* Advanced shadows - 3D depth system */
+    --shadow-minimal: 0 1px 3px hsl(150 12% 12% / 0.04);
+    --shadow-soft: 0 2px 12px -2px hsl(150 12% 12% / 0.08);
+    --shadow-medium: 0 8px 32px -8px hsl(150 12% 12% / 0.12);
+    --shadow-large: 0 16px 48px -12px hsl(150 12% 12% / 0.18);
+    --shadow-glow: 0 0 40px hsl(145 58% 42% / 0.25);
+    --shadow-glow-intense: 0 0 60px hsl(145 58% 42% / 0.4);
+    --shadow-inset: inset 0 2px 8px hsl(150 12% 12% / 0.06);
     
-    /* Smooth transitions */
+    /* Premium transitions - Sophisticated timing */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-elegant: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+
+    /* Typography scale - Premium hierarchy */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    --text-6xl: 3.75rem;
+    --text-7xl: 4.5rem;
 
     --radius: 0.75rem;
 
