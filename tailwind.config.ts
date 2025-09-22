@@ -25,7 +25,6 @@ export default {
           glow: "hsl(var(--primary-glow))",
           deep: "hsl(var(--primary-deep))",
           light: "hsl(var(--primary-light))",
-          subtle: "hsl(var(--primary-subtle))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -44,7 +43,6 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
           light: "hsl(var(--accent-light))",
-          subtle: "hsl(var(--accent-subtle))",
         },
         "crypto-gold": {
           DEFAULT: "hsl(var(--crypto-gold))",
@@ -53,14 +51,8 @@ export default {
         "crypto-silver": "hsl(var(--crypto-silver))",
         "crypto-platinum": "hsl(var(--crypto-platinum))",
         "crypto-lime": "hsl(var(--crypto-lime))",
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
+        success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -88,7 +80,6 @@ export default {
         "gradient-depth": "var(--gradient-depth)",
         "gradient-glow": "var(--gradient-glow)",
         "gradient-page": "var(--gradient-page)",
-        "gradient-surface": "var(--gradient-surface)",
       },
       boxShadow: {
         minimal: "var(--shadow-minimal)",
@@ -98,7 +89,6 @@ export default {
         glow: "var(--shadow-glow)",
         "glow-intense": "var(--shadow-glow-intense)",
         inset: "var(--shadow-inset)",
-        surface: "var(--shadow-surface)",
       },
       transitionTimingFunction: {
         smooth: "var(--transition-smooth)",

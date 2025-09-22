@@ -9,78 +9,72 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Light theme base - Clean whites and soft grays inspired by NCTR.live */
-    --background: 0 0% 99%;
-    --foreground: 240 10% 15%;
+    /* Base colors - Deep charcoal with lime accents */
+    --background: 0 0% 100%;
+    --foreground: 150 12% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 15%;
+    --card-foreground: 150 12% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 15%;
+    --popover-foreground: 150 12% 8%;
 
-    /* NCTR signature lime - Matching official site */
-    --primary: 82 100% 48%; /* Official NCTR lime */
-    --primary-foreground: 240 10% 15%;
-    --primary-glow: 82 95% 60%;
+    /* NCTR lime theme - Vibrant lime green with depth */
+    --primary: 82 100% 50%; /* Bright NCTR lime */
+    --primary-foreground: 150 12% 8%;
+    --primary-glow: 82 85% 65%;
     --primary-deep: 82 100% 35%;
-    --primary-light: 82 85% 75%;
-    --primary-subtle: 82 40% 95%;
+    --primary-light: 82 80% 75%;
 
-    /* Secondary - Ultra-clean light grays */
-    --secondary: 210 15% 97%;
-    --secondary-foreground: 240 10% 15%;
-    --secondary-accent: 210 20% 92%;
+    /* Secondary - Modern charcoal grays */
+    --secondary: 210 8% 95%;
+    --secondary-foreground: 150 12% 8%;
+    --secondary-accent: 210 12% 88%;
 
-    /* Muted - Soft neutral tones */
-    --muted: 210 15% 95%;
-    --muted-foreground: 240 8% 45%;
+    /* Muted - Sophisticated grays */
+    --muted: 210 8% 97%;
+    --muted-foreground: 210 10% 42%;
 
-    /* Accent - Refined holographic blues */
-    --accent: 200 100% 55%;
+    /* Accent - Electric blue for contrast */
+    --accent: 200 100% 60%;
     --accent-foreground: 0 0% 100%;
-    --accent-light: 200 80% 70%;
-    --accent-subtle: 200 40% 95%;
+    --accent-light: 200 85% 75%;
 
-    /* Premium metallic tones */
-    --crypto-gold: 45 95% 58%;
-    --crypto-gold-foreground: 240 10% 15%;
-    --crypto-silver: 210 15% 70%;
-    --crypto-platinum: 220 10% 80%;
-    --crypto-lime: 82 100% 48%;
+    /* Crypto premium metals - Enhanced with lime */
+    --crypto-gold: 50 100% 55%;
+    --crypto-gold-foreground: 150 12% 8%;
+    --crypto-silver: 210 8% 75%;
+    --crypto-platinum: 240 5% 85%;
+    --crypto-lime: 82 100% 50%;
 
-    /* Status colors - Clean and vibrant */
-    --success: 82 100% 48%;
-    --success-foreground: 240 10% 15%;
-    --warning: 38 90% 55%;
-    --warning-foreground: 240 10% 15%;
-    --destructive: 0 75% 55%;
+    /* Status colors - Enhanced vibrancy */
+    --success: 82 100% 50%; /* Use NCTR lime for success */
+    --warning: 38 100% 55%;
+    --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs - Minimal and clean */
-    --border: 210 20% 88%;
-    --input: 210 20% 93%;
-    --ring: 82 100% 48%;
+    /* Borders and inputs - Subtle with lime hints */
+    --border: 210 12% 90%;
+    --input: 210 12% 90%;
+    --ring: 82 100% 50%;
 
-    /* Light theme gradients - Clean and futuristic */
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(82 40% 96%) 50%, hsl(200 30% 96%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(82 100% 48%) 0%, hsl(82 60% 85%) 50%, hsl(200 50% 88%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 25% 97%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(82 100% 48%) 0%, hsl(200 80% 65%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(82 100% 48%) 0%, hsl(82 90% 55%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(82 100% 48% / 0.08) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(82 30% 98%) 30%, hsl(210 25% 97%) 100%);
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
+    /* Premium gradients - NCTR lime focused */
+    --gradient-hero: linear-gradient(135deg, hsl(82 100% 50%) 0%, hsl(82 85% 65%) 35%, hsl(200 100% 60%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(82 100% 50%) 0%, hsl(50 100% 55%) 50%, hsl(200 100% 60%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(82 100% 50%) 0%, hsl(200 100% 60%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(82 100% 50%) 0%, hsl(82 100% 35%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(82 100% 50% / 0.15) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(82 20% 98%) 50%, hsl(210 20% 98%) 100%);
     
-    /* Light theme shadows - Subtle depth with lime accents */
-    --shadow-minimal: 0 1px 3px hsl(240 10% 15% / 0.06);
-    --shadow-soft: 0 2px 12px -2px hsl(240 10% 15% / 0.1);
-    --shadow-medium: 0 8px 32px -8px hsl(240 10% 15% / 0.15);
-    --shadow-large: 0 16px 48px -12px hsl(240 10% 15% / 0.2);
-    --shadow-glow: 0 0 40px hsl(82 100% 48% / 0.15);
-    --shadow-glow-intense: 0 0 60px hsl(82 100% 48% / 0.25);
-    --shadow-inset: inset 0 2px 8px hsl(240 10% 15% / 0.04);
-    --shadow-surface: 0 1px 3px hsl(240 15% 20% / 0.08);
+    /* Advanced shadows - 3D depth system with lime glow */
+    --shadow-minimal: 0 1px 3px hsl(150 12% 8% / 0.04);
+    --shadow-soft: 0 2px 12px -2px hsl(150 12% 8% / 0.08);
+    --shadow-medium: 0 8px 32px -8px hsl(150 12% 8% / 0.12);
+    --shadow-large: 0 16px 48px -12px hsl(150 12% 8% / 0.18);
+    --shadow-glow: 0 0 40px hsl(82 100% 50% / 0.25);
+    --shadow-glow-intense: 0 0 60px hsl(82 100% 50% / 0.4);
+    --shadow-inset: inset 0 2px 8px hsl(150 12% 8% / 0.06);
     
     /* Premium transitions - Sophisticated timing */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -103,14 +97,14 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 99%;
-    --sidebar-foreground: 240 10% 15%;
-    --sidebar-primary: 82 100% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 20% 96%;
-    --sidebar-accent-foreground: 240 10% 15%;
-    --sidebar-border: 210 20% 88%;
-    --sidebar-ring: 82 100% 48%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 82 100% 50%;
   }
 
   .dark {
