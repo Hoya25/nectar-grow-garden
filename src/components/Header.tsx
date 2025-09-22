@@ -43,7 +43,7 @@ const Header = () => {
         >
           <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gradient-hero shadow-soft group-hover:shadow-glow transition-all duration-300">
             <video 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover scale-150 translate-y-1"
               autoPlay
               loop
               muted
