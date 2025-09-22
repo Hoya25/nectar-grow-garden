@@ -20,7 +20,9 @@ import {
   Users,
   ShoppingBag,
   Star,
-  Loader2
+  Loader2,
+  ExternalLink,
+  Video
 } from 'lucide-react';
 
 interface EarningOpportunity {
@@ -176,7 +178,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
     try {
       if (editingOpportunity) {
-        // Update existing opportunity
         const { error } = await supabase
           .from('earning_opportunities')
           .update(formData)
@@ -194,7 +195,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
           description: `${formData.title} has been updated successfully.`,
         });
       } else {
-        // Create new opportunity
         const { data, error } = await supabase
           .from('earning_opportunities')
           .insert(formData)
@@ -307,11 +307,30 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
   return (
     <div className="space-y-6">
+      {/* Quick Start Guide */}
+      <Card className="bg-section-highlight border border-section-border">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-foreground">
+            <Gift className="w-5 h-5" />
+            Opportunity Management Hub
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground mb-4">
+            Create earning opportunities for your users. Need brands? Use the "Brand Search" tab to find and add new partners from Loyalize.
+          </p>
+          <div className="flex gap-2 text-sm">
+            <Badge variant="outline">📈 {opportunities.filter(o => o.is_active).length} Active</Badge>
+            <Badge variant="outline">🏢 {brands.length} Brands Available</Badge>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="text-xl font-semibold">Opportunity Management</h3>
-          <p className="text-muted-foreground">Create and manage earning opportunities for users</p>
+          <h3 className="text-xl font-semibold text-foreground">Opportunities</h3>
+          <p className="text-muted-foreground">Create and manage earning opportunities</p>
         </div>
         
         <div className="flex gap-2">
@@ -342,27 +361,30 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
             <DialogTrigger asChild>
               <Button 
                 onClick={resetForm}
-                className="bg-gradient-hero hover:opacity-90"
+                className="bg-primary hover:bg-primary/90 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add Opportunity
+                Create Opportunity
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>
+                <DialogTitle className="text-xl text-foreground">
                   {editingOpportunity ? 'Edit Opportunity' : 'Create New Opportunity'}
                 </DialogTitle>
               </DialogHeader>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Basic Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Title *</Label>
+                    <Label htmlFor="title">Opportunity Title *</Label>
                     <Input
                       id="title"
                       value={formData.title}
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      placeholder="e.g., Nike Shopping Rewards"
                       required
                     />
                   </div>
@@ -377,7 +399,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="shopping">Shopping</SelectItem>
+                        <SelectItem value="shopping">Shopping Rewards</SelectItem>
                         <SelectItem value="invite">Invite Friends</SelectItem>
                         <SelectItem value="partner">Partner Bonus</SelectItem>
                         <SelectItem value="bonus">Special Bonus</SelectItem>
@@ -392,65 +414,78 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Describe this earning opportunity..."
+                    placeholder="Describe what users need to do to earn NCTR..."
+                    rows={3}
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Select Brand Partner (Optional)</Label>
-                  <Select onValueChange={handleBrandSelect}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose from existing brands..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {brands.map((brand) => (
-                        <SelectItem key={brand.id} value={brand.id}>
-                          {brand.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Brand Selection */}
+                <div className="bg-section-highlight p-4 rounded-lg space-y-4">
+                  <h4 className="font-semibold text-foreground flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4" />
+                    Brand Partner Selection
+                  </h4>
+                  
+                  <div className="space-y-3">
+                    <Select onValueChange={handleBrandSelect} value="">
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="🔍 Search and select from existing brands..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <div className="p-2 text-sm text-muted-foreground border-b">
+                          Available Brands ({brands.length})
+                        </div>
+                        {brands.map((brand) => (
+                          <SelectItem key={brand.id} value={brand.id}>
+                            <div className="flex items-center gap-2">
+                              {brand.logo_url && (
+                                <img src={brand.logo_url} alt="" className="w-4 h-4 rounded" />
+                              )}
+                              {brand.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                        {brands.length === 0 && (
+                          <div className="p-2 text-sm text-muted-foreground">
+                            No brands available. Use Brand Search tab to add brands first.
+                          </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className="text-xs text-muted-foreground">
+                      💡 Tip: Use "Brand Search" tab to find and add new brands from Loyalize
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="partner_name">Brand Name</Label>
+                      <Input
+                        id="partner_name"
+                        value={formData.partner_name}
+                        onChange={(e) => setFormData({...formData, partner_name: e.target.value})}
+                        placeholder="Enter brand name"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="partner_logo_url">Brand Logo URL</Label>
+                      <Input
+                        id="partner_logo_url"
+                        type="url"
+                        value={formData.partner_logo_url}
+                        onChange={(e) => setFormData({...formData, partner_logo_url: e.target.value})}
+                        placeholder="https://example.com/logo.png"
+                      />
+                    </div>
+                  </div>
                 </div>
 
+                {/* Rewards */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="partner_name">Partner Name</Label>
-                    <Input
-                      id="partner_name"
-                      value={formData.partner_name}
-                      onChange={(e) => setFormData({...formData, partner_name: e.target.value})}
-                      placeholder="Brand or partner name"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="partner_logo_url">Partner Logo URL</Label>
-                    <Input
-                      id="partner_logo_url"
-                      type="url"
-                      value={formData.partner_logo_url}
-                      onChange={(e) => setFormData({...formData, partner_logo_url: e.target.value})}
-                      placeholder="https://example.com/logo.png"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nctr_reward">Fixed NCTR Reward</Label>
-                    <Input
-                      id="nctr_reward"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.nctr_reward}
-                      onChange={(e) => setFormData({...formData, nctr_reward: parseFloat(e.target.value) || 0})}
-                      placeholder="One-time reward amount"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="reward_per_dollar">NCTR per Dollar</Label>
+                    <Label htmlFor="reward_per_dollar">NCTR per $1 Spent</Label>
                     <Input
                       id="reward_per_dollar"
                       type="number"
@@ -458,83 +493,110 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       min="0"
                       value={formData.reward_per_dollar}
                       onChange={(e) => setFormData({...formData, reward_per_dollar: parseFloat(e.target.value) || 0})}
-                      placeholder="Reward rate for purchases"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="affiliate_link">Affiliate Link</Label>
-                  <Input
-                    id="affiliate_link"
-                    type="url"
-                    value={formData.affiliate_link}
-                    onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
-                    placeholder="https://partner.com/affiliate/..."
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-foreground">Brand Video (Optional)</h4>
-                  <div className="space-y-2">
-                    <Label htmlFor="video_url">Video URL</Label>
-                    <Input
-                      id="video_url"
-                      type="url"
-                      value={formData.video_url}
-                      onChange={(e) => setFormData({...formData, video_url: e.target.value})}
-                      placeholder="https://example.com/brand-video.mp4"
+                      placeholder="0.0150"
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nctr_reward">Sign-up Bonus NCTR</Label>
+                    <Input
+                      id="nctr_reward"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.nctr_reward}
+                      onChange={(e) => setFormData({...formData, nctr_reward: parseFloat(e.target.value) || 0})}
+                      placeholder="25.00"
+                    />
+                  </div>
+                </div>
+
+                {/* Video Section */}
+                <div className="bg-section-highlight p-4 rounded-lg space-y-4">
+                  <h4 className="font-semibold text-foreground flex items-center gap-2">
+                    <Video className="w-4 h-4" />
+                    Brand Video (Optional)
+                  </h4>
+                  
+                  <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="video_title">Video Title</Label>
+                      <Label htmlFor="video_url">Video URL</Label>
                       <Input
-                        id="video_title"
-                        value={formData.video_title}
-                        onChange={(e) => setFormData({...formData, video_title: e.target.value})}
-                        placeholder="About Our Brand"
+                        id="video_url"
+                        type="url"
+                        value={formData.video_url}
+                        onChange={(e) => setFormData({...formData, video_url: e.target.value})}
+                        placeholder="https://example.com/brand-video.mp4"
                       />
+                      <div className="text-xs text-muted-foreground">
+                        📹 Upload your video to a hosting service and paste the URL here
+                      </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="video_description">Video Description</Label>
-                      <Input
-                        id="video_description"
-                        value={formData.video_description}
-                        onChange={(e) => setFormData({...formData, video_description: e.target.value})}
-                        placeholder="Learn more about our mission"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="video_title">Video Title</Label>
+                        <Input
+                          id="video_title"
+                          value={formData.video_title}
+                          onChange={(e) => setFormData({...formData, video_title: e.target.value})}
+                          placeholder="About Nike"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="video_description">Video Description</Label>
+                        <Input
+                          id="video_description"
+                          value={formData.video_description}
+                          onChange={(e) => setFormData({...formData, video_description: e.target.value})}
+                          placeholder="Learn about Nike's innovation..."
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is_active"
-                    checked={formData.is_active}
-                    onCheckedChange={(checked) => setFormData({...formData, is_active: checked})}
-                  />
-                  <Label htmlFor="is_active">Active</Label>
+                {/* Links & Activation */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="affiliate_link">Shopping Link</Label>
+                    <Input
+                      id="affiliate_link"
+                      type="url"
+                      value={formData.affiliate_link}
+                      onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
+                      placeholder="https://nike.com/affiliate/12345"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_active"
+                      checked={formData.is_active}
+                      onCheckedChange={(checked) => setFormData({...formData, is_active: checked})}
+                    />
+                    <Label htmlFor="is_active" className="text-sm font-medium">
+                      Activate opportunity immediately
+                    </Label>
+                  </div>
                 </div>
 
-                <div className="flex gap-2 pt-4">
+                <div className="flex justify-end gap-3 pt-6 border-t border-section-border">
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={() => setModalOpen(false)}
-                    className="flex-1"
                   >
                     Cancel
                   </Button>
                   <Button 
                     type="submit" 
                     disabled={loading}
-                    className="flex-1 bg-gradient-hero hover:opacity-90"
+                    className="bg-primary hover:bg-primary/90 text-white"
                   >
                     {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    {editingOpportunity ? 'Update Opportunity' : 'Create Opportunity'}
+                    {editingOpportunity ? 'Update' : 'Create'} Opportunity
                   </Button>
                 </div>
               </form>
@@ -545,86 +607,64 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
       {/* Opportunities Grid */}
       {loading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <Card key={i} className="bg-card/80 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <div className="animate-pulse space-y-3">
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
-                  <div className="h-3 bg-muted rounded w-1/2"></div>
-                  <div className="h-8 bg-muted rounded"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="text-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading opportunities...</p>
         </div>
       ) : filteredOpportunities.length === 0 ? (
-        <Card className="bg-card/80 backdrop-blur-sm">
-          <CardContent className="p-8 text-center">
-            <Gift className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">
+        <Card className="bg-white border border-section-border text-center py-12">
+          <CardContent>
+            <Gift className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2 text-foreground">
               {searchTerm || filterType !== 'all' ? 'No opportunities match your filters.' : 'No opportunities created yet.'}
-            </p>
+            </h3>
+            <p className="text-muted-foreground mb-4">Start by creating your first earning opportunity!</p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredOpportunities.map((opportunity) => {
             const IconComponent = getOpportunityIcon(opportunity.opportunity_type);
             return (
-              <Card key={opportunity.id} className="bg-card/80 backdrop-blur-sm hover:shadow-glow transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <IconComponent className="w-4 h-4" />
-                        <CardTitle className="text-lg">{opportunity.title}</CardTitle>
+              <Card key={opportunity.id} className="bg-white border border-section-border shadow-soft hover:shadow-medium transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-section-highlight rounded-lg flex items-center justify-center">
+                        <IconComponent className="w-5 h-5 text-foreground" />
                       </div>
-                      <div className="flex gap-2 mb-2">
-                        <Badge variant={opportunity.is_active ? 'default' : 'secondary'}>
-                          {opportunity.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
-                        <Badge variant="outline">
-                          {opportunity.opportunity_type.toUpperCase()}
-                        </Badge>
+                      <div>
+                        <h4 className="font-semibold text-foreground">{opportunity.title}</h4>
+                        <p className="text-sm text-muted-foreground">{opportunity.partner_name || 'No Partner'}</p>
                       </div>
                     </div>
-                    {opportunity.partner_logo_url && (
-                      <img 
-                        src={opportunity.partner_logo_url} 
-                        alt={opportunity.partner_name}
-                        className="w-10 h-10 object-contain rounded"
-                      />
-                    )}
+                    <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
+                      {opportunity.is_active ? 'Active' : 'Inactive'}
+                    </Badge>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {opportunity.description || 'No description available.'}
-                  </p>
-                  
-                  {opportunity.partner_name && (
-                    <p className="text-sm font-medium mb-2">Partner: {opportunity.partner_name}</p>
-                  )}
-                  
-                  <div className="grid grid-cols-2 gap-2 text-sm mb-4">
+
+                  <div className="space-y-2 mb-4">
                     {opportunity.nctr_reward > 0 && (
-                      <div>
-                        <span className="text-muted-foreground">Fixed Reward:</span>
-                        <p className="font-medium text-primary">{opportunity.nctr_reward} NCTR</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Sign-up Bonus:</span>
+                        <span className="font-medium text-section-accent">{opportunity.nctr_reward} NCTR</span>
                       </div>
                     )}
-                    {opportunity.reward_per_dollar > 0 && (
-                      <div>
-                        <span className="text-muted-foreground">Rate:</span>
-                        <p className="font-medium text-primary">{opportunity.reward_per_dollar} NCTR/$1</p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Per Dollar:</span>
+                      <span className="font-medium text-section-accent">{opportunity.reward_per_dollar} NCTR</span>
+                    </div>
+                    {opportunity.video_url && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Has Video:</span>
+                        <Video className="w-4 h-4 text-section-accent" />
                       </div>
                     )}
                   </div>
 
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => handleEdit(opportunity)}
                       className="flex-1"
@@ -632,15 +672,16 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant={opportunity.is_active ? "secondary" : "default"}
                       size="sm"
                       onClick={() => toggleOpportunityStatus(opportunity)}
+                      className="flex-1"
                     >
                       {opportunity.is_active ? 'Deactivate' : 'Activate'}
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => handleDelete(opportunity)}
                       className="text-destructive hover:text-destructive"

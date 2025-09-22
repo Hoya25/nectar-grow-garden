@@ -7,12 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
-import ProfileModal from '@/components/ProfileModal';
+import { useAdmin } from '@/hooks/useAdmin';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
@@ -45,8 +45,11 @@ interface EarningOpportunity {
   video_description?: string;
 }
 
+import ProfileModal from '@/components/ProfileModal';
+
 const Garden = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress } = useNCTRPrice();
   const navigate = useNavigate();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
@@ -184,6 +187,17 @@ const Garden = () => {
               <User className="w-4 h-4" />
               Profile
             </Button>
+            {isAdmin && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/admin')}
+                className="flex items-center gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
+              >
+                <Settings className="w-4 h-4" />
+                Admin
+              </Button>
+            )}
             <Button 
               variant="outline" 
               onClick={handleSignOut}

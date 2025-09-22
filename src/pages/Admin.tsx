@@ -215,36 +215,72 @@ const Admin = () => {
         </div>
 
         {/* Admin Tabs */}
-        <Tabs defaultValue="loyalize" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+        <Tabs defaultValue="opportunities" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="opportunities" className="flex items-center gap-2">
+              <Gift className="w-4 h-4" />
+              Opportunities
+            </TabsTrigger>
             <TabsTrigger value="loyalize" className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
-              Loyalize
+              Brand Search
             </TabsTrigger>
-            <TabsTrigger value="brands">Brand Management</TabsTrigger>
-            <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-            <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="loyalize">
-            <LoyalizeBrandSync onBrandsUpdated={fetchAdminStats} />
-          </TabsContent>
-
-          <TabsContent value="brands">
-            <BrandManagement onStatsUpdate={fetchAdminStats} />
-          </TabsContent>
 
           <TabsContent value="opportunities">
             <OpportunityManagement onStatsUpdate={fetchAdminStats} />
           </TabsContent>
 
-          <TabsContent value="users">
-            <UserManagement />
+          <TabsContent value="loyalize">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Brand Search & Integration</h3>
+                <p className="text-muted-foreground">Search and add new brands from Loyalize to create opportunities</p>
+              </div>
+              <LoyalizeBrandSync onBrandsUpdated={fetchAdminStats} />
+              
+              <div className="mt-8">
+                <h4 className="text-lg font-semibold mb-4">Manage Existing Brands</h4>
+                <BrandManagement onStatsUpdate={fetchAdminStats} />
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="settings" className="space-y-4">
-            <SiteSettingsManagement />
+          <TabsContent value="settings" className="space-y-6">
+            <div>
+              <h3 className="text-xl font-semibold mb-2">System Settings</h3>
+              <p className="text-muted-foreground">Configure site settings and manage users</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="bg-white border border-section-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    User Management
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <UserManagement />
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white border border-section-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    Site Settings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SiteSettingsManagement />
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
