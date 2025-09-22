@@ -476,8 +476,8 @@ const Garden = () => {
                 
                 <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
                   {opportunities.map((opportunity, index) => (
-                    <Card key={opportunity.id} className={`bg-white shadow-large hover:shadow-glow-intense transition-all duration-500 border-2 ${index === 0 ? 'border-primary' : 'border-section-border'} group`}>
-                      <CardContent className="p-8">
+                    <Card key={opportunity.id} className={`bg-white shadow-large hover:shadow-glow-intense transition-all duration-500 border-2 ${index === 0 ? 'border-primary' : 'border-section-border'} group flex flex-col h-full`}>
+                      <CardContent className="p-8 flex flex-col h-full">
                         {/* Header with elegant spacing */}
                         <div className="text-center mb-8">
                           {index === 0 && (
@@ -529,21 +529,21 @@ const Garden = () => {
                           </div>
                         )}
 
-                        {/* Earning Display - Large and prominent */}
-                        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-8 mb-8 text-center border border-primary/20">
+                        {/* Earning Display - Consistent height and alignment */}
+                        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-6 mb-6 text-center border border-primary/20 min-h-[140px] flex flex-col justify-center">
                           <div className="flex items-center justify-center space-x-4 mb-3">
-                            <div className="text-4xl font-bold text-primary">
+                            <div className="text-3xl font-bold text-primary">
                               {formatNCTR(opportunity.reward_per_dollar || 0)}
                             </div>
-                            <img src={nctrLogo} alt="NCTR" className="h-28 w-auto" />
+                            <img src={nctrLogo} alt="NCTR" className="h-24 w-auto" />
                           </div>
-                          <div className="text-lg text-muted-foreground font-medium mb-4">per $1 spent</div>
+                          <div className="text-base text-muted-foreground font-medium mb-3">per $1 spent</div>
                           
                           {opportunity.nctr_reward > 0 && (
-                            <div className="bg-white rounded-xl p-4 shadow-soft">
+                            <div className="bg-white rounded-xl p-3 shadow-soft">
                               <div className="flex items-center justify-center space-x-2 text-primary">
-                                <Gift className="w-5 h-5" />
-                                <span className="font-bold text-lg">
+                                <Gift className="w-4 h-4" />
+                                <span className="font-bold text-sm">
                                   +{formatNCTR(opportunity.nctr_reward)} NCTR Welcome Bonus
                                 </span>
                               </div>
@@ -552,17 +552,21 @@ const Garden = () => {
                         </div>
 
                         {/* Description with elegant typography */}
-                        {opportunity.description && (
-                          <p className="text-foreground leading-relaxed text-center mb-8 text-lg">
-                            {opportunity.description}
-                          </p>
-                        )}
+                        <div className="flex-grow mb-6">
+                          {opportunity.description && (
+                            <p className="text-foreground leading-relaxed text-center">
+                              {opportunity.description}
+                            </p>
+                          )}
+                        </div>
 
-                        {/* CTA Button - Large and prominent */}
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]">
-                          <ExternalLink className="w-6 h-6 mr-3" />
-                          Start Earning with {opportunity.partner_name || 'This Brand'}
-                        </Button>
+                        {/* CTA Button - Consistent size and alignment */}
+                        <div className="mt-auto">
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]">
+                            <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
+                            <span className="truncate">Start Earning</span>
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -588,8 +592,8 @@ const Garden = () => {
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {opportunities.map((opportunity, index) => (
-                    <Card key={opportunity.id} className="bg-white border border-section-border shadow-soft hover:shadow-medium transition-all duration-300 group">
-                      <CardContent className="p-6">
+                    <Card key={opportunity.id} className="bg-white border border-section-border shadow-soft hover:shadow-medium transition-all duration-300 group flex flex-col">
+                      <CardContent className="p-6 flex flex-col h-full">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center space-x-3">
                             {opportunity.partner_logo_url ? (
@@ -619,20 +623,29 @@ const Garden = () => {
                           )}
                         </div>
 
-                        <div className="bg-section-highlight rounded-lg p-3 mb-4 text-center">
+                        {/* NCTR Display - Consistent height and alignment */}
+                        <div className="bg-section-highlight rounded-lg p-4 mb-4 text-center min-h-[80px] flex flex-col justify-center flex-grow">
                           <div className="flex items-center justify-center space-x-2 mb-1">
                             <span className="text-lg font-bold text-section-accent">
                               {formatNCTR(opportunity.reward_per_dollar || 0)}
                             </span>
                             <img src={nctrLogo} alt="NCTR" className="h-14 w-auto" />
                           </div>
-                          <div className="text-xs text-muted-foreground">per $1</div>
+                          <div className="text-xs text-muted-foreground">per $1 spent</div>
+                          {opportunity.nctr_reward > 0 && (
+                            <div className="text-xs text-primary font-medium mt-2">
+                              +{formatNCTR(opportunity.nctr_reward)} NCTR bonus
+                            </div>
+                          )}
                         </div>
 
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 rounded-lg group-hover:shadow-medium transition-all duration-300">
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Earn Now
-                        </Button>
+                        {/* Button - Consistent alignment */}
+                        <div className="mt-auto">
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300">
+                            <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span className="truncate">Earn Now</span>
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
