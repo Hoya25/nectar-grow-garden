@@ -2,79 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The Garden Design System - Premium 3D animated brand aesthetic 
-Sophisticated nature-meets-technology design language with NCTR lime green focus
+/* The Garden Design System - Inverted NCTR color scheme
+Green backgrounds with gunmetal grey text for better contrast and brand alignment
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    /* Base colors - Light theme with NCTR logo colors */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 25%; /* Dark charcoal grey from NCTR logo */
+    /* Base colors - Inverted scheme: green backgrounds with grey text */
+    --background: 75 100% 85%; /* Light green background */
+    --foreground: 0 0% 25%; /* Dark gunmetal grey text */
 
-    --card: 0 0% 100%;
+    --card: 75 80% 90%; /* Lighter green for cards */
     --card-foreground: 0 0% 25%;
 
-    --popover: 0 0% 100%;
+    --popover: 75 80% 90%;
     --popover-foreground: 0 0% 25%;
 
-    /* NCTR lime theme - Matching logo colors */
-    --primary: 75 85% 75%; /* Bright lime-yellow from NCTR logo background */
-    --primary-foreground: 0 0% 25%; /* Dark charcoal from NCTR text */
-    --primary-glow: 75 70% 65%;
-    --primary-deep: 75 85% 55%;
-    --primary-light: 75 60% 85%;
+    /* NCTR theme - Inverted: green backgrounds, grey text */
+    --primary: 120 100% 30%; /* Darker green for primary elements */
+    --primary-foreground: 0 0% 95%; /* Light text on green */
+    --primary-glow: 120 80% 40%;
+    --primary-deep: 120 100% 25%;
+    --primary-light: 120 60% 50%;
 
-    /* Secondary - Subtle grays */
-    --secondary: 210 8% 95%;
+    /* Secondary - Green tinted */
+    --secondary: 75 30% 85%;
     --secondary-foreground: 0 0% 25%;
-    --secondary-accent: 210 12% 88%;
+    --secondary-accent: 75 40% 80%;
 
-    /* Muted - Light grays */
-    --muted: 210 8% 97%;
-    --muted-foreground: 0 0% 45%;
+    /* Muted - Light green tones */
+    --muted: 75 25% 88%;
+    --muted-foreground: 0 0% 35%;
 
-    /* Accent - Complementary to NCTR lime */
-    --accent: 200 65% 50%;
+    /* Accent - Complementary to green */
+    --accent: 300 65% 50%;
     --accent-foreground: 0 0% 100%;
-    --accent-light: 200 50% 65%;
+    --accent-light: 300 50% 65%;
 
-    /* Crypto premium metals - NCTR lime focused */
+    /* Crypto premium metals - Green theme */
     --crypto-gold: 50 75% 50%;
     --crypto-gold-foreground: 0 0% 25%;
     --crypto-silver: 210 8% 75%;
     --crypto-platinum: 240 5% 85%;
-    --crypto-lime: 75 85% 75%;
+    --crypto-lime: 120 100% 30%;
 
-    /* Status colors - NCTR lime theme */
-    --success: 75 85% 75%; /* Use NCTR lime for success */
+    /* Status colors - Green theme */
+    --success: 120 100% 30%;
     --warning: 38 75% 50%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs */
-    --border: 210 12% 90%;
-    --input: 210 12% 90%;
-    --ring: 75 85% 75%;
+    /* Borders and inputs - Green tinted */
+    --border: 75 20% 75%;
+    --input: 75 20% 80%;
+    --ring: 120 100% 30%;
 
-    /* Premium gradients - NCTR logo inspired */
-    --gradient-hero: linear-gradient(135deg, hsl(75 85% 75%) 0%, hsl(75 70% 65%) 35%, hsl(200 65% 50%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(75 85% 75%) 0%, hsl(50 75% 50%) 50%, hsl(200 65% 50%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(75 85% 75%) 0%, hsl(200 65% 50%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(75 85% 75%) 0%, hsl(75 85% 55%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(75 85% 75% / 0.08) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(75 15% 98%) 50%, hsl(210 20% 98%) 100%);
+    /* Premium gradients - Green focused with grey accents */
+    --gradient-hero: linear-gradient(135deg, hsl(120 100% 30%) 0%, hsl(120 80% 35%) 35%, hsl(75 60% 50%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(120 100% 30%) 0%, hsl(75 80% 40%) 50%, hsl(120 70% 45%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(75 80% 90%) 0%, hsl(75 60% 85%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(120 100% 30%) 0%, hsl(75 60% 50%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(120 100% 30%) 0%, hsl(120 100% 25%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(120 100% 30% / 0.08) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(75 100% 85%) 0%, hsl(120 20% 80%) 50%, hsl(75 40% 88%) 100%);
     
-    /* Subtle shadows - matching dark grey theme */
-    --shadow-minimal: 0 1px 3px hsl(0 0% 25% / 0.04);
-    --shadow-soft: 0 2px 12px -2px hsl(0 0% 25% / 0.08);
-    --shadow-medium: 0 8px 32px -8px hsl(0 0% 25% / 0.12);
-    --shadow-large: 0 16px 48px -12px hsl(0 0% 25% / 0.18);
-    --shadow-glow: 0 0 20px hsl(75 85% 75% / 0.12);
-    --shadow-glow-intense: 0 0 30px hsl(75 85% 75% / 0.18);
-    --shadow-inset: inset 0 2px 8px hsl(0 0% 25% / 0.06);
+    /* Subtle shadows - using grey */
+    --shadow-minimal: 0 1px 3px hsl(0 0% 25% / 0.08);
+    --shadow-soft: 0 2px 12px -2px hsl(0 0% 25% / 0.12);
+    --shadow-medium: 0 8px 32px -8px hsl(0 0% 25% / 0.15);
+    --shadow-large: 0 16px 48px -12px hsl(0 0% 25% / 0.20);
+    --shadow-glow: 0 0 20px hsl(120 100% 30% / 0.15);
+    --shadow-glow-intense: 0 0 30px hsl(120 100% 30% / 0.25);
+    --shadow-inset: inset 0 2px 8px hsl(0 0% 25% / 0.08);
     
     /* Premium transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -97,54 +97,54 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 75 50% 88%;
     --sidebar-foreground: 0 0% 25%;
-    --sidebar-primary: 0 0% 25%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-primary: 120 100% 30%;
+    --sidebar-primary-foreground: 0 0% 95%;
+    --sidebar-accent: 75 30% 85%;
     --sidebar-accent-foreground: 0 0% 25%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 75 85% 75%;
+    --sidebar-border: 75 20% 75%;
+    --sidebar-ring: 120 100% 30%;
   }
 
   .dark {
-    --background: 0 0% 25%; /* Dark charcoal background */
-    --foreground: 75 85% 75%; /* NCTR lime text on dark */
+    --background: 120 100% 25%; /* Dark green background */
+    --foreground: 0 0% 90%; /* Light text on dark green */
 
-    --card: 0 0% 25%;
-    --card-foreground: 75 85% 75%;
+    --card: 120 100% 25%;
+    --card-foreground: 0 0% 90%;
 
-    --popover: 0 0% 25%;
-    --popover-foreground: 75 85% 75%;
+    --popover: 120 100% 25%;
+    --popover-foreground: 0 0% 90%;
 
-    /* Dark mode with NCTR logo colors inverted */
-    --primary: 75 85% 75%;
+    /* Dark mode with inverted green theme */
+    --primary: 75 100% 85%;
     --primary-foreground: 0 0% 25%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 75 85% 75%;
+    --secondary: 120 20% 30%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 120 15% 35%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 200 65% 50%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 300 65% 50%;
+    --accent-foreground: 0 0% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 75 85% 75%;
+    --border: 120 15% 35%;
+    --input: 120 15% 35%;
+    --ring: 75 100% 85%;
     
-    --sidebar-background: 0 0% 25%;
-    --sidebar-foreground: 75 85% 75%;
-    --sidebar-primary: 75 85% 75%;
+    --sidebar-background: 120 100% 25%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 75 100% 85%;
     --sidebar-primary-foreground: 0 0% 25%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 75 85% 75%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 75 85% 75%;
+    --sidebar-accent: 120 20% 30%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 120 15% 35%;
+    --sidebar-ring: 75 100% 85%;
   }
 }
 
