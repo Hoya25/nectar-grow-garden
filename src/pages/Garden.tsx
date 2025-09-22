@@ -220,7 +220,7 @@ const Garden = () => {
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
                     </div>
-                    <Coins className="h-8 w-8 text-primary/60" />
+                    <Coins className="h-8 w-8 text-foreground/60" />
                   </div>
                 </CardContent>
               </Card>
@@ -368,7 +368,7 @@ const Garden = () => {
                   <Card key={opportunity.id} className="bg-card/90 backdrop-blur-sm shadow-medium hover:shadow-glow transition-all duration-300 animate-fade-in">
                     <CardContent className="p-0">
                        {/* Brand Header with Logo */}
-                      <div className="bg-gradient-accent p-6 text-foreground">
+                      <div className="bg-white border-2 border-primary p-6 text-foreground">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center space-x-3">
                             {opportunity.partner_logo_url ? (
@@ -395,10 +395,10 @@ const Garden = () => {
                         </div>
 
                         {/* Earning Rate - Prominent Display */}
-                        <div className="bg-white/10 rounded-lg p-4">
+                        <div className="bg-white/10 border border-primary rounded-lg p-4">
                           <div className="text-center">
                             <div className="flex items-center justify-center space-x-2 mb-1">
-                              <div className="text-2xl font-bold">
+                              <div className="text-2xl font-bold text-section-accent">
                                 {formatNCTR(opportunity.reward_per_dollar || 0)}
                               </div>
                               <img 

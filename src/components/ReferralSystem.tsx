@@ -117,7 +117,7 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">
+            <div className="text-2xl font-bold text-foreground">
               {referralStats.total_referrals}
             </div>
             <p className="text-xs text-muted-foreground">Active community members</p>

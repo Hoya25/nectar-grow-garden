@@ -227,7 +227,7 @@ const Profile = () => {
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-primary" />
+                    <User className="h-5 w-5 text-foreground" />
                     Personal Information
                   </CardTitle>
                   {!editMode ? (
@@ -353,7 +353,7 @@ const Profile = () => {
             <Card className="bg-card/80 backdrop-blur-sm">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Shield className="h-5 w-5 text-primary" />
+                  <Shield className="h-5 w-5 text-foreground" />
                   Account Status
                 </CardTitle>
               </CardHeader>
@@ -388,7 +388,7 @@ const Profile = () => {
               <Card className="bg-card/80 backdrop-blur-sm">
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <Wallet className="h-5 w-5 text-primary" />
+                    <Wallet className="h-5 w-5 text-foreground" />
                     NCTR Summary
                   </CardTitle>
                 </CardHeader>
@@ -396,7 +396,7 @@ const Profile = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Available</span>
-                      <span className="font-semibold text-primary">
+                      <span className="font-semibold text-foreground">
                         {portfolio.available_nctr.toFixed(2)} NCTR
                       </span>
                     </div>

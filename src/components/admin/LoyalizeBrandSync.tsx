@@ -226,7 +226,7 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">NCTR per $1:</span>
-                    <span className="font-medium text-primary">{brand.nctr_per_dollar.toFixed(4)}</span>
+                    <span className="font-medium text-foreground">{brand.nctr_per_dollar.toFixed(4)}</span>
                   </div>
                 </div>
 

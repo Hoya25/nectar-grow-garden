@@ -280,7 +280,7 @@ const UserManagement = () => {
                     <div className="grid grid-cols-3 gap-4 text-center mr-6">
                       <div>
                         <div className="text-sm text-muted-foreground">Available</div>
-                        <div className="font-semibold text-primary">
+                        <div className="font-semibold text-foreground">
                           {user.portfolio.available_nctr.toFixed(2)} NCTR
                         </div>
                       </div>

@@ -248,7 +248,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                       </div>
                       <div>
                         <span className="text-muted-foreground">Reward Multiplier:</span>
-                        <p className="font-medium text-primary">{selectedOption.multiplier}</p>
+                        <p className="font-medium text-foreground">{selectedOption.multiplier}</p>
                       </div>
                     </div>
                   </CardContent>

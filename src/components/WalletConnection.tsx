@@ -33,7 +33,7 @@ const WalletConnection = () => {
     <Card className="bg-card/50 backdrop-blur-sm border-border/50">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Wallet className="h-5 w-5 text-primary" />
+          <Wallet className="h-5 w-5 text-foreground" />
           Base Wallet
         </CardTitle>
       </CardHeader>
