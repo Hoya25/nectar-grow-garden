@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import ProfileModal from "@/components/ProfileModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Settings } from "lucide-react";
-import nctrLogo from "@/assets/nctr-logo.png";
 
 const Header = () => {
   const { user, signOut } = useAuth();
@@ -40,30 +39,7 @@ const Header = () => {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate('/')}>
-            <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gradient-hero shadow-soft group-hover:shadow-glow transition-all duration-500 group-hover:scale-105">
-              <video 
-                className="w-full h-full object-cover scale-150 translate-y-1"
-                autoPlay
-                loop
-                muted
-                playsInline
-                disablePictureInPicture
-              >
-                <source src="/assets/logo-animation.mp4" type="video/mp4" />
-                <div className="w-full h-full bg-gradient-hero flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-sm">🌱</span>
-                </div>
-              </video>
-              <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-            </div>
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl font-bold bg-gradient-premium bg-clip-text text-transparent group-hover:animate-gradient-shift bg-[length:200%_200%] transition-all duration-300">The Garden</span>
-              <img 
-                src={nctrLogo} 
-                alt="NCTR" 
-                className="h-6 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-              />
-            </div>
+            <span className="text-2xl font-bold bg-gradient-premium bg-clip-text text-transparent group-hover:animate-gradient-shift bg-[length:200%_200%] transition-all duration-300">The Garden</span>
           </div>
         
         <nav className="hidden md:flex items-center space-x-8">
