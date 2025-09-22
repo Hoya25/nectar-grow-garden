@@ -151,11 +151,11 @@ const Garden = () => {
   return (
     <div className="min-h-screen bg-gradient-page">
       {/* Header */}
-      <header className="bg-card/80 backdrop-blur-sm border-b border-border">
+      <header className="neon-section-subtle backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold nctr-text animate-nctr-glow">
                 The Garden
               </h1>
             <img 
@@ -164,13 +164,13 @@ const Garden = () => {
               className="h-14 w-auto opacity-90 bg-white/80 rounded-lg px-2 py-1 shadow-soft"
             />
             </div>
-            <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0`}>
+            <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0 neon-glow`}>
               {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
             </Badge>
           </div>
           <div className="flex items-center gap-3">
             <ProfileModal>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2 section-text hover:bg-primary/10 hover:text-primary">
                 <User className="w-4 h-4" />
                 Quick Profile
               </Button>
@@ -179,12 +179,16 @@ const Garden = () => {
               variant="outline" 
               size="sm"
               onClick={() => navigate('/profile')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
             >
               <User className="w-4 h-4" />
               Profile
             </Button>
-            <Button variant="outline" onClick={handleSignOut}>
+            <Button 
+              variant="outline" 
+              onClick={handleSignOut}
+              className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
             </Button>
@@ -194,25 +198,25 @@ const Garden = () => {
 
       <div className="flex min-h-[calc(100vh-80px)]">
         {/* Dashboard Sidebar */}
-        <aside className="w-80 bg-card/60 backdrop-blur-sm border-r border-border p-6 space-y-6">
+        <aside className="neon-section-subtle backdrop-blur-sm border-r border-section-border p-6 space-y-6">
           <div>
-            <h2 className="text-lg font-semibold mb-4 text-primary">Your Dashboard</h2>
+            <h2 className="text-lg font-semibold mb-4 section-heading">Your Dashboard</h2>
             
             {/* Portfolio Overview Cards */}
             <div className="space-y-4">
-              <Card className="bg-gradient-card shadow-soft">
+              <Card className="bg-gradient-section shadow-neon border border-section-border/50">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-1 mb-1">
-                        <p className="text-sm text-muted-foreground">Available</p>
+                        <p className="text-sm text-section-text/70">Available</p>
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
                           className="h-5 w-auto opacity-70 bg-white/60 rounded px-1"
                         />
                       </div>
-                      <p className="text-xl font-bold text-primary">
+                      <p className="text-xl font-bold nctr-text">
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
                     </div>
@@ -221,19 +225,19 @@ const Garden = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-card shadow-soft">
+              <Card className="bg-gradient-section shadow-neon border border-section-border/50">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-1 mb-1">
-                        <p className="text-sm text-muted-foreground">Pending</p>
+                        <p className="text-sm text-section-text/70">Pending</p>
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
                           className="h-5 w-auto opacity-70 bg-white/60 rounded px-1"
                         />
                       </div>
-                      <p className="text-xl font-bold text-warning">
+                      <p className="text-xl font-bold text-warning animate-pulse">
                         {formatNCTR(portfolio?.pending_nctr || 0)}
                       </p>
                     </div>
@@ -242,12 +246,12 @@ const Garden = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-card shadow-soft">
+              <Card className="bg-gradient-section shadow-neon border border-section-border/50">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-1 mb-1">
-                        <p className="text-sm text-muted-foreground">Total Earned</p>
+                        <p className="text-sm text-section-text/70">Total Earned</p>
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
@@ -341,10 +345,10 @@ const Garden = () => {
         <main className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2 bg-gradient-hero bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold mb-2 nctr-glow animate-nctr-glow">
                 Earning Opportunities
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-section-text/90">
                 Discover amazing brands and earn NCTR with every purchase
               </p>
             </div>

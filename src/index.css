@@ -2,70 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The Garden Design System - Light Mode Inversion of NCTR.live 
-Based on the exact colors from https://www.nctr.live/
+/* The Garden Design System - Dark Sections with Neon Accents
+Based on NCTR.live with inverted section styling:
+- Dark section backgrounds 
+- Bright neon text and accents
+- Neon borders around sections
 All colors MUST be HSL to avoid yellow bug issues.
 */
 
 @layer base {
   :root {
-    /* Light mode - inverted from NCTR.live dark theme */
-    --background: 0 0% 98%;                    /* Light background vs NCTR's dark */
-    --foreground: 240 9% 12%;                  /* Dark text vs NCTR's light text */
-    --card: 0 0% 100%;
-    --card-foreground: 240 9% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 9% 12%;
+    /* Base page background - keep light */
+    --background: 0 0% 98%;
+    --foreground: 240 9% 12%;
     
-    /* NCTR neon lime/yellow from reference site */
-    --primary: 66 100% 50%;                    /* Exact NCTR neon lime */
-    --primary-foreground: 240 9% 12%;          /* Dark text on lime */
-    --primary-glow: 66 100% 45%;
+    /* Cards and sections - now dark with neon accents */
+    --card: 240 12% 8%;                       /* Dark section backgrounds */
+    --card-foreground: 66 100% 85%;           /* Bright neon text on dark sections */
+    --popover: 240 12% 8%;
+    --popover-foreground: 66 100% 85%;
+    
+    /* NCTR neon lime - now used for text and accents */
+    --primary: 66 100% 50%;                   /* Bright neon lime */
+    --primary-foreground: 240 12% 8%;         /* Dark background for neon text */
+    --primary-glow: 66 100% 60%;
     --primary-deep: 66 100% 40%;
     --primary-light: 66 80% 70%;
     
-    /* Clean light grays for secondary elements */
-    --secondary: 210 20% 95%;
-    --secondary-foreground: 240 9% 12%;
-    --secondary-accent: 210 15% 90%;
+    /* Section styling */
+    --section-bg: 240 12% 8%;                 /* Dark section backgrounds */
+    --section-border: 66 100% 50%;            /* Neon section borders */
+    --section-text: 66 100% 85%;              /* Bright text on sections */
+    --section-accent: 66 100% 50%;            /* Neon accents */
     
-    --muted: 210 20% 92%;
-    --muted-foreground: 240 4% 46%;
+    /* Secondary elements */
+    --secondary: 240 8% 15%;                  /* Darker secondary */
+    --secondary-foreground: 66 100% 85%;      /* Bright text */
+    --secondary-accent: 240 8% 20%;
     
-    /* Bright accent matching NCTR energy */
-    --accent: 66 100% 50%;                     /* Use NCTR lime as accent */
-    --accent-foreground: 240 9% 12%;
+    --muted: 240 8% 12%;                      /* Dark muted */
+    --muted-foreground: 66 80% 70%;           /* Dimmed neon text */
+    
+    /* Bright neon accent */
+    --accent: 66 100% 50%;
+    --accent-foreground: 240 12% 8%;
     --accent-light: 66 80% 70%;
     
-    /* Status colors - NCTR theme */
-    --success: 66 100% 50%;                    /* NCTR lime for success */
+    /* Status colors */
+    --success: 66 100% 50%;
     --warning: 38 90% 50%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     
     /* Borders and inputs */
-    --border: 214 31% 91%;
-    --input: 214 31% 91%;
-    --ring: 66 100% 50%;
+    --border: 66 100% 50%;                    /* Neon borders */
+    --input: 240 8% 15%;                      /* Dark inputs */
+    --ring: 66 100% 50%;                      /* Neon focus rings */
     
-    /* Premium gradients - NCTR inspired */
-    --gradient-hero: linear-gradient(135deg, hsl(66 100% 50%) 0%, hsl(76 100% 55%) 35%, hsl(180 100% 45%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(66 100% 50%) 0%, hsl(66 100% 45%) 50%, hsl(180 100% 50%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(66 100% 50%) 0%, hsl(180 100% 45%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(66 100% 50%) 0%, hsl(66 100% 45%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(66 100% 50% / 0.08) 0%, transparent 70%);
+    /* Neon-focused gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(240 12% 8%) 0%, hsl(240 8% 15%) 35%, hsl(240 10% 10%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(66 100% 50%) 0%, hsl(76 100% 55%) 50%, hsl(180 100% 50%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(240 12% 8%) 0%, hsl(240 8% 12%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(66 100% 50%) 0%, hsl(180 100% 50%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(240 12% 8%) 0%, hsl(240 8% 15%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(66 100% 50% / 0.2) 0%, transparent 70%);
     --gradient-page: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(210 20% 96%) 50%, hsl(66 30% 96%) 100%);
-    --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 45%), hsl(280 100% 50%), hsl(320 100% 50%));
+    --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 50%), hsl(280 100% 50%), hsl(320 100% 50%));
+    --gradient-section: linear-gradient(180deg, hsl(240 12% 8%) 0%, hsl(240 8% 12%) 100%);
     
-    /* Light mode shadows */
-    --shadow-minimal: 0 1px 3px hsl(240 9% 12% / 0.04);
-    --shadow-soft: 0 2px 12px -2px hsl(240 9% 12% / 0.08);
-    --shadow-medium: 0 8px 32px -8px hsl(240 9% 12% / 0.12);
-    --shadow-large: 0 16px 48px -12px hsl(240 9% 12% / 0.18);
-    --shadow-glow: 0 0 20px hsl(66 100% 50% / 0.15);
-    --shadow-glow-intense: 0 0 30px hsl(66 100% 50% / 0.25);
-    --shadow-inset: inset 0 2px 8px hsl(240 9% 12% / 0.06);
+    /* Enhanced shadows with neon glow */
+    --shadow-minimal: 0 1px 3px hsl(0 0% 0% / 0.3);
+    --shadow-soft: 0 2px 12px -2px hsl(0 0% 0% / 0.4);
+    --shadow-medium: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
+    --shadow-large: 0 16px 48px -12px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 20px hsl(66 100% 50% / 0.4);
+    --shadow-glow-intense: 0 0 40px hsl(66 100% 50% / 0.6);
+    --shadow-inset: inset 0 2px 8px hsl(0 0% 0% / 0.3);
+    --shadow-neon: 0 0 5px hsl(66 100% 50%), 0 0 10px hsl(66 100% 50%), 0 0 15px hsl(66 100% 50%);
     
     /* Premium transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -77,93 +90,94 @@ All colors MUST be HSL to avoid yellow bug issues.
     
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 9% 12%;
-    --sidebar-primary: 66 100% 50%;            /* NCTR lime for sidebar */
-    --sidebar-primary-foreground: 240 9% 12%;
+    --sidebar-primary: 66 100% 50%;
+    --sidebar-primary-foreground: 240 12% 8%;
     --sidebar-accent: 66 100% 50%;
-    --sidebar-accent-foreground: 240 9% 12%;
-    --sidebar-border: 214 31% 91%;
+    --sidebar-accent-foreground: 240 12% 8%;
+    --sidebar-border: 66 100% 50%;
     --sidebar-ring: 66 100% 50%;
   }
 
   .dark {
-    /* Dark mode - matching original NCTR.live theme */
-    --background: 240 12% 6%;                  /* NCTR dark background */
-    --foreground: 66 100% 50%;                 /* NCTR lime text */
+    /* Dark mode - full dark theme */
+    --background: 240 12% 6%;
+    --foreground: 66 100% 85%;
     --card: 240 12% 8%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: 66 100% 85%;
     --popover: 240 12% 8%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 66 100% 85%;
     
-    /* NCTR neon lime primary */
     --primary: 66 100% 50%;
     --primary-foreground: 240 12% 6%;
-    --primary-glow: 66 100% 55%;
-    --primary-deep: 66 100% 45%;
-    --primary-light: 66 80% 70%;
+    
+    --section-bg: 240 12% 8%;
+    --section-border: 66 100% 50%;
+    --section-text: 66 100% 85%;
+    --section-accent: 66 100% 50%;
     
     --secondary: 240 8% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 66 100% 85%;
     --secondary-accent: 240 8% 20%;
     
     --muted: 240 8% 15%;
-    --muted-foreground: 240 5% 65%;
+    --muted-foreground: 66 80% 70%;
     
     --accent: 66 100% 50%;
     --accent-foreground: 240 12% 6%;
-    --accent-light: 66 80% 70%;
     
     --success: 66 100% 50%;
     --warning: 38 90% 60%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 240 8% 15%;
+    --border: 66 100% 50%;
     --input: 240 8% 15%;
     --ring: 66 100% 50%;
     
-    /* Dark mode gradients with NCTR neon */
-    --gradient-hero: linear-gradient(135deg, hsl(66 100% 50%) 0%, hsl(76 100% 55%) 35%, hsl(180 100% 50%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(66 100% 50%) 0%, hsl(66 100% 55%) 50%, hsl(180 100% 50%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(240 12% 6%) 0%, hsl(240 8% 15%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(66 100% 50%) 0%, hsl(180 100% 50%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(66 100% 50%) 0%, hsl(66 100% 45%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(66 100% 50% / 0.15) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(240 12% 6%) 0%, hsl(240 8% 15%) 50%, hsl(240 10% 10%) 100%);
-    --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 50%), hsl(280 100% 50%), hsl(320 100% 50%));
-    
-    /* Dark mode shadows with glow effects */
-    --shadow-minimal: 0 1px 3px hsl(0 0% 0% / 0.3);
-    --shadow-soft: 0 2px 12px -2px hsl(0 0% 0% / 0.4);
-    --shadow-medium: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
-    --shadow-large: 0 16px 48px -12px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 20px hsl(66 100% 50% / 0.3);
-    --shadow-glow-intense: 0 0 30px hsl(66 100% 50% / 0.5);
-    --shadow-inset: inset 0 2px 8px hsl(0 0% 0% / 0.3);
-    
     --sidebar-background: 240 12% 6%;
-    --sidebar-foreground: 0 0% 98%;
+    --sidebar-foreground: 66 100% 85%;
     --sidebar-primary: 66 100% 50%;
     --sidebar-primary-foreground: 240 12% 6%;
     --sidebar-accent: 66 100% 50%;
     --sidebar-accent-foreground: 240 12% 6%;
-    --sidebar-border: 240 8% 15%;
+    --sidebar-border: 66 100% 50%;
     --sidebar-ring: 66 100% 50%;
   }
 }
 
 @layer components {
-  /* NCTR Brand Typography - matches reference site */
+  /* Section styling with neon borders */
+  .neon-section {
+    @apply bg-gradient-section border-2 border-section-border;
+    box-shadow: var(--shadow-neon);
+  }
+  
+  .neon-section-subtle {
+    @apply bg-section-bg border border-section-border/50;
+    box-shadow: 0 0 10px hsl(var(--section-border) / 0.2);
+  }
+  
+  /* NCTR Brand Typography */
   .nctr-text {
     @apply text-primary font-bold tracking-wider;
-    text-shadow: 0 0 10px hsl(var(--primary) / 0.4);
+    text-shadow: 0 0 10px hsl(var(--primary) / 0.6);
   }
   
   .nctr-glow {
     @apply text-primary;
-    text-shadow: 0 0 15px hsl(var(--primary) / 0.6), 0 0 30px hsl(var(--primary) / 0.4);
+    text-shadow: 0 0 15px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.6);
   }
   
-  /* Holographic effects inspired by NCTR sphere */
+  .section-text {
+    @apply text-section-text;
+  }
+  
+  .section-heading {
+    @apply text-section-text font-bold;
+    text-shadow: 0 0 8px hsl(var(--section-text) / 0.5);
+  }
+  
+  /* Holographic effects */
   .holographic-border {
     background: var(--gradient-holographic);
     background-size: 400% 400%;
@@ -177,11 +191,24 @@ All colors MUST be HSL to avoid yellow bug issues.
   .glow-intense {
     box-shadow: var(--shadow-glow-intense);
   }
+  
+  .neon-glow {
+    box-shadow: var(--shadow-neon);
+  }
 }
 
 @keyframes holographic {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px hsl(66 100% 50%), 0 0 10px hsl(66 100% 50%);
+  }
+  50% {
+    box-shadow: 0 0 10px hsl(66 100% 50%), 0 0 20px hsl(66 100% 50%), 0 0 30px hsl(66 100% 50%);
+  }
 }
 
 @layer base {

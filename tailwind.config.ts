@@ -44,6 +44,13 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
           light: "hsl(var(--accent-light))",
         },
+        // Section-specific colors for dark sections with neon accents
+        section: {
+          bg: "hsl(var(--section-bg))",
+          border: "hsl(var(--section-border))",
+          text: "hsl(var(--section-text))",
+          accent: "hsl(var(--section-accent))",
+        },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
         popover: {
@@ -74,6 +81,7 @@ export default {
         "gradient-glow": "var(--gradient-glow)",
         "gradient-page": "var(--gradient-page)",
         "gradient-holographic": "var(--gradient-holographic)",
+        "gradient-section": "var(--gradient-section)",
       },
       boxShadow: {
         minimal: "var(--shadow-minimal)",
@@ -83,6 +91,7 @@ export default {
         glow: "var(--shadow-glow)",
         "glow-intense": "var(--shadow-glow-intense)",
         inset: "var(--shadow-inset)",
+        neon: "var(--shadow-neon)",
       },
       transitionTimingFunction: {
         smooth: "var(--transition-smooth)",
@@ -186,6 +195,16 @@ export default {
             textShadow: "0 0 20px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.6)",
             transform: "scale(1.01)"
           }
+        },
+
+        // Neon pulse animation for sections
+        "neon-pulse": {
+          "0%, 100%": {
+            boxShadow: "0 0 5px hsl(66 100% 50%), 0 0 10px hsl(66 100% 50%)"
+          },
+          "50%": {
+            boxShadow: "0 0 10px hsl(66 100% 50%), 0 0 20px hsl(66 100% 50%), 0 0 30px hsl(66 100% 50%)"
+          }
         }
       },
       animation: {
@@ -206,6 +225,7 @@ export default {
         "shimmer": "shimmer 2.5s linear infinite",
         "gradient-shift": "gradient-shift 3s ease infinite",
         "nctr-glow": "nctr-glow 3s ease-in-out infinite",
+        "neon-pulse": "neon-pulse 2s ease-in-out infinite",
         
         // Slide effects
         "slide-in-right": "slide-in-right 0.6s cubic-bezier(0.23, 1, 0.320, 1)",
