@@ -106,6 +106,8 @@ const ProfileModal = ({ children }: ProfileModalProps) => {
           full_name: formData.full_name || null,
           email: user.email,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
