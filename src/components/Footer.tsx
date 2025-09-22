@@ -19,7 +19,7 @@ const Footer = () => {
               <img 
                 src={nctrLogo} 
                 alt="NCTR" 
-                className="h-20 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                className="h-40 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
               />
             </div>
             
