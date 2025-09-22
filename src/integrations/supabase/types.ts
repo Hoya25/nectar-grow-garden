@@ -528,6 +528,10 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      decrement: {
+        Args: { x: number }
+        Returns: number
+      }
       get_admin_profiles_safe: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -589,6 +593,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      increment: {
+        Args: { x: number }
+        Returns: number
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
@@ -596,6 +604,10 @@ export type Database = {
       make_user_admin_by_email: {
         Args: { admin_role?: string; user_email: string }
         Returns: string
+      }
+      move_pending_to_available: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: undefined
       }
       update_user_status: {
         Args: { user_id: string }
