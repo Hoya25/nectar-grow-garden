@@ -39,13 +39,13 @@ const Header = () => {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate('/')}>
-          <div className="relative overflow-hidden rounded-lg w-24 h-16">
+          <div className="relative overflow-hidden rounded-lg w-28 h-20">
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="h-24 w-auto object-cover scale-150 object-center transition-all duration-500 group-hover:scale-[1.65] group-hover:brightness-110"
+              className="h-28 w-auto object-cover scale-150 object-center transition-all duration-500 group-hover:scale-[1.65] group-hover:brightness-110"
               onError={(e) => {
                 // Fallback to text if video fails to load
                 e.currentTarget.style.display = 'none';
