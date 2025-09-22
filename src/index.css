@@ -2,150 +2,186 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The Garden Design System - Premium 3D animated brand aesthetic 
-Sophisticated nature-meets-technology design language with NCTR lime green focus
-All colors MUST be HSL.
+/* The Garden Design System - Light Mode Inversion of NCTR.live 
+Based on the exact colors from https://www.nctr.live/
+All colors MUST be HSL to avoid yellow bug issues.
 */
 
 @layer base {
   :root {
-    /* Base colors - Light theme with NCTR logo colors */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 25%; /* Dark charcoal grey from NCTR logo */
-
+    /* Light mode - inverted from NCTR.live dark theme */
+    --background: 0 0% 98%;                    /* Light background vs NCTR's dark */
+    --foreground: 240 9% 12%;                  /* Dark text vs NCTR's light text */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 25%;
-
+    --card-foreground: 240 9% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 25%;
-
-    /* NCTR lime theme - Matching logo colors */
-    --primary: 75 85% 75%; /* Bright lime-yellow from NCTR logo background */
-    --primary-foreground: 0 0% 25%; /* Dark charcoal from NCTR text */
-    --primary-glow: 75 70% 65%;
-    --primary-deep: 75 85% 55%;
-    --primary-light: 75 60% 85%;
-
-    /* Secondary - Subtle grays */
-    --secondary: 210 8% 95%;
-    --secondary-foreground: 0 0% 25%;
-    --secondary-accent: 210 12% 88%;
-
-    /* Muted - Light grays */
-    --muted: 210 8% 97%;
-    --muted-foreground: 0 0% 45%;
-
-    /* Accent - Complementary to NCTR lime */
-    --accent: 200 65% 50%;
-    --accent-foreground: 0 0% 100%;
-    --accent-light: 200 50% 65%;
-
-    /* Crypto premium metals - NCTR lime focused */
-    --crypto-gold: 50 75% 50%;
-    --crypto-gold-foreground: 0 0% 25%;
-    --crypto-silver: 210 8% 75%;
-    --crypto-platinum: 240 5% 85%;
-    --crypto-lime: 75 85% 75%;
-
-    /* Status colors - NCTR lime theme */
-    --success: 75 85% 75%; /* Use NCTR lime for success */
-    --warning: 38 75% 50%;
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Borders and inputs */
-    --border: 210 12% 90%;
-    --input: 210 12% 90%;
-    --ring: 75 85% 75%;
-
-    /* Premium gradients - NCTR logo inspired */
-    --gradient-hero: linear-gradient(135deg, hsl(75 85% 75%) 0%, hsl(75 70% 65%) 35%, hsl(200 65% 50%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(75 85% 75%) 0%, hsl(50 75% 50%) 50%, hsl(200 65% 50%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(75 85% 75%) 0%, hsl(200 65% 50%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(75 85% 75%) 0%, hsl(75 85% 55%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(75 85% 75% / 0.08) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(75 15% 98%) 50%, hsl(210 20% 98%) 100%);
+    --popover-foreground: 240 9% 12%;
     
-    /* Subtle shadows - matching dark grey theme */
-    --shadow-minimal: 0 1px 3px hsl(0 0% 25% / 0.04);
-    --shadow-soft: 0 2px 12px -2px hsl(0 0% 25% / 0.08);
-    --shadow-medium: 0 8px 32px -8px hsl(0 0% 25% / 0.12);
-    --shadow-large: 0 16px 48px -12px hsl(0 0% 25% / 0.18);
-    --shadow-glow: 0 0 20px hsl(75 85% 75% / 0.12);
-    --shadow-glow-intense: 0 0 30px hsl(75 85% 75% / 0.18);
-    --shadow-inset: inset 0 2px 8px hsl(0 0% 25% / 0.06);
+    /* NCTR neon lime/yellow from reference site */
+    --primary: 66 100% 50%;                    /* Exact NCTR neon lime */
+    --primary-foreground: 240 9% 12%;          /* Dark text on lime */
+    --primary-glow: 66 100% 45%;
+    --primary-deep: 66 100% 40%;
+    --primary-light: 66 80% 70%;
+    
+    /* Clean light grays for secondary elements */
+    --secondary: 210 20% 95%;
+    --secondary-foreground: 240 9% 12%;
+    --secondary-accent: 210 15% 90%;
+    
+    --muted: 210 20% 92%;
+    --muted-foreground: 240 4% 46%;
+    
+    /* Bright accent matching NCTR energy */
+    --accent: 66 100% 50%;                     /* Use NCTR lime as accent */
+    --accent-foreground: 240 9% 12%;
+    --accent-light: 66 80% 70%;
+    
+    /* Status colors - NCTR theme */
+    --success: 66 100% 50%;                    /* NCTR lime for success */
+    --warning: 38 90% 50%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders and inputs */
+    --border: 214 31% 91%;
+    --input: 214 31% 91%;
+    --ring: 66 100% 50%;
+    
+    /* Premium gradients - NCTR inspired */
+    --gradient-hero: linear-gradient(135deg, hsl(66 100% 50%) 0%, hsl(76 100% 55%) 35%, hsl(180 100% 45%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(66 100% 50%) 0%, hsl(66 100% 45%) 50%, hsl(180 100% 50%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(66 100% 50%) 0%, hsl(180 100% 45%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(66 100% 50%) 0%, hsl(66 100% 45%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(66 100% 50% / 0.08) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(210 20% 96%) 50%, hsl(66 30% 96%) 100%);
+    --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 45%), hsl(280 100% 50%), hsl(320 100% 50%));
+    
+    /* Light mode shadows */
+    --shadow-minimal: 0 1px 3px hsl(240 9% 12% / 0.04);
+    --shadow-soft: 0 2px 12px -2px hsl(240 9% 12% / 0.08);
+    --shadow-medium: 0 8px 32px -8px hsl(240 9% 12% / 0.12);
+    --shadow-large: 0 16px 48px -12px hsl(240 9% 12% / 0.18);
+    --shadow-glow: 0 0 20px hsl(66 100% 50% / 0.15);
+    --shadow-glow-intense: 0 0 30px hsl(66 100% 50% / 0.25);
+    --shadow-inset: inset 0 2px 8px hsl(240 9% 12% / 0.06);
     
     /* Premium transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     --transition-elegant: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-
-    /* Typography scale */
-    --text-xs: 0.75rem;
-    --text-sm: 0.875rem;
-    --text-base: 1rem;
-    --text-lg: 1.125rem;
-    --text-xl: 1.25rem;
-    --text-2xl: 1.5rem;
-    --text-3xl: 1.875rem;
-    --text-4xl: 2.25rem;
-    --text-5xl: 3rem;
-    --text-6xl: 3.75rem;
-    --text-7xl: 4.5rem;
-
+    
     --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 25%;
-    --sidebar-primary: 0 0% 25%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 0 0% 25%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 75 85% 75%;
+    
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 9% 12%;
+    --sidebar-primary: 66 100% 50%;            /* NCTR lime for sidebar */
+    --sidebar-primary-foreground: 240 9% 12%;
+    --sidebar-accent: 66 100% 50%;
+    --sidebar-accent-foreground: 240 9% 12%;
+    --sidebar-border: 214 31% 91%;
+    --sidebar-ring: 66 100% 50%;
   }
 
   .dark {
-    --background: 0 0% 25%; /* Dark charcoal background */
-    --foreground: 75 85% 75%; /* NCTR lime text on dark */
-
-    --card: 0 0% 25%;
-    --card-foreground: 75 85% 75%;
-
-    --popover: 0 0% 25%;
-    --popover-foreground: 75 85% 75%;
-
-    /* Dark mode with NCTR logo colors inverted */
-    --primary: 75 85% 75%;
-    --primary-foreground: 0 0% 25%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 75 85% 75%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 200 65% 50%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 75 85% 75%;
+    /* Dark mode - matching original NCTR.live theme */
+    --background: 240 12% 6%;                  /* NCTR dark background */
+    --foreground: 66 100% 50%;                 /* NCTR lime text */
+    --card: 240 12% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 12% 8%;
+    --popover-foreground: 0 0% 98%;
     
-    --sidebar-background: 0 0% 25%;
-    --sidebar-foreground: 75 85% 75%;
-    --sidebar-primary: 75 85% 75%;
-    --sidebar-primary-foreground: 0 0% 25%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 75 85% 75%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 75 85% 75%;
+    /* NCTR neon lime primary */
+    --primary: 66 100% 50%;
+    --primary-foreground: 240 12% 6%;
+    --primary-glow: 66 100% 55%;
+    --primary-deep: 66 100% 45%;
+    --primary-light: 66 80% 70%;
+    
+    --secondary: 240 8% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 240 8% 20%;
+    
+    --muted: 240 8% 15%;
+    --muted-foreground: 240 5% 65%;
+    
+    --accent: 66 100% 50%;
+    --accent-foreground: 240 12% 6%;
+    --accent-light: 66 80% 70%;
+    
+    --success: 66 100% 50%;
+    --warning: 38 90% 60%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 240 8% 15%;
+    --input: 240 8% 15%;
+    --ring: 66 100% 50%;
+    
+    /* Dark mode gradients with NCTR neon */
+    --gradient-hero: linear-gradient(135deg, hsl(66 100% 50%) 0%, hsl(76 100% 55%) 35%, hsl(180 100% 50%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(66 100% 50%) 0%, hsl(66 100% 55%) 50%, hsl(180 100% 50%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(240 12% 6%) 0%, hsl(240 8% 15%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(66 100% 50%) 0%, hsl(180 100% 50%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(66 100% 50%) 0%, hsl(66 100% 45%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(66 100% 50% / 0.15) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(240 12% 6%) 0%, hsl(240 8% 15%) 50%, hsl(240 10% 10%) 100%);
+    --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 50%), hsl(280 100% 50%), hsl(320 100% 50%));
+    
+    /* Dark mode shadows with glow effects */
+    --shadow-minimal: 0 1px 3px hsl(0 0% 0% / 0.3);
+    --shadow-soft: 0 2px 12px -2px hsl(0 0% 0% / 0.4);
+    --shadow-medium: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
+    --shadow-large: 0 16px 48px -12px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 20px hsl(66 100% 50% / 0.3);
+    --shadow-glow-intense: 0 0 30px hsl(66 100% 50% / 0.5);
+    --shadow-inset: inset 0 2px 8px hsl(0 0% 0% / 0.3);
+    
+    --sidebar-background: 240 12% 6%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 66 100% 50%;
+    --sidebar-primary-foreground: 240 12% 6%;
+    --sidebar-accent: 66 100% 50%;
+    --sidebar-accent-foreground: 240 12% 6%;
+    --sidebar-border: 240 8% 15%;
+    --sidebar-ring: 66 100% 50%;
   }
+}
+
+@layer components {
+  /* NCTR Brand Typography - matches reference site */
+  .nctr-text {
+    @apply text-primary font-bold tracking-wider;
+    text-shadow: 0 0 10px hsl(var(--primary) / 0.4);
+  }
+  
+  .nctr-glow {
+    @apply text-primary;
+    text-shadow: 0 0 15px hsl(var(--primary) / 0.6), 0 0 30px hsl(var(--primary) / 0.4);
+  }
+  
+  /* Holographic effects inspired by NCTR sphere */
+  .holographic-border {
+    background: var(--gradient-holographic);
+    background-size: 400% 400%;
+    animation: holographic 3s ease-in-out infinite;
+  }
+  
+  .glow-effect {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .glow-intense {
+    box-shadow: var(--shadow-glow-intense);
+  }
+}
+
+@keyframes holographic {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 @layer base {

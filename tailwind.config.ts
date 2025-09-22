@@ -44,13 +44,6 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
           light: "hsl(var(--accent-light))",
         },
-        "crypto-gold": {
-          DEFAULT: "hsl(var(--crypto-gold))",
-          foreground: "hsl(var(--crypto-gold-foreground))",
-        },
-        "crypto-silver": "hsl(var(--crypto-silver))",
-        "crypto-platinum": "hsl(var(--crypto-platinum))",
-        "crypto-lime": "hsl(var(--crypto-lime))",
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
         popover: {
@@ -80,6 +73,7 @@ export default {
         "gradient-depth": "var(--gradient-depth)",
         "gradient-glow": "var(--gradient-glow)",
         "gradient-page": "var(--gradient-page)",
+        "gradient-holographic": "var(--gradient-holographic)",
       },
       boxShadow: {
         minimal: "var(--shadow-minimal)",
@@ -142,16 +136,22 @@ export default {
           "50%": { transform: "translateY(-6px)" }
         },
         
-        // Pulse glow effect
+        // Pulse glow effect - NCTR inspired
         "pulse-glow": {
           "0%, 100%": { 
-            boxShadow: "0 0 20px hsl(var(--primary-glow) / 0.2)",
+            boxShadow: "0 0 20px hsl(var(--primary) / 0.2)",
             transform: "scale(1)"
           },
           "50%": { 
-            boxShadow: "0 0 40px hsl(var(--primary-glow) / 0.4)",
+            boxShadow: "0 0 40px hsl(var(--primary) / 0.4)",
             transform: "scale(1.02)"
           }
+        },
+        
+        // Holographic animation
+        "holographic": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" }
         },
         
         // Slide animations
@@ -174,6 +174,18 @@ export default {
         "gradient-shift": {
           "0%, 100%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" }
+        },
+
+        // NCTR glow pulse
+        "nctr-glow": {
+          "0%, 100%": { 
+            textShadow: "0 0 10px hsl(var(--primary) / 0.4)",
+            transform: "scale(1)"
+          },
+          "50%": { 
+            textShadow: "0 0 20px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.6)",
+            transform: "scale(1.01)"
+          }
         }
       },
       animation: {
@@ -190,8 +202,10 @@ export default {
         // Continuous effects
         "float": "float 6s ease-in-out infinite",
         "pulse-glow": "pulse-glow 4s ease-in-out infinite",
+        "holographic": "holographic 3s ease-in-out infinite",
         "shimmer": "shimmer 2.5s linear infinite",
         "gradient-shift": "gradient-shift 3s ease infinite",
+        "nctr-glow": "nctr-glow 3s ease-in-out infinite",
         
         // Slide effects
         "slide-in-right": "slide-in-right 0.6s cubic-bezier(0.23, 1, 0.320, 1)",
