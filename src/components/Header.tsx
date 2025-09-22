@@ -46,7 +46,7 @@ const Header = () => {
           {!user ? (
             <>
               <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
-                Refer a Friend
+                Invite a Friend
               </Button>
               <Button 
                 variant="ghost" 
@@ -75,7 +75,7 @@ const Header = () => {
           ) : (
             <>
               <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
-                Refer a Friend
+                Invite a Friend
               </Button>
               <Button 
                 variant="default" 
