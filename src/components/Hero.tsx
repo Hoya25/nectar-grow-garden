@@ -18,7 +18,7 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight animate-fade-in-up">
             Crypto for{" "}
-            <span className="text-primary animate-gradient-shift">
+            <span className="bg-gradient-premium bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_200%]">
               All of Us
             </span>
           </h1>

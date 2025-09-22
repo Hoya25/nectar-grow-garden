@@ -18,7 +18,7 @@ const Footer = () => {
           {/* Premium Logo Section */}
           <div className="text-center mb-16 animate-fade-in-up">
             <div className="flex items-center justify-center space-x-4 mb-8 group">
-              <span className="text-4xl font-bold text-primary">The Garden</span>
+              <span className="text-4xl font-bold bg-gradient-premium bg-clip-text text-transparent">The Garden</span>
               <img 
                 src={nctrLogo} 
                 alt="NCTR" 
@@ -29,7 +29,7 @@ const Footer = () => {
             {/* Premium Description */}
             <p className="text-xl text-background/90 leading-relaxed mb-12 max-w-4xl mx-auto font-medium">
               The Garden is an innovation from{" "}
-              <span className="text-primary font-bold">
+              <span className="bg-gradient-premium bg-clip-text text-transparent font-bold">
                 Project Butterfly
               </span>
               . A blockchain initiative creating an ecosystem to harness our buying power 
@@ -40,7 +40,7 @@ const Footer = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">              
               <div className="group">
                 <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
-                  <div className="text-3xl font-bold text-primary mb-2">{settings.site_stats?.brand_partners || "5K+"}</div>
+                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">{settings.site_stats?.brand_partners || "5K+"}</div>
                   <div className="text-background/80 font-medium">Brand Partners</div>
                 </div>
               </div>
