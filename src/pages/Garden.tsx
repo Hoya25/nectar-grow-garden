@@ -45,6 +45,7 @@ interface EarningOpportunity {
   reward_per_dollar: number;
   partner_name: string;
   partner_logo_url: string;
+  affiliate_link?: string;
   video_url?: string;
   video_title?: string;
   video_description?: string;
@@ -138,12 +139,199 @@ const Garden = () => {
     }).format(amount);
   };
 
+  const handleOpportunityClick = async (opportunity: EarningOpportunity) => {
+    console.log('Opportunity clicked:', opportunity.title, opportunity.opportunity_type);
+    
+    switch (opportunity.opportunity_type) {
+      case 'invite':
+        handleInviteOpportunity(opportunity);
+        break;
+      case 'bonus':
+        handleBonusOpportunity(opportunity);
+        break;
+      case 'shopping':
+      case 'partner':
+        handleShoppingOpportunity(opportunity);
+        break;
+      default:
+        handleGenericOpportunity(opportunity);
+        break;
+    }
+  };
+
+  const handleInviteOpportunity = (opportunity: EarningOpportunity) => {
+    // For invite opportunities, we'll show the referral system
+    const referralSection = document.querySelector('[data-referral-system]');
+    if (referralSection) {
+      referralSection.scrollIntoView({ behavior: 'smooth' });
+      toast({
+        title: "🎉 Referral Program",
+        description: "Scroll down to find your referral link and start inviting friends!",
+      });
+    }
+  };
+
+  const handleBonusOpportunity = async (opportunity: EarningOpportunity) => {
+    if (opportunity.title.includes('Profile')) {
+      // Navigate to profile page for profile completion
+      navigate('/profile');
+      toast({
+        title: "Complete Your Profile",
+        description: "Fill out your profile to earn your bonus NCTR!",
+      });
+    } else if (opportunity.title.includes('Daily Check-in')) {
+      // Handle daily check-in
+      await awardDailyBonus(opportunity);
+    } else {
+      // Generic bonus handling
+      await awardBonus(opportunity);
+    }
+  };
+
+  const handleShoppingOpportunity = (opportunity: EarningOpportunity) => {
+    if (opportunity.affiliate_link) {
+      // Open affiliate link in new tab
+      window.open(opportunity.affiliate_link, '_blank');
+      toast({
+        title: "Redirecting...",
+        description: `Opening ${opportunity.partner_name || 'partner'} in a new tab!`,
+      });
+    } else {
+      toast({
+        title: "Coming Soon!",
+        description: "This shopping opportunity will be available soon.",
+      });
+    }
+  };
+
+  const handleGenericOpportunity = (opportunity: EarningOpportunity) => {
+    toast({
+      title: "Opportunity Details",
+      description: opportunity.description || "More details coming soon!",
+    });
+  };
+
+  const awardDailyBonus = async (opportunity: EarningOpportunity) => {
+    try {
+      // Check if user already claimed today's bonus
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existingTransaction } = await supabase
+        .from('nctr_transactions')
+        .select('id')
+        .eq('user_id', user?.id)
+        .eq('opportunity_id', opportunity.id)
+        .gte('created_at', today + 'T00:00:00')
+        .maybeSingle();
+
+      if (existingTransaction) {
+        toast({
+          title: "Already Claimed!",
+          description: "You've already claimed today's daily bonus. Come back tomorrow!",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await awardNCTR(opportunity, 'Daily check-in bonus');
+    } catch (error) {
+      console.error('Error awarding daily bonus:', error);
+      toast({
+        title: "Error",
+        description: "Failed to award daily bonus. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'vip': return 'bg-gradient-to-r from-yellow-400 to-yellow-600';
       case 'premium': return 'bg-gradient-to-r from-purple-400 to-purple-600';
       case 'advanced': return 'bg-gradient-to-r from-blue-400 to-blue-600';
       default: return 'bg-gradient-to-r from-green-400 to-green-600';
+    }
+  };
+
+  const awardBonus = async (opportunity: EarningOpportunity) => {
+    try {
+      // Check if user already completed this bonus opportunity
+      const { data: existingTransaction } = await supabase
+        .from('nctr_transactions')
+        .select('id')
+        .eq('user_id', user?.id)
+        .eq('opportunity_id', opportunity.id)
+        .maybeSingle();
+
+      if (existingTransaction) {
+        toast({
+          title: "Already Completed!",
+          description: "You've already completed this bonus opportunity.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await awardNCTR(opportunity, 'Bonus opportunity completed');
+    } catch (error) {
+      console.error('Error awarding bonus:', error);
+      toast({
+        title: "Error",
+        description: "Failed to award bonus. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const awardNCTR = async (opportunity: EarningOpportunity, description: string) => {
+    try {
+      const rewardAmount = opportunity.nctr_reward || 0;
+      
+      if (rewardAmount <= 0) {
+        toast({
+          title: "No Reward",
+          description: "This opportunity doesn't have an immediate NCTR reward.",
+        });
+        return;
+      }
+
+      // Create transaction record
+      const { error: transactionError } = await supabase
+        .from('nctr_transactions')
+        .insert({
+          user_id: user?.id,
+          transaction_type: 'earned',
+          nctr_amount: rewardAmount,
+          opportunity_id: opportunity.id,
+          description: description,
+          partner_name: opportunity.partner_name,
+          status: 'completed'
+        });
+
+      if (transactionError) throw transactionError;
+
+      // Update user portfolio
+      const { error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .update({
+          available_nctr: (portfolio?.available_nctr || 0) + rewardAmount,
+          total_earned: (portfolio?.total_earned || 0) + rewardAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user?.id);
+
+      if (portfolioError) throw portfolioError;
+
+      // Refresh user data
+      await fetchUserData();
+
+      toast({
+        title: "🎉 NCTR Earned!",
+        description: `You've earned ${formatNCTR(rewardAmount)} NCTR from ${opportunity.title}!`,
+      });
+
+    } catch (error) {
+      console.error('Error awarding NCTR:', error);
+      throw error;
     }
   };
 
@@ -351,7 +539,10 @@ const Garden = () => {
                       </p>
                     )}
 
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300">
+                    <Button 
+                      onClick={() => handleOpportunityClick(opportunities[0])}
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300"
+                    >
                       <ExternalLink className="w-5 h-5 mr-3" />
                       Start Earning with {opportunities[0].partner_name || 'This Brand'}
                     </Button>
@@ -453,13 +644,16 @@ const Garden = () => {
                           )}
                         </div>
 
-                        {/* CTA Button - Consistent size and alignment */}
-                        <div className="mt-auto">
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]">
-                            <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
-                            <span className="truncate">Start Earning</span>
-                          </Button>
-                        </div>
+                         {/* CTA Button - Consistent size and alignment */}
+                         <div className="mt-auto">
+                           <Button 
+                             onClick={() => handleOpportunityClick(opportunity)}
+                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]"
+                           >
+                             <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
+                             <span className="truncate">Start Earning</span>
+                           </Button>
+                         </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -532,13 +726,16 @@ const Garden = () => {
                           )}
                         </div>
 
-                        {/* Button - Consistent alignment */}
-                        <div className="mt-auto">
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300">
-                            <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
-                            <span className="truncate">Earn Now</span>
-                          </Button>
-                        </div>
+                         {/* Button - Consistent alignment */}
+                         <div className="mt-auto">
+                           <Button 
+                             onClick={() => handleOpportunityClick(opportunity)}
+                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300"
+                           >
+                             <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
+                             <span className="truncate">Earn Now</span>
+                           </Button>
+                         </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -547,7 +744,7 @@ const Garden = () => {
             )}
 
             {/* Community Section */}
-            <div className="mt-12">
+            <div className="mt-12" data-referral-system>
               <Card className="bg-white border-2 border-primary shadow-soft">
                 <CardHeader>
                   <CardTitle className="text-xl text-foreground">Join the Community</CardTitle>
