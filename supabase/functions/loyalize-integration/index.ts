@@ -278,18 +278,18 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     } else {
       console.log('⚠️ No Uber stores found in API results');
       
-      // Add Uber manually if not found
+      // Add Uber Gift Cards manually if not found
       allStores.push({
-        id: 'uber-manual-001',
-        name: 'Uber',
-        description: 'Uber ride sharing and food delivery platform. Get rides, order food, and more.',
-        imageUrl: logoData['uber'] || 'https://api.loyalize.com/resources/stores/uber/logo',
-        commission: { value: 4.5, format: '%' },
-        categories: ['Transportation', 'Food Delivery'],
-        url: 'https://www.uber.com',
-        homePage: 'https://www.uber.com'
+        id: 'uber-gift-cards-manual-001',
+        name: 'Uber Gift Cards',
+        description: 'Purchase Uber gift cards through MyGiftCardsPlus and earn up to 1% cashback. Perfect for rides and food delivery.',
+        imageUrl: logoData['uber'] || 'https://logo.clearbit.com/uber.com',
+        commission: { value: 1.0, format: '%' },
+        categories: ['Gift Cards', 'Transportation'],
+        url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
+        homePage: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR'
       });
-      console.log('✅ Added Uber manually to ensure availability');
+      console.log('✅ Added Uber Gift Cards manually to ensure availability');
     }
     
     console.log(`📈 Total stores retrieved: ${allStores.length}`);
@@ -309,18 +309,18 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     } else {
       console.log('⚠️ No Uber stores found in API results');
       
-      // Add Uber manually if not found
-      allStores.push({
-        id: 'uber-manual-001',
-        name: 'Uber',
-        description: 'Uber ride sharing and food delivery platform. Get rides, order food, and more.',
-        imageUrl: 'https://api.loyalize.com/resources/stores/uber/logo',
-        commission: { value: 4.5, format: '%' },
-        categories: ['Transportation', 'Food Delivery'],
-        url: 'https://www.uber.com',
-        homePage: 'https://www.uber.com'
-      });
-      console.log('✅ Added Uber manually to ensure availability');
+       // Add Uber Gift Cards manually if not found
+       allStores.push({
+         id: 'uber-gift-cards-manual-002',
+         name: 'Uber Gift Cards',
+         description: 'Purchase Uber gift cards through MyGiftCardsPlus and earn up to 1% cashback. Perfect for rides and food delivery.',
+         imageUrl: 'https://logo.clearbit.com/uber.com',
+         commission: { value: 1.0, format: '%' },
+         categories: ['Gift Cards', 'Transportation'],
+         url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
+         homePage: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR'
+       });
+       console.log('✅ Added Uber Gift Cards manually to ensure availability');
     }
     
     // Transform store data to brand format
@@ -391,28 +391,16 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
   console.log(isFallback ? '🔄 Using fallback brand data...' : '🔄 Using sample brand data (API key not configured)...')
   
   const enhancedBrands = [
-    // Priority brands including Uber
+    // Priority brands including Uber Gift Cards
     {
-      loyalize_id: 'uber-001',
-      name: 'Uber',
-      description: 'Uber ride sharing and food delivery platform. Get rides, order food, and more with Uber services.',
+      loyalize_id: 'uber-gift-cards-001',
+      name: 'Uber Gift Cards',
+      description: 'Purchase Uber gift cards for rides and food delivery. Get up to 1% cashback on gift card purchases through MyGiftCardsPlus.',
       logo_url: 'https://logo.clearbit.com/uber.com',
-      commission_rate: 0.045,
-      nctr_per_dollar: 100.0, // Fixed default rate
-      category: 'Transportation',
-      website_url: 'https://www.uber.com',
-      is_active: true,
-      featured: true,
-    },
-    {
-      loyalize_id: 'uber-eats-001',
-      name: 'Uber Eats',
-      description: 'Food delivery service from Uber. Order from local restaurants and get delivery straight to your door.',
-      logo_url: 'https://logo.clearbit.com/ubereats.com',
-      commission_rate: 0.055,
-      nctr_per_dollar: 100.0, // Fixed default rate
-      category: 'Food Delivery',
-      website_url: 'https://www.ubereats.com',
+      commission_rate: 0.01,
+      nctr_per_dollar: 10.0, // 1% cashback converted to NCTR
+      category: 'Gift Cards',
+      website_url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
       is_active: true,
       featured: true,
     },
@@ -537,7 +525,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       success: true,
       message,
       brands_count: enhancedBrands.length,
-      uber_included: true,
+      uber_gift_cards_included: true,
       is_sample_data: !isFallback,
       is_fallback_data: isFallback,
       brand_types: ['Transportation', 'Gift Cards', 'Electronics', 'Athletic']

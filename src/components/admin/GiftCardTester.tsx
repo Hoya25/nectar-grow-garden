@@ -20,7 +20,7 @@ interface TestResult {
 
 const GiftCardTester = () => {
   const { user } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('Uber');
+  const [searchTerm, setSearchTerm] = useState('Uber Gift Cards');
   const [testing, setTesting] = useState(false);
   const [results, setResults] = useState<TestResult[]>([]);
 
@@ -131,7 +131,7 @@ const GiftCardTester = () => {
       <CardContent className="space-y-4">
         <div className="flex gap-2">
           <Input
-            placeholder="Enter brand name (e.g., Uber, Amazon, Target)"
+            placeholder="Enter brand name (e.g., Uber Gift Cards, Amazon, Target)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && testGiftCardSearch()}
@@ -224,7 +224,7 @@ const GiftCardTester = () => {
         {/* Quick Test Buttons */}
         <div className="flex flex-wrap gap-2 pt-2 border-t">
           <p className="text-sm text-muted-foreground w-full mb-2">Quick Tests:</p>
-          {['Uber', 'Amazon', 'Target', 'Starbucks', 'Apple'].map((brand) => (
+          {['Uber Gift Cards', 'Amazon', 'Target', 'Starbucks', 'Apple'].map((brand) => (
             <Button
               key={brand}
               variant="ghost"

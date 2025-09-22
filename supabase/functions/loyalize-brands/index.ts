@@ -86,7 +86,7 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
     if (query.toLowerCase().includes('gift')) {
       searchTerms.push(`${query} gift card`, `${query} gift cards`);
     }
-    if (query.toLowerCase() === 'uber') {
+    if (query.toLowerCase() === 'uber' || query.toLowerCase().includes('uber gift')) {
       searchTerms.push('uber gift card', 'uber gift cards', 'uber eats gift card');
     }
     
@@ -176,9 +176,9 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
         id: 'uber_gift_mock',
         loyalize_id: 'uber_gift_mock',
         name: 'Uber Gift Cards',
-        description: 'Uber gift cards for rides and food delivery. Perfect for gifting mobility and convenience.',
+        description: 'Purchase Uber gift cards through MyGiftCardsPlus and earn up to 1% cashback. Perfect for gifting rides and food delivery.',
         logo_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=100&h=100&fit=crop',
-        website_url: 'https://www.uber.com/gift-cards',
+        website_url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
         category: 'Gift Cards',
         commission_rate: 4.5,
         status: 'active',
@@ -404,9 +404,9 @@ function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
     {
       id: 'uber_gift_cards',
       name: 'Uber Gift Cards',
-      description: 'Uber gift cards for rides, food delivery, and grocery delivery. Perfect for gifting mobility and convenience.',
+      description: 'Purchase Uber gift cards through MyGiftCardsPlus and earn up to 1% cashback. Perfect for gifting rides, food delivery, and groceries.',
       logo_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=100&h=100&fit=crop',
-      website_url: 'https://www.uber.com/gift-cards',
+      website_url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
       category: 'Gift Cards',
       commission_rate: 4.5,
       status: 'active'
