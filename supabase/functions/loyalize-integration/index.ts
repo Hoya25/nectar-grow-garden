@@ -546,7 +546,9 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       headers: { 
         ...corsHeaders,
         'Content-Type': 'application/json'
-  }
+      }
+    }
+  );
 }
 
 async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> {
