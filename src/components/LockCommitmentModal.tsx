@@ -42,7 +42,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
       duration: 360,
       title: '360LOCK - Elite Commitment',
       description: 'Maximum Alliance commitment for elite status qualification and exclusive experiences',
-      benefits: ['Qualifies for Member Status tiers', 'Elite partner access', 'VIP experiences & events', 'Exclusive rewards program', 'Priority Alliance status'],
+      benefits: ['Qualifies for Wings tiers', 'Elite partner access', 'VIP experiences & events', 'Exclusive rewards program', 'Priority Alliance status'],
       color: 'bg-gradient-to-r from-primary to-primary/80',
       textColor: 'text-primary',
       bgColor: 'bg-primary/5',
@@ -292,7 +292,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                     {selectedType === '360LOCK' && (
                       <div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
                         <p className="text-sm text-primary font-medium">
-                          💎 360LOCK qualifies for Member Status tiers with earning multipliers up to 2.0x!
+                          💎 360LOCK qualifies for Wings tiers with earning multipliers up to 2.0x!
                         </p>
                       </div>
                     )}

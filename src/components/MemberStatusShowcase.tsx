@@ -267,7 +267,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Trophy className="w-5 h-5 text-primary" />
-            <span>NCTR Alliance Member Status Tiers</span>
+            <span>NCTR Alliance Wings Tiers</span>
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -105,7 +105,7 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                 <div className="flex items-center space-x-1 mb-1">
                   <Sparkles className={`w-4 h-4 ${colors.icon}`} />
                   <span className={`text-sm font-semibold ${colors.text}`}>
-                    Member Status Program
+                    Wings - Maximize Opportunities
                   </span>
                 </div>
                 <p className={`text-xs ${colors.text}/70`}>
@@ -130,7 +130,7 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                   <DialogHeader>
                     <DialogTitle className="flex items-center space-x-2 text-xl">
                       <Crown className="w-6 h-6 text-primary" />
-                      <span>NCTR Alliance Member Status Program</span>
+                      <span>NCTR Alliance Wings Program</span>
                     </DialogTitle>
                   </DialogHeader>
                   
@@ -186,7 +186,7 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
             <div className="flex items-center justify-between text-xs mb-2">
               <div className="flex items-center space-x-1">
                 <Sparkles className={`w-3 h-3 ${colors.icon}`} />
-                <span className={colors.text}>Member Status Program</span>
+                <span className={colors.text}>Wings - Maximize Opportunities</span>
               </div>
               <span className={`${colors.text}/70`}>More 360LOCK = Higher earnings</span>
             </div>

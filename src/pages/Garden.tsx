@@ -223,7 +223,7 @@ const Garden = () => {
           onLockCreated={fetchUserData}
         />
 
-        {/* Main Content - Earning Opportunities with Member Status */}
+        {/* Main Content - Earning Opportunities with Wings */}
         <main className="flex-1 p-8">
           <div className="max-w-7xl mx-auto">
             {/* Member Status Banner - Compact */}
