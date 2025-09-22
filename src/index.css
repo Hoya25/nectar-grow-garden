@@ -14,11 +14,11 @@ All colors MUST be HSL to avoid yellow bug issues.
   :root {
     /* Base page background - keep light */
     --background: 0 0% 98%;
-    --foreground: 240 9% 12%;
+    --foreground: 0 0% 45%;                   /* NCTR grey from logo */
     
-    /* Cards and sections - now dark with neon accents */
-    --card: 240 12% 8%;                       /* Dark section backgrounds */
-    --card-foreground: 66 100% 85%;           /* Bright neon text on dark sections */
+    /* Cards and sections - now white backgrounds */
+    --card: 0 0% 100%;                        /* White section backgrounds */
+    --card-foreground: 0 0% 45%;              /* NCTR grey text on white sections */
     --popover: 240 12% 8%;
     --popover-foreground: 66 100% 85%;
     
@@ -30,18 +30,18 @@ All colors MUST be HSL to avoid yellow bug issues.
     --primary-light: 66 80% 70%;
     
     /* Section styling */
-    --section-bg: 240 12% 8%;                 /* Dark section backgrounds */
+    --section-bg: 0 0% 100%;                  /* White section backgrounds */
     --section-border: 66 100% 50%;            /* Neon section borders */
-    --section-text: 66 100% 85%;              /* Bright text on sections */
-    --section-accent: 66 100% 50%;            /* Neon accents */
+    --section-text: 0 0% 45%;                 /* NCTR grey text on sections */
+    --section-accent: 66 100% 50%;            /* Neon accents for numbers */
     
     /* Secondary elements */
-    --secondary: 240 8% 15%;                  /* Darker secondary */
-    --secondary-foreground: 66 100% 85%;      /* Bright text */
-    --secondary-accent: 240 8% 20%;
+    --secondary: 0 0% 95%;                    /* Light grey secondary */
+    --secondary-foreground: 0 0% 45%;         /* NCTR grey text */
+    --secondary-accent: 0 0% 90%;
     
-    --muted: 240 8% 12%;                      /* Dark muted */
-    --muted-foreground: 66 80% 70%;           /* Dimmed neon text */
+    --muted: 0 0% 95%;                        /* Light grey muted */
+    --muted-foreground: 0 0% 60%;             /* Lighter grey text */
     
     /* Bright neon accent */
     --accent: 66 100% 50%;
@@ -55,8 +55,8 @@ All colors MUST be HSL to avoid yellow bug issues.
     --destructive-foreground: 0 0% 98%;
     
     /* Borders and inputs */
-    --border: 66 100% 50%;                    /* Neon borders */
-    --input: 240 8% 15%;                      /* Dark inputs */
+    --border: 0 0% 85%;                       /* Light grey borders */
+    --input: 0 0% 100%;                       /* White inputs */
     --ring: 66 100% 50%;                      /* Neon focus rings */
     
     /* Neon-focused gradients */
@@ -68,7 +68,7 @@ All colors MUST be HSL to avoid yellow bug issues.
     --gradient-glow: radial-gradient(ellipse at center, hsl(66 100% 50% / 0.2) 0%, transparent 70%);
     --gradient-page: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(210 20% 96%) 50%, hsl(66 30% 96%) 100%);
     --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 50%), hsl(280 100% 50%), hsl(320 100% 50%));
-    --gradient-section: linear-gradient(180deg, hsl(240 12% 8%) 0%, hsl(240 8% 12%) 100%);
+    --gradient-section: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
     
     /* Enhanced shadows with neon glow */
     --shadow-minimal: 0 1px 3px hsl(0 0% 0% / 0.3);
