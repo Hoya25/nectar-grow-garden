@@ -265,74 +265,167 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
       {/* All Status Levels Overview */}
       <Card className="bg-white shadow-soft border border-section-border">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Trophy className="w-5 h-5 text-primary" />
-            <span>NCTR Alliance Wings Tiers</span>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Trophy className="w-5 h-5 text-primary" />
+              <span>NCTR Alliance Wings - All Tiers</span>
+            </div>
+            <Badge variant="outline" className="text-xs">
+              {statusLevels.length} Tiers Available
+            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3">
-            {statusLevels.map((level, index) => {
-              const isUnlocked = current360NCTR >= level.min_locked_nctr;
-              const isCurrent = level.status_name === currentStatus;
-              const StatusLevelIcon = statusIcons[level.status_name as keyof typeof statusIcons] || Star;
-              const levelColors = statusColors[level.status_name as keyof typeof statusColors] || statusColors.starter;
-              
-              return (
-                <div 
-                  key={level.status_name}
-                  className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
-                    isCurrent 
-                      ? `bg-gradient-to-r ${levelColors.bg} ${levelColors.border} border-2` 
-                      : isUnlocked 
-                        ? 'bg-green-50 border-green-200' 
-                        : 'bg-gray-50 border-gray-200'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-full ${
-                      isCurrent ? 'bg-white/50' : isUnlocked ? 'bg-green-100' : 'bg-gray-100'
-                    }`}>
-                      <StatusLevelIcon className={`w-5 h-5 ${
-                        isCurrent ? levelColors.icon : isUnlocked ? 'text-green-600' : 'text-gray-400'
-                      }`} />
-                    </div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <h4 className={`font-semibold ${
-                          isCurrent ? levelColors.text : isUnlocked ? 'text-green-800' : 'text-gray-600'
-                        }`}>
-                          {level.status_name?.toUpperCase()}
-                        </h4>
-                        {isCurrent && (
-                          <Badge variant="secondary" className="bg-primary text-primary-foreground text-xs">
-                            CURRENT
-                          </Badge>
+          <div className="space-y-4">
+            {/* Progress Path Visualization */}
+            <div className="relative">
+              <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-gray-200"></div>
+              <div className="space-y-3">
+                {statusLevels.map((level, index) => {
+                  const isUnlocked = current360NCTR >= level.min_locked_nctr;
+                  const isCurrent = level.status_name === currentStatus;
+                  const isNext = level.status_name === nextStatusData?.status_name;
+                  const StatusLevelIcon = statusIcons[level.status_name as keyof typeof statusIcons] || Star;
+                  const levelColors = statusColors[level.status_name as keyof typeof statusColors] || statusColors.starter;
+                  
+                  return (
+                    <div key={level.status_name} className="relative">
+                      {/* Progress Circle */}
+                      <div className={`absolute left-4 top-4 w-4 h-4 rounded-full border-2 z-10 ${
+                        isCurrent 
+                          ? 'bg-primary border-primary shadow-lg' 
+                          : isUnlocked 
+                            ? 'bg-green-500 border-green-500' 
+                            : isNext
+                              ? 'bg-white border-primary border-4 shadow-lg animate-pulse'
+                              : 'bg-gray-200 border-gray-300'
+                      }`}></div>
+                      
+                      {/* Level Card */}
+                      <div className={`ml-12 p-4 rounded-lg border-2 transition-all duration-300 ${
+                        isCurrent 
+                          ? `bg-gradient-to-r ${levelColors.bg} ${levelColors.border} shadow-lg transform scale-105` 
+                          : isNext
+                            ? 'bg-gradient-to-r from-primary/5 to-primary/10 border-primary/30 shadow-md hover:shadow-lg'
+                            : isUnlocked 
+                              ? 'bg-green-50 border-green-200 hover:bg-green-100' 
+                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className={`p-2 rounded-full ${
+                              isCurrent ? 'bg-white/50' : isNext ? 'bg-primary/10' : isUnlocked ? 'bg-green-100' : 'bg-gray-100'
+                            }`}>
+                              <StatusLevelIcon className={`w-5 h-5 ${
+                                isCurrent ? levelColors.icon : isNext ? 'text-primary' : isUnlocked ? 'text-green-600' : 'text-gray-400'
+                              }`} />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <h4 className={`font-bold text-lg ${
+                                  isCurrent ? levelColors.text : isNext ? 'text-primary' : isUnlocked ? 'text-green-800' : 'text-gray-600'
+                                }`}>
+                                  {level.status_name?.toUpperCase()}
+                                </h4>
+                                {isCurrent && (
+                                  <Badge variant="secondary" className="bg-primary text-primary-foreground text-xs animate-pulse">
+                                    CURRENT TIER
+                                  </Badge>
+                                )}
+                                {isNext && (
+                                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-xs animate-pulse">
+                                    NEXT ACHIEVABLE
+                                  </Badge>
+                                )}
+                                {isUnlocked && !isCurrent && (
+                                  <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300 text-xs">
+                                    UNLOCKED
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className={`text-sm font-medium ${
+                                isCurrent ? levelColors.text + '/80' : isNext ? 'text-primary/80' : isUnlocked ? 'text-green-700' : 'text-gray-500'
+                              }`}>
+                                {formatNCTR(level.min_locked_nctr)} NCTR Required • {level.reward_multiplier}x Earnings Multiplier
+                              </p>
+                              {isNext && (
+                                <p className="text-xs text-primary/70 mt-1 font-medium">
+                                  🎯 {formatNCTR(level.min_locked_nctr - current360NCTR)} NCTR needed to unlock
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="text-right">
+                            <div className={`text-2xl font-bold ${
+                              isCurrent ? levelColors.text : isNext ? 'text-primary' : isUnlocked ? 'text-green-700' : 'text-gray-500'
+                            }`}>
+                              {level.reward_multiplier}x
+                            </div>
+                            <p className={`text-xs ${
+                              isCurrent ? levelColors.text + '/60' : isNext ? 'text-primary/70' : isUnlocked ? 'text-green-600' : 'text-gray-400'
+                            }`}>
+                              Bonus Rate
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Benefits Preview */}
+                        {(isCurrent || isNext) && level.benefits && level.benefits.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-white/30">
+                            <div className="grid md:grid-cols-2 gap-2">
+                              {level.benefits.slice(0, 4).map((benefit, idx) => (
+                                <div key={idx} className="flex items-center space-x-2">
+                                  <div className={`w-1.5 h-1.5 rounded-full ${
+                                    isCurrent ? levelColors.icon.replace('text-', 'bg-') : 'bg-primary'
+                                  }`}></div>
+                                  <span className={`text-xs ${
+                                    isCurrent ? levelColors.text + '/80' : 'text-primary/80'
+                                  }`}>
+                                    {benefit}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            {level.benefits.length > 4 && (
+                              <p className={`text-xs mt-2 ${
+                                isCurrent ? levelColors.text + '/60' : 'text-primary/60'
+                              }`}>
+                                +{level.benefits.length - 4} more exclusive benefits
+                              </p>
+                            )}
+                          </div>
                         )}
                       </div>
-                      <p className={`text-sm ${
-                        isCurrent ? levelColors.text + '/70' : isUnlocked ? 'text-green-600' : 'text-gray-500'
-                      }`}>
-                        {formatNCTR(level.min_locked_nctr)} NCTR • {level.reward_multiplier}x Multiplier
-                      </p>
                     </div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            {/* Quick Stats */}
+            <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-4 border border-primary/20 mt-6">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-bold text-primary">
+                    {statusLevels.filter(level => current360NCTR >= level.min_locked_nctr).length}
                   </div>
-                  
-                  <div className="text-right">
-                    <div className={`text-lg font-bold ${
-                      isCurrent ? levelColors.text : isUnlocked ? 'text-green-700' : 'text-gray-500'
-                    }`}>
-                      {level.reward_multiplier}x
-                    </div>
-                    <p className={`text-xs ${
-                      isCurrent ? levelColors.text + '/60' : isUnlocked ? 'text-green-600' : 'text-gray-400'
-                    }`}>
-                      Earnings
-                    </p>
-                  </div>
+                  <p className="text-xs text-primary/70">Tiers Unlocked</p>
                 </div>
-              );
-            })}
+                <div>
+                  <div className="text-lg font-bold text-primary">
+                    {currentStatusData?.reward_multiplier || 1}x
+                  </div>
+                  <p className="text-xs text-primary/70">Current Multiplier</p>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-primary">
+                    {nextStatusData ? `${nextStatusData.reward_multiplier}x` : 'MAX'}
+                  </div>
+                  <p className="text-xs text-primary/70">Next Multiplier</p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
