@@ -201,163 +201,81 @@ serve(async (req) => {
   }
 })
 
-async function syncFromLoyalizeAPI(apiKey: string, supabase: any) {
-  console.log('Attempting to sync from live Loyalize API...')
-  console.log('🔑 API Key configured:', apiKey ? 'Yes' : 'No')
-  console.log('🔑 API Key length:', apiKey?.length || 0)
-  console.log('🔑 API Key prefix:', apiKey ? apiKey.substring(0, 8) + '...' : 'None')
+async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Response> {
+  console.log('🔗 Starting Loyalize API sync with correct endpoint...');
   
-  // Multiple authentication methods to try
-  const authMethods = [
-    { name: 'Bearer Token', headers: { 'Authorization': `Bearer ${apiKey}` } },
-    { name: 'API Key Header', headers: { 'X-API-Key': apiKey } },
-    { name: 'Token Auth', headers: { 'Authorization': `Token ${apiKey}` } },
-    { name: 'API Key', headers: { 'apikey': apiKey } },
-    { name: 'API-Key', headers: { 'api-key': apiKey } },
-    { name: 'Basic Auth', headers: { 'Authorization': `Basic ${btoa(apiKey + ':')}` } }
-  ]
-  
-  const possibleEndpoints = [
-    'https://api.loyalize.com/v1/brands',
-    'https://api.loyalize.com/v1/merchants', 
-    'https://api.loyalize.com/brands',
-    'https://loyalize.com/api/v1/brands',
-    'https://api.loyalize.com/v1/partners',
-    'https://api.loyalize.com/merchants',
-    'https://api.loyalize.com/api/v1/merchants',
-    'https://loyalize.com/api/merchants'
-  ]
-  
-  let lastError = null
-  
-  for (const endpoint of possibleEndpoints) {
-    for (const authMethod of authMethods) {
-      try {
-        console.log(`🔄 Trying endpoint: ${endpoint} with ${authMethod.name}`)
-        
-        const response = await fetch(endpoint, {
-          method: 'GET',
-          headers: {
-            ...authMethod.headers,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'NCTR-Loyalize-Integration/1.0'
-          },
-        })
-        
-        console.log(`📊 ${endpoint} status: ${response.status} (${authMethod.name})`)
-        
-        if (response.status === 401) {
-          const errorText = await response.text()
-          console.log(`🔐 Auth failed with ${authMethod.name} on ${endpoint}:`, errorText.substring(0, 200))
-          continue // Try next auth method
-        }
-        
-        if (response.ok) {
-          const data = await response.json()
-          console.log(`✅ SUCCESS! Authenticated with ${authMethod.name} on ${endpoint}`)
-          console.log(`📄 Response keys:`, Object.keys(data))
-          
-          // Try different possible data structures
-          let brands = null
-          if (data.brands && Array.isArray(data.brands)) {
-            brands = data.brands
-          } else if (data.merchants && Array.isArray(data.merchants)) {
-            brands = data.merchants
-          } else if (data.partners && Array.isArray(data.partners)) {
-            brands = data.partners  
-          } else if (Array.isArray(data)) {
-            brands = data
-          } else if (data.data && Array.isArray(data.data)) {
-            brands = data.data
-          } else if (data.results && Array.isArray(data.results)) {
-            brands = data.results
-          }
-          
-          if (!brands || brands.length === 0) {
-            console.log(`⚠️ No brands array found in response from ${endpoint}`)
-            console.log(`📄 Available keys:`, Object.keys(data))
-            continue
-          }
-          
-          console.log(`🎉 Found ${brands.length} brands from ${endpoint} using ${authMethod.name}`)
-          console.log(`📄 Sample brand keys:`, brands[0] ? Object.keys(brands[0]) : 'No brands')
-          
-          // Transform brands to our format
-          const transformedBrands = brands.map((brand: any, index: number) => ({
-            loyalize_id: (brand.id || brand.merchant_id || brand.partner_id || brand.brand_id || `loyalize-${Date.now()}-${index}`).toString(),
-            name: brand.name || brand.merchant_name || brand.partner_name || brand.brand_name || `Brand ${index}`,
-            description: brand.description || brand.summary || brand.bio || `Partner brand offering cashback rewards`,
-            logo_url: brand.logo_url || brand.logo || brand.image_url || brand.avatar || null,
-            commission_rate: parseFloat(brand.commission_rate || brand.commission || brand.rate || brand.payout_rate || '5') / (brand.commission_rate > 1 ? 100 : 1),
-            nctr_per_dollar: parseFloat(brand.nctr_per_dollar || ((parseFloat(brand.commission_rate || brand.commission || '5') / (brand.commission_rate > 1 ? 100 : 1)) * 0.1).toString()),
-            category: brand.category || brand.vertical || brand.industry || brand.sector || 'General',
-            website_url: brand.website_url || brand.url || brand.website || brand.link || brand.homepage || null,
-            is_active: brand.is_active !== false && brand.status !== 'inactive' && brand.active !== false,
-            featured: brand.featured || brand.is_featured || brand.priority === 'high' || false,
-          }))
-          
-          // Filter out invalid brands
-          const validBrands = transformedBrands.filter(brand => 
-            brand.loyalize_id && brand.name && brand.name !== `Brand ${transformedBrands.indexOf(brand)}`
-          )
-          
-          if (validBrands.length === 0) {
-            console.log(`❌ No valid brands after filtering`)
-            continue
-          }
-          
-          console.log(`✅ ${validBrands.length}/${transformedBrands.length} brands are valid`)
-          
-          // Upsert to database
-          const { data: upsertData, error: upsertError } = await supabase
-            .from('brands')
-            .upsert(validBrands, {
-              onConflict: 'loyalize_id',
-              ignoreDuplicates: false
-            })
-          
-          if (upsertError) {
-            console.error('Database upsert error:', upsertError)
-            throw upsertError
-          }
-          
-          console.log(`🎉 Successfully synced ${validBrands.length} LIVE brands from Loyalize API using ${authMethod.name}`)
-          
-          return new Response(
-            JSON.stringify({
-              success: true,
-              message: `Successfully synced ${validBrands.length} LIVE brands from Loyalize API`,
-              brands_count: validBrands.length,
-              endpoint_used: endpoint,
-              auth_method_used: authMethod.name,
-              is_live_data: true,
-              is_sample_data: false,
-              is_fallback_data: false
-            }),
-            { 
-              headers: { 
-                ...corsHeaders,
-                'Content-Type': 'application/json'
-              }
-            }
-          )
-        } else {
-          const errorText = await response.text()
-          console.error(`❌ ${endpoint} failed with ${authMethod.name}: ${response.status} ${response.statusText}`)
-          console.error(`Error response: ${errorText.substring(0, 300)}`)
-          lastError = new Error(`${endpoint} (${authMethod.name}): ${response.status} - ${errorText}`)
-        }
-      } catch (error) {
-        console.error(`💥 Error with ${endpoint} using ${authMethod.name}:`, error)
-        lastError = error
+  try {
+    const endpoint = 'https://api.loyalize.com/v1/stores';
+    console.log(`🔄 Fetching from: ${endpoint}`);
+    
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Authorization': apiKey,
+        'Content-Type': 'application/json'
       }
+    });
+    
+    console.log(`📊 API response status: ${response.status}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '');
+      console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
+      console.error(`Error response: ${errorText}`);
+      throw new Error(`Loyalize API error: ${response.status} - ${errorText}`);
     }
+    
+    const data = await response.json();
+    console.log(`✅ Successfully fetched ${data.content?.length || 0} stores from Loyalize`);
+    
+    // Transform store data to brand format
+    const transformedBrands = data.content?.map((store: any) => ({
+      loyalize_id: store.id?.toString() || '',
+      name: store.name || 'Unknown Store',
+      description: store.description || `Shop with ${store.name} and earn NCTR rewards`,
+      logo_url: store.imageUrl || null,
+      commission_rate: store.commission?.value ? (store.commission.format === '%' ? store.commission.value / 100 : store.commission.value) : 0.05,
+      nctr_per_dollar: store.commission?.value ? (store.commission.format === '%' ? (store.commission.value / 100) * 0.1 : store.commission.value * 0.1) : 0.005,
+      category: store.categories?.[0] || 'General',
+      website_url: store.url || null,
+      is_active: true,
+      featured: false,
+    })) || [];
+    
+    if (transformedBrands.length === 0) {
+      console.log('⚠️ No stores found in API response');
+      throw new Error('No stores found in API response');
+    }
+    
+    // Upsert to database
+    const { data: upsertData, error: upsertError } = await supabase
+      .from('brands')
+      .upsert(transformedBrands, {
+        onConflict: 'loyalize_id',
+        ignoreDuplicates: false
+      });
+    
+    if (upsertError) {
+      console.error('Database upsert error:', upsertError);
+      throw upsertError;
+    }
+    
+    console.log(`🎉 Successfully synced ${transformedBrands.length} stores from Loyalize API`);
+    
+    return new Response(JSON.stringify({
+      success: true,
+      message: `✅ Successfully synced ${transformedBrands.length} brands from Loyalize API`,
+      brands_synced: transformedBrands.length,
+      total_stores: data.totalElements || 0,
+      is_live_data: true
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+    
+  } catch (error) {
+    console.error('🚫 Loyalize API sync failed:', error);
+    throw error;
   }
-  
-  // All endpoints and auth methods failed
-  console.error(`🚫 ALL ${possibleEndpoints.length} endpoints and ${authMethods.length} auth methods failed`)
-  throw lastError || new Error('All Loyalize API endpoints and authentication methods failed')
 }
 
 async function syncSampleBrands(supabase: any, isFallback = false) {

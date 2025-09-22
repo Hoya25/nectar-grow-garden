@@ -70,130 +70,208 @@ serve(async (req) => {
   }
 });
 
-async function searchBrands(req: Request, apiKey: string) {
-  const body = await req.json().catch(() => ({}));
-  const { query, category, limit = 20, offset = 0 } = body as LoyalizeSearchParams;
-
-  console.log('Searching Loyalize brands:', { query, category, limit, offset });
-
-  try {
-    // Mock Loyalize API structure - replace with actual API endpoints
-    const loyalizeUrl = new URL('https://api.loyalize.com/v1/brands/search');
-    if (query) loyalizeUrl.searchParams.set('q', query);
-    if (category) loyalizeUrl.searchParams.set('category', category);
-    loyalizeUrl.searchParams.set('limit', limit.toString());
-    loyalizeUrl.searchParams.set('offset', offset.toString());
-
-    const response = await fetch(loyalizeUrl.toString(), {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      // If Loyalize API is not available, return mock data for testing
-      console.log('Loyalize API not accessible, returning mock data');
-      return new Response(
-        JSON.stringify({
-          brands: getMockBrands(query, category),
-          total: getMockBrands(query, category).length,
-          hasMore: false
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const data = await response.json();
-    
-    return new Response(
-      JSON.stringify(data),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
-  } catch (error) {
-    console.error('Error searching Loyalize brands:', error);
-    
-    // Fallback to mock data if API is unavailable
-    return new Response(
-      JSON.stringify({
-        brands: getMockBrands(query, category),
-        total: getMockBrands(query, category).length,
-        hasMore: false
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-  }
-}
-
-async function importBrand(req: Request, apiKey: string, supabase: any) {
-  const body = await req.json();
-  const { brandId } = body;
-
-  if (!brandId) {
-    throw new Error('Brand ID is required');
-  }
-
-  console.log('Importing brand from Loyalize:', brandId);
+async function searchBrands(req: Request, apiKey: string): Promise<Response> {
+  const url = new URL(req.url);
+  const query = url.searchParams.get('query') || '';
+  const category = url.searchParams.get('category') || '';
+  const limit = parseInt(url.searchParams.get('limit') || '20');
+  const offset = parseInt(url.searchParams.get('offset') || '0');
 
   try {
-    // Fetch detailed brand info from Loyalize
-    const response = await fetch(`https://api.loyalize.com/v1/brands/${brandId}`, {
+    console.log(`🔍 Searching stores: query="${query}", category="${category}"`);
+    
+    const endpoint = 'https://api.loyalize.com/v1/stores';
+    const searchUrl = new URL(endpoint);
+    
+    // Add query parameters according to API docs
+    if (query) searchUrl.searchParams.set('name', query);
+    if (category) searchUrl.searchParams.set('categories', category);
+    searchUrl.searchParams.set('size', limit.toString());
+    searchUrl.searchParams.set('page', Math.floor(offset / limit).toString());
+
+    const response = await fetch(searchUrl.toString(), {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
+        'Authorization': apiKey,
+        'Content-Type': 'application/json'
+      }
     });
 
-    let brandData: LoyalizeBrand;
-    
-    if (!response.ok) {
-      // Mock brand data if API is not available
-      const mockBrands = getMockBrands();
-      brandData = mockBrands.find(b => b.id === brandId) || mockBrands[0];
+    if (response.ok) {
+      const data = await response.json();
+      console.log(`✅ Successfully fetched ${data.content?.length || 0} stores`);
+      
+      // Transform stores to brand format
+      const brands = data.content?.map((store: any) => ({
+        id: store.id?.toString() || '',
+        name: store.name || 'Unknown Store',
+        logo_url: store.imageUrl || '',
+        commission_rate: store.commission?.value || 0,
+        commission_format: store.commission?.format || '%',
+        description: store.description || '',
+        website_url: store.url || '',
+        category: store.categories?.[0] || 'General'
+      })) || [];
+      
+      return new Response(JSON.stringify({
+        success: true,
+        brands: brands,
+        total: data.totalElements || 0,
+        page: data.number || 0,
+        totalPages: data.totalPages || 1
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     } else {
-      brandData = await response.json();
+      const errorText = await response.text().catch(() => '');
+      console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
+      console.error(`Error response: ${errorText}`);
+      
+      // If API fails, return mock data
+      console.log('🔄 API failed, using mock data');
+      const mockBrands = getMockBrands(query, category);
+      
+      return new Response(JSON.stringify({
+        success: true,
+        brands: mockBrands.slice(offset, offset + limit),
+        total: mockBrands.length,
+        note: 'Using mock data - API unavailable'
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
-
-    // Insert brand into Supabase
-    const { data, error } = await supabase
-      .from('brands')
-      .insert({
-        name: brandData.name,
-        description: brandData.description,
-        logo_url: brandData.logo_url,
-        website_url: brandData.website_url,
-        category: brandData.category,
-        loyalize_id: brandData.id,
-        commission_rate: brandData.commission_rate / 100, // Convert percentage to decimal
-        nctr_per_dollar: calculateNCTRRate(brandData.commission_rate),
-        is_active: brandData.status === 'active',
-        featured: false
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    console.log('Brand imported successfully:', data.name);
-
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        brand: data,
-        message: `${brandData.name} imported successfully`
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
+    
   } catch (error) {
-    console.error('Error importing brand:', error);
-    throw error;
+    console.error('❌ Search brands error:', error);
+    
+    // Fallback to mock data
+    const mockBrands = getMockBrands(query, category);
+    return new Response(JSON.stringify({
+      success: true,
+      brands: mockBrands.slice(offset, offset + limit),
+      total: mockBrands.length,
+      note: 'Using mock data - API error'
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 }
+}
 
-async function syncAllBrands(apiKey: string, supabase: any) {
-  console.log('Starting bulk sync of Loyalize brands');
+async function importBrand(req: Request, apiKey: string, supabase: any): Promise<Response> {
+  try {
+    const { brandId } = await req.json();
+    console.log(`📥 Importing store: ${brandId}`);
+    
+    // Get store details from Loyalize API
+    const endpoint = `https://api.loyalize.com/v1/stores/${brandId}`;
+    
+    const response = await fetch(endpoint, {
+      headers: {
+        'Authorization': apiKey,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const storeData = await response.json();
+      console.log(`✅ Successfully fetched store details: ${storeData.name}`);
+      
+      // Calculate NCTR rate based on commission
+      const commissionRate = storeData.commission?.value ? (storeData.commission.format === '%' ? storeData.commission.value / 100 : storeData.commission.value) : 0.05;
+      const nctrPerDollar = calculateNCTRRate(storeData.commission?.value || 5);
+      
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from('brands')
+        .upsert({
+          loyalize_id: brandId,
+          name: storeData.name || 'Unknown Store',
+          description: storeData.description || '',
+          logo_url: storeData.imageUrl || '',
+          commission_rate: commissionRate,
+          nctr_per_dollar: nctrPerDollar,
+          website_url: storeData.url || '',
+          category: storeData.categories?.[0] || 'General',
+          is_active: true,
+          featured: false
+        }, { 
+          onConflict: 'loyalize_id',
+          ignoreDuplicates: false 
+        })
+        .select();
+
+      if (error) {
+        console.error('❌ Database error:', error);
+        throw error;
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: `Store "${storeData.name}" imported successfully`,
+        brand: data?.[0]
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } else {
+      const errorText = await response.text().catch(() => '');
+      console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
+      
+      // If API fails, create with mock data
+      console.log('🔄 API failed, creating with mock data');
+      const mockBrands = getMockBrands();
+      const mockBrand = mockBrands.find(b => b.id === brandId) || mockBrands[0];
+      
+      const nctrPerDollar = calculateNCTRRate(mockBrand.commission_rate);
+      
+      const { data, error } = await supabase
+        .from('brands')
+        .upsert({
+          loyalize_id: brandId,
+          name: mockBrand.name,
+          description: mockBrand.description,
+          logo_url: mockBrand.logo_url,
+          commission_rate: mockBrand.commission_rate / 100,
+          nctr_per_dollar: nctrPerDollar,
+          website_url: mockBrand.website_url,
+          category: mockBrand.category,
+          is_active: true,
+          featured: false
+        }, { 
+          onConflict: 'loyalize_id',
+          ignoreDuplicates: false 
+        })
+        .select();
+
+      if (error) {
+        console.error('❌ Database error:', error);
+        throw error;
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: `Mock brand "${mockBrand.name}" imported successfully`,
+        brand: data?.[0],
+        note: 'Using mock data - API unavailable'
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Import brand error:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+}
+}
+
+async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
+  console.log('🔄 Starting bulk sync of Loyalize stores');
 
   try {
     // Get all brands with Loyalize IDs
@@ -208,24 +286,31 @@ async function syncAllBrands(apiKey: string, supabase: any) {
     
     for (const brand of existingBrands) {
       try {
-        // Fetch updated brand data from Loyalize
-        const response = await fetch(`https://api.loyalize.com/v1/brands/${brand.loyalize_id}`, {
+        // Fetch updated store data from Loyalize
+        const response = await fetch(`https://api.loyalize.com/v1/stores/${brand.loyalize_id}`, {
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
+            'Authorization': apiKey,
             'Content-Type': 'application/json',
           },
         });
 
         if (response.ok) {
-          const loyalizeBrand = await response.json();
+          const storeData = await response.json();
           
           // Update commission rate and other data
+          const commissionRate = storeData.commission?.value ? (storeData.commission.format === '%' ? storeData.commission.value / 100 : storeData.commission.value) : 0.05;
+          
           await supabase
             .from('brands')
             .update({
-              commission_rate: loyalizeBrand.commission_rate / 100,
-              nctr_per_dollar: calculateNCTRRate(loyalizeBrand.commission_rate),
-              is_active: loyalizeBrand.status === 'active'
+              commission_rate: commissionRate,
+              nctr_per_dollar: calculateNCTRRate(storeData.commission?.value || 5),
+              is_active: true,
+              name: storeData.name,
+              description: storeData.description,
+              logo_url: storeData.imageUrl,
+              website_url: storeData.url,
+              category: storeData.categories?.[0] || 'General'
             })
             .eq('id', brand.id);
           
@@ -236,18 +321,18 @@ async function syncAllBrands(apiKey: string, supabase: any) {
       }
     }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: `Synced ${updatedCount} brands successfully`
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: `Synced ${updatedCount} brands successfully`
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
 
   } catch (error) {
     console.error('Error syncing brands:', error);
     throw error;
   }
+}
 }
 
 function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
