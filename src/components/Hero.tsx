@@ -19,14 +19,14 @@ const Hero = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in-up drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)'}}>
-            Crypto for{" "}
+            Everyday Crypto for{" "}
             <span className="text-yellow-300 animate-gradient-shift bg-[length:200%_200%] drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
-              All of Us
+              Everyday People
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up [animation-delay:0.2s] opacity-0 [animation-fill-mode:forwards] drop-shadow-xl font-semibold" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)'}}>
-            Build your crypto portfolio with limited risk and financial barriers
+          <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up [animation-delay:0.2s] opacity-0 [animation-fill-mode:forwards] drop-shadow-xl font-semibold" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)'}}>
+            Unlock Rewards by Simply Being Yourself: Turn Your Next Purchase or Friend Invite into Crypto Wins – Safe, Simple, Barrier-Free
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up [animation-delay:0.4s] opacity-0 [animation-fill-mode:forwards]">
