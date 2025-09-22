@@ -18,30 +18,12 @@ const Footer = () => {
           {/* Premium Logo Section */}
           <div className="text-center mb-16 animate-fade-in-up">
             <div className="flex items-center justify-center space-x-4 mb-8 group">
-              <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-gradient-hero shadow-glow group-hover:shadow-glow-intense transition-all duration-500">
-                <video 
-                  className="w-full h-full object-cover scale-150 translate-y-1"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  disablePictureInPicture
-                >
-                  <source src="/assets/logo-animation.mp4" type="video/mp4" />
-                  <div className="w-full h-full bg-gradient-hero flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-lg">🌱</span>
-                  </div>
-                </video>
-                <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-4xl font-bold bg-gradient-premium bg-clip-text text-transparent">The Garden</span>
-                <img 
-                  src={nctrLogo} 
-                  alt="NCTR" 
-                  className="h-20 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
-                />
-              </div>
+              <span className="text-4xl font-bold bg-gradient-premium bg-clip-text text-transparent">The Garden</span>
+              <img 
+                src={nctrLogo} 
+                alt="NCTR" 
+                className="h-20 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+              />
             </div>
             
             {/* Premium Description */}
