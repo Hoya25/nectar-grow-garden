@@ -222,7 +222,7 @@ const Garden = () => {
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="flex items-center space-x-1 mb-1">
+                      <div className="flex items-center space-x-2 mb-1">
                         <p className="text-xs text-section-text/70">Available</p>
                         <img 
                           src={nctrLogo} 
@@ -243,7 +243,7 @@ const Garden = () => {
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="flex items-center space-x-1 mb-1">
+                      <div className="flex items-center space-x-2 mb-1">
                         <p className="text-xs text-section-text/70">Pending</p>
                         <img 
                           src={nctrLogo} 
@@ -264,7 +264,7 @@ const Garden = () => {
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="flex items-center space-x-1 mb-1">
+                      <div className="flex items-center space-x-2 mb-1">
                         <p className="text-xs text-section-text/70">Total Earned</p>
                         <img 
                           src={nctrLogo} 
@@ -287,7 +287,7 @@ const Garden = () => {
           <Card className="bg-white shadow-medium border border-section-border">
             <CardContent className="p-3">
               <div className="text-center text-foreground">
-                <div className="flex items-center justify-center space-x-2 mb-2">
+                <div className="flex items-center justify-center space-x-3 mb-2">
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
@@ -422,7 +422,7 @@ const Garden = () => {
 
                     <div className="grid md:grid-cols-2 gap-6 mb-6">
                       <div className="bg-section-highlight rounded-xl p-6 text-center">
-                        <div className="flex items-center justify-center space-x-2 mb-2">
+                        <div className="flex items-center justify-center space-x-4 mb-2">
                           <div className="text-3xl font-bold text-section-accent">
                             {formatNCTR(opportunities[0].reward_per_dollar || 0)}
                           </div>
@@ -437,7 +437,7 @@ const Garden = () => {
                       
                       {opportunities[0].nctr_reward > 0 && (
                         <div className="bg-primary/10 rounded-xl p-6 text-center border border-primary/20">
-                          <div className="flex items-center justify-center space-x-2 mb-2">
+                          <div className="flex items-center justify-center space-x-3 mb-2">
                             <div className="text-3xl font-bold text-primary">
                               {formatNCTR(opportunities[0].nctr_reward)}
                             </div>
@@ -531,7 +531,7 @@ const Garden = () => {
 
                         {/* Earning Display - Large and prominent */}
                         <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-8 mb-8 text-center border border-primary/20">
-                          <div className="flex items-center justify-center space-x-3 mb-3">
+                          <div className="flex items-center justify-center space-x-4 mb-3">
                             <div className="text-4xl font-bold text-primary">
                               {formatNCTR(opportunity.reward_per_dollar || 0)}
                             </div>
@@ -620,7 +620,7 @@ const Garden = () => {
                         </div>
 
                         <div className="bg-section-highlight rounded-lg p-3 mb-4 text-center">
-                          <div className="flex items-center justify-center space-x-1 mb-1">
+                          <div className="flex items-center justify-center space-x-2 mb-1">
                             <span className="text-lg font-bold text-section-accent">
                               {formatNCTR(opportunity.reward_per_dollar || 0)}
                             </span>
