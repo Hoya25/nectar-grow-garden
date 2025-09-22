@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Trophy, TrendingUp, ChevronRight, Sparkles, Crown } from 'lucide-react';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
+import { LevelUpModal } from '@/components/LevelUpModal';
 import nctrLogo from "@/assets/nctr-logo.png";
 
 interface MemberStatusBannerProps {
@@ -13,6 +14,7 @@ interface MemberStatusBannerProps {
   current360NCTR: number;
   availableNCTR?: number;
   onUpgradeClick?: () => void;
+  onEarnMoreClick?: () => void;
 }
 
 const statusColors = {
@@ -60,14 +62,14 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
   currentStatus,
   current360NCTR,
   availableNCTR = 0,
-  onUpgradeClick
+  onUpgradeClick,
+  onEarnMoreClick
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const colors = statusColors[currentStatus as keyof typeof statusColors] || statusColors.starter;
   const multiplier = getMultiplier(currentStatus);
   const nextStatus = getNextStatusInfo(currentStatus);
-  const canUpgradeNow = availableNCTR >= (nextStatus.required - current360NCTR);
-  const needsToBuy = current360NCTR < nextStatus.required && availableNCTR < (nextStatus.required - current360NCTR);
+  const isDiamondStatus = currentStatus === 'diamond';
 
   return (
     <>
@@ -146,32 +148,35 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
               </Dialog>
 
               {/* Buy NCTR or Upgrade Action */}
-              {needsToBuy && currentStatus !== 'diamond' ? (
-                <BuyNCTRUpgrade
-                  currentAmount={current360NCTR}
-                  targetAmount={nextStatus.required}
-                  targetStatus={nextStatus.status}
-                  className="hidden sm:flex"
-                />
-              ) : canUpgradeNow && currentStatus !== 'diamond' ? (
-                <Button 
-                  onClick={onUpgradeClick}
-                  size="sm"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              {!isDiamondStatus && (
+                <LevelUpModal
+                  currentStatus={currentStatus}
+                  current360NCTR={current360NCTR}
+                  availableNCTR={availableNCTR}
+                  nextStatusInfo={{
+                    status: nextStatus.status,
+                    required: nextStatus.required,
+                    multiplier: getMultiplier(nextStatus.status)
+                  }}
+                  onEarnMoreClick={() => {
+                    // Scroll to earning opportunities section
+                    const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
+                    if (opportunitiesSection) {
+                      opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    onEarnMoreClick?.();
+                  }}
+                  onLockCommitmentClick={onUpgradeClick}
                 >
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  <span className="hidden sm:inline">Lock NCTR</span>
-                  <span className="sm:hidden">Lock</span>
-                </Button>
-              ) : currentStatus !== 'diamond' && (
-                <BuyNCTRButton
-                  variant="outline"
-                  size="sm"
-                  className={`${colors.text} border-current hover:bg-white/20`}
-                >
-                  <span className="hidden sm:inline">Buy NCTR</span>
-                  <span className="sm:hidden">Buy</span>
-                </BuyNCTRButton>
+                  <Button 
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">Level Up</span>
+                    <span className="sm:hidden">Up</span>
+                  </Button>
+                </LevelUpModal>
               )}
             </div>
           </div>
@@ -186,14 +191,28 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
               <span className={`${colors.text}/70`}>More 360LOCK = Higher earnings</span>
             </div>
             
-            {/* Mobile Buy/Upgrade Button */}
-            {needsToBuy && currentStatus !== 'diamond' && (
-              <BuyNCTRUpgrade
-                currentAmount={current360NCTR}
-                targetAmount={nextStatus.required}
-                targetStatus={nextStatus.status}
-                className="w-full"
-              />
+            {/* Mobile Level Up Button */}
+            {!isDiamondStatus && (
+              <LevelUpModal
+                currentStatus={currentStatus}
+                current360NCTR={current360NCTR}
+                availableNCTR={availableNCTR}
+                nextStatusInfo={{
+                  status: nextStatus.status,
+                  required: nextStatus.required,
+                  multiplier: getMultiplier(nextStatus.status)
+                }}
+                onEarnMoreClick={onEarnMoreClick}
+                onLockCommitmentClick={onUpgradeClick}
+              >
+                <Button 
+                  size="sm"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Level Up to {nextStatus.status?.toUpperCase()}
+                </Button>
+              </LevelUpModal>
             )}
           </div>
         </CardContent>

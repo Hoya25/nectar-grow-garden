@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, Star, Crown, Diamond, Award, Zap, TrendingUp, Gift } from 'lucide-react';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
+import { LevelUpModal } from '@/components/LevelUpModal';
 import nctrLogo from "@/assets/nctr-logo.png";
 
 interface StatusLevel {
@@ -20,6 +21,7 @@ interface MemberStatusShowcaseProps {
   currentStatus: string;
   current360NCTR: number;
   onUpgradeClick?: () => void;
+  onEarnMoreClick?: () => void;
 }
 
 const statusIcons = {
@@ -73,7 +75,8 @@ const statusColors = {
 export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
   currentStatus,
   current360NCTR,
-  onUpgradeClick
+  onUpgradeClick,
+  onEarnMoreClick
 }) => {
   const [statusLevels, setStatusLevels] = useState<StatusLevel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -235,33 +238,26 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
                 ))}
               </div>
               
-              <div className="flex items-center justify-between">
-                {onUpgradeClick && current360NCTR >= nextStatusData.min_locked_nctr ? (
-                  <Button 
-                    onClick={onUpgradeClick}
-                    size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  >
-                    Lock Available NCTR
+              <div className="flex justify-center">
+                <LevelUpModal
+                  currentStatus={currentStatus}
+                  current360NCTR={current360NCTR}
+                  availableNCTR={0} // This will be passed from parent if needed
+                  nextStatusInfo={{
+                    status: nextStatusData.status_name,
+                    required: nextStatusData.min_locked_nctr,
+                    multiplier: `${nextStatusData.reward_multiplier}x`
+                  }}
+                  onEarnMoreClick={onEarnMoreClick}
+                  onLockCommitmentClick={onUpgradeClick}
+                >
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Level Up to {nextStatusData.status_name?.toUpperCase()}
                   </Button>
-                ) : (
-                  <BuyNCTRUpgrade
-                    currentAmount={current360NCTR}
-                    targetAmount={nextStatusData.min_locked_nctr}
-                    targetStatus={nextStatusData.status_name}
-                  />
-                )}
+                </LevelUpModal>
               </div>
             </div>
-
-            {onUpgradeClick && current360NCTR >= nextStatusData.min_locked_nctr && (
-              <Button 
-                onClick={onUpgradeClick}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                Upgrade to {nextStatusData.status_name?.toUpperCase()} Member
-              </Button>
-            )}
           </CardContent>
         </Card>
       )}

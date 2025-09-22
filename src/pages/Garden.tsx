@@ -238,17 +238,25 @@ const Garden = () => {
                   (lockButton as HTMLElement).click();
                 }
               }}
+              onEarnMoreClick={() => {
+                // Scroll to earning opportunities
+                const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
+                if (opportunitiesSection) {
+                  opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
             />
 
             {/* Earning Opportunities Section */}
-            <div className="mb-12 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 nctr-glow">
-                Earning Opportunities
-              </h1>
-              <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
-                Support NCTR Alliance partners and earn NCTR with every transaction
-              </p>
-            </div>
+            <div data-earning-opportunities>
+              <div className="mb-12 text-center">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 nctr-glow">
+                  Earning Opportunities
+                </h1>
+                <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
+                  Support NCTR Alliance partners and earn NCTR with every transaction
+                </p>
+              </div>
 
             {opportunities.length === 0 ? (
               <Card className="bg-white border border-section-border shadow-soft">
@@ -547,6 +555,7 @@ const Garden = () => {
                   <ReferralSystem />
                 </CardContent>
               </Card>
+            </div>
             </div>
           </div>
         </main>
