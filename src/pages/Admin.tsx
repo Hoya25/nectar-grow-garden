@@ -135,7 +135,7 @@ const Admin = () => {
                 Back to Garden
               </Button>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-foreground">
                   Admin Dashboard
                 </h1>
                 <p className="text-sm text-muted-foreground">
@@ -143,7 +143,7 @@ const Admin = () => {
                 </p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-gradient-hero text-foreground border-0">
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
               {adminUser?.role?.toUpperCase()}
             </Badge>
           </div>
@@ -216,16 +216,16 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="opportunities" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="opportunities" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-3 bg-section-highlight">
+            <TabsTrigger value="opportunities" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Gift className="w-4 h-4" />
-              Opportunities
+              Create Opportunities
             </TabsTrigger>
-            <TabsTrigger value="loyalize" className="flex items-center gap-2">
+            <TabsTrigger value="loyalize" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Sparkles className="w-4 h-4" />
-              Brand Search
+              Find Brands
             </TabsTrigger>
-            <TabsTrigger value="settings">
+            <TabsTrigger value="settings" className="text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Settings className="w-4 h-4 mr-2" />
               Settings
             </TabsTrigger>
@@ -237,32 +237,44 @@ const Admin = () => {
 
           <TabsContent value="loyalize">
             <div className="space-y-6">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Brand Search & Integration</h3>
-                <p className="text-muted-foreground">Search and add new brands from Loyalize to create opportunities</p>
-              </div>
-              <LoyalizeBrandSync onBrandsUpdated={fetchAdminStats} />
+              <Card className="bg-section-highlight border border-section-border">
+                <CardHeader>
+                  <CardTitle className="text-foreground">Find & Add Brands</CardTitle>
+                  <p className="text-muted-foreground">Search the Loyalize database to find new brands for your platform</p>
+                </CardHeader>
+                <CardContent>
+                  <LoyalizeBrandSync onBrandsUpdated={fetchAdminStats} />
+                </CardContent>
+              </Card>
               
-              <div className="mt-8">
-                <h4 className="text-lg font-semibold mb-4">Manage Existing Brands</h4>
-                <BrandManagement onStatsUpdate={fetchAdminStats} />
-              </div>
+              <Card className="bg-white border border-section-border">
+                <CardHeader>
+                  <CardTitle className="text-foreground">Manage Your Brands</CardTitle>
+                  <p className="text-muted-foreground">Edit and organize the brands you've added</p>
+                </CardHeader>
+                <CardContent>
+                  <BrandManagement onStatsUpdate={fetchAdminStats} />
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">System Settings</h3>
-              <p className="text-muted-foreground">Configure site settings and manage users</p>
-            </div>
+            <Card className="bg-section-highlight border border-section-border">
+              <CardHeader>
+                <CardTitle className="text-foreground">System Management</CardTitle>
+                <p className="text-muted-foreground">Manage users and configure site settings</p>
+              </CardHeader>
+            </Card>
             
             <div className="grid md:grid-cols-2 gap-6">
               <Card className="bg-white border border-section-border">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
                     <Users className="w-4 h-4" />
                     User Management
                   </CardTitle>
+                  <p className="text-sm text-muted-foreground">View and manage user accounts</p>
                 </CardHeader>
                 <CardContent>
                   <UserManagement />
@@ -271,10 +283,11 @@ const Admin = () => {
               
               <Card className="bg-white border border-section-border">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
                     <Settings className="w-4 h-4" />
                     Site Settings
                   </CardTitle>
+                  <p className="text-sm text-muted-foreground">Configure platform settings</p>
                 </CardHeader>
                 <CardContent>
                   <SiteSettingsManagement />

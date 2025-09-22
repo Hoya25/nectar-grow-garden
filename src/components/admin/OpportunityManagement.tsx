@@ -312,16 +312,24 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Gift className="w-5 h-5" />
-            Opportunity Management Hub
+            Create New Opportunities
           </CardTitle>
+          <p className="text-muted-foreground">
+            Start here to create earning opportunities for your users
+          </p>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground mb-4">
-            Create earning opportunities for your users. Need brands? Use the "Brand Search" tab to find and add new partners from Loyalize.
-          </p>
-          <div className="flex gap-2 text-sm">
-            <Badge variant="outline">📈 {opportunities.filter(o => o.is_active).length} Active</Badge>
-            <Badge variant="outline">🏢 {brands.length} Brands Available</Badge>
+          <div className="space-y-3">
+            <p className="text-sm text-foreground">
+              <span className="font-medium">Step 1:</span> Need brands? Use the "Find Brands" tab to search and add partners from Loyalize
+            </p>
+            <p className="text-sm text-foreground">
+              <span className="font-medium">Step 2:</span> Create opportunities below and select from your added brands
+            </p>
+            <div className="flex gap-2 text-sm pt-2">
+              <Badge variant="outline" className="bg-white">✅ {opportunities.filter(o => o.is_active).length} Active Opportunities</Badge>
+              <Badge variant="outline" className="bg-white">🏢 {brands.length} Brands Ready</Badge>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -329,8 +337,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="text-xl font-semibold text-foreground">Opportunities</h3>
-          <p className="text-muted-foreground">Create and manage earning opportunities</p>
+          <h3 className="text-xl font-semibold text-foreground">Your Opportunities</h3>
+          <p className="text-muted-foreground">Manage your earning opportunities</p>
         </div>
         
         <div className="flex gap-2">
@@ -361,10 +369,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
             <DialogTrigger asChild>
               <Button 
                 onClick={resetForm}
-                className="bg-primary hover:bg-primary/90 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Create Opportunity
+                Create New Opportunity
               </Button>
             </DialogTrigger>
             
@@ -593,7 +601,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   <Button 
                     type="submit" 
                     disabled={loading}
-                    className="bg-primary hover:bg-primary/90 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
                   >
                     {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     {editingOpportunity ? 'Update' : 'Create'} Opportunity
@@ -676,7 +684,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       variant={opportunity.is_active ? "secondary" : "default"}
                       size="sm"
                       onClick={() => toggleOpportunityStatus(opportunity)}
-                      className="flex-1"
+                      className="flex-1 border-0"
                     >
                       {opportunity.is_active ? 'Deactivate' : 'Activate'}
                     </Button>
