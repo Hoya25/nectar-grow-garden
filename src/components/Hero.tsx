@@ -16,7 +16,7 @@ const Hero = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
-            De-risking Crypto for{" "}
+            Crypto for{" "}
             <span className="bg-gradient-hero bg-clip-text text-transparent">
               All of Us
             </span>
