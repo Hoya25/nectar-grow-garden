@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-garden.jpg";
+import nctrLogo from "@/assets/nctr-n-logo.png";
 
 const Hero = () => {
   return (
@@ -42,6 +43,15 @@ const Hero = () => {
       {/* Enhanced Decorative Elements */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-glow/10 rounded-full blur-3xl animate-pulse-glow" />
+      
+      {/* NCTR Logo Background */}
+      <div className="absolute right-10 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none">
+        <img 
+          src={nctrLogo} 
+          alt="NCTR Logo" 
+          className="w-96 h-96 object-contain animate-pulse-glow"
+        />
+      </div>
     </section>
   );
 };
