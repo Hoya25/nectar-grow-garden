@@ -37,10 +37,29 @@ const Header = () => {
   return (
     <header className="w-full border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-minimal">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center space-x-3 cursor-pointer group"
+        <div className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate('/')}>
-            <span className="text-2xl font-bold bg-gradient-premium bg-clip-text text-transparent group-hover:animate-gradient-shift bg-[length:200%_200%] transition-all duration-300">The Garden</span>
+          <div className="relative overflow-hidden rounded-lg">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-12 w-auto object-contain transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
+              onError={(e) => {
+                // Fallback to text if video fails to load
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'block';
+              }}
+            >
+              <source src="/assets/logo-animation-3d.mp4" type="video/mp4" />
+            </video>
+            <span className="hidden text-2xl font-bold bg-gradient-premium bg-clip-text text-transparent group-hover:animate-gradient-shift bg-[length:200%_200%] transition-all duration-300">
+              The Garden
+            </span>
           </div>
+        </div>
         
         <nav className="hidden md:flex items-center space-x-8">
           {!user ? (
