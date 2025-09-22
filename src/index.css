@@ -20,11 +20,11 @@ All colors MUST be HSL.
     --popover-foreground: 0 0% 25%;
 
     /* NCTR theme - Gunmetal grey for NCTR elements */
-    --primary: 0 0% 25%; /* Gunmetal grey for NCTR elements */
+    --primary: 0 0% 45%; /* Gunmetal grey matching NCTR logo */
     --primary-foreground: 0 0% 100%; /* White text on gunmetal */
-    --primary-glow: 0 0% 35%;
-    --primary-deep: 0 0% 20%;
-    --primary-light: 0 0% 40%;
+    --primary-glow: 0 0% 55%;
+    --primary-deep: 0 0% 35%;
+    --primary-light: 0 0% 60%;
 
     /* Secondary - Light grey */
     --secondary: 0 0% 96%;
@@ -60,10 +60,10 @@ All colors MUST be HSL.
 
     /* Premium gradients - Clean with green accents */
     --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 50%, hsl(120 20% 96%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(0 0% 25%) 0%, hsl(120 60% 50%) 50%, hsl(0 0% 30%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(0 0% 45%) 0%, hsl(120 60% 50%) 50%, hsl(0 0% 50%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
     --gradient-accent: linear-gradient(90deg, hsl(120 60% 50%) 0%, hsl(120 50% 60%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(0 0% 25%) 0%, hsl(0 0% 20%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(0 0% 45%) 0%, hsl(0 0% 35%) 100%);
     --gradient-glow: radial-gradient(ellipse at center, hsl(120 60% 50% / 0.08) 0%, transparent 70%);
     --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 50%, hsl(120 10% 96%) 100%);
     
@@ -99,7 +99,7 @@ All colors MUST be HSL.
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 25%;
-    --sidebar-primary: 0 0% 25%;
+    --sidebar-primary: 0 0% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 96%;
     --sidebar-accent-foreground: 0 0% 25%;
@@ -118,7 +118,7 @@ All colors MUST be HSL.
     --popover-foreground: 0 0% 95%;
 
     /* Dark mode - Gunmetal grey for NCTR elements */
-    --primary: 0 0% 25%; /* Gunmetal grey stays consistent */
+    --primary: 0 0% 45%; /* Gunmetal grey stays consistent */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 20%;
@@ -139,7 +139,7 @@ All colors MUST be HSL.
     
     --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 0% 25%;
+    --sidebar-primary: 0 0% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 20%;
     --sidebar-accent-foreground: 0 0% 90%;
