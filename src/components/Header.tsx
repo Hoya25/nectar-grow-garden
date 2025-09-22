@@ -59,6 +59,9 @@ const Header = () => {
               The Garden
             </span>
           </div>
+          <span className="text-2xl font-bold bg-gradient-premium bg-clip-text text-transparent group-hover:animate-gradient-shift bg-[length:200%_200%] transition-all duration-300">
+            The Garden
+          </span>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
