@@ -14,6 +14,7 @@ import ReferralSystem from '@/components/ReferralSystem';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
+import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
@@ -417,43 +418,31 @@ const Garden = () => {
           </div>
         </aside>
 
-        {/* Main Content - Member Status and Earning Opportunities */}
+        {/* Main Content - Earning Opportunities with Member Status */}
         <main className="flex-1 p-8">
-          <div className="max-w-7xl mx-auto space-y-12">
-            {/* Member Status Showcase */}
-            <div>
-              <div className="mb-8 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 nctr-glow">
-                  Member Status Program
-                </h1>
-                <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
-                  The more NCTR you commit to 360LOCK, the higher your status and earning multipliers
-                </p>
-              </div>
-              
-              <MemberStatusShowcase 
-                currentStatus={portfolio?.opportunity_status || 'starter'}
-                current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
-                onUpgradeClick={() => {
-                  // Scroll to lock commitment modal or trigger it
-                  const lockButton = document.querySelector('[data-lock-commitment]');
-                  if (lockButton) {
-                    (lockButton as HTMLElement).click();
-                  }
-                }}
-              />
-            </div>
+          <div className="max-w-7xl mx-auto">
+            {/* Member Status Banner - Compact */}
+            <MemberStatusBanner 
+              currentStatus={portfolio?.opportunity_status || 'starter'}
+              current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
+              onUpgradeClick={() => {
+                // Scroll to lock commitment modal or trigger it
+                const lockButton = document.querySelector('[data-lock-commitment]');
+                if (lockButton) {
+                  (lockButton as HTMLElement).click();
+                }
+              }}
+            />
 
             {/* Earning Opportunities Section */}
-            <div>
-              <div className="mb-12 text-center">
-                <h2 className="text-4xl md:text-5xl font-bold mb-4 nctr-glow">
-                  Earning Opportunities
-                </h2>
-                <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
-                  Support NCTR Alliance partners and earn NCTR with every transaction
-                </p>
-              </div>
+            <div className="mb-12 text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 nctr-glow">
+                Earning Opportunities
+              </h1>
+              <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
+                Support NCTR Alliance partners and earn NCTR with every transaction
+              </p>
+            </div>
 
             {opportunities.length === 0 ? (
               <Card className="bg-white border border-section-border shadow-soft">
@@ -752,7 +741,6 @@ const Garden = () => {
                   <ReferralSystem />
                 </CardContent>
               </Card>
-            </div>
             </div>
           </div>
         </main>
