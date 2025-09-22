@@ -51,8 +51,8 @@ const ReferralSystem = () => {
       // For now, we'll use mock data
       const mockStats = {
         total_referrals: 3,
-        pending_rewards: 150.5,
-        total_earned_from_referrals: 450.75
+        pending_rewards: 150,
+        total_earned_from_referrals: 450
       };
       setReferralStats(mockStats);
     } catch (error) {

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
@@ -17,6 +17,9 @@ import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Portfolio {
   available_nctr: number;
@@ -62,6 +65,9 @@ const Garden = () => {
   const [locks, setLocks] = useState<LockCommitment[]>([]);
   const [opportunities, setOpportunities] = useState<EarningOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [referralCode, setReferralCode] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -72,7 +78,61 @@ const Garden = () => {
     }
     
     fetchUserData();
+    generateReferralCode();
   }, [user, navigate]);
+
+  const generateReferralCode = () => {
+    if (user) {
+      // Generate a simple referral code based on user ID
+      const code = user.id.slice(0, 8).toUpperCase();
+      setReferralCode(code);
+    }
+  };
+
+  const getReferralLink = () => {
+    return `${window.location.origin}/auth?ref=${referralCode}`;
+  };
+
+  const copyInviteLink = async () => {
+    const link = getReferralLink();
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      toast({
+        title: "Link Copied!",
+        description: "Your referral link has been copied to clipboard.",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      toast({
+        title: "Copy Failed",
+        description: "Please manually copy the link.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const shareViaEmail = () => {
+    const subject = "Join The Garden and Start Earning NCTR!";
+    const body = `Hey! I wanted to invite you to join The Garden, where you can earn NCTR tokens through everyday activities.
+
+Use my referral link to get started: ${getReferralLink()}
+
+We both earn 50 NCTR when you sign up!`;
+    
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  };
+
+  const shareViaText = () => {
+    const message = `Join The Garden and earn NCTR tokens! Use my referral link: ${getReferralLink()}`;
+    window.open(`sms:?body=${encodeURIComponent(message)}`);
+  };
+
+  const shareViaWhatsApp = () => {
+    const message = `🌱 Join The Garden and start earning NCTR tokens! Use my referral link: ${getReferralLink()}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+  };
 
   const fetchUserData = async () => {
     try {
@@ -134,9 +194,9 @@ const Garden = () => {
 
   const formatNCTR = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 8,
-    }).format(amount);
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Math.floor(amount));
   };
 
   const handleOpportunityClick = async (opportunity: EarningOpportunity) => {
@@ -160,15 +220,12 @@ const Garden = () => {
   };
 
   const handleInviteOpportunity = (opportunity: EarningOpportunity) => {
-    // For invite opportunities, we'll show the referral system
-    const referralSection = document.querySelector('[data-referral-system]');
-    if (referralSection) {
-      referralSection.scrollIntoView({ behavior: 'smooth' });
-      toast({
-        title: "🎉 Referral Program",
-        description: "Scroll down to find your referral link and start inviting friends!",
-      });
-    }
+    // For invite opportunities, open a direct share link modal
+    setInviteModalOpen(true);
+    toast({
+      title: "🎉 Invite Friends",
+      description: "Share your link and earn 50 NCTR for each friend who joins!",
+    });
   };
 
   const handleBonusOpportunity = async (opportunity: EarningOpportunity) => {
@@ -759,6 +816,69 @@ const Garden = () => {
           </div>
         </main>
       </div>
+
+      {/* Invite Friends Modal */}
+      <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Share2 className="w-5 h-5 mr-2" />
+              🎉 Invite Friends & Earn 50 NCTR
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-4 border border-primary/20">
+              <h4 className="font-semibold text-primary mb-2">How it works:</h4>
+              <ul className="text-sm space-y-1 text-muted-foreground">
+                <li>• Share your unique link below</li>
+                <li>• Friends join using your link</li>
+                <li>• You both earn 50 NCTR instantly!</li>
+              </ul>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="invite-link">Your Personal Invite Link:</Label>
+              <div className="flex space-x-2">
+                <Input
+                  id="invite-link"
+                  value={getReferralLink()}
+                  readOnly
+                  className="flex-1 text-sm"
+                />
+                <Button 
+                  onClick={copyInviteLink}
+                  variant="outline"
+                  className="flex-shrink-0"
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <Button onClick={shareViaEmail} variant="outline" size="sm" className="text-xs">
+                <Mail className="w-3 h-3 mr-1" />
+                Email
+              </Button>
+              <Button onClick={shareViaText} variant="outline" size="sm" className="text-xs">
+                <MessageCircle className="w-3 h-3 mr-1" />
+                Text
+              </Button>
+              <Button onClick={shareViaWhatsApp} variant="outline" size="sm" className="text-xs">
+                <MessageCircle className="w-3 h-3 mr-1" />
+                WhatsApp
+              </Button>
+            </div>
+
+            <Button 
+              onClick={() => setInviteModalOpen(false)}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              Start Sharing!
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
