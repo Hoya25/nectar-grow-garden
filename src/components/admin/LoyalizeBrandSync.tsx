@@ -165,7 +165,7 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
               <Button 
                 onClick={syncBrands}
                 disabled={isSyncing}
-                className="bg-gradient-hero hover:opacity-90"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
                 {isSyncing ? 'Syncing...' : 'Sync Brands'}
@@ -284,11 +284,11 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
                             >
                               Cancel
                             </Button>
-                            <Button 
-                              onClick={() => createOpportunityFromBrand(selectedBrand)}
-                              disabled={isCreatingOpportunity}
-                              className="flex-1 bg-gradient-hero hover:opacity-90"
-                            >
+                             <Button 
+                               onClick={() => createOpportunityFromBrand(selectedBrand)}
+                               disabled={isCreatingOpportunity}
+                               className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                             >
                               {isCreatingOpportunity ? 'Creating...' : 'Create Opportunity'}
                             </Button>
                           </div>
