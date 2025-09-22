@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-garden.jpg";
+import heroImage from "@/assets/hero-garden-new.jpg";
 import nctrLogo from "@/assets/nctr-n-transparent.png";
 import nctrOverlay from "@/assets/nctr-n-overlay.png";
 
