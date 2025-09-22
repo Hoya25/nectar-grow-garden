@@ -267,7 +267,6 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
     });
   }
 }
-}
 
 async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
   console.log('🔄 Starting bulk sync of Loyalize stores');
@@ -331,7 +330,6 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
     console.error('Error syncing brands:', error);
     throw error;
   }
-}
 }
 
 function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
