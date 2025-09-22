@@ -155,7 +155,6 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
     });
   }
 }
-}
 
 async function importBrand(req: Request, apiKey: string, supabase: any): Promise<Response> {
   try {
