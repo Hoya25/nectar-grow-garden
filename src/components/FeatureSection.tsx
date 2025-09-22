@@ -10,6 +10,7 @@ interface FeatureSectionProps {
   gradient?: boolean;
   bulletPoints?: string[];
   titleColor?: string;
+  simple?: boolean;
 }
 
 const FeatureSection = ({ 
@@ -20,10 +21,11 @@ const FeatureSection = ({
   icon, 
   gradient = false,
   bulletPoints,
-  titleColor
+  titleColor,
+  simple = false
 }: FeatureSectionProps) => {
   return (
-    <section className={`py-32 relative overflow-hidden ${gradient ? 'neon-section animate-neon-pulse' : 'neon-section-subtle'}`}>
+    <section className={`py-32 relative overflow-hidden ${simple ? 'bg-background' : gradient ? 'neon-section animate-neon-pulse' : 'neon-section-subtle'}`}>
       {/* Neon Background Elements */}
       {gradient && (
         <div className="absolute inset-0">
