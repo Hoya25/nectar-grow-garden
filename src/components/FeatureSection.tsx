@@ -8,6 +8,7 @@ interface FeatureSectionProps {
   buttonHref?: string;
   icon: string;
   gradient?: boolean;
+  bulletPoints?: string[];
 }
 
 const FeatureSection = ({ 
@@ -16,7 +17,8 @@ const FeatureSection = ({
   buttonText, 
   buttonHref, 
   icon, 
-  gradient = false 
+  gradient = false,
+  bulletPoints
 }: FeatureSectionProps) => {
   return (
     <section className={`py-32 relative overflow-hidden ${gradient ? 'neon-section animate-neon-pulse' : 'neon-section-subtle'}`}>
@@ -57,9 +59,21 @@ const FeatureSection = ({
                 )}
               </h2>
               
-              <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed font-medium section-text/90">
-                {description}
-              </p>
+              
+              <div className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed font-medium section-text/90 space-y-6">
+                <p>{description}</p>
+                
+                {bulletPoints && (
+                  <ul className="space-y-4 text-left max-w-3xl mx-auto">
+                    {bulletPoints.map((point, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="text-primary text-2xl leading-none mt-1">•</span>
+                        <span className="text-lg md:text-xl leading-relaxed">{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               
               {/* Premium CTA with Neon Effects */}
               <div className="pt-4">
