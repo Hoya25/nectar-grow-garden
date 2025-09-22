@@ -568,6 +568,8 @@ function generateTrackingUrl(baseUrl: string, userId: string, brandId: string): 
     return `${baseUrl}${separator}ref=nctr_platform&brand_id=${brandId}&user_id=${userId}&tracking_id=nctr_${Date.now()}`;
   }
 }
+
+async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> {
   console.log('🖼️ Fetching store logos from sku-details endpoint');
   
   try {
