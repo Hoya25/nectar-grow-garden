@@ -44,12 +44,13 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
           light: "hsl(var(--accent-light))",
         },
-        // Section-specific colors for dark sections with neon accents
+        // Section-specific colors for light sections with subtle accents
         section: {
           bg: "hsl(var(--section-bg))",
           border: "hsl(var(--section-border))",
           text: "hsl(var(--section-text))",
           accent: "hsl(var(--section-accent))",
+          highlight: "hsl(var(--section-highlight))",
         },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
@@ -185,25 +186,23 @@ export default {
           "50%": { backgroundPosition: "100% 50%" }
         },
 
-        // NCTR glow pulse
+        // NCTR glow - toned down
         "nctr-glow": {
           "0%, 100%": { 
-            textShadow: "0 0 10px hsl(var(--primary) / 0.4)",
-            transform: "scale(1)"
+            textShadow: "0 1px 2px hsl(var(--primary) / 0.2)"
           },
           "50%": { 
-            textShadow: "0 0 20px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.6)",
-            transform: "scale(1.01)"
+            textShadow: "0 1px 3px hsl(var(--primary) / 0.4)"
           }
         },
 
-        // Neon pulse animation for sections
+        // Neon pulse - subtle
         "neon-pulse": {
           "0%, 100%": {
-            boxShadow: "0 0 5px hsl(66 100% 50%), 0 0 10px hsl(66 100% 50%)"
+            boxShadow: "0 1px 2px hsl(66 100% 50% / 0.2)"
           },
           "50%": {
-            boxShadow: "0 0 10px hsl(66 100% 50%), 0 0 20px hsl(66 100% 50%), 0 0 30px hsl(66 100% 50%)"
+            boxShadow: "0 1px 3px hsl(66 100% 50% / 0.3)"
           }
         }
       },
@@ -224,8 +223,8 @@ export default {
         "holographic": "holographic 3s ease-in-out infinite",
         "shimmer": "shimmer 2.5s linear infinite",
         "gradient-shift": "gradient-shift 3s ease infinite",
-        "nctr-glow": "nctr-glow 3s ease-in-out infinite",
-        "neon-pulse": "neon-pulse 2s ease-in-out infinite",
+        "nctr-glow": "nctr-glow 4s ease-in-out infinite",
+        "neon-pulse": "neon-pulse 3s ease-in-out infinite",
         
         // Slide effects
         "slide-in-right": "slide-in-right 0.6s cubic-bezier(0.23, 1, 0.320, 1)",

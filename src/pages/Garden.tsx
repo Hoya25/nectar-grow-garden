@@ -151,11 +151,11 @@ const Garden = () => {
   return (
     <div className="min-h-screen bg-gradient-page">
       {/* Header */}
-      <header className="neon-section-subtle backdrop-blur-sm border-b border-section-border">
+      <header className="section-highlight backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold nctr-text animate-nctr-glow">
+              <h1 className="text-2xl font-bold nctr-text">
                 The Garden
               </h1>
             <img 
@@ -164,7 +164,7 @@ const Garden = () => {
               className="h-14 w-auto opacity-90"
             />
             </div>
-            <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0 neon-glow`}>
+            <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0`}>
               {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
             </Badge>
           </div>
@@ -198,13 +198,13 @@ const Garden = () => {
 
       <div className="flex min-h-[calc(100vh-80px)]">
         {/* Dashboard Sidebar */}
-        <aside className="neon-section-subtle backdrop-blur-sm border-r border-section-border p-6 space-y-6">
+        <aside className="section-highlight backdrop-blur-sm border-r border-section-border p-6 space-y-6">
           <div>
             <h2 className="text-lg font-semibold mb-4 section-heading">Your Dashboard</h2>
             
             {/* Portfolio Overview Cards */}
             <div className="space-y-4">
-              <Card className="bg-gradient-section shadow-neon border border-section-border/50">
+              <Card className="bg-white shadow-soft border border-section-border/30">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -216,7 +216,7 @@ const Garden = () => {
                           className="h-5 w-auto opacity-70"
                         />
                       </div>
-                      <p className="text-xl font-bold nctr-text">
+                      <p className="text-xl font-bold text-section-accent">
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
                     </div>
@@ -225,7 +225,7 @@ const Garden = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-section shadow-neon border border-section-border/50">
+              <Card className="bg-white shadow-soft border border-section-border/30">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -237,7 +237,7 @@ const Garden = () => {
                           className="h-5 w-auto opacity-70"
                         />
                       </div>
-                      <p className="text-xl font-bold text-warning animate-pulse">
+                      <p className="text-xl font-bold text-warning">
                         {formatNCTR(portfolio?.pending_nctr || 0)}
                       </p>
                     </div>
@@ -246,7 +246,7 @@ const Garden = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-section shadow-neon border border-section-border/50">
+              <Card className="bg-white shadow-soft border border-section-border/30">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -258,7 +258,7 @@ const Garden = () => {
                           className="h-5 w-auto opacity-70"
                         />
                       </div>
-                      <p className="text-xl font-bold text-success">
+                      <p className="text-xl font-bold text-section-accent">
                         {formatNCTR(portfolio?.total_earned || 0)}
                       </p>
                     </div>
@@ -345,7 +345,7 @@ const Garden = () => {
         <main className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2 nctr-glow animate-nctr-glow">
+              <h1 className="text-3xl font-bold mb-2 nctr-glow">
                 Earning Opportunities
               </h1>
               <p className="text-section-text/90">

@@ -31,9 +31,10 @@ All colors MUST be HSL to avoid yellow bug issues.
     
     /* Section styling */
     --section-bg: 0 0% 100%;                  /* White section backgrounds */
-    --section-border: 66 100% 50%;            /* Neon section borders */
+    --section-border: 0 0% 85%;               /* Light grey section borders */
     --section-text: 0 0% 45%;                 /* NCTR grey text on sections */
-    --section-accent: 66 100% 50%;            /* Neon accents for numbers */
+    --section-accent: 66 100% 50%;            /* Neon accents for numbers only */
+    --section-highlight: 0 0% 96%;            /* Light grey highlight backgrounds */
     
     /* Secondary elements */
     --secondary: 0 0% 95%;                    /* Light grey secondary */
@@ -70,15 +71,15 @@ All colors MUST be HSL to avoid yellow bug issues.
     --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 50%), hsl(280 100% 50%), hsl(320 100% 50%));
     --gradient-section: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
     
-    /* Enhanced shadows with neon glow */
-    --shadow-minimal: 0 1px 3px hsl(0 0% 0% / 0.3);
-    --shadow-soft: 0 2px 12px -2px hsl(0 0% 0% / 0.4);
-    --shadow-medium: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
-    --shadow-large: 0 16px 48px -12px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 20px hsl(66 100% 50% / 0.4);
-    --shadow-glow-intense: 0 0 40px hsl(66 100% 50% / 0.6);
-    --shadow-inset: inset 0 2px 8px hsl(0 0% 0% / 0.3);
-    --shadow-neon: 0 0 5px hsl(66 100% 50%), 0 0 10px hsl(66 100% 50%), 0 0 15px hsl(66 100% 50%);
+    /* Enhanced shadows - toned down */
+    --shadow-minimal: 0 1px 3px hsl(0 0% 0% / 0.1);
+    --shadow-soft: 0 2px 12px -2px hsl(0 0% 0% / 0.15);
+    --shadow-medium: 0 8px 32px -8px hsl(0 0% 0% / 0.2);
+    --shadow-large: 0 16px 48px -12px hsl(0 0% 0% / 0.25);
+    --shadow-glow: 0 2px 8px hsl(0 0% 0% / 0.1);
+    --shadow-glow-intense: 0 4px 16px hsl(0 0% 0% / 0.15);
+    --shadow-inset: inset 0 1px 3px hsl(0 0% 0% / 0.1);
+    --shadow-neon: 0 1px 3px hsl(66 100% 50% / 0.3);
     
     /* Premium transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -146,15 +147,17 @@ All colors MUST be HSL to avoid yellow bug issues.
 }
 
 @layer components {
-  /* Section styling with neon borders */
+  /* Section styling with subtle borders */
   .neon-section {
-    @apply bg-gradient-section border-2 border-section-border;
-    box-shadow: var(--shadow-neon);
+    @apply bg-gradient-section border border-section-border shadow-soft;
   }
   
   .neon-section-subtle {
-    @apply bg-section-bg border border-section-border/50;
-    box-shadow: 0 0 10px hsl(var(--section-border) / 0.2);
+    @apply bg-section-bg border border-section-border/30 shadow-minimal;
+  }
+  
+  .section-highlight {
+    @apply bg-section-highlight border border-section-border/50 shadow-soft;
   }
   
   /* NCTR Brand Typography */
@@ -165,7 +168,7 @@ All colors MUST be HSL to avoid yellow bug issues.
   
   .nctr-glow {
     @apply text-primary;
-    text-shadow: 0 0 15px hsl(var(--primary) / 0.8), 0 0 30px hsl(var(--primary) / 0.6);
+    text-shadow: 0 1px 2px hsl(var(--primary) / 0.3);
   }
   
   .section-text {
@@ -174,7 +177,6 @@ All colors MUST be HSL to avoid yellow bug issues.
   
   .section-heading {
     @apply text-section-text font-bold;
-    text-shadow: 0 0 8px hsl(var(--section-text) / 0.5);
   }
   
   /* Holographic effects */
@@ -185,11 +187,11 @@ All colors MUST be HSL to avoid yellow bug issues.
   }
   
   .glow-effect {
-    box-shadow: var(--shadow-glow);
+    box-shadow: var(--shadow-soft);
   }
   
   .glow-intense {
-    box-shadow: var(--shadow-glow-intense);
+    box-shadow: var(--shadow-medium);
   }
   
   .neon-glow {
