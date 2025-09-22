@@ -39,7 +39,7 @@ interface BrandGiftCardSearchProps {
 
 const BrandGiftCardSearch = ({ brands, onBrandsUpdate }: BrandGiftCardSearchProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [syncingGiftCards, setSyncingGiftCards] = useState(false);
 
   const categories = [
@@ -54,7 +54,7 @@ const BrandGiftCardSearch = ({ brands, onBrandsUpdate }: BrandGiftCardSearchProp
       brand.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
       brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = !selectedCategory || brand.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || brand.category === selectedCategory;
     
     return matchesSearch && matchesCategory;
   });
@@ -124,7 +124,7 @@ const BrandGiftCardSearch = ({ brands, onBrandsUpdate }: BrandGiftCardSearchProp
                   <SelectValue placeholder="All categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -298,14 +298,14 @@ const BrandGiftCardSearch = ({ brands, onBrandsUpdate }: BrandGiftCardSearchProp
           <CardContent className="p-8 text-center">
             <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
-              {searchTerm || selectedCategory 
+            {searchTerm || selectedCategory !== 'all' 
                 ? 'No brands or gift cards match your search criteria.' 
                 : 'No brands or gift cards available.'}
             </p>
-            {searchTerm || selectedCategory ? (
+            {searchTerm || selectedCategory !== 'all' ? (
               <Button 
                 variant="outline" 
-                onClick={() => {setSearchTerm(''); setSelectedCategory('');}}
+                onClick={() => {setSearchTerm(''); setSelectedCategory('all');}}
                 className="mt-2"
               >
                 Clear Search
