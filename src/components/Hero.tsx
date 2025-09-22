@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-garden.jpg";
+import nctrLogo from "@/assets/nctr-n-transparent.png";
 
 const Hero = () => {
   return (
@@ -9,8 +10,8 @@ const Hero = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/40 to-background/60" />
-        <div className="absolute inset-0 bg-gradient-glow opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/50 to-background/80" />
+        <div className="absolute inset-0 bg-gradient-glow opacity-15" />
       </div>
       
       {/* Content with Premium Animations */}
@@ -41,7 +42,16 @@ const Hero = () => {
       
       {/* Enhanced Decorative Elements */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background via-background/80 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-glow/10 rounded-full blur-3xl animate-pulse-glow" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-glow/8 rounded-full blur-2xl animate-pulse-glow" />
+      
+      {/* NCTR Logo Background */}
+      <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none">
+        <img 
+          src={nctrLogo} 
+          alt="NCTR Logo" 
+          className="w-80 h-80 object-contain"
+        />
+      </div>
     </section>
   );
 };
