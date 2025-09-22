@@ -9,6 +9,7 @@ interface FeatureSectionProps {
   icon: string;
   gradient?: boolean;
   bulletPoints?: string[];
+  titleColor?: string;
 }
 
 const FeatureSection = ({ 
@@ -18,7 +19,8 @@ const FeatureSection = ({
   buttonHref, 
   icon, 
   gradient = false,
-  bulletPoints
+  bulletPoints,
+  titleColor
 }: FeatureSectionProps) => {
   return (
     <section className={`py-32 relative overflow-hidden ${gradient ? 'neon-section animate-neon-pulse' : 'neon-section-subtle'}`}>
@@ -48,8 +50,8 @@ const FeatureSection = ({
             
             {/* Layered Content with Neon Typography */}
             <div className="text-center space-y-8 animate-fade-in-up">
-              <h2 className="text-5xl md:text-6xl font-bold leading-tight section-heading">
-                <span className="nctr-glow animate-nctr-glow">
+               <h2 className="text-5xl md:text-6xl font-bold leading-tight section-heading">
+                <span className={titleColor || "nctr-glow animate-nctr-glow"}>
                   {title.split(' ').slice(0, 2).join(' ')}
                 </span>
                 {title.split(' ').length > 2 && (

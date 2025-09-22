@@ -13,6 +13,7 @@ const Index = () => {
       {/* Earn Crypto Every Day Section */}
       <FeatureSection
         title="Earn Crypto Effortlessly"
+        titleColor="text-green-400 animate-pulse-glow"
         description="Your Daily Habits, Rewarded in The Garden
 
 Step into The Garden and start earning NCTR —our next-generation rewards Alliance Token—simply by being yourself every day. Turn everyday moments into real crypto wins, like:"
