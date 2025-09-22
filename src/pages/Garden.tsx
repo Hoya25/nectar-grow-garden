@@ -363,7 +363,7 @@ const Garden = () => {
                 Earning Opportunities
               </h1>
               <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
-                Discover amazing brands and earn NCTR with every purchase
+                Support NCTR Alliance brands and earn NCTR with every purchase
               </p>
             </div>
 
