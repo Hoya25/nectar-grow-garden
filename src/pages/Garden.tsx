@@ -227,7 +227,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-6 w-auto opacity-70"
+                          className="h-14 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-lg font-bold text-section-accent">
@@ -248,7 +248,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-6 w-auto opacity-70"
+                          className="h-14 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-lg font-bold text-section-accent">
@@ -269,7 +269,7 @@ const Garden = () => {
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-6 w-auto opacity-70"
+                          className="h-14 w-auto opacity-70"
                         />
                       </div>
                       <p className="text-lg font-bold text-section-accent">
@@ -291,7 +291,7 @@ const Garden = () => {
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-10 w-auto"
+                    className="h-22 w-auto"
                   />
                   <p className="text-xs opacity-80">Price</p>
                 </div>
@@ -426,11 +426,11 @@ const Garden = () => {
                           <div className="text-3xl font-bold text-section-accent">
                             {formatNCTR(opportunities[0].reward_per_dollar || 0)}
                           </div>
-                          <img 
-                            src={nctrLogo} 
-                            alt="NCTR" 
-                            className="h-12 w-auto"
-                          />
+                              <img 
+                                src={nctrLogo} 
+                                alt="NCTR" 
+                                className="h-40 w-auto"
+                              />
                         </div>
                         <div className="text-sm text-muted-foreground font-medium">per $1 spent</div>
                       </div>
@@ -444,7 +444,7 @@ const Garden = () => {
                             <img 
                               src={nctrLogo} 
                               alt="NCTR" 
-                              className="h-12 w-auto"
+                              className="h-28 w-auto"
                             />
                           </div>
                           <div className="text-sm text-primary font-medium">Welcome Bonus</div>
@@ -535,7 +535,7 @@ const Garden = () => {
                             <div className="text-4xl font-bold text-primary">
                               {formatNCTR(opportunity.reward_per_dollar || 0)}
                             </div>
-                            <img src={nctrLogo} alt="NCTR" className="h-12 w-auto" />
+                            <img src={nctrLogo} alt="NCTR" className="h-28 w-auto" />
                           </div>
                           <div className="text-lg text-muted-foreground font-medium mb-4">per $1 spent</div>
                           
@@ -624,7 +624,7 @@ const Garden = () => {
                             <span className="text-lg font-bold text-section-accent">
                               {formatNCTR(opportunity.reward_per_dollar || 0)}
                             </span>
-                            <img src={nctrLogo} alt="NCTR" className="h-6 w-auto" />
+                            <img src={nctrLogo} alt="NCTR" className="h-14 w-auto" />
                           </div>
                           <div className="text-xs text-muted-foreground">per $1</div>
                         </div>
