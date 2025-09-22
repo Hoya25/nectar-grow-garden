@@ -372,8 +372,8 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         name: store.name || 'Unknown Store',
         description: store.description || `Shop with ${store.name} and earn NCTR rewards`,
         logo_url: logoData[storeId] || store.imageUrl || `https://api.loyalize.com/resources/stores/${storeId}/logo`,
-        commission_rate: Math.min(Math.max(commissionRate, 0.0001), 99.9999), // Max 99.9999 for NUMERIC(6,4)
-        nctr_per_dollar: Math.min(10.0, 99.9999), // Default 10.0, max 99.9999 for NUMERIC(6,4)
+        commission_rate: Math.min(Math.max(commissionRate, 0.0001), 999999.9999), // Max 999,999.9999 for NUMERIC(10,4)
+        nctr_per_dollar: Math.min(100.0, 999999.9999), // Default 100.0, max 999,999.9999 for NUMERIC(10,4)
         category: store.categories?.[0] || 'General',
         website_url: store.url || store.homePage || null,
         is_active: true,
@@ -436,8 +436,8 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       name: 'Uber Gift Cards',
       description: 'Purchase Uber gift cards for rides and food delivery. Get up to 1% cashback on gift card purchases through MyGiftCardsPlus.',
       logo_url: 'https://logo.clearbit.com/uber.com',
-      commission_rate: 0.0100, // NUMERIC(6,4) max 99.9999
-      nctr_per_dollar: 10.0000, // NUMERIC(6,4) max 99.9999
+      commission_rate: 0.0100, // NUMERIC(10,4) max 999,999.9999
+      nctr_per_dollar: 100.0000, // Now supports 100+ values with NUMERIC(10,4)
       category: 'Gift Cards',
       website_url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
       is_active: true,
