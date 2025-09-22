@@ -54,6 +54,7 @@ export type Database = {
       }
       admin_users: {
         Row: {
+          access_level: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -62,6 +63,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_level?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -70,6 +72,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_level?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -490,9 +493,25 @@ export type Database = {
         Args: { user_id: string }
         Returns: string
       }
+      check_admin_access_level: {
+        Args: { required_level: string }
+        Returns: boolean
+      }
       check_user_is_admin: {
         Args: { check_user_id: string }
         Returns: boolean
+      }
+      get_admin_profiles_safe: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+        }[]
       }
       get_public_profile: {
         Args: { profile_user_id: string }
@@ -501,6 +520,15 @@ export type Database = {
           full_name: string
           id: string
           username: string
+        }[]
+      }
+      get_sensitive_profile_data: {
+        Args: { target_user_id: string }
+        Returns: {
+          email: string
+          user_id: string
+          wallet_address: string
+          wallet_connected_at: string
         }[]
       }
       get_user_status_details: {
