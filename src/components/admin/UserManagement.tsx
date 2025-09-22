@@ -20,10 +20,12 @@ interface UserProfile {
   id: string;
   user_id: string;
   username: string;
-  email: string;
   full_name: string;
   avatar_url: string;
   created_at: string;
+  wallet_address?: string;
+  wallet_connected_at?: string;
+  // Note: email is no longer included for security reasons
 }
 
 interface UserPortfolio {
@@ -50,11 +52,9 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // Fetch user profiles
+      // Fetch user profiles using secure admin function (no email access)
       const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .rpc('get_admin_safe_profiles');
 
       if (profilesError) throw profilesError;
 
@@ -91,7 +91,7 @@ const UserManagement = () => {
       console.error('Error fetching users:', error);
       toast({
         title: "Error",
-        description: "Failed to load users.",
+        description: "Failed to load users. This may be due to security restrictions.",
         variant: "destructive",
       });
     } finally {
@@ -101,12 +101,11 @@ const UserManagement = () => {
 
   const filteredUsers = users.filter(user =>
     user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.username?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const makeAdmin = async (user: UserData) => {
-    if (!confirm(`Make ${user.full_name || user.email} an admin? They will have access to manage the platform.`)) {
+    if (!confirm(`Make ${user.full_name || user.username || 'this user'} an admin? They will have access to manage the platform.`)) {
       return;
     }
 
@@ -121,13 +120,13 @@ const UserManagement = () => {
       if (error) throw error;
 
       await logActivity('granted_admin', 'user', user.user_id, { 
-        user_email: user.email,
-        user_name: user.full_name 
+        user_name: user.full_name || user.username,
+        user_id: user.user_id
       });
 
       toast({
         title: "Admin Access Granted",
-        description: `${user.full_name || user.email} is now an admin.`,
+        description: `${user.full_name || user.username || 'User'} is now an admin.`,
       });
 
       fetchUsers();
@@ -142,7 +141,7 @@ const UserManagement = () => {
   };
 
   const removeAdmin = async (user: UserData) => {
-    if (!confirm(`Remove admin access from ${user.full_name || user.email}?`)) {
+    if (!confirm(`Remove admin access from ${user.full_name || user.username || 'this user'}?`)) {
       return;
     }
 
@@ -155,13 +154,13 @@ const UserManagement = () => {
       if (error) throw error;
 
       await logActivity('revoked_admin', 'user', user.user_id, { 
-        user_email: user.email,
-        user_name: user.full_name 
+        user_name: user.full_name || user.username,
+        user_id: user.user_id
       });
 
       toast({
         title: "Admin Access Revoked",
-        description: `${user.full_name || user.email} is no longer an admin.`,
+        description: `${user.full_name || user.username || 'User'} is no longer an admin.`,
       });
 
       fetchUsers();
@@ -240,14 +239,15 @@ const UserManagement = () => {
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={user.avatar_url} alt={user.full_name} />
                       <AvatarFallback>
-                        {user.full_name ? user.full_name.split(' ').map(n => n[0]).join('') : user.email[0].toUpperCase()}
+                        {user.full_name ? user.full_name.split(' ').map(n => n[0]).join('') : 
+                         user.username ? user.username[0].toUpperCase() : 'U'}
                       </AvatarFallback>
                     </Avatar>
                     
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold">
-                          {user.full_name || 'No name provided'}
+                          {user.full_name || user.username || 'Anonymous User'}
                         </h4>
                         {user.is_admin && (
                           <Badge variant="secondary" className="bg-gradient-hero text-foreground border-0">
@@ -263,14 +263,22 @@ const UserManagement = () => {
                       </div>
                       
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Mail className="w-3 h-3" />
-                          {user.email}
-                        </div>
+                        {user.username && (
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            @{user.username}
+                          </div>
+                        )}
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           Joined {new Date(user.created_at).toLocaleDateString()}
                         </div>
+                        {user.wallet_address && (
+                          <div className="flex items-center gap-1">
+                            <TrendingUp className="w-3 h-3" />
+                            Wallet Connected
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

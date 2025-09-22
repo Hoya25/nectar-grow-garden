@@ -513,6 +513,20 @@ export type Database = {
           username: string
         }[]
       }
+      get_admin_safe_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+          wallet_address: string
+          wallet_connected_at: string
+        }[]
+      }
       get_public_profile: {
         Args: { profile_user_id: string }
         Returns: {
