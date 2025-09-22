@@ -359,7 +359,7 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="commission_rate">Commission Rate (%)</Label>
+                    <Label htmlFor="commission_rate">Commission Rate (%) - Admin View Only</Label>
                     <Input
                       id="commission_rate"
                       type="number"
@@ -369,10 +369,11 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
                       value={formData.commission_rate}
                       onChange={(e) => setFormData({...formData, commission_rate: parseFloat(e.target.value)})}
                     />
+                    <p className="text-xs text-muted-foreground">Affiliate commission rate from partner (not shown to users)</p>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="nctr_per_dollar">NCTR per $1</Label>
+                    <Label htmlFor="nctr_per_dollar">NCTR per $1 - User Earning Rate</Label>
                     <Input
                       id="nctr_per_dollar"
                       type="number"
@@ -381,6 +382,7 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
                       value={formData.nctr_per_dollar}
                       onChange={(e) => setFormData({...formData, nctr_per_dollar: parseFloat(e.target.value)})}
                     />
+                    <p className="text-xs text-muted-foreground">How much NCTR users earn per $1 spent (manually set by you)</p>
                   </div>
                 </div>
 
@@ -490,12 +492,12 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
                 
                 <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                   <div>
-                    <span className="text-muted-foreground">Commission:</span>
+                    <span className="text-muted-foreground">Commission (Admin):</span>
                     <p className="font-medium">{(brand.commission_rate * 100).toFixed(2)}%</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">NCTR Rate:</span>
-                    <p className="font-medium">{brand.nctr_per_dollar} per $1</p>
+                    <span className="text-muted-foreground">User Earning Rate:</span>
+                    <p className="font-medium">{brand.nctr_per_dollar} NCTR/$1</p>
                   </div>
                 </div>
 

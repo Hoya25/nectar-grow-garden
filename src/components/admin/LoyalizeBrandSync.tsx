@@ -221,12 +221,12 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
 
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Commission:</span>
+                    <span className="text-muted-foreground">Commission (Admin Only):</span>
                     <span className="font-medium">{(brand.commission_rate * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">NCTR per $1:</span>
-                    <span className="font-medium text-foreground">{brand.nctr_per_dollar.toFixed(4)}</span>
+                    <span className="text-muted-foreground">User Earning Rate:</span>
+                    <span className="font-medium text-foreground">{brand.nctr_per_dollar.toFixed(4)} NCTR/$1</span>
                   </div>
                 </div>
 
