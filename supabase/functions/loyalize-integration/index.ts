@@ -615,5 +615,3 @@ async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> 
     return {};
   }
 }
-  )
-}
