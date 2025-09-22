@@ -13,6 +13,7 @@ import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import ProfileModal from '@/components/ProfileModal';
+import nctrLogo from "@/assets/nctr-logo.png";
 
 interface Portfolio {
   available_nctr: number;
@@ -153,9 +154,16 @@ const Garden = () => {
       <header className="bg-card/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              The Garden
-            </h1>
+            <div className="flex items-center space-x-3">
+              <h1 className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+                The Garden
+              </h1>
+            <img 
+              src={nctrLogo} 
+              alt="NCTR" 
+              className="h-6 w-auto opacity-90"
+            />
+            </div>
             <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0`}>
               {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
             </Badge>
@@ -196,7 +204,14 @@ const Garden = () => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Available NCTR</p>
+                      <div className="flex items-center space-x-1 mb-1">
+                        <p className="text-sm text-muted-foreground">Available</p>
+                        <img 
+                          src={nctrLogo} 
+                          alt="NCTR" 
+                          className="h-3 w-auto opacity-70"
+                        />
+                      </div>
                       <p className="text-xl font-bold text-primary">
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
@@ -210,7 +225,14 @@ const Garden = () => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Pending NCTR</p>
+                      <div className="flex items-center space-x-1 mb-1">
+                        <p className="text-sm text-muted-foreground">Pending</p>
+                        <img 
+                          src={nctrLogo} 
+                          alt="NCTR" 
+                          className="h-3 w-auto opacity-70"
+                        />
+                      </div>
                       <p className="text-xl font-bold text-warning">
                         {formatNCTR(portfolio?.pending_nctr || 0)}
                       </p>
@@ -224,7 +246,14 @@ const Garden = () => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Earned</p>
+                      <div className="flex items-center space-x-1 mb-1">
+                        <p className="text-sm text-muted-foreground">Total Earned</p>
+                        <img 
+                          src={nctrLogo} 
+                          alt="NCTR" 
+                          className="h-3 w-auto opacity-70"
+                        />
+                      </div>
                       <p className="text-xl font-bold text-success">
                         {formatNCTR(portfolio?.total_earned || 0)}
                       </p>
@@ -240,7 +269,14 @@ const Garden = () => {
           <Card className="bg-gradient-depth shadow-medium">
             <CardContent className="p-4">
               <div className="text-center text-white">
-                <p className="text-sm opacity-80">NCTR Price</p>
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <img 
+                    src={nctrLogo} 
+                    alt="NCTR" 
+                    className="h-5 w-auto"
+                  />
+                  <p className="text-sm opacity-80">Price</p>
+                </div>
                 <p className="text-2xl font-bold">${formatPrice(currentPrice)}</p>
                 <p className={`text-sm ${getChangeColor(priceChange24h)}`}>
                   {formatChange(priceChange24h)} (24h)
@@ -357,13 +393,26 @@ const Garden = () => {
                         {/* Earning Rate - Prominent Display */}
                         <div className="bg-white/10 rounded-lg p-4">
                           <div className="text-center">
-                            <div className="text-2xl font-bold mb-1">
-                              {formatNCTR(opportunity.reward_per_dollar || 0)} NCTR
+                            <div className="flex items-center justify-center space-x-2 mb-1">
+                              <div className="text-2xl font-bold">
+                                {formatNCTR(opportunity.reward_per_dollar || 0)}
+                              </div>
+                              <img 
+                                src={nctrLogo} 
+                                alt="NCTR" 
+                                className="h-6 w-auto"
+                              />
                             </div>
                             <div className="text-sm opacity-80">per $1 spent</div>
                             {opportunity.nctr_reward > 0 && (
-                              <div className="text-xs opacity-70 mt-2">
-                                + {formatNCTR(opportunity.nctr_reward)} NCTR signup bonus
+                              <div className="flex items-center justify-center space-x-1 text-xs opacity-70 mt-2">
+                                <span>+ {formatNCTR(opportunity.nctr_reward)}</span>
+                                <img 
+                                  src={nctrLogo} 
+                                  alt="NCTR" 
+                                  className="h-3 w-auto"
+                                />
+                                <span>signup bonus</span>
                               </div>
                             )}
                           </div>

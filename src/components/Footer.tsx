@@ -1,3 +1,5 @@
+import nctrLogo from "@/assets/nctr-logo.png";
+
 const Footer = () => {
   return (
     <footer className="relative bg-gradient-to-br from-foreground via-primary-deep to-foreground text-background py-24 overflow-hidden">
@@ -29,7 +31,14 @@ const Footer = () => {
                 </video>
                 <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
               </div>
-              <span className="text-4xl font-bold bg-gradient-premium bg-clip-text text-transparent">The Garden</span>
+              <div className="flex items-center space-x-3">
+                <span className="text-4xl font-bold bg-gradient-premium bg-clip-text text-transparent">The Garden</span>
+                <img 
+                  src={nctrLogo} 
+                  alt="NCTR" 
+                  className="h-8 w-auto opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                />
+              </div>
             </div>
             
             {/* Premium Description */}
@@ -60,7 +69,14 @@ const Footer = () => {
               
               <div className="group">
                 <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
-                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">$2M+</div>
+                  <div className="flex items-center justify-center space-x-2 mb-2">
+                    <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent">$2M+</div>
+                    <img 
+                      src={nctrLogo} 
+                      alt="NCTR" 
+                      className="h-6 w-auto opacity-90"
+                    />
+                  </div>
                   <div className="text-background/80 font-medium">NCTR Distributed</div>
                 </div>
               </div>
