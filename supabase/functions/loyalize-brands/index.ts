@@ -76,22 +76,24 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
   const category = url.searchParams.get('category') || '';
   const limit = parseInt(url.searchParams.get('limit') || '20');
   const offset = parseInt(url.searchParams.get('offset') || '0');
+  const countries = url.searchParams.get('countries') || 'US';
 
   try {
     console.log(`🔍 Searching stores: query="${query}", category="${category}"`);
     
-    const endpoint = 'https://api.loyalize.com/v1/stores';
+    // Use the correct search endpoint according to API docs
+    const endpoint = 'https://api.loyalize.com/v1/stores/search';
     const searchUrl = new URL(endpoint);
     
     // Add query parameters according to API docs
-    if (query) searchUrl.searchParams.set('name', query);
-    if (category) searchUrl.searchParams.set('categories', category);
+    if (query) searchUrl.searchParams.set('term', query); // Use 'term' instead of 'name'
     searchUrl.searchParams.set('size', limit.toString());
     searchUrl.searchParams.set('page', Math.floor(offset / limit).toString());
+    searchUrl.searchParams.set('countries', countries);
 
     const response = await fetch(searchUrl.toString(), {
       headers: {
-        'Authorization': apiKey,
+        'Authorization': `Bearer ${apiKey}`, // Use Bearer token format
         'Content-Type': 'application/json'
       }
     });
@@ -100,16 +102,19 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
       const data = await response.json();
       console.log(`✅ Successfully fetched ${data.content?.length || 0} stores`);
       
-      // Transform stores to brand format
+      // Transform stores to brand format with tracking URL
       const brands = data.content?.map((store: any) => ({
         id: store.id?.toString() || '',
+        loyalize_id: store.id?.toString() || '',
         name: store.name || 'Unknown Store',
-        logo_url: store.imageUrl || '',
-        commission_rate: store.commission?.value || 0,
-        commission_format: store.commission?.format || '%',
-        description: store.description || '',
-        website_url: store.url || '',
-        category: store.categories?.[0] || 'General'
+        logo_url: `https://api.loyalize.com/resources/stores/${store.id}/logo`,
+        commission_rate: store.commissionRate || 0,
+        description: store.description || store.tagline || '',
+        website_url: store.homePage || '',
+        tracking_url: store.trackingUrl || '',
+        category: category || store.categories?.[0] || 'General',
+        countries: store.countries || ['US'],
+        status: 'active'
       })) || [];
       
       return new Response(JSON.stringify({
@@ -166,7 +171,7 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
     
     const response = await fetch(endpoint, {
       headers: {
-        'Authorization': apiKey,
+        'Authorization': `Bearer ${apiKey}`, // Use Bearer token format
         'Content-Type': 'application/json'
       }
     });
@@ -176,8 +181,8 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
       console.log(`✅ Successfully fetched store details: ${storeData.name}`);
       
       // Calculate NCTR rate based on commission
-      const commissionRate = storeData.commission?.value ? (storeData.commission.format === '%' ? storeData.commission.value / 100 : storeData.commission.value) : 0.05;
-      const nctrPerDollar = calculateNCTRRate(storeData.commission?.value || 5);
+      const commissionRate = storeData.commissionRate || 0.05;
+      const nctrPerDollar = calculateNCTRRate(commissionRate * 100);
       
       // Insert into Supabase
       const { data, error } = await supabase
@@ -185,11 +190,11 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
         .upsert({
           loyalize_id: brandId,
           name: storeData.name || 'Unknown Store',
-          description: storeData.description || '',
-          logo_url: storeData.imageUrl || '',
+          description: storeData.description || storeData.tagline || '',
+          logo_url: `https://api.loyalize.com/resources/stores/${brandId}/logo`,
           commission_rate: commissionRate,
           nctr_per_dollar: nctrPerDollar,
-          website_url: storeData.url || '',
+          website_url: storeData.homePage || '',
           category: storeData.categories?.[0] || 'General',
           is_active: true,
           featured: false
@@ -287,7 +292,7 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
         // Fetch updated store data from Loyalize
         const response = await fetch(`https://api.loyalize.com/v1/stores/${brand.loyalize_id}`, {
           headers: {
-            'Authorization': apiKey,
+            'Authorization': `Bearer ${apiKey}`, // Use Bearer token format
             'Content-Type': 'application/json',
           },
         });
@@ -296,18 +301,18 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
           const storeData = await response.json();
           
           // Update commission rate and other data
-          const commissionRate = storeData.commission?.value ? (storeData.commission.format === '%' ? storeData.commission.value / 100 : storeData.commission.value) : 0.05;
+          const commissionRate = storeData.commissionRate || 0.05;
           
           await supabase
             .from('brands')
             .update({
               commission_rate: commissionRate,
-              nctr_per_dollar: calculateNCTRRate(storeData.commission?.value || 5),
+              nctr_per_dollar: calculateNCTRRate(commissionRate * 100),
               is_active: true,
               name: storeData.name,
-              description: storeData.description,
-              logo_url: storeData.imageUrl,
-              website_url: storeData.url,
+              description: storeData.description || storeData.tagline,
+              logo_url: `https://api.loyalize.com/resources/stores/${brand.loyalize_id}/logo`,
+              website_url: storeData.homePage,
               category: storeData.categories?.[0] || 'General'
             })
             .eq('id', brand.id);
@@ -330,6 +335,22 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
     console.error('Error syncing brands:', error);
     throw error;
   }
+}
+
+// Generate tracking URL with required parameters
+function generateTrackingUrl(storeId: string, userId: string, loyalizeId: string, subId?: string): string {
+  const baseUrl = `https://api.loyalize.com/v1/stores/${storeId}/tracking`;
+  const trackingUrl = new URL(baseUrl);
+  
+  trackingUrl.searchParams.set('cid', loyalizeId); // Your Loyalize ID
+  trackingUrl.searchParams.set('pid', 'nctr_platform'); // Traffic source identifier
+  trackingUrl.searchParams.set('cp', userId); // Unique shopper identifier
+  
+  if (subId) {
+    trackingUrl.searchParams.set('sid', subId); // Optional SubID for grouping
+  }
+  
+  return trackingUrl.toString();
 }
 
 function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
