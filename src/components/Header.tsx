@@ -56,11 +56,11 @@ const Header = () => {
                 Sign Up
               </Button>
               <Button 
-                className="bg-gradient-hero hover:bg-gradient-depth text-foreground shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
+                className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
                 onClick={handleAuthAction}
               >
                 <span className="relative z-10">{user ? 'My Garden' : 'Enter The Garden'}</span>
-                <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-section-highlight opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Button>
               {isAdmin && (
                 <Button 
@@ -79,11 +79,11 @@ const Header = () => {
               </Button>
               <Button 
                 variant="default" 
-                className="bg-gradient-hero hover:bg-gradient-depth text-foreground shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
+                className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
                 onClick={handleAuthAction}
               >
                 <span className="relative z-10">{user ? 'My Garden' : 'Enter The Garden'}</span>
-                <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-section-highlight opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Button>
               
               {isAdmin && (
@@ -104,7 +104,7 @@ const Header = () => {
                 >
                   <Avatar className="h-8 w-8 ring-2 ring-primary-glow/20 transition-all duration-300 hover:ring-primary-glow/40">
                     <AvatarImage src="" />
-                    <AvatarFallback className="text-sm bg-gradient-hero text-foreground font-medium">
+                    <AvatarFallback className="text-sm bg-white border-2 border-primary text-foreground font-medium">
                       {getInitials(user.email || 'User')}
                     </AvatarFallback>
                   </Avatar>
@@ -139,7 +139,7 @@ const Header = () => {
                 <Button variant="ghost" size="sm" className="rounded-xl">
                   <Avatar className="h-8 w-8 ring-2 ring-primary-glow/20">
                     <AvatarImage src="" />
-                    <AvatarFallback className="text-sm bg-gradient-hero text-foreground">
+                    <AvatarFallback className="text-sm bg-white border-2 border-primary text-foreground">
                       {getInitials(user.email || 'User')}
                     </AvatarFallback>
                   </Avatar>

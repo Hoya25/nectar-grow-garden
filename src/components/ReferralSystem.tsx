@@ -262,7 +262,7 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
                       copyReferralLink();
                       setShareModalOpen(false);
                     }}
-                    className="w-full bg-gradient-hero hover:opacity-90"
+                    className="w-full bg-white border-2 border-primary text-foreground hover:bg-section-highlight"
                   >
                     Copy Message & Link
                   </Button>

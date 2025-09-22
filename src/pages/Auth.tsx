@@ -60,7 +60,7 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-page flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm shadow-elegant">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-foreground">
             Welcome to The Garden
           </CardTitle>
           <CardDescription>
@@ -103,7 +103,7 @@ const Auth = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-hero hover:opacity-90"
+                  className="w-full bg-white border-2 border-primary text-foreground hover:bg-section-highlight"
                   disabled={loading}
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -153,7 +153,7 @@ const Auth = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-hero hover:opacity-90"
+                  className="w-full bg-white border-2 border-primary text-foreground hover:bg-section-highlight"
                   disabled={loading}
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

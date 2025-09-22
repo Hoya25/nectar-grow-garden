@@ -455,7 +455,7 @@ const Garden = () => {
                         </p>
 
                         {/* Action Button */}
-                        <Button className="w-full bg-gradient-hero hover:opacity-90 text-lg py-3">
+                        <Button className="w-full bg-white border-2 border-primary text-foreground hover:bg-section-highlight text-lg py-3">
                           <ExternalLink className="w-5 h-5 mr-2" />
                           Start Earning Now
                         </Button>
@@ -468,9 +468,9 @@ const Garden = () => {
 
             {/* Community Section */}
             <div className="mt-12">
-              <Card className="bg-gradient-card shadow-large">
+              <Card className="bg-white border-2 border-primary shadow-soft">
                 <CardHeader>
-                  <CardTitle className="text-xl">Join the Community</CardTitle>
+                  <CardTitle className="text-xl text-foreground">Join the Community</CardTitle>
                   <p className="text-muted-foreground">Invite friends and earn together</p>
                 </CardHeader>
                 <CardContent>

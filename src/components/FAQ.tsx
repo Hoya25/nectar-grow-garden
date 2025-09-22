@@ -42,7 +42,7 @@ const FAQ = () => {
               <br />
               <span className="text-foreground">Questions</span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-hero mx-auto rounded-full" />
+            <div className="w-24 h-1 bg-white border border-primary mx-auto rounded-full" />
           </div>
           
           {/* 3D-Styled FAQ Cards */}
@@ -61,7 +61,7 @@ const FAQ = () => {
                     <AccordionTrigger className="px-8 py-6 text-left hover:bg-gradient-glow/10 transition-all duration-300 hover:no-underline group/trigger">
                       <div className="flex items-center gap-4 w-full">
                         {/* Premium Icon */}
-                        <div className="w-12 h-12 bg-gradient-hero rounded-xl flex items-center justify-center shadow-soft group-hover/trigger:shadow-glow transition-all duration-300 group-hover/trigger:scale-110">
+                        <div className="w-12 h-12 bg-white border-2 border-primary rounded-xl flex items-center justify-center shadow-soft group-hover/trigger:shadow-glow transition-all duration-300 group-hover/trigger:scale-110">
                           <span className="text-xl">{faq.icon}</span>
                         </div>
                         

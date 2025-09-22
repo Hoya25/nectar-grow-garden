@@ -30,10 +30,10 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up [animation-delay:0.4s] opacity-0 [animation-fill-mode:forwards]">
             <Button 
               size="lg" 
-              className="bg-gradient-hero hover:bg-gradient-depth transition-all duration-500 hover:shadow-glow-intense hover:scale-105 text-lg px-8 py-6 shadow-large group relative overflow-hidden"
+              className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight transition-all duration-500 hover:scale-105 text-lg px-8 py-6 shadow-large group relative overflow-hidden"
             >
               <span className="relative z-10">How We're Democratizing Crypto →</span>
-              <div className="absolute inset-0 bg-gradient-premium opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-section-highlight opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </Button>
           </div>
         </div>
