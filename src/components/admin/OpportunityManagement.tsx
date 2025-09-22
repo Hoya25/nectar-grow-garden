@@ -118,8 +118,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   };
 
   const filteredOpportunities = opportunities.filter(opp => {
-    const matchesSearch = opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         opp.partner_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (opp.partner_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+                         (opp.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     const matchesType = filterType === 'all' || opp.opportunity_type === filterType;
     return matchesSearch && matchesType;
   });
