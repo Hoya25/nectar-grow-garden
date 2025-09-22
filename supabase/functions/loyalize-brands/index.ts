@@ -383,6 +383,56 @@ function getMockBrands(query?: string, category?: string): LoyalizeBrand[] {
       category: 'Beauty',
       commission_rate: 9.2,
       status: 'active'
+    },
+    {
+      id: 'loy_giftcard_001',
+      name: 'Amazon Gift Cards',
+      description: 'Digital and physical gift cards for the world\'s largest online retailer',
+      logo_url: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=100&h=100&fit=crop',
+      website_url: 'https://amazon.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 4.0,
+      status: 'active'
+    },
+    {
+      id: 'loy_giftcard_002',
+      name: 'Apple Store Gift Cards',
+      description: 'Gift cards for Apple products, apps, and services',
+      logo_url: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=100&h=100&fit=crop',
+      website_url: 'https://apple.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 3.5,
+      status: 'active'
+    },
+    {
+      id: 'loy_giftcard_003',
+      name: 'Target Gift Cards',
+      description: 'Versatile gift cards for retail shopping and online purchases',
+      logo_url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=100&h=100&fit=crop',
+      website_url: 'https://target.com/gift-cards',
+      category: 'Gift Cards',
+      commission_rate: 5.5,
+      status: 'active'
+    },
+    {
+      id: 'loy_giftcard_004',
+      name: 'Visa Prepaid Cards',
+      description: 'Flexible prepaid Visa cards accepted everywhere Visa is accepted',
+      logo_url: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=100&h=100&fit=crop',
+      website_url: 'https://usa.visa.com/pay-with-visa/cards/prepaid-cards.html',
+      category: 'Gift Cards',
+      commission_rate: 2.8,
+      status: 'active'
+    },
+    {
+      id: 'loy_giftcard_005',
+      name: 'Steam Gift Cards',
+      description: 'Digital gift cards for gaming, software, and entertainment on Steam',
+      logo_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=100&h=100&fit=crop',
+      website_url: 'https://store.steampowered.com/digitalgiftcards',
+      category: 'Gift Cards',
+      commission_rate: 6.2,
+      status: 'active'
     }
   ];
 

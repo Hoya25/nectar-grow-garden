@@ -43,7 +43,7 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
 
   const categories = [
     'Fashion', 'Electronics', 'Home & Garden', 'Health & Fitness', 
-    'Beauty', 'Sports', 'Books', 'Automotive', 'Food & Beverages'
+    'Beauty', 'Sports', 'Books', 'Automotive', 'Food & Beverages', 'Gift Cards'
   ];
 
   const searchBrands = async () => {
@@ -160,9 +160,9 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="search-term">Search Term</Label>
-                    <Input
+                     <Input
                       id="search-term"
-                      placeholder="Brand name or keywords..."
+                      placeholder="Brand name, gift cards, or keywords..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && searchBrands()}
