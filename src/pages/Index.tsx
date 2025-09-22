@@ -13,7 +13,7 @@ const Index = () => {
       {/* Earn Crypto Every Day Section */}
       <FeatureSection
         title="Earn Crypto"
-        description="In The Garden you'll find opportunities to earn NCTR (nectar), our first token, by doing the simple things you do every day. Like shopping. Buy the things you need and want, and get NCTR in return."
+        description="In The Garden you'll find opportunities to earn NCTR (nectar), the next generation rewards Alliance Token, by doing the simple things you do every day. Like shopping. Buy the things you need and want, and get NCTR in return."
         buttonText="Enter The Garden →"
         icon=""
       />
