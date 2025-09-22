@@ -19,12 +19,12 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 150 12% 8%;
 
-    /* NCTR lime theme - Vibrant lime green with depth */
-    --primary: 82 100% 50%; /* Bright NCTR lime */
+    /* NCTR lime theme - Subtle outline focused */
+    --primary: 82 60% 45%; /* Toned down NCTR lime */
     --primary-foreground: 150 12% 8%;
-    --primary-glow: 82 85% 65%;
-    --primary-deep: 82 100% 35%;
-    --primary-light: 82 80% 75%;
+    --primary-glow: 82 40% 55%;
+    --primary-deep: 82 70% 30%;
+    --primary-light: 82 35% 65%;
 
     /* Secondary - Modern charcoal grays */
     --secondary: 210 8% 95%;
@@ -35,45 +35,45 @@ All colors MUST be HSL.
     --muted: 210 8% 97%;
     --muted-foreground: 210 10% 42%;
 
-    /* Accent - Electric blue for contrast */
-    --accent: 200 100% 60%;
+    /* Accent - Toned down blue for contrast */
+    --accent: 200 65% 50%;
     --accent-foreground: 0 0% 100%;
-    --accent-light: 200 85% 75%;
+    --accent-light: 200 50% 65%;
 
-    /* Crypto premium metals - Enhanced with lime */
-    --crypto-gold: 50 100% 55%;
+    /* Crypto premium metals - Subtle lime accent */
+    --crypto-gold: 50 75% 50%;
     --crypto-gold-foreground: 150 12% 8%;
     --crypto-silver: 210 8% 75%;
     --crypto-platinum: 240 5% 85%;
-    --crypto-lime: 82 100% 50%;
+    --crypto-lime: 82 60% 45%;
 
-    /* Status colors - Enhanced vibrancy */
-    --success: 82 100% 50%; /* Use NCTR lime for success */
-    --warning: 38 100% 55%;
-    --destructive: 0 85% 55%;
+    /* Status colors - Subtle tones */
+    --success: 82 60% 45%; /* Use toned down NCTR lime */
+    --warning: 38 75% 50%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders and inputs - Subtle with lime hints */
     --border: 210 12% 90%;
     --input: 210 12% 90%;
-    --ring: 82 100% 50%;
+    --ring: 82 60% 45%;
 
-    /* Premium gradients - NCTR lime focused */
-    --gradient-hero: linear-gradient(135deg, hsl(82 100% 50%) 0%, hsl(82 85% 65%) 35%, hsl(200 100% 60%) 100%);
-    --gradient-premium: linear-gradient(120deg, hsl(82 100% 50%) 0%, hsl(50 100% 55%) 50%, hsl(200 100% 60%) 100%);
+    /* Premium gradients - Subtle outline focused */
+    --gradient-hero: linear-gradient(135deg, hsl(82 60% 45%) 0%, hsl(82 40% 55%) 35%, hsl(200 65% 50%) 100%);
+    --gradient-premium: linear-gradient(120deg, hsl(82 60% 45%) 0%, hsl(50 75% 50%) 50%, hsl(200 65% 50%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
-    --gradient-accent: linear-gradient(90deg, hsl(82 100% 50%) 0%, hsl(200 100% 60%) 100%);
-    --gradient-depth: linear-gradient(145deg, hsl(82 100% 50%) 0%, hsl(82 100% 35%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(82 100% 50% / 0.15) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(82 20% 98%) 50%, hsl(210 20% 98%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(82 60% 45%) 0%, hsl(200 65% 50%) 100%);
+    --gradient-depth: linear-gradient(145deg, hsl(82 60% 45%) 0%, hsl(82 70% 30%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(82 60% 45% / 0.08) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(82 15% 98%) 50%, hsl(210 20% 98%) 100%);
     
-    /* Advanced shadows - 3D depth system with lime glow */
+    /* Advanced shadows - Subtle outline system */
     --shadow-minimal: 0 1px 3px hsl(150 12% 8% / 0.04);
     --shadow-soft: 0 2px 12px -2px hsl(150 12% 8% / 0.08);
     --shadow-medium: 0 8px 32px -8px hsl(150 12% 8% / 0.12);
     --shadow-large: 0 16px 48px -12px hsl(150 12% 8% / 0.18);
-    --shadow-glow: 0 0 40px hsl(82 100% 50% / 0.25);
-    --shadow-glow-intense: 0 0 60px hsl(82 100% 50% / 0.4);
+    --shadow-glow: 0 0 20px hsl(82 60% 45% / 0.12);
+    --shadow-glow-intense: 0 0 30px hsl(82 60% 45% / 0.18);
     --shadow-inset: inset 0 2px 8px hsl(150 12% 8% / 0.06);
     
     /* Premium transitions - Sophisticated timing */
@@ -104,7 +104,7 @@ All colors MUST be HSL.
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 82 100% 50%;
+    --sidebar-ring: 82 60% 45%;
   }
 
   .dark {
@@ -117,8 +117,8 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    /* Dark mode with NCTR lime as primary */
-    --primary: 82 100% 50%;
+    /* Dark mode with toned down NCTR lime */
+    --primary: 82 60% 45%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -127,7 +127,7 @@ All colors MUST be HSL.
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 200 100% 60%;
+    --accent: 200 65% 50%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -135,16 +135,16 @@ All colors MUST be HSL.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 82 100% 50%;
+    --ring: 82 60% 45%;
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 82 100% 50%;
+    --sidebar-primary: 82 60% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 82 100% 50%;
+    --sidebar-ring: 82 60% 45%;
   }
 }
 
