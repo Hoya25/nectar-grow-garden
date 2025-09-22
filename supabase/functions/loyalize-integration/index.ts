@@ -222,11 +222,11 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     let allStores: any[] = [];
     let page = 0;
     let hasMorePages = true;
-    const maxPageSize = 200; // Increase from 50 to 200 for faster sync
+    const maxPageSize = 1000; // Increase from 200 to 1000 for faster sync
     
     // First, try to get all stores with pagination
     while (hasMorePages) {
-      const endpoint = `https://api.loyalize.com/v1/stores?page=${page}&size=${maxPageSize}&status=active`;
+      const endpoint = `https://api.loyalize.com/v1/stores?page=${page}&size=${maxPageSize}`;
       console.log(`🔄 Fetching page ${page} from: ${endpoint}`);
       
       const response = await fetch(endpoint, {
