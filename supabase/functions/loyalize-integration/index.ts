@@ -185,10 +185,22 @@ serve(async (req) => {
   } catch (error) {
     console.error('Loyalize integration error:', error)
     
+    // For sync_brands action, try emergency fallback
+    if (requestBody?.action === 'sync_brands') {
+      try {
+        console.log('Attempting emergency fallback to sample data...')
+        return await syncSampleBrands(supabase, true)
+      } catch (fallbackError) {
+        console.error('Emergency fallback also failed:', fallbackError)
+      }
+    }
+    
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message || 'Internal server error'
+        error: error.message || 'Internal server error',
+        brands_count: 0,
+        fallback_attempted: requestBody?.action === 'sync_brands'
       }),
       {
         status: 500,
@@ -397,6 +409,7 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     return new Response(JSON.stringify({
       success: true,
       message: `✅ Successfully synced ${syncedCount} brands from Loyalize API`,
+      brands_count: syncedCount,
       brands_synced: syncedCount,
       total_pages_fetched: page,
       uber_included: foundUberStores.length > 0 || true, // Always true since we add manually if not found
@@ -549,6 +562,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       success: true,
       message,
       brands_count: enhancedBrands.length,
+      brands_synced: enhancedBrands.length,
       uber_gift_cards_included: true,
       is_sample_data: !isFallback,
       is_fallback_data: isFallback,
