@@ -211,107 +211,107 @@ const Garden = () => {
       </header>
 
       <div className="flex min-h-[calc(100vh-80px)]">
-        {/* Dashboard Sidebar */}
-        <aside className="section-highlight backdrop-blur-sm border-r border-section-border p-6 space-y-6">
+        {/* Compact Dashboard Sidebar */}
+        <aside className="section-highlight backdrop-blur-sm border-r border-section-border p-4 space-y-4 w-72 flex-shrink-0">
           <div>
-            <h2 className="text-lg font-semibold mb-4 section-heading">Your Dashboard</h2>
+            <h2 className="text-base font-semibold mb-3 section-heading">Dashboard</h2>
             
-            {/* Portfolio Overview Cards */}
-            <div className="space-y-4">
+            {/* Portfolio Overview Cards - Compact */}
+            <div className="space-y-3">
               <Card className="bg-white shadow-soft border border-section-border/30">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-1 mb-1">
-                        <p className="text-sm text-section-text/70">Available</p>
+                        <p className="text-xs text-section-text/70">Available</p>
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-10 w-auto opacity-70"
+                          className="h-6 w-auto opacity-70"
                         />
                       </div>
-                      <p className="text-xl font-bold text-section-accent">
+                      <p className="text-lg font-bold text-section-accent">
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
                     </div>
-                    <Coins className="h-8 w-8 text-foreground/60" />
+                    <Coins className="h-6 w-6 text-foreground/60" />
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-white shadow-soft border border-section-border/30">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-1 mb-1">
-                        <p className="text-sm text-section-text/70">Pending</p>
+                        <p className="text-xs text-section-text/70">Pending</p>
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-10 w-auto opacity-70"
+                          className="h-6 w-auto opacity-70"
                         />
                       </div>
-                      <p className="text-xl font-bold text-section-accent">
+                      <p className="text-lg font-bold text-section-accent">
                         {formatNCTR(portfolio?.pending_nctr || 0)}
                       </p>
                     </div>
-                    <TrendingUp className="h-8 w-8 text-warning/60" />
+                    <TrendingUp className="h-6 w-6 text-warning/60" />
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-white shadow-soft border border-section-border/30">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-1 mb-1">
-                        <p className="text-sm text-section-text/70">Total Earned</p>
+                        <p className="text-xs text-section-text/70">Total Earned</p>
                         <img 
                           src={nctrLogo} 
                           alt="NCTR" 
-                          className="h-10 w-auto opacity-70"
+                          className="h-6 w-auto opacity-70"
                         />
                       </div>
-                      <p className="text-xl font-bold text-section-accent">
+                      <p className="text-lg font-bold text-section-accent">
                         {formatNCTR(portfolio?.total_earned || 0)}
                       </p>
                     </div>
-                    <Gift className="h-8 w-8 text-success/60" />
+                    <Gift className="h-6 w-6 text-success/60" />
                   </div>
                 </CardContent>
               </Card>
             </div>
           </div>
 
-          {/* NCTR Price Info */}
+          {/* NCTR Price Info - Compact */}
           <Card className="bg-white shadow-medium border border-section-border">
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="text-center text-foreground">
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-16 w-auto"
+                    className="h-10 w-auto"
                   />
-                  <p className="text-sm opacity-80">Price</p>
+                  <p className="text-xs opacity-80">Price</p>
                 </div>
-                <p className="text-2xl font-bold text-section-accent">${formatPrice(currentPrice)}</p>
-                <p className={`text-sm ${getChangeColor(priceChange24h)}`}>
+                <p className="text-xl font-bold text-section-accent">${formatPrice(currentPrice)}</p>
+                <p className={`text-xs ${getChangeColor(priceChange24h)}`}>
                   {formatChange(priceChange24h)} (24h)
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Lock Commitments Summary */}
+          {/* Lock Commitments Summary - Compact */}
           {locks.length > 0 && (
             <Card className="bg-white shadow-soft border border-section-border">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base text-foreground">Lock Commitments</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-foreground">Lock Status</CardTitle>
               </CardHeader>
-              <CardContent className="p-4 pt-0">
+              <CardContent className="p-3 pt-0">
                 <div className="space-y-2">
-                  {locks.slice(0, 2).map((lock) => {
+                  {locks.slice(0, 1).map((lock) => {
                     const unlockDate = new Date(lock.unlock_date);
                     const lockDate = new Date(lock.lock_date);
                     const totalDuration = unlockDate.getTime() - lockDate.getTime();
@@ -319,7 +319,7 @@ const Garden = () => {
                     const progress = Math.min((elapsed / totalDuration) * 100, 100);
                     
                     return (
-                      <div key={lock.id} className="text-sm">
+                      <div key={lock.id} className="text-xs">
                         <div className="flex justify-between mb-1">
                           <span className="text-foreground">{lock.lock_type}</span>
                           <span className="text-section-accent font-bold">{Math.round(progress)}%</span>
@@ -328,41 +328,41 @@ const Garden = () => {
                       </div>
                     );
                   })}
-                  {locks.length > 2 && (
-                    <p className="text-xs text-muted-foreground">+{locks.length - 2} more</p>
+                  {locks.length > 1 && (
+                    <p className="text-xs text-muted-foreground">+{locks.length - 1} more</p>
                   )}
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Quick Actions */}
-          <div className="space-y-3">
+          {/* Quick Actions - Compact */}
+          <div className="space-y-2">
             <LockCommitmentModal 
               availableNCTR={portfolio?.available_nctr || 0}
               onLockCreated={fetchUserData}
             />
-            <Button variant="outline" className="w-full" onClick={() => navigate('/profile')}>
-              <User className="w-4 h-4 mr-2" />
-              View Full Profile
+            <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => navigate('/profile')}>
+              <User className="w-3 h-3 mr-2" />
+              Profile
             </Button>
           </div>
 
-          {/* Wallet Connection */}
+          {/* Wallet Connection - Compact */}
           <div>
-            <h3 className="text-sm font-medium mb-2">Wallet Connection</h3>
+            <h3 className="text-xs font-medium mb-2">Wallet</h3>
             <SimpleWalletConnection />
           </div>
         </aside>
 
-        {/* Main Content - Earning Opportunities */}
-        <main className="flex-1 p-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2 nctr-glow">
+        {/* Main Content - Earning Opportunities with More Space */}
+        <main className="flex-1 p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-12 text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 nctr-glow">
                 Earning Opportunities
               </h1>
-              <p className="text-section-text/90">
+              <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
                 Discover amazing brands and earn NCTR with every purchase
               </p>
             </div>
@@ -466,84 +466,103 @@ const Garden = () => {
                 </CardContent>
               </Card>
             ) : opportunities.length <= 3 ? (
-              // Few opportunities - Showcase layout
-              <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 mb-4">
-                    {opportunities.length} Exclusive Opportunities
+              // Few opportunities - Showcase layout with elegant spacing
+              <div className="space-y-8">
+                <div className="text-center mb-12">
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 mb-4 px-6 py-2 text-sm">
+                    {opportunities.length} Premium Opportunities Available
                   </Badge>
                 </div>
                 
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
                   {opportunities.map((opportunity, index) => (
-                    <Card key={opportunity.id} className={`bg-white border shadow-soft hover:shadow-large transition-all duration-300 ${index === 0 ? 'border-primary border-2' : 'border-section-border'}`}>
-                      <CardContent className="p-0">
+                    <Card key={opportunity.id} className={`bg-white shadow-large hover:shadow-glow-intense transition-all duration-500 border-2 ${index === 0 ? 'border-primary' : 'border-section-border'} group`}>
+                      <CardContent className="p-8">
+                        {/* Header with elegant spacing */}
+                        <div className="text-center mb-8">
+                          {index === 0 && (
+                            <Badge className="bg-primary text-primary-foreground border-0 mb-4 px-4 py-1">
+                              FEATURED OPPORTUNITY
+                            </Badge>
+                          )}
+                          
+                          <div className="flex items-center justify-center mb-4">
+                            {opportunity.partner_logo_url && (
+                              <img 
+                                src={opportunity.partner_logo_url} 
+                                alt={`${opportunity.partner_name} logo`}
+                                className="w-16 h-16 rounded-2xl object-cover shadow-medium"
+                              />
+                            )}
+                          </div>
+                          
+                          <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                            {opportunity.title}
+                          </h3>
+                          {opportunity.partner_name && (
+                            <p className="text-lg text-muted-foreground">{opportunity.partner_name}</p>
+                          )}
+                        </div>
+
+                        {/* Video Section with elegant presentation */}
                         {opportunity.video_url && (
-                          <div className="relative">
-                            <video 
-                              className="w-full h-48 object-cover rounded-t-lg"
-                              controls
-                              poster={opportunity.partner_logo_url}
-                            >
-                              <source src={opportunity.video_url} type="video/mp4" />
-                            </video>
-                            {index === 0 && (
-                              <div className="absolute top-3 right-3">
-                                <Badge className="bg-primary text-primary-foreground border-0 text-xs">
-                                  FEATURED
-                                </Badge>
+                          <div className="mb-8">
+                            <div className="relative rounded-2xl overflow-hidden shadow-large">
+                              <video 
+                                className="w-full h-56 object-cover"
+                                controls
+                                poster={opportunity.partner_logo_url}
+                              >
+                                <source src={opportunity.video_url} type="video/mp4" />
+                              </video>
+                            </div>
+                            {(opportunity.video_title || opportunity.video_description) && (
+                              <div className="mt-4 text-center">
+                                {opportunity.video_title && (
+                                  <p className="font-medium text-foreground mb-1">{opportunity.video_title}</p>
+                                )}
+                                {opportunity.video_description && (
+                                  <p className="text-sm text-muted-foreground">{opportunity.video_description}</p>
+                                )}
                               </div>
                             )}
                           </div>
                         )}
-                        
-                        <div className="p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center space-x-3">
-                              {opportunity.partner_logo_url && (
-                                <img 
-                                  src={opportunity.partner_logo_url} 
-                                  alt={`${opportunity.partner_name} logo`}
-                                  className="w-12 h-12 rounded-lg object-cover"
-                                />
-                              )}
-                              <div>
-                                <h3 className="font-bold text-foreground text-lg">{opportunity.title}</h3>
-                                {opportunity.partner_name && (
-                                  <p className="text-sm text-muted-foreground">{opportunity.partner_name}</p>
-                                )}
+
+                        {/* Earning Display - Large and prominent */}
+                        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-8 mb-8 text-center border border-primary/20">
+                          <div className="flex items-center justify-center space-x-3 mb-3">
+                            <div className="text-4xl font-bold text-primary">
+                              {formatNCTR(opportunity.reward_per_dollar || 0)}
+                            </div>
+                            <img src={nctrLogo} alt="NCTR" className="h-12 w-auto" />
+                          </div>
+                          <div className="text-lg text-muted-foreground font-medium mb-4">per $1 spent</div>
+                          
+                          {opportunity.nctr_reward > 0 && (
+                            <div className="bg-white rounded-xl p-4 shadow-soft">
+                              <div className="flex items-center justify-center space-x-2 text-primary">
+                                <Gift className="w-5 h-5" />
+                                <span className="font-bold text-lg">
+                                  +{formatNCTR(opportunity.nctr_reward)} NCTR Welcome Bonus
+                                </span>
                               </div>
                             </div>
-                          </div>
-
-                          <div className="bg-section-highlight rounded-lg p-4 mb-4">
-                            <div className="text-center">
-                              <div className="flex items-center justify-center space-x-2 mb-1">
-                                <div className="text-2xl font-bold text-section-accent">
-                                  {formatNCTR(opportunity.reward_per_dollar || 0)}
-                                </div>
-                                <img src={nctrLogo} alt="NCTR" className="h-8 w-auto" />
-                              </div>
-                              <div className="text-sm text-muted-foreground">per $1 spent</div>
-                              {opportunity.nctr_reward > 0 && (
-                                <div className="text-xs text-primary font-medium mt-2">
-                                  + {formatNCTR(opportunity.nctr_reward)} NCTR bonus
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {opportunity.description && (
-                            <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                              {opportunity.description}
-                            </p>
                           )}
-
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-3 rounded-lg">
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Start Earning
-                          </Button>
                         </div>
+
+                        {/* Description with elegant typography */}
+                        {opportunity.description && (
+                          <p className="text-foreground leading-relaxed text-center mb-8 text-lg">
+                            {opportunity.description}
+                          </p>
+                        )}
+
+                        {/* CTA Button - Large and prominent */}
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]">
+                          <ExternalLink className="w-6 h-6 mr-3" />
+                          Start Earning with {opportunity.partner_name || 'This Brand'}
+                        </Button>
                       </CardContent>
                     </Card>
                   ))}
