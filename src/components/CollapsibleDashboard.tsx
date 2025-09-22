@@ -54,127 +54,149 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
   locks,
   onLockCreated
 }) => {
+  const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed on mobile
   const navigate = useNavigate();
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor } = useNCTRPrice();
 
   return (
-    <aside className="section-highlight backdrop-blur-sm border-r border-section-border p-4 space-y-4 w-72 flex-shrink-0 animate-slide-in-right">
-      <div className="flex items-center justify-between mb-3">
+    <div className="lg:w-80 xl:w-96">
+      {/* Mobile Toggle Button */}
+      <div className="lg:hidden bg-section-highlight border-b border-section-border p-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="w-full justify-between hover:bg-primary/10 text-sm"
+        >
+          <span className="font-medium">Portfolio {isCollapsed ? '▼' : '▲'}</span>
+          <span className="text-xs text-muted-foreground">
+            {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_360_nctr || 0))} NCTR
+          </span>
+        </Button>
+      </div>
+
+      {/* Dashboard Content */}
+      <aside className={`
+        section-highlight backdrop-blur-sm border-r border-section-border 
+        ${isCollapsed ? 'hidden lg:block' : 'block'} 
+        lg:block p-3 sm:p-4 space-y-3 sm:space-y-4 w-full flex-shrink-0 animate-slide-in-right
+      `}>
+      <div className="hidden lg:flex items-center justify-between mb-3">
         <h2 className="text-base font-semibold section-heading">Dashboard</h2>
       </div>
       
-      {/* Portfolio Overview Cards - Full */}
-      <div className="space-y-3">
-        <Card className="bg-white shadow-soft border border-section-border/30">
-          <CardContent className="p-3">
+      {/* Portfolio Overview Cards - Mobile Optimized */}
+      <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3 lg:space-y-0">
+        <Card className="bg-white shadow-soft border border-section-border/30 col-span-2 sm:col-span-1 lg:col-span-1">
+          <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-section-text/70 font-medium">Available</p>
+                <div className="flex items-center justify-between mb-1 sm:mb-2">
+                  <p className="text-xs sm:text-sm text-section-text/70 font-medium">Available</p>
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-12 w-auto opacity-70"
+                    className="h-8 sm:h-12 w-auto opacity-70"
                   />
                 </div>
-                <p className="text-xl font-bold text-section-accent mb-1">
+                <p className="text-lg sm:text-xl font-bold text-section-accent mb-1">
                   {formatNCTR(portfolio?.available_nctr || 0)}
                 </p>
                 <p className="text-xs text-muted-foreground">Ready to commit</p>
               </div>
-              <Coins className="h-6 w-6 text-foreground/60 ml-2" />
+              <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-foreground/60 ml-2" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 shadow-soft border border-blue-200">
-          <CardContent className="p-3">
+          <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-semibold text-blue-700">90</span>
-                    <Lock className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center justify-between mb-1 sm:mb-2">
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <span className="text-xs sm:text-sm font-semibold text-blue-700">90</span>
+                    <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                     <span className="text-xs font-semibold text-blue-700">LOCK</span>
                   </div>
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-12 w-auto opacity-70"
+                    className="h-8 sm:h-12 w-auto opacity-70"
                   />
                 </div>
-                <p className="text-lg font-bold text-blue-800 mb-1">
+                <p className="text-base sm:text-lg font-bold text-blue-800 mb-1">
                   {formatNCTR(portfolio?.lock_90_nctr || 0)}
                 </p>
-                <p className="text-xs text-blue-600">Standard Commitment</p>
+                <p className="text-xs text-blue-600">Standard</p>
               </div>
-              <TrendingUp className="h-6 w-6 text-blue-600 ml-2" />
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 ml-2" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-primary/10 to-primary/20 shadow-soft border border-primary/30">
-          <CardContent className="p-3">
+          <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-bold text-primary">360</span>
-                    <Lock className="w-4 h-4 text-primary" />
+                <div className="flex items-center justify-between mb-1 sm:mb-2">
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <span className="text-xs sm:text-sm font-bold text-primary">360</span>
+                    <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                     <span className="text-xs font-bold text-primary">LOCK</span>
                   </div>
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-12 w-auto opacity-90"
+                    className="h-8 sm:h-12 w-auto opacity-90"
                   />
                 </div>
-                <p className="text-lg font-bold text-primary mb-1">
+                <p className="text-base sm:text-lg font-bold text-primary mb-1">
                   {formatNCTR(portfolio?.lock_360_nctr || 0)}
                 </p>
-                <p className="text-xs text-primary/80">Alliance Status Builder</p>
+                <p className="text-xs text-primary/80">Alliance</p>
               </div>
-              <Gift className="h-6 w-6 text-primary ml-2" />
+              <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-primary ml-2" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-white shadow-soft border border-section-border/30">
-          <CardContent className="p-3">
+          <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-section-text/70 font-medium">Total Earned</p>
+                <div className="flex items-center justify-between mb-1 sm:mb-2">
+                  <p className="text-xs sm:text-sm text-section-text/70 font-medium">Total Earned</p>
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-12 w-auto opacity-70"
+                    className="h-8 sm:h-12 w-auto opacity-70"
                   />
                 </div>
-                <p className="text-xl font-bold text-section-accent mb-1">
+                <p className="text-lg sm:text-xl font-bold text-section-accent mb-1">
                   {formatNCTR(portfolio?.total_earned || 0)}
                 </p>
-                <p className="text-xs text-muted-foreground">Lifetime earnings</p>
+                <p className="text-xs text-muted-foreground">Lifetime</p>
               </div>
-              <Users className="h-6 w-6 text-success/60 ml-2" />
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-success/60 ml-2" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* NCTR Price Info - Full */}
+      {/* NCTR Price Info - Mobile Compact */}
       <Card className="bg-white shadow-medium border border-section-border">
-        <CardContent className="p-4">
+        <CardContent className="p-3 sm:p-4">
           <div className="text-center text-foreground">
-            <div className="flex items-center justify-center space-x-3 mb-3">
+            <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-2 sm:mb-3">
               <img 
                 src={nctrLogo} 
                 alt="NCTR" 
-                className="h-16 w-auto"
+                className="h-12 sm:h-16 w-auto"
               />
             </div>
-            <p className="text-2xl font-bold text-section-accent mb-1">${formatPrice(currentPrice)}</p>
-            <p className={`text-sm ${getChangeColor(priceChange24h)}`}>
+            <p className="text-xl sm:text-2xl font-bold text-section-accent mb-1">${formatPrice(currentPrice)}</p>
+            <p className={`text-xs sm:text-sm ${getChangeColor(priceChange24h)}`}>
               {formatChange(priceChange24h)} (24h)
             </p>
           </div>
@@ -249,25 +271,26 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         </Card>
       )}
 
-      {/* Quick Actions - Full */}
-      <div className="space-y-2">
+      {/* Quick Actions - Mobile Optimized */}
+      <div className="grid grid-cols-1 gap-2">
         <div data-lock-commitment>
           <LockCommitmentModal 
             availableNCTR={portfolio?.available_nctr || 0}
             onLockCreated={onLockCreated}
           />
         </div>
-        <Button variant="outline" size="sm" className="w-full text-xs border-primary/50 text-primary hover:bg-primary/10" onClick={() => navigate('/profile')}>
-          <User className="w-3 h-3 mr-2" />
+        <Button variant="outline" size="sm" className="w-full text-xs sm:text-sm border-primary/50 text-primary hover:bg-primary/10 min-h-[44px]" onClick={() => navigate('/profile')}>
+          <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
           Alliance Profile
         </Button>
       </div>
 
-      {/* Wallet Connection - Full */}
+      {/* Wallet Connection - Mobile Compact */}
       <div>
-        <h3 className="text-xs font-medium mb-2">Wallet</h3>
+        <h3 className="text-xs sm:text-sm font-medium mb-2">Wallet</h3>
         <SimpleWalletConnection />
       </div>
     </aside>
+    </div>
   );
 };

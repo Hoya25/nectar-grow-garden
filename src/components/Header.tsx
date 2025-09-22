@@ -54,7 +54,7 @@ const Header = () => {
                     Invite a Friend
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto mx-4 sm:mx-0">
                   <DialogHeader>
                     <DialogTitle>Invite Friends & Earn Together</DialogTitle>
                   </DialogHeader>
@@ -103,7 +103,7 @@ const Header = () => {
                     Invite a Friend
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto mx-4 sm:mx-0">
                   <DialogHeader>
                     <DialogTitle>Invite Friends & Earn Together</DialogTitle>
                   </DialogHeader>
@@ -167,25 +167,58 @@ const Header = () => {
 
         <div className="md:hidden">
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-xl p-2">
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="mx-4 max-w-[calc(100vw-2rem)] max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-base">Invite Friends & Earn</DialogTitle>
+                  </DialogHeader>
+                  <ReferralSystem />
+                </DialogContent>
+              </Dialog>
+              <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl px-3 py-2 text-sm">
+                Garden
+              </Button>
               <ProfileModal>
-                <Button variant="ghost" size="sm" className="rounded-xl">
-                  <Avatar className="h-8 w-8 ring-2 ring-primary-glow/20">
+                <Button variant="ghost" size="sm" className="rounded-xl p-2">
+                  <Avatar className="h-7 w-7 ring-2 ring-primary-glow/20">
                     <AvatarImage src="" />
-                    <AvatarFallback className="text-sm bg-white border-2 border-primary text-foreground">
+                    <AvatarFallback className="text-xs bg-white border-2 border-primary text-foreground">
                       {getInitials(user.email || 'User')}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </ProfileModal>
-              <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl">
-                Garden
-              </Button>
             </div>
           ) : (
-            <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl">
-              Sign In
-            </Button>
+            <div className="flex items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-xl p-2">
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="mx-4 max-w-[calc(100vw-2rem)] max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-base">Invite Friends & Earn</DialogTitle>
+                  </DialogHeader>
+                  <div className="text-center py-6">
+                    <p className="text-muted-foreground mb-4 text-sm">Sign up to access your referral program!</p>
+                    <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 w-full">
+                      Join The Garden
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl px-3 py-2 text-sm">
+                Sign In
+              </Button>
+            </div>
           )}
         </div>
       </div>

@@ -110,14 +110,14 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
   return (
     <div className="space-y-6">
       {/* Referral Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="bg-card/80 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
             <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
+          <CardContent className="px-4 pb-4">
+            <div className="text-xl sm:text-2xl font-bold text-foreground">
               {referralStats.total_referrals}
             </div>
             <p className="text-xs text-muted-foreground">Active community members</p>
@@ -125,25 +125,25 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
         </Card>
 
         <Card className="bg-card/80 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
             <CardTitle className="text-sm font-medium">Pending Rewards</CardTitle>
             <Gift className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-500">
+          <CardContent className="px-4 pb-4">
+            <div className="text-xl sm:text-2xl font-bold text-orange-500">
               {referralStats.pending_rewards.toLocaleString()} NCTR
             </div>
             <p className="text-xs text-muted-foreground">Processing rewards</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/80 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="bg-card/80 backdrop-blur-sm sm:col-span-2 lg:col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
             <CardTitle className="text-sm font-medium">Total Earned</CardTitle>
             <Gift className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-500">
+          <CardContent className="px-4 pb-4">
+            <div className="text-xl sm:text-2xl font-bold text-green-500">
               {referralStats.total_earned_from_referrals.toLocaleString()} NCTR
             </div>
             <p className="text-xs text-muted-foreground">From referrals</p>
@@ -160,7 +160,7 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <h4 className="font-semibold mb-2">How It Works</h4>
               <ul className="text-sm space-y-1 text-muted-foreground">
@@ -200,12 +200,13 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
                 id="referral-link"
                 value={getReferralLink()}
                 readOnly
-                className="flex-1"
+                className="flex-1 text-xs sm:text-sm"
               />
               <Button 
                 onClick={copyReferralLink}
                 variant="outline"
-                className="flex-shrink-0"
+                className="flex-shrink-0 px-3"
+                size="sm"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </Button>
@@ -213,23 +214,23 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
           </div>
 
           <div className="flex gap-2 flex-wrap">
-            <Button onClick={shareViaEmail} variant="outline" size="sm">
-              <Mail className="w-4 h-4 mr-2" />
-              Email
+            <Button onClick={shareViaEmail} variant="outline" size="sm" className="flex-1 sm:flex-none min-h-[44px]">
+              <Mail className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Email</span>
             </Button>
-            <Button onClick={shareViaText} variant="outline" size="sm">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Text
+            <Button onClick={shareViaText} variant="outline" size="sm" className="flex-1 sm:flex-none min-h-[44px]">
+              <MessageCircle className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">Text</span>
             </Button>
-            <Button onClick={shareViaWhatsApp} variant="outline" size="sm">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              WhatsApp
+            <Button onClick={shareViaWhatsApp} variant="outline" size="sm" className="flex-1 sm:flex-none min-h-[44px]">
+              <MessageCircle className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="text-xs sm:text-sm">WhatsApp</span>
             </Button>
             <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  More Options
+                <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px]">
+                  <Share2 className="w-4 h-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">More Options</span>
                 </Button>
               </DialogTrigger>
               <DialogContent>

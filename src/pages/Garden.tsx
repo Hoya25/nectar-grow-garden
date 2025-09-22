@@ -407,71 +407,80 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
     <div className="min-h-screen bg-gradient-page">
       {/* Header */}
       <header className="section-highlight backdrop-blur-sm border-b border-section-border">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold nctr-text">
-                The Garden
-              </h1>
-            <img 
-              src={nctrLogo} 
-              alt="NCTR" 
-              className="h-28 w-auto opacity-90"
-            />
+        <div className="container mx-auto px-4 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <h1 className="text-xl sm:text-2xl font-bold nctr-text">
+                  The Garden
+                </h1>
+                <img 
+                  src={nctrLogo} 
+                  alt="NCTR" 
+                  className="h-16 sm:h-28 w-auto opacity-90"
+                />
+              </div>
+              <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0 text-xs sm:text-sm px-2 py-1`}>
+                <span className="hidden sm:inline">{portfolio?.opportunity_status?.toUpperCase() || 'STARTER'} • {portfolio?.lock_360_nctr && parseFloat(portfolio.lock_360_nctr.toString()) > 0 ? '360LOCK MEMBER' : 'STANDARD'}</span>
+                <span className="sm:hidden">{portfolio?.opportunity_status?.charAt(0).toUpperCase() || 'S'}</span>
+              </Badge>
             </div>
-          <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0`}>
-            {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'} • {portfolio?.lock_360_nctr && parseFloat(portfolio.lock_360_nctr.toString()) > 0 ? '360LOCK MEMBER' : 'STANDARD'}
-          </Badge>
-          </div>
-          <div className="flex items-center gap-3">
-            <ProfileModal>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2 section-text hover:bg-primary/10 hover:text-primary">
-                <User className="w-4 h-4" />
-                Quick Profile
-              </Button>
-            </ProfileModal>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/profile')}
-              className="flex items-center gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
-            >
-              <User className="w-4 h-4" />
-              Profile
-            </Button>
-            {isAdmin && (
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">
+              <ProfileModal>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm">
+                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Quick Profile</span>
+                  <span className="sm:hidden">Profile</span>
+                </Button>
+              </ProfileModal>
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => navigate('/admin')}
-                className="flex items-center gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
+                onClick={() => navigate('/profile')}
+                className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
               >
-                <Settings className="w-4 h-4" />
-                Admin
+                <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Profile</span>
+                <span className="sm:hidden">Prof</span>
               </Button>
-            )}
-            <Button 
-              variant="outline" 
-              onClick={handleSignOut}
-              className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
+              {isAdmin && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/admin')}
+                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
+                >
+                  <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Admin</span>
+                  <span className="sm:hidden">Adm</span>
+                </Button>
+              )}
+              <Button 
+                variant="outline" 
+                onClick={handleSignOut}
+                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
+              >
+                <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Sign Out</span>
+                <span className="sm:hidden">Out</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="flex min-h-[calc(100vh-80px)]">
+      <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
         {/* Collapsible Dashboard */}
-        <CollapsibleDashboard 
-          portfolio={portfolio}
-          locks={locks}
-          onLockCreated={fetchUserData}
-        />
+        <div className="lg:w-80 xl:w-96">
+          <CollapsibleDashboard 
+            portfolio={portfolio}
+            locks={locks}
+            onLockCreated={fetchUserData}
+          />
+        </div>
 
         {/* Main Content - Earning Opportunities with Wings */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             {/* Member Status Banner - Compact */}
             <MemberStatusBanner 
@@ -496,11 +505,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
             {/* Earning Opportunities Section */}
             <div data-earning-opportunities>
-              <div className="mb-12 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 nctr-glow">
+              <div className="mb-8 sm:mb-12 text-center">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 nctr-glow">
                   Earning Opportunities
                 </h1>
-                <p className="text-xl text-section-text/90 max-w-2xl mx-auto">
+                <p className="text-base sm:text-lg lg:text-xl text-section-text/90 max-w-2xl mx-auto px-4 sm:px-0">
                   Support NCTR Alliance partners and earn NCTR with every transaction
                 </p>
               </div>
@@ -521,77 +530,77 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   {opportunities[0].video_url && (
                     <div className="relative">
                       <video 
-                        className="w-full h-64 md:h-80 object-cover rounded-t-lg"
+                        className="w-full h-48 sm:h-64 md:h-80 object-cover rounded-t-lg"
                         controls
                         poster={opportunities[0].partner_logo_url}
                       >
                         <source src={opportunities[0].video_url} type="video/mp4" />
                         Your browser does not support the video tag.
                       </video>
-                      <div className="absolute top-4 right-4">
-                        <Badge variant="secondary" className="bg-primary/90 text-primary-foreground border-0">
+                      <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
+                        <Badge variant="secondary" className="bg-primary/90 text-primary-foreground border-0 text-xs sm:text-sm">
                           FEATURED
                         </Badge>
                       </div>
                     </div>
                   )}
                   
-                  <div className="p-8">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="flex items-center space-x-4">
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-4">
+                      <div className="flex items-center space-x-3 sm:space-x-4">
                         {opportunities[0].partner_logo_url && (
                           <img 
                             src={opportunities[0].partner_logo_url} 
                             alt={`${opportunities[0].partner_name} logo`}
-                            className="w-16 h-16 rounded-xl object-cover shadow-soft"
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
                           />
                         )}
-                        <div>
-                          <h2 className="text-2xl font-bold text-foreground mb-1">{opportunities[0].title}</h2>
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 truncate">{opportunities[0].title}</h2>
                           {opportunities[0].partner_name && (
-                            <p className="text-lg text-muted-foreground">{opportunities[0].partner_name}</p>
+                            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground truncate">{opportunities[0].partner_name}</p>
                           )}
-                          <Badge variant="outline" className="mt-2 bg-section-highlight">
+                          <Badge variant="outline" className="mt-2 bg-section-highlight text-xs sm:text-sm">
                             {opportunities[0].opportunity_type.replace('_', ' ').toUpperCase()}
                           </Badge>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6 mb-6">
-                      <div className="bg-section-highlight rounded-xl p-6 text-center">
-                        <div className="flex items-center justify-center space-x-4 mb-2">
-                          <div className="text-3xl font-bold text-section-accent">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                      <div className="bg-section-highlight rounded-xl p-4 sm:p-6 text-center">
+                        <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 mb-2">
+                          <div className="text-2xl sm:text-3xl font-bold text-section-accent">
                             {formatNCTR(opportunities[0].reward_per_dollar || 0)}
                           </div>
                               <img 
                                 src={nctrLogo} 
                                 alt="NCTR" 
-                                className="h-40 w-auto"
+                                className="h-24 sm:h-32 lg:h-40 w-auto"
                               />
                         </div>
-                        <div className="text-sm text-muted-foreground font-medium">per $1 spent</div>
+                        <div className="text-xs sm:text-sm text-muted-foreground font-medium">per $1 spent</div>
                       </div>
                       
                       {opportunities[0].nctr_reward > 0 && (
-                        <div className="bg-primary/10 rounded-xl p-6 text-center border border-primary/20">
-                          <div className="flex items-center justify-center space-x-3 mb-2">
-                            <div className="text-3xl font-bold text-primary">
+                        <div className="bg-primary/10 rounded-xl p-4 sm:p-6 text-center border border-primary/20">
+                          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
+                            <div className="text-2xl sm:text-3xl font-bold text-primary">
                               {formatNCTR(opportunities[0].nctr_reward)}
                             </div>
                             <img 
                               src={nctrLogo} 
                               alt="NCTR" 
-                              className="h-28 w-auto"
+                              className="h-20 sm:h-24 lg:h-28 w-auto"
                             />
                           </div>
-                          <div className="text-sm text-primary font-medium">Welcome Bonus</div>
+                          <div className="text-xs sm:text-sm text-primary font-medium">Welcome Bonus</div>
                         </div>
                       )}
                     </div>
 
                     {opportunities[0].description && (
-                      <p className="text-foreground leading-relaxed mb-6 text-lg">
+                      <p className="text-sm sm:text-base lg:text-lg text-foreground leading-relaxed mb-4 sm:mb-6">
                         {opportunities[0].description}
                       </p>
                     )}
@@ -819,36 +828,37 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
       {/* Invite Friends Modal */}
       <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="mx-4 max-w-[calc(100vw-2rem)] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <Share2 className="w-5 h-5 mr-2" />
+            <DialogTitle className="flex items-center text-base sm:text-lg">
+              <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               🎉 Invite Friends & Earn 1000 NCTR in 360LOCK
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-4 border border-primary/20">
-              <h4 className="font-semibold text-primary mb-2">How it works:</h4>
-              <ul className="text-sm space-y-1 text-muted-foreground">
+            <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-3 sm:p-4 border border-primary/20">
+              <h4 className="font-semibold text-primary mb-2 text-sm sm:text-base">How it works:</h4>
+              <ul className="text-xs sm:text-sm space-y-1 text-muted-foreground">
                 <li>• Share your unique link below</li>
                 <li>• Friends join using your link</li>
-                <li>• You both earn 50 NCTR instantly!</li>
+                <li>• You both earn 1000 NCTR in 360LOCK instantly!</li>
               </ul>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="invite-link">Your Personal Invite Link:</Label>
+              <Label htmlFor="invite-link" className="text-sm">Your Personal Invite Link:</Label>
               <div className="flex space-x-2">
                 <Input
                   id="invite-link"
                   value={getReferralLink()}
                   readOnly
-                  className="flex-1 text-sm"
+                  className="flex-1 text-xs sm:text-sm min-h-[44px]"
                 />
                 <Button 
                   onClick={copyInviteLink}
                   variant="outline"
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 min-h-[44px] px-3"
+                  size="sm"
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
@@ -856,23 +866,23 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <Button onClick={shareViaEmail} variant="outline" size="sm" className="text-xs">
-                <Mail className="w-3 h-3 mr-1" />
-                Email
+              <Button onClick={shareViaEmail} variant="outline" size="sm" className="text-xs min-h-[44px] flex-col gap-1 p-2">
+                <Mail className="w-4 h-4" />
+                <span>Email</span>
               </Button>
-              <Button onClick={shareViaText} variant="outline" size="sm" className="text-xs">
-                <MessageCircle className="w-3 h-3 mr-1" />
-                Text
+              <Button onClick={shareViaText} variant="outline" size="sm" className="text-xs min-h-[44px] flex-col gap-1 p-2">
+                <MessageCircle className="w-4 h-4" />
+                <span>Text</span>
               </Button>
-              <Button onClick={shareViaWhatsApp} variant="outline" size="sm" className="text-xs">
-                <MessageCircle className="w-3 h-3 mr-1" />
-                WhatsApp
+              <Button onClick={shareViaWhatsApp} variant="outline" size="sm" className="text-xs min-h-[44px] flex-col gap-1 p-2">
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp</span>
               </Button>
             </div>
 
             <Button 
               onClick={() => setInviteModalOpen(false)}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground min-h-[48px] text-sm sm:text-base"
             >
               Start Sharing!
             </Button>
