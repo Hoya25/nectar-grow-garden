@@ -38,13 +38,25 @@ const Header = () => {
     <header className="w-full border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div 
-          className="flex items-center space-x-2 cursor-pointer"
+          className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate('/')}
         >
-          <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">🌱</span>
+          <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gradient-hero shadow-soft group-hover:shadow-glow transition-all duration-300">
+            <video 
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              disablePictureInPicture
+            >
+              <source src="/assets/logo-animation.mp4" type="video/mp4" />
+              <div className="w-full h-full bg-gradient-hero flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">🌱</span>
+              </div>
+            </video>
           </div>
-          <span className="text-xl font-bold text-primary">The Garden</span>
+          <span className="text-xl font-bold text-primary group-hover:text-primary-glow transition-colors duration-300">The Garden</span>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
