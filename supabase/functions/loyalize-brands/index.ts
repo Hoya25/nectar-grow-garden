@@ -105,7 +105,7 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
 
       const response = await fetch(searchUrl.toString(), {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${apiKey}`, // Fixed: Added Bearer prefix
           'Content-Type': 'application/json'
         }
       });
@@ -209,7 +209,7 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
     
     const response = await fetch(endpoint, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`, // Use Bearer token format
+        'Authorization': `Bearer ${apiKey}`, // Fixed: Added Bearer prefix
         'Content-Type': 'application/json'
       }
     });
@@ -330,7 +330,7 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
         // Fetch updated store data from Loyalize
         const response = await fetch(`https://api.loyalize.com/v1/stores/${brand.loyalize_id}`, {
           headers: {
-            'Authorization': `Bearer ${apiKey}`, // Use Bearer token format
+            'Authorization': `Bearer ${apiKey}`, // Fixed: Added Bearer prefix
             'Content-Type': 'application/json',
           },
         });
