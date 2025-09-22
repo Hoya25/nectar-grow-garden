@@ -1,4 +1,4 @@
-import nctrLogo from "@/assets/nctr-logo.png";
+import nctrLogo from "@/assets/nctr-logo-grey.png";
 import NCTRTicker from "@/components/NCTRTicker";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 

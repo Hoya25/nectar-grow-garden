@@ -13,7 +13,7 @@ import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import ProfileModal from '@/components/ProfileModal';
-import nctrLogo from "@/assets/nctr-logo.png";
+import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
   available_nctr: number;

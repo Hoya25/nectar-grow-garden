@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import nctrLogo from "@/assets/nctr-logo.png";
+import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface NCTRTickerProps {
   initialTotal: number;
