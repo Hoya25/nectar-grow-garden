@@ -23,7 +23,7 @@ const Index = () => {
         title="How We're Democratizing Crypto"
         description="We're breaking down the barriers that have kept crypto out of reach. No complex wallets, no technical knowledge required, no upfront investment. Just simple activities that earn you real crypto rewards."
         buttonText="Learn More →"
-        icon="🚀"
+        icon=""
         gradient={true}
       />
       
