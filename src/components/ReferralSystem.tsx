@@ -166,7 +166,7 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
               <ul className="text-sm space-y-1 text-muted-foreground">
                 <li>• Share your unique referral link</li>
                 <li>• Friends join The Garden using your link</li>
-                <li>• You both earn 50 NCTR when they sign up</li>
+                <li>• You both earn 1000 NCTR when they sign up</li>
                 <li>• Earn 10% of their earning activity</li>
               </ul>
             </div>
@@ -253,7 +253,7 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
                       Use my referral link: <span className="font-mono text-xs">{getReferralLink()}</span>
                     </p>
                     <p>
-                      We both earn 50 NCTR when you sign up. It's a great way to get started with crypto without any risk! 🚀
+                      We both earn 1000 NCTR when you sign up. It's a great way to get started with crypto without any risk! 🚀
                     </p>
                   </div>
 

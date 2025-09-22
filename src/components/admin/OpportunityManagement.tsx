@@ -514,7 +514,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       min="0"
                       value={formData.nctr_reward}
                       onChange={(e) => setFormData({...formData, nctr_reward: parseFloat(e.target.value) || 0})}
-                      placeholder="25.00"
+                      placeholder="1000.00"
                     />
                   </div>
                 </div>
