@@ -1,6 +1,9 @@
 import nctrLogo from "@/assets/nctr-logo.png";
+import NCTRTicker from "@/components/NCTRTicker";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Footer = () => {
+  const { settings } = useSiteSettings();
   return (
     <footer className="relative bg-gradient-to-br from-foreground via-primary-deep to-foreground text-background py-24 overflow-hidden">
       {/* Premium Background Elements */}
@@ -52,31 +55,20 @@ const Footer = () => {
             </p>
             
             {/* Premium Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">              
               <div className="group">
                 <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
-                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">10,000+</div>
-                  <div className="text-background/80 font-medium">Community Members</div>
-                </div>
-              </div>
-              
-              <div className="group">
-                <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
-                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">500+</div>
+                  <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent mb-2">{settings.site_stats?.brand_partners || "5K+"}</div>
                   <div className="text-background/80 font-medium">Brand Partners</div>
                 </div>
               </div>
               
               <div className="group">
                 <div className="bg-background/10 backdrop-blur-md rounded-2xl p-8 shadow-large hover:shadow-glow-intense transition-all duration-500 hover:scale-105 border border-background/20">
-                  <div className="flex items-center justify-center space-x-2 mb-2">
-                    <div className="text-3xl font-bold bg-gradient-premium bg-clip-text text-transparent">$2M+</div>
-                    <img 
-                      src={nctrLogo} 
-                      alt="NCTR" 
-                      className="h-14 w-auto opacity-90"
-                    />
-                  </div>
+                  <NCTRTicker 
+                    initialTotal={settings.nctr_distribution_rate?.current_total || 2500000}
+                    tokensPerSecond={settings.nctr_distribution_rate?.tokens_per_second || 50}
+                  />
                   <div className="text-background/80 font-medium">NCTR Distributed</div>
                 </div>
               </div>

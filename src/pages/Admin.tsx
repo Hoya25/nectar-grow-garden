@@ -23,6 +23,7 @@ import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
 import UserManagement from '@/components/admin/UserManagement';
 import LoyalizeBrandSync from '@/components/admin/LoyalizeBrandSync';
+import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 
 interface AdminStats {
   total_users: number;
@@ -243,19 +244,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-4">
-            <Card className="bg-card/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="w-5 h-5 mr-2" />
-                  System Settings
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  System configuration options will be available here.
-                </p>
-              </CardContent>
-            </Card>
+            <SiteSettingsManagement />
           </TabsContent>
         </Tabs>
       </div>
