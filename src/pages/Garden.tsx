@@ -64,6 +64,8 @@ const Garden = () => {
 
   useEffect(() => {
     if (!user) {
+      // Store the current path for redirect after auth
+      sessionStorage.setItem('authRedirect', '/garden');
       navigate('/auth');
       return;
     }

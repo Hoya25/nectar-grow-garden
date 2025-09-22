@@ -22,7 +22,15 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/garden');
+      // Check if there's a redirect URL in the query params or session storage
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirect') || sessionStorage.getItem('authRedirect') || '/garden';
+      
+      // Clear stored redirect
+      sessionStorage.removeItem('authRedirect');
+      
+      console.log('User authenticated, redirecting to:', redirectTo);
+      navigate(redirectTo);
     }
   }, [user, navigate]);
 
