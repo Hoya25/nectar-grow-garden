@@ -33,14 +33,16 @@ const FeatureSection = ({
           {/* 3D-Inspired Feature Card */}
           <div className="relative group">
             {/* Floating Icon with Neon Effects */}
-            <div className="flex justify-center mb-12">
-              <div className="relative">
-                <div className="w-24 h-24 bg-gradient-premium rounded-3xl shadow-neon flex items-center justify-center group-hover:shadow-glow-intense transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 animate-scale-in neon-glow">
-                  <span className="text-5xl section-text animate-pulse-glow">{icon}</span>
+            {icon && (
+              <div className="flex justify-center mb-12">
+                <div className="relative">
+                  <div className="w-24 h-24 bg-gradient-premium rounded-3xl shadow-neon flex items-center justify-center group-hover:shadow-glow-intense transition-all duration-700 group-hover:scale-110 group-hover:rotate-3 animate-scale-in neon-glow">
+                    <span className="text-5xl section-text animate-pulse-glow">{icon}</span>
+                  </div>
+                  <div className="absolute inset-0 bg-primary/20 rounded-3xl opacity-30 blur-xl scale-75 group-hover:scale-100 transition-transform duration-700" />
                 </div>
-                <div className="absolute inset-0 bg-primary/20 rounded-3xl opacity-30 blur-xl scale-75 group-hover:scale-100 transition-transform duration-700" />
               </div>
-            </div>
+            )}
             
             {/* Layered Content with Neon Typography */}
             <div className="text-center space-y-8 animate-fade-in-up">

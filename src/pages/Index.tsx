@@ -15,7 +15,7 @@ const Index = () => {
         title="Earn Crypto Every Day, With Everyday Activities"
         description="In The Garden you'll find opportunities to earn NCTR (nectar), our first token, by doing the simple things you do every day. Like shopping. Buy the things you need and want, and get NCTR in return."
         buttonText="Enter The Garden →"
-        icon="🌟"
+        icon=""
       />
       
       {/* How We're Democratizing Crypto Section */}
