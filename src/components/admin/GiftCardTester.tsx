@@ -5,17 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Search, ExternalLink, Gift, Loader2, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Search, ExternalLink, Gift, Loader2, CheckCircle, User } from 'lucide-react';
 
 interface TestResult {
   brand_name: string;
   found: boolean;
   commission_rate?: number;
   affiliate_link?: string;
+  tracking_id?: string;
+  user_credited?: string;
   error?: string;
 }
 
 const GiftCardTester = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('Uber');
   const [testing, setTesting] = useState(false);
   const [results, setResults] = useState<TestResult[]>([]);
@@ -61,13 +65,14 @@ const GiftCardTester = () => {
         // Test each found brand
         for (const brand of brands.slice(0, 3)) { // Test first 3 results
           try {
-            // Test 2: Try to generate affiliate link
+            // Test 2: Try to generate affiliate link with real user ID
+            const testUserId = user?.id || 'test-user-admin';
             const { data: affiliateData, error: affiliateError } = await supabase.functions.invoke('loyalize-affiliate', {
               body: {
                 action: 'generate',
-                brand_id: brand.id,
-                user_id: 'test-user-123',
-                product_url: brand.website_url || `https://${brand.name.toLowerCase().replace(/\s+/g, '')}.com`
+                brandId: brand.id,
+                userId: testUserId,
+                productUrl: brand.website_url || `https://${brand.name.toLowerCase().replace(/\s+/g, '')}.com`
               }
             });
 
@@ -76,6 +81,8 @@ const GiftCardTester = () => {
               found: true,
               commission_rate: brand.commission_rate,
               affiliate_link: affiliateData?.affiliate_link,
+              tracking_id: affiliateData?.tracking_id,
+              user_credited: testUserId,
               error: affiliateError ? `Affiliate link generation failed: ${affiliateError.message}` : undefined
             });
 
@@ -176,6 +183,17 @@ const GiftCardTester = () => {
                           {result.affiliate_link && (
                             <Badge variant="secondary" className="text-xs">
                               Affiliate Link Generated
+                            </Badge>
+                          )}
+                          {result.tracking_id && (
+                            <Badge variant="outline" className="text-xs">
+                              <User className="w-3 h-3 mr-1" />
+                              Tracking: {result.tracking_id.substring(0, 12)}...
+                            </Badge>
+                          )}
+                          {result.user_credited && (
+                            <Badge variant="secondary" className="text-xs">
+                              Credits: {result.user_credited === user?.id ? 'You' : 'Test User'}
                             </Badge>
                           )}
                         </div>

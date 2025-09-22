@@ -7,10 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
+import UserAffiliateLinks from '@/components/UserAffiliateLinks';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
@@ -810,6 +811,24 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                 </div>
               </div>
             )}
+
+            {/* Affiliate Links Section */}
+            <div className="mt-12" data-affiliate-links>
+              <Card className="bg-white border-2 border-primary shadow-soft">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+                    <Link className="w-5 h-5" />
+                    Your Personalized Affiliate Links
+                  </CardTitle>
+                  <p className="text-muted-foreground">
+                    Generate trackable links that credit earnings directly to your Garden account
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <UserAffiliateLinks />
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Community Section */}
             <div className="mt-12" data-referral-system>

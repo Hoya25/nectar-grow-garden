@@ -30,11 +30,16 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const body = await req.json();
-    const { action, brandId, userId, productUrl } = body;
+    const { action, brandId, userId, productUrl, brand_id, user_id, product_url } = body;
+    
+    // Support both camelCase and snake_case for backward compatibility
+    const normalizedBrandId = brandId || brand_id;
+    const normalizedUserId = userId || user_id;
+    const normalizedProductUrl = productUrl || product_url;
 
     switch (action) {
       case 'generate':
-        return await generateAffiliateLink(brandId, userId, productUrl, loyalizeApiKey, supabase);
+        return await generateAffiliateLink(normalizedBrandId, normalizedUserId, normalizedProductUrl, loyalizeApiKey, supabase);
       
       case 'track':
         return await trackPurchase(body, supabase);
@@ -65,6 +70,17 @@ async function generateAffiliateLink(
   console.log('🔗 Generating affiliate link:', { brandId, userId, productUrl });
 
   try {
+    // Validate user exists and get profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('user_id, username, email')
+      .eq('user_id', userId)
+      .single();
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.error('Profile lookup error:', profileError);
+    }
+
     // Get brand information from our database
     const { data: brand, error: brandError } = await supabase
       .from('brands')
@@ -123,34 +139,43 @@ async function generateAffiliateLink(
       affiliateData = generateMockAffiliateLink(brand, productUrl, trackingId);
     }
 
-    // Store the pending transaction
+    // Store the pending transaction with detailed tracking
     const { error: transactionError } = await supabase
       .from('nctr_transactions')
       .insert({
         user_id: userId,
         transaction_type: 'pending',
-        brand_id: brandId,
-        tracking_id: trackingId,
         nctr_amount: 0, // Will be updated when purchase is confirmed
         description: `${isGiftCard ? 'Gift Card Purchase' : 'Purchase'} via ${brand.name}`,
+        partner_name: brand.name,
         status: 'pending',
         earning_source: isGiftCard ? 'gift_card_affiliate' : 'affiliate_purchase'
       });
 
     if (transactionError) {
       console.error('Failed to create transaction record:', transactionError);
+      // Don't fail the entire request if transaction logging fails
     }
+
+    console.log(`✅ Generated affiliate link for user ${userId} (${profile?.username || profile?.email || 'Unknown'}) -> ${brand.name}`);
 
     return new Response(JSON.stringify({
       success: true,
       affiliate_link: affiliateData.link,
       tracking_id: affiliateData.tracking_id,
+      user_profile: {
+        user_id: userId,
+        username: profile?.username,
+        email: profile?.email
+      },
       brand: {
+        id: brand.id,
         name: brand.name,
         logo_url: brand.logo_url,
         commission_rate: brand.commission_rate,
         nctr_per_dollar: brand.nctr_per_dollar,
-        is_gift_card: isGiftCard
+        is_gift_card: isGiftCard,
+        category: brand.category
       },
       expires_at: affiliateData.expires_at
     }), {
@@ -169,52 +194,6 @@ async function generateAffiliateLink(
   }
 }
 
-      if (response.ok) {
-        affiliateData = await response.json();
-      } else {
-        throw new Error('Loyalize API not available');
-      }
-    } catch (error) {
-      console.log('Using mock affiliate link generation');
-      // Generate mock affiliate link for testing
-      affiliateData = generateMockAffiliateLink(brand, productUrl, trackingId);
-    }
-
-    // Store the generated link for tracking
-    const { error: insertError } = await supabase
-      .from('nctr_transactions')
-      .insert({
-        user_id: userId,
-        transaction_type: 'pending',
-        nctr_amount: 0, // Will be updated when purchase is confirmed
-        description: `Affiliate link generated for ${brand.name}`,
-        partner_name: brand.name,
-        status: 'pending'
-      });
-
-    if (insertError) {
-      console.error('Error storing transaction:', insertError);
-    }
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        affiliate_link: affiliateData.affiliate_url,
-        tracking_id: trackingId,
-        brand_name: brand.name,
-        commission_rate: brand.commission_rate,
-        nctr_per_dollar: brand.nctr_per_dollar,
-        expires_at: affiliateData.expires_at
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
-  } catch (error) {
-    console.error('Error generating affiliate link:', error);
-    throw error;
-  }
-}
-
 async function trackPurchase(data: any, supabase: any): Promise<Response> {
   const { trackingId, purchaseAmount, orderId, timestamp } = data;
   
@@ -222,7 +201,14 @@ async function trackPurchase(data: any, supabase: any): Promise<Response> {
 
   try {
     // Parse tracking ID to extract user and brand information
-    const { userId, brandId } = parseTrackingId(trackingId);
+    const parsedIds = parseTrackingId(trackingId);
+    const { userId, brandId } = parsedIds;
+    
+    if (!userId || !brandId) {
+      throw new Error(`Invalid tracking ID format: ${trackingId}`);
+    }
+
+    console.log('📊 Tracking purchase for user:', userId, 'brand:', brandId, 'amount:', purchaseAmount);
 
     // Get brand information for commission calculation
     const { data: brand, error: brandError } = await supabase
@@ -231,29 +217,34 @@ async function trackPurchase(data: any, supabase: any): Promise<Response> {
       .eq('id', brandId)
       .single();
 
-    if (brandError) throw brandError;
+    if (brandError) {
+      throw new Error(`Brand not found for ID: ${brandId}`);
+    }
 
-    // Calculate NCTR reward
-    const nctrReward = purchaseAmount * brand.nctr_per_dollar;
+    // Calculate NCTR reward based on brand settings
+    const nctrReward = purchaseAmount * (brand.nctr_per_dollar || 0.01);
 
-    // Record the purchase transaction
+    // Create the completed transaction record
     const { data: transaction, error: transactionError } = await supabase
       .from('nctr_transactions')
       .insert({
         user_id: userId,
         transaction_type: 'earned',
         nctr_amount: nctrReward,
-        description: `Purchase reward from ${brand.name}`,
         purchase_amount: purchaseAmount,
+        description: `Purchase reward from ${brand.name} (Order: ${orderId})`,
         partner_name: brand.name,
-        status: 'completed'
+        status: 'completed',
+        earning_source: 'affiliate_purchase'
       })
       .select()
       .single();
 
-    if (transactionError) throw transactionError;
+    if (transactionError) {
+      throw new Error(`Failed to create transaction: ${transactionError.message}`);
+    }
 
-    // Update user's portfolio
+    // Update user's portfolio with earned NCTR
     const { data: portfolio, error: portfolioError } = await supabase
       .from('nctr_portfolio')
       .select('available_nctr, total_earned')
@@ -261,45 +252,76 @@ async function trackPurchase(data: any, supabase: any): Promise<Response> {
       .single();
 
     if (!portfolioError && portfolio) {
-      await supabase
+      const { error: updateError } = await supabase
         .from('nctr_portfolio')
         .update({
           available_nctr: portfolio.available_nctr + nctrReward,
-          total_earned: portfolio.total_earned + nctrReward
+          total_earned: portfolio.total_earned + nctrReward,
+          updated_at: new Date().toISOString()
         })
         .eq('user_id', userId);
+
+      if (updateError) {
+        console.error('Portfolio update error:', updateError);
+        // Don't fail the entire request if portfolio update fails
+      }
     }
+
+    console.log(`✅ Successfully tracked purchase: ${nctrReward} NCTR credited to user ${userId}`);
 
     return new Response(
       JSON.stringify({
         success: true,
         nctr_earned: nctrReward,
         transaction_id: transaction.id,
+        user_id: userId,
+        brand_name: brand.name,
+        purchase_amount: purchaseAmount,
         message: `Earned ${nctrReward.toFixed(8)} NCTR from your purchase!`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error tracking purchase:', error);
-    throw error;
+    console.error('❌ Error tracking purchase:', error);
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
   }
 }
 
 function generateTrackingId(userId: string, brandId: string): string {
   const timestamp = Date.now().toString(36);
-  const userHash = userId.slice(0, 8);
-  const brandHash = brandId.slice(0, 8);
+  const userHash = userId.slice(-8); // Take last 8 chars to avoid collisions
+  const brandHash = brandId.slice(-8);
   return `tgn_${userHash}_${brandHash}_${timestamp}`;
 }
 
 function parseTrackingId(trackingId: string): { userId: string, brandId: string } {
-  // This is a simplified parser - in production you'd want more robust parsing
-  const parts = trackingId.split('_');
-  return {
-    userId: parts[1] || '',
-    brandId: parts[2] || ''
-  };
+  // Enhanced parser with better error handling
+  try {
+    const parts = trackingId.split('_');
+    if (parts.length < 4 || parts[0] !== 'tgn') {
+      throw new Error('Invalid tracking ID format');
+    }
+    return {
+      userId: parts[1] || '',
+      brandId: parts[2] || ''
+    };
+  } catch (error) {
+    console.error('Error parsing tracking ID:', trackingId, error);
+    return {
+      userId: '',
+      brandId: ''
+    };
+  }
 }
 
 function generateMockAffiliateLink(brand: any, productUrl: string, trackingId: string): AffiliateLink {
@@ -309,7 +331,7 @@ function generateMockAffiliateLink(brand: any, productUrl: string, trackingId: s
   
   return {
     original_url: productUrl,
-    affiliate_url: affiliateUrl,
+    link: affiliateUrl, // Use 'link' to match the expected structure
     tracking_id: trackingId,
     expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
   };
