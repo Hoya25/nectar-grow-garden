@@ -23,7 +23,14 @@ export const useAdmin = () => {
       return;
     }
 
-    checkAdminStatus();
+    // Only check admin status if user is anderson@projectbutterfly.io
+    if (user.email === 'anderson@projectbutterfly.io') {
+      checkAdminStatus();
+    } else {
+      setIsAdmin(false);
+      setAdminUser(null);
+      setLoading(false);
+    }
   }, [user]);
 
   const checkAdminStatus = async () => {
