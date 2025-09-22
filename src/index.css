@@ -22,18 +22,18 @@ All colors MUST be HSL to avoid yellow bug issues.
     --popover: 240 12% 8%;
     --popover-foreground: 66 100% 85%;
     
-    /* NCTR neon lime - now used for text and accents */
-    --primary: 66 100% 50%;                   /* Bright neon lime */
+    /* NCTR dark neon green - now used for text and accents */
+    --primary: 120 100% 35%;                  /* Dark neon green */
     --primary-foreground: 240 12% 8%;         /* Dark background for neon text */
-    --primary-glow: 66 100% 60%;
-    --primary-deep: 66 100% 40%;
-    --primary-light: 66 80% 70%;
+    --primary-glow: 120 100% 45%;
+    --primary-deep: 120 100% 25%;
+    --primary-light: 120 80% 55%;
     
     /* Section styling */
     --section-bg: 0 0% 100%;                  /* White section backgrounds */
     --section-border: 0 0% 85%;               /* Light grey section borders */
     --section-text: 0 0% 45%;                 /* NCTR grey text on sections */
-    --section-accent: 66 100% 50%;            /* Neon accents for numbers only */
+    --section-accent: 120 100% 35%;           /* Dark neon green accents for numbers only */
     --section-highlight: 0 0% 96%;            /* Light grey highlight backgrounds */
     
     /* Secondary elements */
@@ -44,13 +44,13 @@ All colors MUST be HSL to avoid yellow bug issues.
     --muted: 0 0% 95%;                        /* Light grey muted */
     --muted-foreground: 0 0% 60%;             /* Lighter grey text */
     
-    /* Bright neon accent */
-    --accent: 66 100% 50%;
+    /* Dark neon green accent */
+    --accent: 120 100% 35%;
     --accent-foreground: 240 12% 8%;
-    --accent-light: 66 80% 70%;
+    --accent-light: 120 80% 55%;
     
     /* Status colors */
-    --success: 66 100% 50%;
+    --success: 120 100% 35%;
     --warning: 38 90% 50%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
@@ -58,7 +58,7 @@ All colors MUST be HSL to avoid yellow bug issues.
     /* Borders and inputs */
     --border: 0 0% 85%;                       /* Light grey borders */
     --input: 0 0% 100%;                       /* White inputs */
-    --ring: 66 100% 50%;                      /* Neon focus rings */
+    --ring: 120 100% 35%;                     /* Dark neon green focus rings */
     
     /* Neon-focused gradients */
     --gradient-hero: linear-gradient(135deg, hsl(240 12% 8%) 0%, hsl(240 8% 15%) 35%, hsl(240 10% 10%) 100%);
@@ -66,9 +66,9 @@ All colors MUST be HSL to avoid yellow bug issues.
     --gradient-card: linear-gradient(180deg, hsl(240 12% 8%) 0%, hsl(240 8% 12%) 100%);
     --gradient-accent: linear-gradient(90deg, hsl(0 0% 100%) 0%, hsl(0 0% 100%) 100%);
     --gradient-depth: linear-gradient(145deg, hsl(240 12% 8%) 0%, hsl(240 8% 15%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(66 100% 50% / 0.2) 0%, transparent 70%);
-    --gradient-page: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(210 20% 96%) 50%, hsl(66 30% 96%) 100%);
-    --gradient-holographic: linear-gradient(45deg, hsl(66 100% 50%), hsl(180 100% 50%), hsl(280 100% 50%), hsl(320 100% 50%));
+    --gradient-glow: radial-gradient(ellipse at center, hsl(120 100% 35% / 0.2) 0%, transparent 70%);
+    --gradient-page: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(210 20% 96%) 50%, hsl(120 30% 96%) 100%);
+    --gradient-holographic: linear-gradient(45deg, hsl(120 100% 35%), hsl(180 100% 50%), hsl(280 100% 50%), hsl(320 100% 50%));
     --gradient-section: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
     
     /* Enhanced shadows - toned down */
@@ -79,7 +79,7 @@ All colors MUST be HSL to avoid yellow bug issues.
     --shadow-glow: 0 2px 8px hsl(0 0% 0% / 0.1);
     --shadow-glow-intense: 0 4px 16px hsl(0 0% 0% / 0.15);
     --shadow-inset: inset 0 1px 3px hsl(0 0% 0% / 0.1);
-    --shadow-neon: 0 1px 3px hsl(66 100% 50% / 0.3);
+    --shadow-neon: 0 1px 3px hsl(120 100% 35% / 0.3);
     
     /* Premium transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -91,12 +91,12 @@ All colors MUST be HSL to avoid yellow bug issues.
     
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 9% 12%;
-    --sidebar-primary: 66 100% 50%;
+    --sidebar-primary: 120 100% 35%;
     --sidebar-primary-foreground: 240 12% 8%;
-    --sidebar-accent: 66 100% 50%;
+    --sidebar-accent: 120 100% 35%;
     --sidebar-accent-foreground: 240 12% 8%;
-    --sidebar-border: 66 100% 50%;
-    --sidebar-ring: 66 100% 50%;
+    --sidebar-border: 120 100% 35%;
+    --sidebar-ring: 120 100% 35%;
   }
 
   .dark {
@@ -108,41 +108,41 @@ All colors MUST be HSL to avoid yellow bug issues.
     --popover: 240 12% 8%;
     --popover-foreground: 66 100% 85%;
     
-    --primary: 66 100% 50%;
+    --primary: 120 100% 35%;
     --primary-foreground: 240 12% 6%;
     
     --section-bg: 240 12% 8%;
-    --section-border: 66 100% 50%;
-    --section-text: 66 100% 85%;
-    --section-accent: 66 100% 50%;
+    --section-border: 120 100% 35%;
+    --section-text: 120 100% 85%;
+    --section-accent: 120 100% 35%;
     
     --secondary: 240 8% 15%;
-    --secondary-foreground: 66 100% 85%;
+    --secondary-foreground: 120 100% 85%;
     --secondary-accent: 240 8% 20%;
     
     --muted: 240 8% 15%;
-    --muted-foreground: 66 80% 70%;
+    --muted-foreground: 120 80% 70%;
     
-    --accent: 66 100% 50%;
+    --accent: 120 100% 35%;
     --accent-foreground: 240 12% 6%;
     
-    --success: 66 100% 50%;
+    --success: 120 100% 35%;
     --warning: 38 90% 60%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 66 100% 50%;
+    --border: 120 100% 35%;
     --input: 240 8% 15%;
-    --ring: 66 100% 50%;
+    --ring: 120 100% 35%;
     
     --sidebar-background: 240 12% 6%;
-    --sidebar-foreground: 66 100% 85%;
-    --sidebar-primary: 66 100% 50%;
+    --sidebar-foreground: 120 100% 85%;
+    --sidebar-primary: 120 100% 35%;
     --sidebar-primary-foreground: 240 12% 6%;
-    --sidebar-accent: 66 100% 50%;
+    --sidebar-accent: 120 100% 35%;
     --sidebar-accent-foreground: 240 12% 6%;
-    --sidebar-border: 66 100% 50%;
-    --sidebar-ring: 66 100% 50%;
+    --sidebar-border: 120 100% 35%;
+    --sidebar-ring: 120 100% 35%;
   }
 }
 
@@ -204,10 +204,10 @@ All colors MUST be HSL to avoid yellow bug issues.
 
 @keyframes neon-pulse {
   0%, 100% {
-    box-shadow: 0 0 5px hsl(66 100% 50%), 0 0 10px hsl(66 100% 50%);
+    box-shadow: 0 0 5px hsl(120 100% 35%), 0 0 10px hsl(120 100% 35%);
   }
   50% {
-    box-shadow: 0 0 10px hsl(66 100% 50%), 0 0 20px hsl(66 100% 50%), 0 0 30px hsl(66 100% 50%);
+    box-shadow: 0 0 10px hsl(120 100% 35%), 0 0 20px hsl(120 100% 35%), 0 0 30px hsl(120 100% 35%);
   }
 }
 
