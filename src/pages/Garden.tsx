@@ -226,11 +226,13 @@ const Garden = () => {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-xs text-section-text/70">Available</p>
-                        <img 
-                          src={nctrLogo} 
-                          alt="NCTR" 
-                          className="h-14 w-auto opacity-70"
-                        />
+                        <div className="flex items-center space-x-1">
+                          <img 
+                            src={nctrLogo} 
+                            alt="NCTR" 
+                            className="h-14 w-auto opacity-70"
+                          />
+                        </div>
                       </div>
                       <p className="text-lg font-bold text-section-accent">
                         {formatNCTR(portfolio?.available_nctr || 0)}
@@ -298,11 +300,13 @@ const Garden = () => {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-xs text-section-text/70">Total Earned</p>
-                        <img 
-                          src={nctrLogo} 
-                          alt="NCTR" 
-                          className="h-14 w-auto opacity-70"
-                        />
+                        <div className="flex items-center space-x-1">
+                          <img 
+                            src={nctrLogo} 
+                            alt="NCTR" 
+                            className="h-14 w-auto opacity-70"
+                          />
+                        </div>
                       </div>
                       <p className="text-lg font-bold text-section-accent">
                         {formatNCTR(portfolio?.total_earned || 0)}
