@@ -451,15 +451,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   alt="NCTR" 
                   className="h-16 sm:h-28 w-auto opacity-90"
                 />
-              </div>{/* End of flex items-center space-x-2 */}
-              <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">{/* Status badge removed */}
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/profile')}
-                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
+                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[44px] text-xs sm:text-sm px-3 sm:px-4"
                 >
-                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <User className="w-4 h-4" />
                   <span className="hidden sm:inline">Profile</span>
                   <span className="sm:hidden">Profile</span>
                 </Button>
@@ -468,23 +468,23 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/admin')}
-                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
+                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[44px] text-xs sm:text-sm px-3 sm:px-4"
                 >
-                  <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Settings className="w-4 h-4" />
                   <span className="hidden sm:inline">Admin</span>
-                  <span className="sm:hidden">Adm</span>
+                  <span className="sm:hidden">Admin</span>
                 </Button>
               )}
               <Button 
                 variant="outline" 
                 onClick={handleSignOut}
-                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
+                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[44px] text-xs sm:text-sm px-3 sm:px-4"
               >
-                <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <LogOut className="w-4 h-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Sign Out</span>
-                <span className="sm:hidden">Out</span>
+                <span className="sm:hidden">Sign Out</span>
               </Button>
-              </div>{/* End of flex items-center gap-2 */}
+              </div>
             </div>{/* End of flex items-center justify-between */}
           </div>{/* End of flex flex-col sm:flex-row */}
         </div>{/* End of container */}
