@@ -268,8 +268,8 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         </CardContent>
       </Card>
 
-      {/* Lock Status Summary - Mobile Optimized */}
-      {(locks.length > 0 || (portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0) || (portfolio?.lock_360_nctr && portfolio.lock_360_nctr > 0)) && (
+      {/* Lock Status Summary - Hidden temporarily */}
+      {false && (locks.length > 0 || (portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0) || (portfolio?.lock_360_nctr && portfolio.lock_360_nctr > 0)) && (
         <Card className="bg-white shadow-soft border border-section-border">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-foreground">Alliance Commitments</CardTitle>
@@ -364,12 +364,12 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         </Button>
       </div>
 
-      {/* Batch Lock Upgrade - Easy Button */}
-      <BatchLockUpgrade 
+      {/* Batch Lock Upgrade - Hidden temporarily */}
+      {false && <BatchLockUpgrade 
         locks={locks}
         onUpgradeComplete={onLockCreated}
         availableNCTR={portfolio?.available_nctr}
-      />
+      />}
 
       {/* Wallet Connection - Conditional Priority */}
       <div>
