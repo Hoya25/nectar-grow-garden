@@ -14,6 +14,7 @@ import { toast } from '@/hooks/use-toast';
 
 import { WingsStatusBar } from '@/components/WingsStatusBar';
 import { LevelUpModal } from '@/components/LevelUpModal';
+import { TransactionHistory } from '@/components/TransactionHistory';
 
 interface UserProfile {
   id: string;
@@ -627,6 +628,11 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Transaction History */}
+            <div className="lg:col-span-3">
+              <TransactionHistory />
+            </div>
           </div>
 
           {/* Sidebar */}
