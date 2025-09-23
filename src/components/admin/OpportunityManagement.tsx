@@ -47,6 +47,10 @@ interface EarningOpportunity {
   lock_360_nctr_reward?: number;
   reward_distribution_type?: string;
   reward_structure?: any;
+  // Social media fields
+  social_platform?: string;
+  social_handle?: string;
+  cta_text?: string;
 }
 
 interface Brand {
@@ -93,7 +97,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     available_nctr_reward: 0,
     lock_90_nctr_reward: 0,
     lock_360_nctr_reward: 0,
-    reward_distribution_type: 'legacy'
+    reward_distribution_type: 'legacy',
+    // Social media fields
+    social_platform: '',
+    social_handle: '',
+    cta_text: ''
   });
 
   useEffect(() => {
@@ -192,7 +200,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       available_nctr_reward: 0,
       lock_90_nctr_reward: 0,
       lock_360_nctr_reward: 0,
-      reward_distribution_type: 'legacy'
+      reward_distribution_type: 'legacy',
+      // Social media fields
+      social_platform: '',
+      social_handle: '',
+      cta_text: ''
     });
     setEditingOpportunity(null);
     setSelectedBrand(null);
@@ -217,7 +229,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       available_nctr_reward: opportunity.available_nctr_reward || 0,
       lock_90_nctr_reward: opportunity.lock_90_nctr_reward || 0,
       lock_360_nctr_reward: opportunity.lock_360_nctr_reward || 0,
-      reward_distribution_type: opportunity.reward_distribution_type || 'legacy'
+      reward_distribution_type: opportunity.reward_distribution_type || 'legacy',
+      // Social media fields
+      social_platform: opportunity.social_platform || '',
+      social_handle: opportunity.social_handle || '',
+      cta_text: opportunity.cta_text || ''
     });
     
     // Set selected brand if available
@@ -387,6 +403,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       case 'invite': return Users;
       case 'shopping': return ShoppingBag;
       case 'partner': return Star;
+      case 'social_follow': return Users;
       default: return Gift;
     }
   };
@@ -447,6 +464,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
               <SelectItem value="shopping">Shopping</SelectItem>
               <SelectItem value="invite">Invite</SelectItem>
               <SelectItem value="partner">Partner</SelectItem>
+              <SelectItem value="social_follow">Social Follow</SelectItem>
               <SelectItem value="bonus">Bonus</SelectItem>
             </SelectContent>
           </Select>
@@ -496,6 +514,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <SelectItem value="shopping">Shopping Rewards</SelectItem>
                         <SelectItem value="invite">Invite Friends</SelectItem>
                         <SelectItem value="partner">Partner Bonus</SelectItem>
+                        <SelectItem value="social_follow">Social Media Follow</SelectItem>
                         <SelectItem value="bonus">Special Bonus</SelectItem>
                       </SelectContent>
                     </Select>
@@ -513,7 +532,106 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   />
                 </div>
 
-                {/* Brand Selection */}
+                {/* Social Media Follow Configuration */}
+                {formData.opportunity_type === 'social_follow' && (
+                  <div className="bg-blue-50 dark:bg-blue-950/20 p-6 rounded-lg border-2 border-blue-200 dark:border-blue-800 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Users className="w-5 h-5 text-blue-600" />
+                      <h4 className="font-bold text-lg text-blue-800 dark:text-blue-300">Social Media Follow Setup</h4>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="social_platform">Platform *</Label>
+                        <Select
+                          value={formData.social_platform || 'twitter'}
+                          onValueChange={(value) => {
+                            setFormData({...formData, social_platform: value});
+                            // Update default titles based on platform
+                            if (value === 'twitter') {
+                              setFormData(prev => ({
+                                ...prev,
+                                social_platform: value,
+                                title: prev.title || 'Follow Us on X (Twitter)',
+                                partner_name: prev.partner_name || 'The Garden'
+                              }));
+                            } else if (value === 'instagram') {
+                              setFormData(prev => ({
+                                ...prev,
+                                social_platform: value,
+                                title: prev.title || 'Follow Us on Instagram',
+                                partner_name: prev.partner_name || 'The Garden'
+                              }));
+                            } else if (value === 'substack') {
+                              setFormData(prev => ({
+                                ...prev,
+                                social_platform: value,
+                                title: prev.title || 'Subscribe to Our Substack',
+                                partner_name: prev.partner_name || 'The Garden'
+                              }));
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="twitter">🐦 X (Twitter)</SelectItem>
+                            <SelectItem value="instagram">📸 Instagram</SelectItem>
+                            <SelectItem value="substack">📝 Substack</SelectItem>
+                            <SelectItem value="youtube">🎥 YouTube</SelectItem>
+                            <SelectItem value="linkedin">💼 LinkedIn</SelectItem>
+                            <SelectItem value="other">🌐 Other Platform</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="social_handle">Account Handle/Username *</Label>
+                        <Input
+                          id="social_handle"
+                          value={formData.social_handle || ''}
+                          onChange={(e) => setFormData({...formData, social_handle: e.target.value})}
+                          placeholder="@thegarden or thegarden"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="social_url">Full Account URL *</Label>
+                      <Input
+                        id="social_url"
+                        type="url"
+                        value={formData.affiliate_link}
+                        onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
+                        placeholder="https://x.com/thegarden"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="cta_text">Call-to-Action Text</Label>
+                      <Input
+                        id="cta_text"
+                        value={formData.cta_text || ''}
+                        onChange={(e) => setFormData({...formData, cta_text: e.target.value})}
+                        placeholder="Follow us for the latest updates and earning tips!"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Optional: Customize the text users see when they complete this opportunity
+                      </p>
+                    </div>
+
+                    <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded border border-blue-300 dark:border-blue-700">
+                      <p className="text-xs text-blue-700 dark:text-blue-400">
+                        💡 <strong>Tip:</strong> You can create follow opportunities for any social account, not just your own. 
+                        This is perfect for partner collaborations or promoting influencer accounts.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Brand Selection - Hide for social follow */}
+                {formData.opportunity_type !== 'social_follow' && (
                 <div className="bg-section-highlight p-4 rounded-lg space-y-4">
                   <h4 className="font-semibold text-foreground flex items-center gap-2">
                     <ShoppingBag className="w-4 h-4" />
@@ -574,6 +692,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize
                   </div>
                 </div>
+                )}
 
                 {/* NCTR Bounty Configuration */}
                 <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-6 rounded-lg border-2 border-primary/20 space-y-6">

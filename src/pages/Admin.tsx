@@ -252,7 +252,7 @@ const Admin = () => {
             <Card className="bg-section-highlight border border-section-border">
               <CardHeader>
                 <CardTitle className="text-foreground">Social Media Bounties</CardTitle>
-                <p className="text-muted-foreground">Manage your social media follow bounties and NCTR rewards</p>
+                <p className="text-muted-foreground">Use the "Create Opportunities" tab and select "Social Media Follow" type for better customization options</p>
               </CardHeader>
               <CardContent>
                 <SocialMediaBountyManager />
