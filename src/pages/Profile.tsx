@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
+import { WingsStatusBar } from '@/components/WingsStatusBar';
 
 interface UserProfile {
   id: string;
@@ -30,6 +31,15 @@ interface Portfolio {
   opportunity_status: string;
   available_nctr: number;
   total_earned: number;
+  lock_360_nctr: number;
+}
+
+interface StatusLevel {
+  status_name: string;
+  min_locked_nctr: number;
+  reward_multiplier: number;
+  description: string;
+  benefits: string[];
 }
 
 const Profile = () => {
@@ -37,6 +47,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [statusLevels, setStatusLevels] = useState<StatusLevel[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -88,12 +99,22 @@ const Profile = () => {
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
-        .select('opportunity_status, available_nctr, total_earned')
+        .select('opportunity_status, available_nctr, total_earned, lock_360_nctr')
         .eq('user_id', user?.id)
         .maybeSingle();
 
       if (portfolioError && portfolioError.code !== 'PGRST116') {
         console.error('Portfolio error:', portfolioError);
+      }
+
+      // Fetch status levels
+      const { data: statusLevelsData, error: statusLevelsError } = await supabase
+        .from('opportunity_status_levels')
+        .select('*')
+        .order('min_locked_nctr', { ascending: true });
+
+      if (statusLevelsError) {
+        console.error('Status levels error:', statusLevelsError);
       }
 
       // Check admin status
@@ -105,6 +126,7 @@ const Profile = () => {
 
       setProfile(profileData);
       setPortfolio(portfolioData);
+      setStatusLevels(statusLevelsData || []);
       setIsAdmin(!!adminData);
 
       if (profileData) {
@@ -324,6 +346,30 @@ const Profile = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Wings Status Bar - Prominent Position */}
+        <div className="mb-8">
+          <WingsStatusBar
+            currentStatus={portfolio?.opportunity_status || 'starter'}
+            current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
+            statusLevels={statusLevels}
+          />
+        </div>
+
+        {/* Wallet Connection - High Visibility */}
+        <div className="mb-8">
+          <Card className="bg-card/80 backdrop-blur-sm border-2 border-primary/20">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="h-5 w-5 text-primary" />
+                Coinbase Wallet Connection
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SimpleWalletConnection />
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Info */}
           <div className="lg:col-span-2 space-y-6">
@@ -548,9 +594,6 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Wallet Connection */}
-            <SimpleWalletConnection />
           </div>
 
           {/* Sidebar */}
@@ -599,20 +642,26 @@ const Profile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Available</span>
-                      <span className="font-semibold text-foreground">
-                        {portfolio.available_nctr.toFixed(2)} NCTR
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Total Earned</span>
-                      <span className="font-semibold text-green-600">
-                        {portfolio.total_earned.toFixed(2)} NCTR
-                      </span>
-                    </div>
-                  </div>
+                   <div className="space-y-3">
+                     <div className="flex items-center justify-between">
+                       <span className="text-sm text-muted-foreground">Available</span>
+                       <span className="font-semibold text-foreground">
+                         {portfolio.available_nctr.toFixed(2)} NCTR
+                       </span>
+                     </div>
+                     <div className="flex items-center justify-between">
+                       <span className="text-sm text-muted-foreground">360LOCK Balance</span>
+                       <span className="font-semibold text-primary">
+                         {(portfolio.lock_360_nctr || 0).toFixed(2)} NCTR
+                       </span>
+                     </div>
+                     <div className="flex items-center justify-between">
+                       <span className="text-sm text-muted-foreground">Total Earned</span>
+                       <span className="font-semibold text-green-600">
+                         {portfolio.total_earned.toFixed(2)} NCTR
+                       </span>
+                     </div>
+                   </div>
 
                   <Button 
                     variant="outline" 

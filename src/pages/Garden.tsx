@@ -18,7 +18,6 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
-import { WingsStatusBar } from '@/components/WingsStatusBar';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -59,14 +58,6 @@ interface EarningOpportunity {
   video_description?: string;
 }
 
-interface StatusLevel {
-  status_name: string;
-  min_locked_nctr: number;
-  reward_multiplier: number;
-  description: string;
-  benefits: string[];
-}
-
 import ProfileModal from '@/components/ProfileModal';
 
 const Garden = () => {
@@ -78,7 +69,6 @@ const Garden = () => {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<LockCommitment[]>([]);
   const [opportunities, setOpportunities] = useState<EarningOpportunity[]>([]);
-  const [statusLevels, setStatusLevels] = useState<StatusLevel[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -189,18 +179,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         console.error('Opportunities error:', opportunitiesError);
       } else {
         setOpportunities(opportunitiesData || []);
-      }
-
-      // Fetch status levels
-      const { data: statusLevelsData, error: statusLevelsError } = await supabase
-        .from('opportunity_status_levels')
-        .select('*')
-        .order('min_locked_nctr', { ascending: true });
-
-      if (statusLevelsError) {
-        console.error('Status levels error:', statusLevelsError);
-      } else {
-        setStatusLevels(statusLevelsData || []);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -495,18 +473,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         />
         </div>
 
-        {/* Main Content - Earning Opportunities with Wings */}
+        {/* Main Content - Earning Opportunities */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
-            {/* Wings Status Progress Bar */}
-            <div className="mb-6">
-              <WingsStatusBar
-                currentStatus={portfolio?.opportunity_status || 'starter'}
-                current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
-                statusLevels={statusLevels}
-              />
-            </div>
-
             {/* Member Status Banner - Compact */}
             <MemberStatusBanner 
               currentStatus={portfolio?.opportunity_status || 'starter'}
