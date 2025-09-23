@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
+import BrandSearchInterface from './BrandSearchInterface';
 import { 
   Plus, 
   Gift, 
@@ -45,10 +46,14 @@ interface EarningOpportunity {
 interface Brand {
   id: string;
   name: string;
-  logo_url: string;
+  logo_url?: string;
   description?: string;
   category?: string;
   website_url?: string;
+  commission_rate?: number;
+  nctr_per_dollar?: number;
+  is_active: boolean;
+  featured?: boolean;
 }
 
 interface OpportunityManagementProps {
@@ -64,9 +69,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   const [filterType, setFilterType] = useState<string>('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<EarningOpportunity | null>(null);
-  const [brandSearchTerm, setBrandSearchTerm] = useState('');
-  const [showBrandDropdown, setShowBrandDropdown] = useState(false);
-  const brandSearchRef = useRef<HTMLDivElement>(null);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -86,6 +89,23 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     fetchOpportunities();
     fetchBrands();
   }, []);
+
+  // Debug logging for brands loading
+  useEffect(() => {
+    console.log(`=== BRAND LOADING DEBUG ===`);
+    console.log(`Total brands loaded: ${brands.length}`);
+    
+    if (brands.length > 0) {
+      // Test search for Uber brands
+      const uberBrands = brands.filter(b => b.name.toLowerCase().includes('uber'));
+      console.log(`Uber brands found: ${uberBrands.length}`);
+      console.log('Uber brand names:', uberBrands.map(b => b.name));
+      
+      // Log first few brands for verification
+      console.log('First 5 brands:', brands.slice(0, 5).map(b => ({ name: b.name, id: b.id })));
+    }
+    console.log(`=== END DEBUG ===`);
+  }, [brands]);
 
   // Handle clicking outside brand search dropdown
   useEffect(() => {
@@ -127,7 +147,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       console.log('Fetching brands...');
       const { data, error } = await supabase
         .from('brands')
-        .select('id, name, logo_url, description, category, website_url')
+        .select('id, name, logo_url, description, category, website_url, commission_rate, nctr_per_dollar, is_active, featured')
         .eq('is_active', true)
         .order('name');
 
@@ -149,44 +169,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
   };
 
-  // Filter brands based on search term
-  const filteredBrands = brands.filter(brand => {
-    if (!brandSearchTerm) return true;
-    
-    const searchLower = brandSearchTerm.toLowerCase().trim();
-    const brandName = (brand.name || '').toLowerCase();
-    const brandDescription = (brand.description || '').toLowerCase();
-    const brandCategory = (brand.category || '').toLowerCase();
-    
-    const matches = (
-      brandName.includes(searchLower) ||
-      brandDescription.includes(searchLower) ||
-      brandCategory.includes(searchLower)
-    );
-    
-    // Debug logging for specific searches
-    if (searchLower.includes('uber')) {
-      console.log(`Checking brand: "${brand.name}" (${brand.id}) against search: "${brandSearchTerm}" - matches: ${matches}`);
-      console.log(`  Brand name: "${brandName}"`);
-      console.log(`  Search term: "${searchLower}"`);
-      console.log(`  Name includes: ${brandName.includes(searchLower)}`);
-    }
-    
-    return matches;
-  });
-
-  // Debug logging for brands
-  useEffect(() => {
-    console.log(`Brands loaded: ${brands.length}`);
-    if (brandSearchTerm) {
-      console.log(`Search term: "${brandSearchTerm}", Filtered results: ${filteredBrands.length}`);
-      if (brandSearchTerm.toLowerCase().includes('uber')) {
-        const uberBrands = brands.filter(b => b.name.toLowerCase().includes('uber'));
-        console.log('Uber brands found in data:', uberBrands.map(b => b.name));
-      }
-    }
-  }, [brands, brandSearchTerm, filteredBrands.length]);
-
+  // Remove old unused filtering logic
   const filteredOpportunities = opportunities.filter(opp => {
     const matchesSearch = opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (opp.partner_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -211,8 +194,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       is_active: true
     });
     setEditingOpportunity(null);
-    setBrandSearchTerm('');
-    setShowBrandDropdown(false);
+    setSelectedBrand(null);
   };
 
   const handleEdit = (opportunity: EarningOpportunity) => {
@@ -231,8 +213,13 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_description: opportunity.video_description || '',
       is_active: opportunity.is_active
     });
-    setBrandSearchTerm(opportunity.partner_name || '');
-    setShowBrandDropdown(false);
+    
+    // Set selected brand if available
+    if (opportunity.partner_name) {
+      const brand = brands.find(b => b.name === opportunity.partner_name);
+      setSelectedBrand(brand || null);
+    }
+    
     setModalOpen(true);
   };
 
@@ -546,106 +533,56 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     Brand Partner Selection
                   </h4>
                   
-                  <div className="space-y-3">
-                     {/* Searchable Brand Input */}
-                     <div className="relative" ref={brandSearchRef}>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="🔍 Search brands by name, category, or description..."
-                          value={brandSearchTerm}
-                          onChange={(e) => setBrandSearchTerm(e.target.value)}
-                          onFocus={() => setShowBrandDropdown(true)}
-                          className="pl-10"
-                        />
-                      </div>
-                      
-                      {/* Brand Search Results Dropdown */}
-                      {showBrandDropdown && (
-                        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-64 overflow-y-auto">
-                          <div className="p-2 text-sm text-muted-foreground border-b bg-muted">
-                            {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
-                            {brandSearchTerm && ` matching "${brandSearchTerm}"`}
-                          </div>
+                  <BrandSearchInterface
+                    onBrandSelect={(brand) => {
+                      if (brand) {
+                        setSelectedBrand(brand);
+                        // Get brand details and generate tracking link
+                        fetchBrandDetails(brand.id).then((brandDetails) => {
+                          const trackingLink = generateUserTrackingLink(brandDetails?.website_url || '', brand.name);
                           
-                          {filteredBrands.length === 0 ? (
-                            <div className="p-4 text-center text-muted-foreground">
-                              {brandSearchTerm ? (
-                                <>
-                                  <p>No brands match your search.</p>
-                                  <p className="text-xs mt-1">Try a different search term or use "Brand Search" tab to add new brands.</p>
-                                </>
-                              ) : (
-                                <p>No brands available. Use "Brand Search" tab to add brands first.</p>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="py-1">
-                              {filteredBrands.map((brand) => (
-                                <div
-                                  key={brand.id}
-                                  className="px-3 py-2 hover:bg-muted cursor-pointer border-b border-border/30 last:border-b-0"
-                                  onClick={() => {
-                                    handleBrandSelect(brand.id);
-                                    setBrandSearchTerm(brand.name);
-                                    setShowBrandDropdown(false);
-                                  }}
-                                >
-                                  <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0">
-                                      {brand.logo_url ? (
-                                        <img 
-                                          src={brand.logo_url} 
-                                          alt={brand.name} 
-                                          className="w-8 h-8 rounded object-cover"
-                                          onError={(e) => {
-                                            e.currentTarget.style.display = 'none';
-                                          }}
-                                        />
-                                      ) : (
-                                        <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
-                                          <ShoppingBag className="w-4 h-4 text-muted-foreground" />
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="font-medium text-foreground truncate">
-                                        {brand.name}
-                                      </div>
-                                      {brand.category && (
-                                        <div className="text-xs text-muted-foreground">
-                                          {brand.category}
-                                        </div>
-                                      )}
-                                      {brand.description && (
-                                        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                          {brand.description}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          
-                          <div className="p-2 border-t bg-muted">
-                            <button
-                              type="button"
-                              onClick={() => setShowBrandDropdown(false)}
-                              className="text-xs text-muted-foreground hover:text-foreground w-full text-center"
-                            >
-                              Close search results
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                          setFormData({
+                            ...formData,
+                            partner_name: brand.name,
+                            partner_logo_url: brand.logo_url || '',
+                            affiliate_link: trackingLink,
+                            title: `Shop with ${brand.name}`,
+                            description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`
+                          });
+                        });
+                      } else {
+                        setSelectedBrand(null);
+                      }
+                    }}
+                    selectedBrand={selectedBrand}
+                    showFullDetails={true}
+                    placeholder="🔍 Search for partner brands and gift cards..."
+                  />
+
+                  {/* Manual Brand Entry */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="partner_name">Brand Name</Label>
+                      <Input
+                        id="partner_name"
+                        value={formData.partner_name}
+                        onChange={(e) => setFormData({...formData, partner_name: e.target.value})}
+                        placeholder="Enter brand name"
+                      />
                     </div>
                     
-                    <div className="text-xs text-muted-foreground">
-                      💡 Tip: Use "Brand Search" tab to find and add new brands from Loyalize
+                    <div className="space-y-2">
+                      <Label htmlFor="partner_logo_url">Brand Logo URL</Label>
+                      <Input
+                        id="partner_logo_url"
+                        type="url"
+                        value={formData.partner_logo_url}
+                        onChange={(e) => setFormData({...formData, partner_logo_url: e.target.value})}
+                        placeholder="https://example.com/logo.png"
+                      />
                     </div>
                   </div>
+                </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
