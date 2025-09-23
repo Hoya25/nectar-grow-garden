@@ -937,15 +937,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
             {/* Community Section */}
             <div className="mt-12" data-referral-system>
-              <Card className="bg-white border-2 border-primary shadow-soft">
-                <CardHeader>
-                  <CardTitle className="text-xl text-foreground">Join the Community</CardTitle>
-                  <p className="text-muted-foreground">Invite friends and earn together</p>
-                </CardHeader>
-                <CardContent>
-                  <ReferralSystem />
-                </CardContent>
-              </Card>
+              <ReferralSystem />
             </div>
             </div>
           </div>
