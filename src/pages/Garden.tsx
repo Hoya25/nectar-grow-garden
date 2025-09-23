@@ -648,9 +648,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
                           />
                         ) : (
-                          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-soft flex-shrink-0">
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-soft flex-shrink-0 flex items-center justify-center">
                             <video 
-                              className="w-full h-full object-cover transform scale-150"
+                              className="w-full h-full object-cover transform scale-125"
                               autoPlay
                               loop
                               muted
@@ -749,9 +749,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                                 className="w-16 h-16 rounded-2xl object-cover shadow-medium"
                               />
                             ) : (
-                              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-medium">
+                              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-medium flex items-center justify-center">
                                 <video 
-                                  className="w-full h-full object-cover transform scale-150"
+                                  className="w-full h-full object-cover transform scale-125"
                                   autoPlay
                                   loop
                                   muted
@@ -873,9 +873,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                                 className="w-10 h-10 rounded-lg object-cover"
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-lg overflow-hidden">
+                              <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
                                 <video 
-                                  className="w-full h-full object-cover transform scale-150"
+                                  className="w-full h-full object-cover transform scale-125"
                                   autoPlay
                                   loop
                                   muted
