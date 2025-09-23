@@ -652,7 +652,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           <img 
                             src={nctrNLogo}
                             alt="The Garden Logo"
-                            className="w-15 h-15 sm:w-20 sm:h-20 rounded-xl object-contain shadow-soft flex-shrink-0 scale-125"
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
                           />
                         )}
                         <div className="min-w-0 flex-1">
@@ -747,7 +747,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                               <img 
                                 src={nctrNLogo}
                                 alt="The Garden Logo"
-                                className="w-20 h-20 rounded-2xl object-contain shadow-medium scale-125"
+                                className="w-16 h-16 rounded-2xl object-cover shadow-medium"
                               />
                             )}
                           </div>
@@ -865,7 +865,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                               <img 
                                 src={nctrNLogo}
                                 alt="The Garden Logo"
-                                className="w-12 h-12 rounded-lg object-contain scale-125"
+                                className="w-10 h-10 rounded-lg object-cover"
                               />
                             )}
                             <div>
