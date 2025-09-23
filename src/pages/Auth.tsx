@@ -22,17 +22,19 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for referral code in URL params
+    // Check for referral code in URL on component mount
     const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get('ref');
-    if (refCode) {
-      setReferralCode(refCode);
-      // Switch to signup tab if they came via referral link
-      setActiveTab('signup');
+    const refParam = urlParams.get('ref');
+    if (refParam) {
+      setReferralCode(refParam);
+      setActiveTab('signup'); // Switch to signup tab if there's a referral code
     }
+  }, []);
 
+  useEffect(() => {
     if (user) {
       // Check if there's a redirect URL in the query params or session storage
+      const urlParams = new URLSearchParams(window.location.search);
       const redirectTo = urlParams.get('redirect') || sessionStorage.getItem('authRedirect') || '/garden';
       
       // Clear stored redirect
@@ -67,11 +69,7 @@ const Auth = () => {
     if (error) {
       setError(error.message);
     } else {
-      if (referralCode) {
-        setError('Welcome! Check your email for the confirmation link. You and your referrer will both receive 50 NCTR once confirmed!');
-      } else {
-        setError('Check your email for the confirmation link!');
-      }
+      setError('Check your email for the confirmation link!');
     }
     
     setLoading(false);
@@ -135,9 +133,9 @@ const Auth = () => {
             
             <TabsContent value="signup" className="space-y-4">
               {referralCode && (
-                <Alert className="bg-green-50 border-green-200">
+                <Alert className="border-green-200 bg-green-50">
                   <AlertDescription className="text-green-800">
-                    🎉 You're joining via referral! You and your referrer will both earn 50 NCTR when you confirm your account.
+                    🎉 You're signing up with a referral code! You and your referrer will both earn 50 NCTR when you complete signup.
                   </AlertDescription>
                 </Alert>
               )}
