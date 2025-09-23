@@ -464,6 +464,39 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referral_code: string
+          referred_user_id: string
+          referrer_user_id: string
+          reward_credited: boolean
+          rewarded_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_user_id: string
+          referrer_user_id: string
+          reward_credited?: boolean
+          rewarded_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_user_id?: string
+          referrer_user_id?: string
+          reward_credited?: boolean
+          rewarded_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -608,6 +641,10 @@ export type Database = {
       move_pending_to_available: {
         Args: { p_amount: number; p_user_id: string }
         Returns: undefined
+      }
+      process_referral_reward: {
+        Args: { p_referral_id: string }
+        Returns: Json
       }
       update_user_status: {
         Args: { user_id: string }
