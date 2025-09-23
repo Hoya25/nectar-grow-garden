@@ -816,7 +816,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     {/* Total NCTR Earn Opportunity */}
                     <div className="flex items-center justify-center gap-2 mb-3">
                       <span className="text-3xl font-bold text-primary">
-                        {formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))} NCTR
+                        {(() => {
+                          const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                          const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
+                          return formatNCTR(totalReward);
+                        })()} NCTR
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground mb-4">Total Earn Opportunity</p>
@@ -932,7 +936,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                          <div className="text-center mb-4 sm:mb-6">
                            {/* Total NCTR Earn Opportunity */}
                            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-                             {formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0) || opportunity.reward_per_dollar)} NCTR
+                             {(() => {
+                               const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                               const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
+                               return formatNCTR(totalReward);
+                             })()} NCTR
                            </div>
                            <div className="text-xs sm:text-sm text-muted-foreground mb-4">Total Earn Opportunity</div>
                            
@@ -1009,7 +1017,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                         <div className="text-center mb-4">
                           {/* Total NCTR Earn Opportunity */}
                           <div className="text-lg font-bold text-primary mb-2">
-                            {formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0) || opportunity.nctr_reward)} NCTR
+                            {(() => {
+                              const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                              const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
+                              return formatNCTR(totalReward);
+                            })()} NCTR
                           </div>
                           <div className="text-xs text-muted-foreground mb-3">Total Earn Opportunity</div>
                           
