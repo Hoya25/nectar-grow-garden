@@ -61,6 +61,21 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
   const shortfall = Math.max(0, neededNCTR - availableNCTR);
   
   const nextColors = statusColors[nextStatusInfo.status as keyof typeof statusColors];
+  
+  // Get current status multiplier
+  const getCurrentMultiplier = (status: string) => {
+    switch (status) {
+      case 'starter': return { multiplier: '1.0', boost: 0 };
+      case 'bronze': return { multiplier: '1.1', boost: 10 };
+      case 'silver': return { multiplier: '1.25', boost: 25 };
+      case 'gold': return { multiplier: '1.4', boost: 40 };
+      case 'platinum': return { multiplier: '1.5', boost: 50 };
+      case 'diamond': return { multiplier: '2.0', boost: 100 };
+      default: return { multiplier: '1.0', boost: 0 };
+    }
+  };
+  
+  const currentMultiplier = getCurrentMultiplier(currentStatus);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -97,7 +112,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                     </div>
                   </div>
                   <Badge variant="outline" className="bg-gray-100 text-gray-600">
-                    1.0x - {((1.0 - 1) * 100)}% bonus
+                    {currentMultiplier.multiplier}x Earning Amplification - {currentMultiplier.boost}% Boost
                   </Badge>
                 </div>
               </CardContent>
@@ -123,7 +138,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                     </div>
                   </div>
                   <Badge className="bg-primary text-primary-foreground">
-                    {nextStatusInfo.multiplier} - {((parseFloat(nextStatusInfo.multiplier) - 1) * 100).toFixed(0)}% bonus
+                    {nextStatusInfo.multiplier}x Earning Amplification - {((parseFloat(nextStatusInfo.multiplier) - 1) * 100).toFixed(0)}% Boost
                   </Badge>
                 </div>
               </CardContent>
@@ -175,7 +190,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         </div>
                         <div>
                           <h4 className="font-semibold text-amber-800">BRONZE ALLIANCE</h4>
-                          <p className="text-sm text-amber-700">1.10x multiplier • 1,000 NCTR in 360LOCK</p>
+                          <p className="text-sm text-amber-700">1.1x Earning Amplification • 10% Boost • 1,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <BuyNCTRButton
@@ -200,7 +215,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         </div>
                         <div>
                           <h4 className="font-semibold text-slate-700">SILVER ALLIANCE</h4>
-                          <p className="text-sm text-slate-600">1.25x multiplier • 2,500 NCTR in 360LOCK</p>
+                          <p className="text-sm text-slate-600">1.25x Earning Amplification • 25% Boost • 2,500 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <BuyNCTRButton
@@ -225,7 +240,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         </div>
                         <div>
                           <h4 className="font-semibold text-yellow-800">GOLD ALLIANCE</h4>
-                          <p className="text-sm text-yellow-700">1.40x multiplier • 5,000 NCTR in 360LOCK</p>
+                          <p className="text-sm text-yellow-700">1.4x Earning Amplification • 40% Boost • 5,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <BuyNCTRButton
@@ -250,7 +265,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         </div>
                         <div>
                           <h4 className="font-semibold text-purple-800">PLATINUM ALLIANCE</h4>
-                          <p className="text-sm text-purple-700">1.50x multiplier • 10,000 NCTR in 360LOCK</p>
+                          <p className="text-sm text-purple-700">1.5x Earning Amplification • 50% Boost • 10,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <BuyNCTRButton
@@ -275,7 +290,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         </div>
                         <div>
                           <h4 className="font-semibold text-blue-800">DIAMOND ALLIANCE</h4>
-                          <p className="text-sm text-blue-700">2.00x multiplier • 25,000 NCTR in 360LOCK</p>
+                          <p className="text-sm text-blue-700">2.0x Earning Amplification • 100% Boost • 25,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <BuyNCTRButton
