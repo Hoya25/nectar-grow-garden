@@ -23,12 +23,25 @@ interface WebhookTesterProps {
 
 const WebhookTester = ({ className }: WebhookTesterProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState('NEW_TRANSACTION');
+  const [selectedEvent, setSelectedEvent] = useState('PURCHASE_COMPLETED');
   const [webhookUrl, setWebhookUrl] = useState('');
   const [customPayload, setCustomPayload] = useState('');
   const [lastResponse, setLastResponse] = useState<any>(null);
 
   const webhookEvents = {
+    'PURCHASE_COMPLETED': {
+      name: 'Purchase Completed',
+      description: 'NCTR purchase completed from token.nctr.live',
+      payload: {
+        user_id: "fb8c3f0c-ea80-46f4-8dbd-65d945aaa8ff",
+        amount: 1000.0,
+        transaction_id: `test_txn_${Date.now()}`,
+        status: "completed",
+        payment_method: "credit_card",
+        timestamp: new Date().toISOString(),
+        source: "garden"
+      }
+    },
     'NEW_TRANSACTION': {
       name: 'New Transaction',
       description: 'Triggered when a new transaction is created',
@@ -171,12 +184,12 @@ const WebhookTester = ({ className }: WebhookTesterProps) => {
   };
 
   const copyWebhookUrl = () => {
-    const baseUrl = window.location.origin.replace('https://', 'https://rndivcsonsojgelzewkb.supabase.co/functions/v1/');
-    const fullUrl = `${baseUrl}transaction-webhooks`;
+    const fullUrl = 'https://rndivcsonsojgelzewkb.supabase.co/functions/v1/purchase-webhook';
     navigator.clipboard.writeText(fullUrl);
+    setWebhookUrl(fullUrl);
     toast({
       title: "Copied to Clipboard",
-      description: "Webhook URL copied successfully",
+      description: "Purchase webhook URL copied and set for testing",
     });
   };
 
@@ -193,10 +206,10 @@ const WebhookTester = ({ className }: WebhookTesterProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Webhook className="w-5 h-5" />
-            Transaction Webhook Tester
+            Purchase Webhook Tester
           </CardTitle>
           <p className="text-muted-foreground">
-            Test webhook endpoints with different transaction events
+            Test the purchase webhook endpoint for NCTR token purchases
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -215,10 +228,10 @@ const WebhookTester = ({ className }: WebhookTesterProps) => {
               </Button>
             </div>
             <div className="bg-muted p-3 rounded font-mono text-sm break-all">
-              https://rndivcsonsojgelzewkb.supabase.co/functions/v1/transaction-webhooks
+              https://rndivcsonsojgelzewkb.supabase.co/functions/v1/purchase-webhook
             </div>
             <p className="text-xs text-muted-foreground">
-              ☝️ Use this URL in your payment provider's webhook settings
+              ☝️ Use this URL in token.nctr.live's webhook settings for purchase notifications
             </p>
           </div>
 

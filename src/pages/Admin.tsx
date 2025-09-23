@@ -272,8 +272,8 @@ const Admin = () => {
           <TabsContent value="webhooks" className="space-y-6">
             <Card className="bg-section-highlight border border-section-border">
               <CardHeader>
-                <CardTitle className="text-foreground">Transaction Webhooks</CardTitle>
-                <p className="text-muted-foreground">Configure and test webhook endpoints for transaction notifications</p>
+                <CardTitle className="text-foreground">Purchase Webhooks</CardTitle>
+                <p className="text-muted-foreground">Test the purchase webhook endpoint for token.nctr.live integration</p>
               </CardHeader>
               <CardContent>
                 <WebhookTester />
