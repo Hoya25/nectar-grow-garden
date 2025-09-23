@@ -812,12 +812,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     </div>
                   </div>
 
-                  <div className="text-center py-2">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <span className="text-2xl font-bold text-primary">{formatNCTR(opportunity.nctr_reward)} NCTR</span>
-                      <Badge className="bg-primary text-primary-foreground">360LOCK</Badge>
+                  <div className="text-center py-4 mb-4">
+                    {/* Total NCTR Earn Opportunity */}
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <span className="text-3xl font-bold text-primary">
+                        {formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))} NCTR
+                      </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">Locked for maximum alliance benefits</p>
+                    <p className="text-sm text-muted-foreground mb-4">Total Earn Opportunity</p>
+                    
+                    {/* Bounty Breakdown */}
+                    <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
                   </div>
 
                   <Button 
@@ -924,14 +929,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           </div>
                         </div>
 
-                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-                           <div className="bg-section-highlight rounded-xl p-4 sm:p-6 text-center">
-                             <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-                               {formatNCTR(opportunity.reward_per_dollar)} NCTR
-                             </div>
-                             <div className="text-xs sm:text-sm text-muted-foreground">Per $1 spent</div>
-                             <div className="text-xs text-primary mt-1">Automatically locked in 90LOCK</div>
+                         <div className="text-center mb-4 sm:mb-6">
+                           {/* Total NCTR Earn Opportunity */}
+                           <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
+                             {formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0) || opportunity.reward_per_dollar)} NCTR
                            </div>
+                           <div className="text-xs sm:text-sm text-muted-foreground mb-4">Total Earn Opportunity</div>
+                           
+                           {/* Bounty Breakdown */}
+                           <RewardDisplay opportunity={opportunity} size="md" showPerDollar={true} />
                          </div>
 
                         <Button 
@@ -1001,7 +1007,14 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                         </div>
 
                         <div className="text-center mb-4">
-                          <RewardDisplay opportunity={opportunity} size="sm" />
+                          {/* Total NCTR Earn Opportunity */}
+                          <div className="text-lg font-bold text-primary mb-2">
+                            {formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0) || opportunity.nctr_reward)} NCTR
+                          </div>
+                          <div className="text-xs text-muted-foreground mb-3">Total Earn Opportunity</div>
+                          
+                          {/* Bounty Breakdown */}
+                          <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} />
                         </div>
 
                         <Button 
