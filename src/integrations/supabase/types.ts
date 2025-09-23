@@ -133,18 +133,23 @@ export type Database = {
       earning_opportunities: {
         Row: {
           affiliate_link: string | null
+          available_nctr_reward: number | null
           created_at: string
           default_lock_type: string | null
           description: string | null
           id: string
           is_active: boolean
+          lock_360_nctr_reward: number | null
+          lock_90_nctr_reward: number | null
           max_per_status: number | null
           min_status: string | null
           nctr_reward: number | null
           opportunity_type: string
           partner_logo_url: string | null
           partner_name: string | null
+          reward_distribution_type: string | null
           reward_per_dollar: number | null
+          reward_structure: Json | null
           title: string
           updated_at: string
           video_description: string | null
@@ -153,18 +158,23 @@ export type Database = {
         }
         Insert: {
           affiliate_link?: string | null
+          available_nctr_reward?: number | null
           created_at?: string
           default_lock_type?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
+          lock_360_nctr_reward?: number | null
+          lock_90_nctr_reward?: number | null
           max_per_status?: number | null
           min_status?: string | null
           nctr_reward?: number | null
           opportunity_type: string
           partner_logo_url?: string | null
           partner_name?: string | null
+          reward_distribution_type?: string | null
           reward_per_dollar?: number | null
+          reward_structure?: Json | null
           title: string
           updated_at?: string
           video_description?: string | null
@@ -173,18 +183,23 @@ export type Database = {
         }
         Update: {
           affiliate_link?: string | null
+          available_nctr_reward?: number | null
           created_at?: string
           default_lock_type?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
+          lock_360_nctr_reward?: number | null
+          lock_90_nctr_reward?: number | null
           max_per_status?: number | null
           min_status?: string | null
           nctr_reward?: number | null
           opportunity_type?: string
           partner_logo_url?: string | null
           partner_name?: string | null
+          reward_distribution_type?: string | null
           reward_per_dollar?: number | null
+          reward_structure?: Json | null
           title?: string
           updated_at?: string
           video_description?: string | null

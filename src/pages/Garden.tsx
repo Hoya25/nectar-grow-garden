@@ -19,6 +19,7 @@ import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
+import { RewardDisplay } from '@/components/RewardDisplay';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -58,6 +59,12 @@ interface EarningOpportunity {
   video_url?: string;
   video_title?: string;
   video_description?: string;
+  // New reward structure fields
+  available_nctr_reward?: number;
+  lock_90_nctr_reward?: number;
+  lock_360_nctr_reward?: number;
+  reward_distribution_type?: string;
+  reward_structure?: any;
 }
 
 import ProfileModal from '@/components/ProfileModal';
@@ -706,34 +713,12 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                       <div className="bg-section-highlight rounded-xl p-4 sm:p-6 text-center">
-                        <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 mb-2">
-                          <div className="text-2xl sm:text-3xl font-bold text-section-accent">
-                            {formatNCTR(opportunities[0].reward_per_dollar || 0)}
-                          </div>
-                              <img 
-                                src={nctrLogo} 
-                                alt="NCTR" 
-                                className="h-24 sm:h-32 lg:h-40 w-auto"
-                              />
-                        </div>
-                        <div className="text-xs sm:text-sm text-muted-foreground font-medium">per $1 spent</div>
+                        <RewardDisplay 
+                          opportunity={opportunities[0]} 
+                          size="lg" 
+                          showPerDollar={true}
+                        />
                       </div>
-                      
-                      {opportunities[0].nctr_reward > 0 && (
-                        <div className="bg-primary/10 rounded-xl p-4 sm:p-6 text-center border border-primary/20">
-                          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
-                            <div className="text-2xl sm:text-3xl font-bold text-primary">
-                              {formatNCTR(opportunities[0].nctr_reward)}
-                            </div>
-                            <img 
-                              src={nctrLogo} 
-                              alt="NCTR" 
-                              className="h-20 sm:h-24 lg:h-28 w-auto"
-                            />
-                          </div>
-                          <div className="text-xs sm:text-sm text-primary font-medium">Welcome Bonus</div>
-                        </div>
-                      )}
                     </div>
 
                     {opportunities[0].description && (
@@ -822,26 +807,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           </div>
                         )}
 
-                        {/* Earning Display - Consistent height and alignment */}
+                        {/* Earning Display - Updated with RewardDisplay */}
                         <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-6 mb-6 text-center border border-primary/20 min-h-[140px] flex flex-col justify-center">
-                          <div className="flex items-center justify-center space-x-4 mb-3">
-                            <div className="text-3xl font-bold text-primary">
-                              {formatNCTR(opportunity.reward_per_dollar || 0)}
-                            </div>
-                            <img src={nctrLogo} alt="NCTR" className="h-24 w-auto" />
-                          </div>
-                          <div className="text-base text-muted-foreground font-medium mb-3">per $1 spent</div>
-                          
-                          {opportunity.nctr_reward > 0 && (
-                            <div className="bg-white rounded-xl p-3 shadow-soft">
-                              <div className="flex items-center justify-center space-x-2 text-primary">
-                                <Gift className="w-4 h-4" />
-                                <span className="font-bold text-sm">
-                                  +{formatNCTR(opportunity.nctr_reward)} NCTR Welcome Bonus
-                                </span>
-                              </div>
-                            </div>
-                          )}
+                          <RewardDisplay 
+                            opportunity={opportunity} 
+                            size="md" 
+                            showPerDollar={true}
+                          />
                         </div>
 
                         {/* Description with elegant typography */}
@@ -921,20 +893,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           )}
                         </div>
 
-                        {/* NCTR Display - Consistent height and alignment */}
+                        {/* NCTR Display - Updated with RewardDisplay */}
                         <div className="bg-section-highlight rounded-lg p-4 mb-4 text-center min-h-[80px] flex flex-col justify-center flex-grow">
-                          <div className="flex items-center justify-center space-x-2 mb-1">
-                            <span className="text-lg font-bold text-section-accent">
-                              {formatNCTR(opportunity.reward_per_dollar || 0)}
-                            </span>
-                            <img src={nctrLogo} alt="NCTR" className="h-14 w-auto" />
-                          </div>
-                          <div className="text-xs text-muted-foreground">per $1 spent</div>
-                          {opportunity.nctr_reward > 0 && (
-                            <div className="text-xs text-primary font-medium mt-2">
-                              +{formatNCTR(opportunity.nctr_reward)} NCTR bonus
-                            </div>
-                          )}
+                          <RewardDisplay 
+                            opportunity={opportunity} 
+                            size="sm" 
+                            showPerDollar={true}
+                          />
                         </div>
 
                          {/* Button - Consistent alignment */}
