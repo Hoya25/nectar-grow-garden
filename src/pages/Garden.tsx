@@ -641,12 +641,22 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   <div className="p-4 sm:p-6 lg:p-8">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-4">
                       <div className="flex items-center space-x-3 sm:space-x-4">
-                        {opportunities[0].partner_logo_url && (
+                        {opportunities[0].partner_logo_url ? (
                           <img 
                             src={opportunities[0].partner_logo_url} 
                             alt={`${opportunities[0].partner_name} logo`}
                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
                           />
+                        ) : (
+                          <video 
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                          >
+                            <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
+                          </video>
                         )}
                         <div className="min-w-0 flex-1">
                           <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 truncate">{opportunities[0].title}</h2>
@@ -730,12 +740,22 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           )}
                           
                           <div className="flex items-center justify-center mb-4">
-                            {opportunity.partner_logo_url && (
+                            {opportunity.partner_logo_url ? (
                               <img 
                                 src={opportunity.partner_logo_url} 
                                 alt={`${opportunity.partner_name} logo`}
                                 className="w-16 h-16 rounded-2xl object-cover shadow-medium"
                               />
+                            ) : (
+                              <video 
+                                className="w-16 h-16 rounded-2xl object-cover shadow-medium"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                              >
+                                <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
+                              </video>
                             )}
                           </div>
                           
@@ -849,9 +869,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                                 className="w-10 h-10 rounded-lg object-cover"
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-lg bg-section-highlight flex items-center justify-center">
-                                <Gift className="w-5 h-5 text-foreground" />
-                              </div>
+                              <video 
+                                className="w-10 h-10 rounded-lg object-cover"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                              >
+                                <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
+                              </video>
                             )}
                             <div>
                               <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
