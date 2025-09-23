@@ -68,7 +68,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isConnected } = useWallet();
-  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor } = useNCTRPrice();
+  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue } = useNCTRPrice();
 
   const handleCommitTo360LOCK = async () => {
     if (!user || !portfolio?.available_nctr || portfolio.available_nctr <= 0) {
@@ -122,9 +122,16 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
           className="w-full justify-between hover:bg-primary/10 text-sm"
         >
           <span className="font-medium">Portfolio {isCollapsed ? '▼' : '▲'}</span>
-          <span className="text-xs text-muted-foreground">
-            {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_360_nctr || 0))} NCTR
-          </span>
+          <div className="flex flex-col items-end text-xs text-muted-foreground">
+            <span>
+              {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_360_nctr || 0) + (portfolio?.lock_90_nctr || 0))} NCTR
+            </span>
+            <span className="text-green-600 font-medium">
+              ${formatPrice(calculatePortfolioValue(
+                (portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0)
+              ))}
+            </span>
+          </div>
         </Button>
       </div>
 
@@ -156,7 +163,12 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   {formatNCTR(portfolio?.available_nctr || 0)}
                 </p>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">Ready to commit</p>
+                  <div className="flex flex-col">
+                    <p className="text-xs text-muted-foreground">Ready to commit</p>
+                    <p className="text-xs text-green-600 font-medium">
+                      ${formatPrice(calculatePortfolioValue(portfolio?.available_nctr || 0))}
+                    </p>
+                  </div>
                   {portfolio?.available_nctr && portfolio.available_nctr > 0 && (
                     <Button
                       onClick={handleCommitTo360LOCK}
@@ -231,7 +243,14 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 <p className="text-base sm:text-lg font-bold text-primary mb-1">
                   {formatNCTR(portfolio?.lock_360_nctr || 0)}
                 </p>
-                <p className="text-xs text-primary/80">Alliance</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <p className="text-xs text-primary/80">Alliance</p>
+                    <p className="text-xs text-primary font-medium">
+                      ${formatPrice(calculatePortfolioValue(portfolio?.lock_360_nctr || 0))}
+                    </p>
+                  </div>
+                </div>
               </div>
               <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-primary ml-2" />
             </div>
@@ -253,7 +272,14 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 <p className="text-lg sm:text-xl font-bold text-section-accent mb-1">
                   {formatNCTR(portfolio?.total_earned || 0)}
                 </p>
-                <p className="text-xs text-muted-foreground">Lifetime</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <p className="text-xs text-muted-foreground">Lifetime</p>
+                    <p className="text-xs text-green-600 font-medium">
+                      ${formatPrice(calculatePortfolioValue(portfolio?.total_earned || 0))}
+                    </p>
+                  </div>
+                </div>
               </div>
               <Users className="h-5 w-5 sm:h-6 sm:w-6 text-success/60 ml-2" />
             </div>
@@ -261,7 +287,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         </Card>
       </div>
 
-      {/* NCTR Price Info - Mobile Compact */}
+      {/* NCTR Price Info & Total Portfolio Value - Mobile Compact */}
       <Card className="bg-white shadow-medium border border-section-border">
         <CardContent className="p-3 sm:p-4">
           <div className="text-center text-foreground">
@@ -273,9 +299,28 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
               />
             </div>
             <p className="text-xl sm:text-2xl font-bold text-section-accent mb-1">${formatPrice(currentPrice)}</p>
-            <p className={`text-xs sm:text-sm ${getChangeColor(priceChange24h)}`}>
+            <p className={`text-xs sm:text-sm mb-2 ${getChangeColor(priceChange24h)}`}>
               {formatChange(priceChange24h)} (24h)
             </p>
+            
+            {/* Total Portfolio Value */}
+            <div className="mt-3 pt-3 border-t border-section-border">
+              <p className="text-xs text-muted-foreground mb-1">Total Portfolio Value</p>
+              <p className="text-lg font-bold text-primary">
+                ${formatPrice(calculatePortfolioValue(
+                  (portfolio?.available_nctr || 0) + 
+                  (portfolio?.lock_90_nctr || 0) + 
+                  (portfolio?.lock_360_nctr || 0)
+                ))}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatNCTR(
+                  (portfolio?.available_nctr || 0) + 
+                  (portfolio?.lock_90_nctr || 0) + 
+                  (portfolio?.lock_360_nctr || 0)
+                )} NCTR
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
