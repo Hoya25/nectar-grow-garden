@@ -484,19 +484,8 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               </div>
             </div>
             
-            {/* Compact Wings Status Display */}
-            <div className="flex items-center gap-4 bg-primary/5 rounded-lg p-2 border border-primary/20">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                  <Gift className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Wings Status</p>
-                  <p className="text-sm font-semibold text-primary capitalize">
-                    {portfolio?.opportunity_status || 'starter'}
-                  </p>
-                </div>
-              </div>
+            {/* Compact Status Display in Header */}
+            <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3 border border-primary/20">
               <div className="flex items-center gap-2">
                 <img 
                   src={nctrLogo} 
@@ -504,9 +493,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   className="h-6 w-auto opacity-70"
                 />
                 <div>
-                  <p className="text-xs text-muted-foreground">Total Portfolio</p>
+                  <p className="text-xs text-muted-foreground">Total NCTR</p>
                   <p className="text-sm font-semibold text-section-accent">
-                    {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))} NCTR
+                    {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
                   </p>
                 </div>
               </div>
@@ -515,8 +504,31 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         </div>
       </header>
 
-      {/* Main Content - Earning Opportunities First */}
+      {/* Main Content */}
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
+        {/* Wings Status - Prominent Section */}
+        <div className="mb-8">
+          <MemberStatusBanner 
+            currentStatus={portfolio?.opportunity_status || 'starter'}
+            current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
+            availableNCTR={portfolio?.available_nctr || 0}
+            onUpgradeClick={() => {
+              // Scroll to lock commitment modal or trigger it
+              const lockButton = document.querySelector('[data-lock-commitment]');
+              if (lockButton) {
+                (lockButton as HTMLElement).click();
+              }
+            }}
+            onEarnMoreClick={() => {
+              // Scroll to earning opportunities
+              const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
+              if (opportunitiesSection) {
+                opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          />
+        </div>
+
         {/* Profile Completion Banner */}
         <div className="mb-6">
           <ProfileCompletionBanner />
@@ -769,28 +781,86 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           </Card>
         </div>
 
-        {/* Community Section - Refreshed */}
-        <div className="mt-12" data-referral-system key="referral-system-updated">
+        {/* Community Section */}
+        <div className="mt-12" data-referral-system>
           <ReferralSystem />
         </div>
-      </main>
-      
-      {/* Portfolio Details - Moved to bottom, less prominent */}
-      <div className="bg-section-highlight border-t border-section-border mt-12">
-        <div className="container mx-auto max-w-6xl">
-          <div className="py-8">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-semibold section-heading mb-2">Portfolio Dashboard</h2>
+
+        {/* Portfolio Section - Secondary Priority */}
+        <div className="mt-12 bg-section-highlight/50 rounded-xl p-6 border border-section-border">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold section-heading">Portfolio Overview</h2>
               <p className="text-sm text-muted-foreground">Manage your NCTR holdings and commitments</p>
             </div>
-            <CollapsibleDashboard 
-              portfolio={portfolio} 
-              locks={locks as any} 
-              onLockCreated={fetchUserData}
-            />
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/profile')}
+              className="flex items-center gap-2 border-primary/50 hover:bg-primary/10"
+            >
+              <User className="w-4 h-4" />
+              Manage in Profile
+            </Button>
+          </div>
+          
+          {/* Simplified Portfolio Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card className="bg-white shadow-sm">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Coins className="w-5 h-5 text-primary" />
+                  <span className="text-sm font-medium text-muted-foreground">Available</span>
+                </div>
+                <p className="text-2xl font-bold text-primary mb-1">
+                  {formatNCTR(portfolio?.available_nctr || 0)}
+                </p>
+                <p className="text-xs text-muted-foreground">NCTR Ready to commit</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-primary/10 to-primary/20">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Gift className="w-5 h-5 text-primary" />
+                  <span className="text-sm font-medium text-primary">360LOCK</span>
+                </div>
+                <p className="text-2xl font-bold text-primary mb-1">
+                  {formatNCTR(portfolio?.lock_360_nctr || 0)}
+                </p>
+                <p className="text-xs text-primary/80">Alliance Benefits</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white shadow-sm">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <span className="text-sm font-medium text-muted-foreground">Total Earned</span>
+                </div>
+                <p className="text-2xl font-bold text-green-600 mb-1">
+                  {formatNCTR(portfolio?.total_earned || 0)}
+                </p>
+                <p className="text-xs text-muted-foreground">Lifetime NCTR</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Portfolio Actions */}
+          <div className="flex flex-wrap gap-3 justify-center">
+            <LockCommitmentModal onLockCreated={fetchUserData} availableNCTR={portfolio?.available_nctr || 0} />
+            
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/profile')}
+              className="flex items-center gap-2"
+            >
+              <User className="w-4 h-4" />
+              Portfolio Details & Sync
+            </Button>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Invite Friends Modal */}
       <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
