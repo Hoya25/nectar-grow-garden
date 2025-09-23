@@ -193,7 +193,19 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 <p className="text-base sm:text-lg font-bold text-blue-800 mb-1">
                   {formatNCTR(portfolio?.lock_90_nctr || 0)}
                 </p>
-                <p className="text-xs text-blue-600">Standard</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-blue-600">Standard</p>
+                  {portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0 && (
+                    <Button
+                      onClick={handleCommitTo360LOCK}
+                      disabled={isCommitting}
+                      size="sm"
+                      className="h-6 px-2 text-xs bg-primary hover:bg-primary-glow text-primary-foreground"
+                    >
+                      {isCommitting ? 'Upgrading...' : '→ 360LOCK'}
+                    </Button>
+                  )}
+                </div>
               </div>
               <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 ml-2" />
             </div>
