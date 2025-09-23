@@ -424,10 +424,6 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
             onLockCreated={onLockCreated}
           />
         </div>
-        <Button variant="outline" size="sm" className="w-full text-xs sm:text-sm border-primary/50 text-primary hover:bg-primary/10 min-h-[44px]" onClick={() => navigate('/profile')}>
-          <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-          Alliance Profile
-        </Button>
       </div>
 
       {/* Batch Lock Upgrade - Hidden temporarily */}
