@@ -16,6 +16,7 @@ interface ReferralStats {
 }
 
 const ReferralSystem = () => {
+  console.log('ReferralSystem component rendering - updated version');
   const { user } = useAuth();
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState<ReferralStats>({

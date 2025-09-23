@@ -935,8 +935,8 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               </Card>
             </div>
 
-            {/* Community Section */}
-            <div className="mt-12" data-referral-system>
+            {/* Community Section - Refreshed */}
+            <div className="mt-12" data-referral-system key="referral-system-updated">
               <ReferralSystem />
             </div>
             </div>
