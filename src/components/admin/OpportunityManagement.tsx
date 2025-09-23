@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -75,7 +75,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     description: '',
     opportunity_type: 'shopping',
     nctr_reward: 0,
-    reward_per_dollar: 10.0, // Default 10 NCTR per $1 spent (max: 99.9999)
+    reward_per_dollar: 100.0, // Default 100 NCTR per $1 spent
     partner_name: '',
     partner_logo_url: '',
     affiliate_link: '',
@@ -106,20 +106,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
     console.log(`=== END DEBUG ===`);
   }, [brands]);
-
-  // Handle clicking outside brand search dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (brandSearchRef.current && !brandSearchRef.current.contains(event.target as Node)) {
-        setShowBrandDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   const fetchOpportunities = async () => {
     try {
@@ -169,7 +155,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
   };
 
-  // Remove old unused filtering logic
   const filteredOpportunities = opportunities.filter(opp => {
     const matchesSearch = opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (opp.partner_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -184,7 +169,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       description: '',
       opportunity_type: 'shopping',
       nctr_reward: 0,
-      reward_per_dollar: 100.0, // Default 100 NCTR per $1 spent
+      reward_per_dollar: 100.0,
       partner_name: '',
       partner_logo_url: '',
       affiliate_link: '',
@@ -221,25 +206,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
     
     setModalOpen(true);
-  };
-
-  const handleBrandSelect = (brandId: string) => {
-    const brand = brands.find(b => b.id === brandId);
-    if (brand) {
-      // Get brand details including website URL for affiliate link
-      fetchBrandDetails(brandId).then((brandDetails) => {
-        const trackingLink = generateUserTrackingLink(brandDetails?.website_url || '', brand.name);
-        
-        setFormData({
-          ...formData,
-          partner_name: brand.name,
-          partner_logo_url: brand.logo_url || '',
-          affiliate_link: trackingLink,
-          title: `Shop with ${brand.name}`,
-          description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`
-        });
-      });
-    }
   };
 
   const fetchBrandDetails = async (brandId: string) => {
@@ -582,29 +548,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       />
                     </div>
                   </div>
-                </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="partner_name">Brand Name</Label>
-                      <Input
-                        id="partner_name"
-                        value={formData.partner_name}
-                        onChange={(e) => setFormData({...formData, partner_name: e.target.value})}
-                        placeholder="Enter brand name"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="partner_logo_url">Brand Logo URL</Label>
-                      <Input
-                        id="partner_logo_url"
-                        type="url"
-                        value={formData.partner_logo_url}
-                        onChange={(e) => setFormData({...formData, partner_logo_url: e.target.value})}
-                        placeholder="https://example.com/logo.png"
-                      />
-                    </div>
+                  
+                  <div className="text-xs text-muted-foreground">
+                    💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize
                   </div>
                 </div>
 
