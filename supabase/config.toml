@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.nctr-pricing]
 verify_jwt = false
+
+[functions.transaction-webhooks]
+verify_jwt = false
