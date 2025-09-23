@@ -530,9 +530,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     {/* Reward Info */}
                     <div className="text-center py-4">
                       <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="text-2xl font-bold text-primary">1000 NCTR</span>
+                        <span className="text-2xl font-bold text-green-500">1000 NCTR</span>
                         <span className="text-lg text-foreground">each in</span>
-                        <span className="text-2xl font-bold text-secondary">360LOCK</span>
+                        <span className="text-2xl font-bold text-blue-500">360LOCK</span>
                       </div>
                       <p className="text-sm text-muted-foreground">Most popular way to earn</p>
                     </div>
@@ -575,17 +575,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                     {/* Earnings Display */}
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center py-4 bg-primary/5 rounded-xl">
+                      <div className="text-center py-4 bg-green-50 rounded-xl border border-green-100">
                         <div className="flex items-center justify-center gap-1 mb-1">
-                          <span className="text-2xl font-bold text-primary">1000</span>
+                          <span className="text-2xl font-bold text-green-500">1000</span>
                           <img src={nctrLogo} alt="NCTR" className="h-4 w-auto" />
                         </div>
                         <div className="text-xs text-muted-foreground">for you</div>
                       </div>
                       
-                      <div className="text-center py-4 bg-secondary/5 rounded-xl">
+                      <div className="text-center py-4 bg-green-50 rounded-xl border border-green-100">
                         <div className="flex items-center justify-center gap-1 mb-1">
-                          <span className="text-2xl font-bold text-secondary">1000</span>
+                          <span className="text-2xl font-bold text-green-500">1000</span>
                           <img src={nctrLogo} alt="NCTR" className="h-4 w-auto" />
                         </div>
                         <div className="text-xs text-muted-foreground">for friend</div>
