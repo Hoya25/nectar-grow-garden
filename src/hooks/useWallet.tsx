@@ -150,13 +150,11 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
       // Update user profile with wallet address
       const { error: updateError } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: currentUser.id,
+        .update({
           wallet_address: walletAddress,
-          wallet_connected_at: new Date().toISOString(),
-          email: currentUser.email,
-          full_name: currentUser.user_metadata?.full_name
-        });
+          wallet_connected_at: new Date().toISOString()
+        })
+        .eq('user_id', currentUser.id);
 
       if (updateError) {
         throw updateError;
