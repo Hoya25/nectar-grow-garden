@@ -290,11 +290,13 @@ const Profile = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'starter': return 'bg-gray-500';
-      case 'advanced': return 'bg-blue-500';
-      case 'premium': return 'bg-purple-500';
-      case 'vip': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
+      case 'starter': return 'bg-gray-600';
+      case 'bronze': return 'bg-amber-700';
+      case 'silver': return 'bg-gray-400';
+      case 'gold': return 'bg-yellow-500';
+      case 'platinum': return 'bg-purple-600';
+      case 'diamond': return 'bg-blue-500';
+      default: return 'bg-gray-600';
     }
   };
 
@@ -657,7 +659,7 @@ const Profile = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Status Level</span>
-                    <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0`}>
+                    <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-white border-0`}>
                       {portfolio?.opportunity_status?.toUpperCase() || 'STARTER'}
                     </Badge>
                   </div>
