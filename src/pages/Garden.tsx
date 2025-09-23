@@ -190,9 +190,30 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         console.error('Completed opportunities error:', completedError);
       } else {
         // Only mark as completed based on earning source - allow social follows to show as completed
-        const completedIds = (completedData || [])
+        let completedIds = (completedData || [])
           .map(item => item.opportunity_id)
           .filter(Boolean);
+
+        // Check for profile completion separately
+        try {
+          const { data: profileCompletionData } = await supabase.rpc('calculate_profile_completion', {
+            p_user_id: user.id
+          });
+          
+          if (profileCompletionData && typeof profileCompletionData === 'object' && 'bonus_awarded' in profileCompletionData) {
+            const completion = profileCompletionData as { bonus_awarded: boolean };
+            if (completion.bonus_awarded) {
+              // Add the profile completion opportunity ID if bonus was awarded
+              const profileOpportunityId = '8847db62-4a02-4d04-b1f6-e213835c6481';
+              if (!completedIds.includes(profileOpportunityId)) {
+                completedIds.push(profileOpportunityId);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error checking profile completion:', error);
+        }
+
         setCompletedOpportunityIds(completedIds);
       }
 
