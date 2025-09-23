@@ -189,13 +189,8 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       if (completedError) {
         console.error('Completed opportunities error:', completedError);
       } else {
-        // Only mark as completed if it's a true one-time bonus (not social follows or profile completion)
+        // Only mark as completed based on earning source - allow social follows to show as completed
         const completedIds = (completedData || [])
-          .filter(item => {
-            // Don't mark social follows as completed - they should remain visible
-            return item.earning_source !== 'profile_completion' && 
-                   item.earning_source !== 'social_follow';
-          })
           .map(item => item.opportunity_id)
           .filter(Boolean);
         setCompletedOpportunityIds(completedIds);
@@ -266,6 +261,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       case 'bonus':
         handleBonusOpportunity(opportunity);
         break;
+      case 'social_follow':
+        handleSocialFollowOpportunity(opportunity);
+        break;
       case 'shopping':
       case 'partner':
         handleShoppingOpportunity(opportunity);
@@ -273,6 +271,135 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       default:
         handleGenericOpportunity(opportunity);
         break;
+    }
+  };
+
+  const handleSocialFollowOpportunity = async (opportunity: EarningOpportunity) => {
+    // Open the social media link
+    if (opportunity.affiliate_link) {
+      window.open(opportunity.affiliate_link, '_blank');
+      
+      // Show confirmation modal after a brief delay
+      setTimeout(() => {
+        const confirmCompletion = confirm(`Did you complete the task: "${opportunity.title}"?\n\nClick OK if you successfully followed/subscribed, or Cancel to try again.`);
+        
+        if (confirmCompletion) {
+          awardSocialFollowReward(opportunity);
+        }
+      }, 2000);
+      
+      toast({
+        title: `Opening ${opportunity.partner_name || 'social platform'}`,
+        description: "Complete the follow/subscribe action, then confirm completion to earn your NCTR reward!",
+      });
+    } else {
+      toast({
+        title: "Link Not Available",
+        description: "The social media link for this opportunity is not configured yet.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const awardSocialFollowReward = async (opportunity: EarningOpportunity) => {
+    try {
+      // Check if already completed
+      const { data: existingTransaction } = await supabase
+        .from('nctr_transactions')
+        .select('id')
+        .eq('user_id', user?.id)
+        .eq('opportunity_id', opportunity.id)
+        .maybeSingle();
+
+      if (existingTransaction) {
+        toast({
+          title: "Already Completed!",
+          description: "You've already earned rewards for this social media task.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Calculate total reward from new structure
+      const availableReward = opportunity.available_nctr_reward || 0;
+      const lock90Reward = opportunity.lock_90_nctr_reward || 0;  
+      const lock360Reward = opportunity.lock_360_nctr_reward || 0;
+      const totalReward = availableReward + lock90Reward + lock360Reward;
+
+      if (totalReward <= 0) {
+        toast({
+          title: "No Reward Configured",
+          description: "This opportunity doesn't have a reward configured yet.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update portfolio - add to appropriate buckets
+      const { error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .update({
+          available_nctr: (portfolio?.available_nctr || 0) + availableReward,
+          total_earned: (portfolio?.total_earned || 0) + totalReward,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user?.id);
+
+      if (portfolioError) throw portfolioError;
+
+      // Create locks for 90LOCK and 360LOCK rewards
+      if (lock90Reward > 0) {
+        await supabase.from('nctr_locks').insert({
+          user_id: user?.id,
+          nctr_amount: lock90Reward,
+          lock_type: '90LOCK',
+          lock_category: '90LOCK',
+          commitment_days: 90,
+          unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+          can_upgrade: true,
+          original_lock_type: '90LOCK'
+        });
+      }
+
+      if (lock360Reward > 0) {
+        await supabase.from('nctr_locks').insert({
+          user_id: user?.id,
+          nctr_amount: lock360Reward,
+          lock_type: '360LOCK',
+          lock_category: '360LOCK', 
+          commitment_days: 360,
+          unlock_date: new Date(Date.now() + 360 * 24 * 60 * 60 * 1000).toISOString(),
+          can_upgrade: false,
+          original_lock_type: '360LOCK'
+        });
+      }
+
+      // Record transaction
+      await supabase.from('nctr_transactions').insert({
+        user_id: user?.id,
+        transaction_type: 'earned',
+        nctr_amount: totalReward,
+        opportunity_id: opportunity.id,
+        description: `Completed social media task: ${opportunity.title} (${availableReward} Available + ${lock90Reward} 90LOCK + ${lock360Reward} 360LOCK)`,
+        earning_source: 'social_follow',
+        status: 'completed'
+      });
+
+      // Refresh data
+      await fetchUserData();
+
+      toast({
+        title: "🎉 Reward Earned!",
+        description: `You've earned ${formatNCTR(totalReward)} NCTR for completing "${opportunity.title}"!`,
+      });
+
+    } catch (error) {
+      console.error('Error awarding social follow reward:', error);
+      toast({
+        title: "Error",
+        description: "Failed to award reward. Please try again or contact support.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -822,49 +949,81 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           )}
 
           {/* Social Media & Other Opportunities */}
-          {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).length > 0 && (
+          {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type)).length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
                 <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
                 🔗 Social & Bonus Opportunities
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-                {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
-                  <Card 
-                    key={opportunity.id}
-                    className="cursor-pointer hover:shadow-medium transition-all duration-300 group bg-gradient-to-br from-white to-section-highlight border border-section-border hover:border-primary/30"
-                    onClick={() => handleOpportunityClick(opportunity)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                            {opportunity.opportunity_type === 'social_follow' ? (
-                              <ExternalLink className="w-6 h-6 text-primary" />
-                            ) : (
-                              <Gift className="w-6 h-6 text-primary" />
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="font-semibold section-heading text-sm mb-1">{opportunity.title}</h4>
-                            <p className="section-text text-xs line-clamp-2">{opportunity.description}</p>
+                {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type)).map((opportunity) => {
+                  const isCompleted = completedOpportunityIds.includes(opportunity.id);
+                  return (
+                    <Card 
+                      key={opportunity.id}
+                      className={`cursor-pointer hover:shadow-medium transition-all duration-300 group border ${
+                        isCompleted 
+                          ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-200' 
+                          : 'bg-gradient-to-br from-white to-section-highlight border-section-border hover:border-primary/30'
+                      }`}
+                      onClick={() => !isCompleted && handleOpportunityClick(opportunity)}
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full transition-colors ${
+                              isCompleted 
+                                ? 'bg-green-100' 
+                                : 'bg-primary/10 group-hover:bg-primary/20'
+                            }`}>
+                              {isCompleted ? (
+                                <Check className="w-6 h-6 text-green-600" />
+                              ) : opportunity.opportunity_type === 'social_follow' ? (
+                                <ExternalLink className="w-6 h-6 text-primary" />
+                              ) : (
+                                <Gift className="w-6 h-6 text-primary" />
+                              )}
+                            </div>
+                            <div>
+                              <h4 className={`font-semibold text-sm mb-1 ${
+                                isCompleted ? 'text-green-800' : 'section-heading'
+                              }`}>
+                                {opportunity.title}
+                                {isCompleted && <span className="ml-2 text-xs">✓ Completed</span>}
+                              </h4>
+                              <p className={`text-xs line-clamp-2 ${
+                                isCompleted ? 'text-green-600' : 'section-text'
+                              }`}>
+                                {opportunity.description}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="text-center mb-4">
-                        <RewardDisplay opportunity={opportunity} size="sm" />
-                      </div>
+                        <div className="text-center mb-4">
+                          <RewardDisplay opportunity={opportunity} size="sm" />
+                        </div>
 
-                      <Button 
-                        className="w-full bg-primary hover:bg-primary-glow text-primary-foreground py-3 text-sm group-hover:scale-105 transition-all duration-300"
-                        size="sm"
-                      >
-                        {opportunity.opportunity_type === 'social_follow' ? 'Follow & Earn →' : 'Complete Task →'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                        <Button 
+                          className={`w-full py-3 text-sm transition-all duration-300 ${
+                            isCompleted 
+                              ? 'bg-green-600 text-white cursor-default' 
+                              : 'bg-primary hover:bg-primary-glow text-primary-foreground group-hover:scale-105'
+                          }`}
+                          size="sm"
+                          disabled={isCompleted}
+                        >
+                          {isCompleted 
+                            ? '✅ Completed & Rewarded' 
+                            : opportunity.opportunity_type === 'social_follow' 
+                              ? 'Follow & Earn →' 
+                              : 'Complete Task →'
+                          }
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           )}
