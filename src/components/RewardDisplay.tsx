@@ -27,9 +27,7 @@ export const RewardDisplay = ({
     }).format(Math.floor(amount));
   };
 
-  const isLegacyReward = opportunity.reward_distribution_type === 'legacy' || 
-                        (!opportunity.reward_distribution_type && 
-                         (opportunity.nctr_reward > 0 || opportunity.reward_per_dollar > 0));
+  const isLegacyReward = opportunity.reward_distribution_type === 'legacy';
 
   const hasNewRewards = (opportunity.available_nctr_reward || 0) > 0 || 
                        (opportunity.lock_90_nctr_reward || 0) > 0 || 
