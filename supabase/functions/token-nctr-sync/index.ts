@@ -24,29 +24,53 @@ async function fetchPortfolioFromNCTRLive(walletAddress: string): Promise<NCTRPo
   try {
     console.log(`Fetching portfolio for wallet: ${walletAddress}`);
     
-    const response = await fetch(`https://token.nctr.live/api/portfolio/${walletAddress}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${nctrTokenApiKey}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    // Try different possible API endpoints and methods
+    const endpoints = [
+      `https://token.nctr.live/api/portfolio/${walletAddress}`,
+      `https://token.nctr.live/api/v1/portfolio/${walletAddress}`,
+      `https://token.nctr.live/portfolio/${walletAddress}`,
+      `https://api.token.nctr.live/portfolio/${walletAddress}`
+    ];
 
-    if (!response.ok) {
-      console.error(`NCTR Live API error: ${response.status} - ${response.statusText}`);
-      return null;
+    for (const endpoint of endpoints) {
+      console.log(`Trying endpoint: ${endpoint}`);
+      
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${nctrTokenApiKey}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      console.log(`Response status: ${response.status}, Content-Type: ${response.headers.get('content-type')}`);
+
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('NCTR Live portfolio data:', data);
+          
+          return {
+            user_id: '', // Will be set by caller
+            available_nctr: data.available_nctr || 0,
+            lock_360_nctr: data.lock_360_nctr || 0,
+            total_earned: data.total_earned || 0,
+            wallet_address: walletAddress,
+          };
+        } else {
+          console.log('Non-JSON response received:', await response.text());
+        }
+      } else {
+        const responseText = await response.text();
+        console.log(`HTTP ${response.status} error from ${endpoint}:`, responseText);
+      }
     }
 
-    const data = await response.json();
-    console.log('NCTR Live portfolio data:', data);
-    
-    return {
-      user_id: '', // Will be set by caller
-      available_nctr: data.available_nctr || 0,
-      lock_360_nctr: data.lock_360_nctr || 0,
-      total_earned: data.total_earned || 0,
-      wallet_address: walletAddress,
-    };
+    console.error('All endpoints failed or returned non-JSON responses');
+    return null;
+
   } catch (error) {
     console.error('Error fetching from NCTR Live:', error);
     return null;
