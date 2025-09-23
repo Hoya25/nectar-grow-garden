@@ -561,6 +561,10 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      commit_available_to_360lock: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: Json
+      }
       decrement: {
         Args: { x: number }
         Returns: number

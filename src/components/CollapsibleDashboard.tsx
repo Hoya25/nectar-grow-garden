@@ -20,6 +20,9 @@ import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import { useNavigate } from 'react-router-dom';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import LockUpgradeModal from '@/components/LockUpgradeModal';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
@@ -58,8 +61,51 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
   onLockCreated
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed on mobile
+  const [isCommitting, setIsCommitting] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor } = useNCTRPrice();
+
+  const handleCommitTo360LOCK = async () => {
+    if (!user || !portfolio?.available_nctr || portfolio.available_nctr <= 0) {
+      toast({
+        title: "No NCTR Available",
+        description: "You don't have any available NCTR to commit.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCommitting(true);
+    try {
+      const { data, error } = await supabase.rpc('commit_available_to_360lock', {
+        p_user_id: user.id,
+        p_amount: portfolio.available_nctr
+      });
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; error?: string };
+      if (result?.success) {
+        toast({
+          title: "🎉 Committed to 360LOCK!",
+          description: `Successfully committed ${formatNCTR(portfolio.available_nctr)} NCTR to 360LOCK for maximum alliance benefits.`,
+        });
+        onLockCreated(); // Refresh data
+      } else {
+        throw new Error(result?.error || 'Failed to commit to 360LOCK');
+      }
+    } catch (error) {
+      console.error('Error committing to 360LOCK:', error);
+      toast({
+        title: "Commitment Failed",
+        description: error instanceof Error ? error.message : "Failed to commit NCTR to 360LOCK. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCommitting(false);
+    }
+  };
 
   return (
     <div className="lg:w-80 xl:w-96">
@@ -105,7 +151,19 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 <p className="text-lg sm:text-xl font-bold text-section-accent mb-1">
                   {formatNCTR(portfolio?.available_nctr || 0)}
                 </p>
-                <p className="text-xs text-muted-foreground">Ready to commit</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">Ready to commit</p>
+                  {portfolio?.available_nctr && portfolio.available_nctr > 0 && (
+                    <Button
+                      onClick={handleCommitTo360LOCK}
+                      disabled={isCommitting}
+                      size="sm"
+                      className="h-6 px-2 text-xs bg-primary hover:bg-primary-glow text-primary-foreground"
+                    >
+                      {isCommitting ? 'Committing...' : '→ 360LOCK'}
+                    </Button>
+                  )}
+                </div>
               </div>
               <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-foreground/60 ml-2" />
             </div>
