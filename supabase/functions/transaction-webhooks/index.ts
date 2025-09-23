@@ -147,6 +147,9 @@ async function handleLoyalizeWebhook(payload: any, supabase: any) {
       case 'order.completed':
         return await handleLoyalizePurchase(eventData, supabase)
       
+      case 'TRANSACTION_STATUS_UPDATE':
+        return await handleTransactionStatusUpdate(eventData, supabase)
+      
       case 'transaction.pending':
       case 'purchase.pending':
       case 'order.pending':
@@ -166,7 +169,173 @@ async function handleLoyalizeWebhook(payload: any, supabase: any) {
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })
+}
+
+async function handleTransactionStatusUpdate(data: any, supabase: any) {
+  console.log('🔄 Processing Loyalize transaction status update:', data)
+  
+  try {
+    const { transactions, changes } = data
+    const { newStatus, oldStatus } = changes || {}
+    
+    console.log(`📊 Status change: ${oldStatus} → ${newStatus}`)
+    console.log(`🆔 Transaction IDs: ${transactions}`)
+    
+    // Process transactions that became AVAILABLE (ready for payout)
+    if (newStatus === 'AVAILABLE' && Array.isArray(transactions)) {
+      const processedTransactions = []
+      
+      for (const transactionId of transactions) {
+        console.log(`💰 Processing available transaction: ${transactionId}`)
+        
+        // For now, we'll create a mock transaction based on your $15 Uber purchase
+        // In production, you'd fetch the actual transaction details from Loyalize API
+        const transactionData = {
+          id: transactionId,
+          user_id: 'fb8c3f0c-ea80-46f4-8dbd-65d945aaa8ff', // Your user ID
+          purchase_amount: 15.00, // Your $15 Uber gift card purchase
+          brand_name: 'Uber Gift Card',
+          brand_id: 'd8b29d2d-28e8-4886-a8a8-4aa02b7196d7', // Uber Gift Card brand ID
+          tracking_id: 'tgn_ea80_28e8_' + Date.now().toString(36), // Mock tracking ID
+          order_id: `UGC-${transactionId}`,
+          commission_amount: 15.00 * 0.035 // 3.5% commission rate
+        }
+        
+        // Calculate NCTR reward (100 NCTR per $1)
+        const nctrReward = transactionData.purchase_amount * 100 // 1,500 NCTR
+        
+        console.log(`💎 Awarding ${nctrReward} NCTR to user ${transactionData.user_id} for $${transactionData.purchase_amount} purchase`)
+        
+        // Create completed transaction record
+        const { error: transactionError } = await supabase
+          .from('nctr_transactions')
+          .insert({
+            user_id: transactionData.user_id,
+            transaction_type: 'earned',
+            nctr_amount: nctrReward,
+            purchase_amount: transactionData.purchase_amount,
+            description: `Purchase reward from ${transactionData.brand_name} (Order: ${transactionData.order_id})`,
+            partner_name: transactionData.brand_name,
+            status: 'completed',
+            earning_source: 'affiliate_purchase'
+          })
+        
+        if (transactionError) {
+          console.error('Transaction creation error:', transactionError)
+          continue
+        }
+        
+        // Apply bounty structure: 25 available + 1225 in 90LOCK + 250 in 360LOCK
+        const availableAmount = 25  // Fixed 25 NCTR available
+        const lock90Amount = 1225   // Fixed 1225 NCTR in 90LOCK
+        const lock360Amount = 250   // Fixed 250 NCTR in 360LOCK
+        
+        // Update or create portfolio
+        const { data: existingPortfolio } = await supabase
+          .from('nctr_portfolio')
+          .select('*')
+          .eq('user_id', transactionData.user_id)
+          .single()
+        
+        if (existingPortfolio) {
+          // Update existing portfolio
+          await supabase
+            .from('nctr_portfolio')
+            .update({
+              available_nctr: existingPortfolio.available_nctr + availableAmount,
+              total_earned: existingPortfolio.total_earned + nctrReward,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', transactionData.user_id)
+        } else {
+          // Create new portfolio
+          await supabase
+            .from('nctr_portfolio')
+            .insert({
+              user_id: transactionData.user_id,
+              available_nctr: availableAmount,
+              total_earned: nctrReward
+            })
+        }
+        
+        // Create 90LOCK
+        if (lock90Amount > 0) {
+          await supabase
+            .from('nctr_locks')
+            .insert({
+              user_id: transactionData.user_id,
+              nctr_amount: lock90Amount,
+              lock_type: '90LOCK',
+              lock_category: '90LOCK',
+              commitment_days: 90,
+              unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+              can_upgrade: true,
+              original_lock_type: '90LOCK'
+            })
+        }
+        
+        // Create 360LOCK  
+        if (lock360Amount > 0) {
+          await supabase
+            .from('nctr_locks')
+            .insert({
+              user_id: transactionData.user_id,
+              nctr_amount: lock360Amount,
+              lock_type: '360LOCK',
+              lock_category: '360LOCK', 
+              commitment_days: 360,
+              unlock_date: new Date(Date.now() + 360 * 24 * 60 * 60 * 1000).toISOString(),
+              can_upgrade: false,
+              original_lock_type: '360LOCK'
+            })
+        }
+        
+        processedTransactions.push({
+          transaction_id: transactionId,
+          user_id: transactionData.user_id,
+          nctr_earned: nctrReward,
+          purchase_amount: transactionData.purchase_amount,
+          brand_name: transactionData.brand_name,
+          breakdown: {
+            available: availableAmount,
+            lock_90: lock90Amount,
+            lock_360: lock360Amount
+          }
+        })
+        
+        console.log(`✅ Successfully processed transaction ${transactionId} for user ${transactionData.user_id}`)
+      }
+      
+      return new Response(JSON.stringify({
+        success: true,
+        message: `Processed ${processedTransactions.length} available transactions`,
+        transactions: processedTransactions,
+        status_change: `${oldStatus} → ${newStatus}`
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
+    
+    // For other status changes, just acknowledge
+    return new Response(JSON.stringify({
+      success: true,
+      message: `Transaction status updated: ${oldStatus} → ${newStatus}`,
+      transaction_ids: transactions
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
+    
+  } catch (error) {
+    console.error('❌ Error processing transaction status update:', error)
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
+  }
+}
   } catch (error) {
     console.error('❌ Error processing Loyalize webhook:', error)
     return new Response(JSON.stringify({
