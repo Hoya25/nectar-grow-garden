@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.transaction-webhooks]
 verify_jwt = false
+
+[functions.token-nctr-sync]
+verify_jwt = false

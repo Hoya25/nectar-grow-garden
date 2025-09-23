@@ -19,6 +19,7 @@ import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
+import { NCTRSyncButton } from '@/components/NCTRSyncButton';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -702,6 +703,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           locks={locks as any} // Type compatibility fix
           onLockCreated={fetchUserData}
         />
+        
+        {/* NCTR Live Sync */}
+        <div className="px-4 sm:px-6 pb-4">
+          <NCTRSyncButton variant="card" className="w-full" />
+        </div>
         </div>
 
         {/* Main Content - Earning Opportunities */}
