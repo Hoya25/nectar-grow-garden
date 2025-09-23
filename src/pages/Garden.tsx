@@ -77,6 +77,7 @@ const Garden = () => {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<LockCommitment[]>([]);
   const [opportunities, setOpportunities] = useState<EarningOpportunity[]>([]);
+  const [completedOpportunityIds, setCompletedOpportunityIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -174,6 +175,21 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         console.error('Locks error:', locksError);
       } else {
         setLocks(locksData || []);
+      }
+
+      // Fetch completed opportunities
+      const { data: completedData, error: completedError } = await supabase
+        .from('nctr_transactions')
+        .select('opportunity_id')
+        .eq('user_id', user?.id)
+        .eq('status', 'completed')
+        .not('opportunity_id', 'is', null);
+
+      if (completedError) {
+        console.error('Completed opportunities error:', completedError);
+      } else {
+        const completedIds = (completedData || []).map(item => item.opportunity_id).filter(Boolean);
+        setCompletedOpportunityIds(completedIds);
       }
 
       // Fetch earning opportunities
@@ -534,6 +550,84 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           <ProfileCompletionBanner />
         </div>
 
+        {/* Portfolio Section - Prominent Display */}
+        <div className="mb-8">
+          <Card className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 shadow-premium">
+            <CardHeader>
+              <CardTitle className="text-xl section-heading flex items-center gap-2">
+                <Coins className="w-6 h-6 text-primary" />
+                Your NCTR Portfolio
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <Card className="bg-white shadow-sm">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Coins className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm font-medium text-muted-foreground">Available</span>
+                    </div>
+                    <p className="text-xl font-bold text-blue-600 mb-1">
+                      {formatNCTR(portfolio?.available_nctr || 0)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Ready to commit</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Gift className="w-5 h-5 text-orange-600" />
+                      <span className="text-sm font-medium text-orange-600">90LOCK</span>
+                    </div>
+                    <p className="text-xl font-bold text-orange-600 mb-1">
+                      {formatNCTR(portfolio?.lock_90_nctr || 0)}
+                    </p>
+                    <p className="text-xs text-orange-600/80">Short commitment</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-primary/10 to-primary/20 border-primary/30">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Gift className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-medium text-primary">360LOCK</span>
+                    </div>
+                    <p className="text-xl font-bold text-primary mb-1">
+                      {formatNCTR(portfolio?.lock_360_nctr || 0)}
+                    </p>
+                    <p className="text-xs text-primary/80">Alliance Benefits</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <TrendingUp className="w-5 h-5 text-green-600" />
+                      <span className="text-sm font-medium text-green-600">Total Earned</span>
+                    </div>
+                    <p className="text-xl font-bold text-green-600 mb-1">
+                      {formatNCTR(portfolio?.total_earned || 0)}
+                    </p>
+                    <p className="text-xs text-green-600/80">Lifetime NCTR</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="flex justify-center">
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/profile')}
+                  className="border-primary/50 text-primary hover:bg-primary/10"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Portfolio Details & Sync
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Main Earning Opportunities - Front and Center */}
         <div data-earning-opportunities>
           <div className="mb-8 sm:mb-12 text-center">
@@ -547,7 +641,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
           {/* Invite Section - Premium Design */}
           <div className="mb-8">
-            {opportunities.filter(op => op.opportunity_type === 'invite').map(opportunity => (
+            {opportunities.filter(op => op.opportunity_type === 'invite' && !completedOpportunityIds.includes(op.id)).map(opportunity => (
               <Card key={opportunity.id} className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
                 <CardContent className="p-6 sm:p-8">
                   <div className="flex items-center space-x-3">
@@ -622,13 +716,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           </div>
 
           {/* Shopping Opportunities */}
-          {opportunities.filter(op => op.opportunity_type === 'shopping').length > 0 && (
+          {opportunities.filter(op => op.opportunity_type === 'shopping' && !completedOpportunityIds.includes(op.id)).length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
                 <div className="w-2 h-6 bg-green-500 rounded-full"></div>
                 🟢 Live Opportunities
               </h3>
-              {opportunities.filter(op => op.opportunity_type === 'shopping').map((opportunity) => (
+              {opportunities.filter(op => op.opportunity_type === 'shopping' && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
                 <Card 
                   key={opportunity.id} 
                   className="mb-4 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-4 border-l-green-500 bg-gradient-to-r from-green-50/50 to-transparent"
@@ -704,7 +798,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </div>
 
             <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
-              {opportunities.filter(op => op.opportunity_type === 'bonus').map((opportunity) => (
+              {opportunities.filter(op => op.opportunity_type === 'bonus' && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
                 <Card 
                   key={opportunity.id}
                   className="cursor-pointer hover:shadow-medium transition-all duration-300 group bg-gradient-to-br from-white to-section-highlight border border-section-border hover:border-primary/30"
@@ -767,6 +861,49 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </div>
           </div>
 
+          {/* Completed Opportunities Section */}
+          {opportunities.filter(op => completedOpportunityIds.includes(op.id)).length > 0 && (
+            <div className="mb-8">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-semibold section-heading mb-2 flex items-center justify-center gap-2">
+                  <Check className="w-6 h-6 text-green-600" />
+                  Completed Opportunities
+                </h3>
+                <p className="section-text">Great job! You've completed these opportunities</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {opportunities.filter(op => completedOpportunityIds.includes(op.id)).map((opportunity) => (
+                  <Card 
+                    key={opportunity.id}
+                    className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-sm"
+                  >
+                    <CardContent className="p-4">
+                      <div className="text-center">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+                          <Check className="w-6 h-6 text-green-600" />
+                        </div>
+                        <h4 className="font-semibold text-green-800 mb-2">{opportunity.title}</h4>
+                        <p className="text-sm text-green-600 mb-3 line-clamp-2">
+                          {opportunity.description}
+                        </p>
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-lg font-bold text-green-700">
+                            {formatNCTR(opportunity.nctr_reward || opportunity.available_nctr_reward || opportunity.lock_360_nctr_reward || 0)}
+                          </span>
+                          <span className="text-sm text-green-600">NCTR Earned</span>
+                        </div>
+                        <Badge className="mt-2 bg-green-600 text-white">
+                          ✅ Completed
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Affiliate Links Section */}
           <Card className="bg-gradient-to-br from-section-highlight to-white border border-section-border shadow-medium">
             <CardHeader>
@@ -785,70 +922,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         <div className="mt-12" data-referral-system>
           <ReferralSystem />
         </div>
-
-          {/* Portfolio Section - Simplified Overview */}
-          <div className="bg-section-highlight/50 rounded-xl p-6 border border-section-border">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold section-heading">Quick Portfolio Overview</h2>
-                <p className="text-sm text-muted-foreground">Summary of your NCTR holdings</p>
-              </div>
-            </div>
-            
-            {/* Simplified Portfolio Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-white shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Coins className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-medium text-muted-foreground">Available</span>
-                  </div>
-                  <p className="text-2xl font-bold text-primary mb-1">
-                    {formatNCTR(portfolio?.available_nctr || 0)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">NCTR Ready to commit</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-primary/10 to-primary/20">
-                <CardContent className="p-4 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Gift className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-medium text-primary">360LOCK</span>
-                  </div>
-                  <p className="text-2xl font-bold text-primary mb-1">
-                    {formatNCTR(portfolio?.lock_360_nctr || 0)}
-                  </p>
-                  <p className="text-xs text-primary/80">Alliance Benefits</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium text-muted-foreground">Total Earned</span>
-                  </div>
-                  <p className="text-2xl font-bold text-green-600 mb-1">
-                    {formatNCTR(portfolio?.total_earned || 0)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Lifetime NCTR</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Call to Action */}
-            <div className="flex justify-center mt-6">
-              <Button 
-                variant="outline"
-                onClick={() => navigate('/garden')}
-                className="flex items-center gap-2"
-              >
-                <TrendingUp className="w-4 h-4" />
-                Earn More NCTR
-              </Button>
-            </div>
-          </div>
       </main>
 
       {/* Invite Friends Modal */}
