@@ -81,6 +81,8 @@ const Garden = () => {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<LockCommitment[]>([]);
   const [opportunities, setOpportunities] = useState<EarningOpportunity[]>([]);
+  const [completedOpportunities, setCompletedOpportunities] = useState<EarningOpportunity[]>([]);
+  const [userTransactions, setUserTransactions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -187,11 +189,34 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
+      // Fetch user's completed transactions to determine completed opportunities
+      const { data: transactionsData, error: transactionsError } = await supabase
+        .from('nctr_transactions')
+        .select('opportunity_id')
+        .eq('user_id', user?.id)
+        .not('opportunity_id', 'is', null);
+
       if (opportunitiesError) {
         console.error('Opportunities error:', opportunitiesError);
+      } else if (transactionsError) {
+        console.error('Transactions error:', transactionsError);
       } else {
-        // Sort opportunities: Live (shopping) first, then Complete (bonus, invite)
-        const sortedOpportunities = (opportunitiesData || []).sort((a, b) => {
+        // Get list of completed opportunity IDs
+        const completedOpportunityIds = new Set(
+          (transactionsData || []).map(t => t.opportunity_id).filter(Boolean)
+        );
+        
+        // Separate active and completed opportunities
+        const allOpportunities = opportunitiesData || [];
+        const activeOpportunities = allOpportunities.filter(
+          opportunity => !completedOpportunityIds.has(opportunity.id)
+        );
+        const completedOpps = allOpportunities.filter(
+          opportunity => completedOpportunityIds.has(opportunity.id)
+        );
+
+        // Sort active opportunities: Live (shopping) first, then Complete (bonus, invite)
+        const sortedActiveOpportunities = activeOpportunities.sort((a, b) => {
           // Define priority: shopping (Live) = 1, bonus/invite (Complete) = 2
           const getPriority = (type: string) => {
             if (type === 'shopping') return 1; // Live opportunities first
@@ -209,7 +234,14 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           return priorityA - priorityB;
         });
         
-        setOpportunities(sortedOpportunities);
+        // Sort completed opportunities by completion date (newest first)
+        const sortedCompletedOpportunities = completedOpps.sort((a, b) => {
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+        
+        setOpportunities(sortedActiveOpportunities);
+        setCompletedOpportunities(sortedCompletedOpportunities);
+        setUserTransactions(Array.from(completedOpportunityIds));
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -815,10 +847,10 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               {opportunities.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
-                    Partner Shopping Opportunities
+                    🌟 Active Earning Opportunities
                   </h2>
                   <p className="text-center text-muted-foreground mb-8">
-                    Earn NCTR from your everyday purchases with our brand partners
+                    Start earning NCTR tokens with these available opportunities
                   </p>
                 </div>
               )}
@@ -827,9 +859,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               <Card className="bg-white border border-section-border shadow-soft">
                 <CardContent className="p-12 text-center">
                   <Gift className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Partner Opportunities Available</h3>
-                  <p className="text-muted-foreground mb-4">We're working on bringing you amazing earning opportunities with top brands!</p>
-                  <p className="text-sm text-muted-foreground">Check back soon for exciting partnership launches.</p>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Active Opportunities Available</h3>
+                  <p className="text-muted-foreground mb-4">All current opportunities have been completed!</p>
+                  <p className="text-sm text-muted-foreground">Check back soon for new earning opportunities.</p>
                 </CardContent>
               </Card>
             ) : opportunities.length === 1 ? (
@@ -1093,6 +1125,71 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                                 </span>
                               </Button>
                          </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Completed Opportunities Section */}
+            {completedOpportunities.length > 0 && (
+              <div className="mt-16 mb-8">
+                <div className="mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
+                    ✅ Completed Opportunities
+                  </h2>
+                  <p className="text-center text-muted-foreground mb-8">
+                    Well done! You've completed {completedOpportunities.length} earning opportunity{completedOpportunities.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {completedOpportunities.map((opportunity) => (
+                    <Card key={opportunity.id} className="bg-gray-50 border border-gray-200 shadow-soft opacity-75">
+                      <CardContent className="p-6 flex flex-col h-full">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            {opportunity.partner_logo_url ? (
+                              <img 
+                                src={opportunity.partner_logo_url} 
+                                alt={`${opportunity.partner_name} logo`}
+                                className="w-10 h-10 rounded-lg object-cover grayscale"
+                              />
+                            ) : (
+                              <img 
+                                src={nctrNLogo}
+                                alt="The Garden Logo"
+                                className="w-10 h-10 rounded-lg object-cover grayscale"
+                              />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <h3 className="text-base font-semibold text-gray-600 truncate">{opportunity.title}</h3>
+                              {opportunity.partner_name && (
+                                <p className="text-sm text-gray-500 truncate">{opportunity.partner_name}</p>
+                              )}
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                            ✓ Completed
+                          </Badge>
+                        </div>
+
+                        {/* Completed Reward Display */}
+                        <div className="bg-green-50 rounded-lg p-4 mb-4 text-center min-h-[80px] flex flex-col justify-center flex-grow border border-green-100">
+                          <RewardDisplay 
+                            opportunity={opportunity} 
+                            size="sm" 
+                            showPerDollar={false}
+                          />
+                          <div className="text-xs text-green-600 mt-2 font-medium">NCTR Earned ✓</div>
+                        </div>
+
+                        {/* Completion Message */}
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600 font-medium">Opportunity Completed!</p>
+                          <p className="text-xs text-gray-500">NCTR tokens have been credited to your account</p>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
