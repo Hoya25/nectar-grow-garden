@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import { Users, Copy, Check, Gift, Share2, Mail, MessageCircle } from 'lucide-react';
+import { Copy, Check, Share2, Mail, MessageCircle } from 'lucide-react';
+import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface ReferralStats {
   total_referrals: number;
@@ -132,172 +131,183 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
   };
 
   return (
-    <div className="space-y-6">
-      {/* Referral Stats */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="bg-card/80 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-            <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-xl sm:text-2xl font-bold text-foreground">
-              {referralStats.total_referrals}
+    <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 overflow-hidden">
+      <CardContent className="p-6">
+        {/* Header Section */}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
+              <Share2 className="w-8 h-8 text-primary" />
             </div>
-            <p className="text-xs text-muted-foreground">Active community members</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card/80 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-            <CardTitle className="text-sm font-medium">Pending Rewards</CardTitle>
-            <Gift className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-xl sm:text-2xl font-bold text-orange-500">
-              {referralStats.pending_rewards.toLocaleString()} NCTR
+            <div>
+              <Badge variant="secondary" className="mb-2 bg-primary/20 text-primary border-primary/30">
+                🚀 TOP EARNER
+              </Badge>
+              <h2 className="text-2xl font-bold text-foreground">Invite Friends</h2>
+              <h3 className="text-xl font-semibold text-muted-foreground">& Earn Together</h3>
             </div>
-            <p className="text-xs text-muted-foreground">Processing rewards</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card/80 backdrop-blur-sm sm:col-span-2 lg:col-span-1">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-            <CardTitle className="text-sm font-medium">Total Earned</CardTitle>
-            <Gift className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-xl sm:text-2xl font-bold text-green-500">
-              {referralStats.total_earned_from_referrals.toLocaleString()} NCTR
-            </div>
-            <p className="text-xs text-muted-foreground">From referrals</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Referral Program Info */}
-        <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Users className="w-5 h-5 mr-2" />
-              Referral Program
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <h4 className="font-semibold mb-2">How It Works</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Share your unique referral link</li>
-                  <li>• Friends join The Garden using your link</li>
-                  <li>• We both earn 1000 NCTR in 360LOCK when they sign up</li>
-                  <li>• Earn 10% of their earning activity</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Lock System</h4>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Referral rewards: Auto 360LOCK for max status</li>
-                  <li>• Daily bonuses: Auto 360LOCK for growth</li>
-                  <li>• Affiliate purchases: Default 90LOCK</li>
-                  <li>• Upgrade 90LOCK → 360LOCK anytime</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-      {/* Referral Link Section */}
-      <Card className="bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle>Your Referral Link</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary">Code: {referralCode}</Badge>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="referral-link">Share this link with friends:</Label>
-            <div className="flex space-x-2">
-              <Input
-                id="referral-link"
-                value={getReferralLink()}
-                readOnly
-                className="flex-1 text-xs sm:text-sm"
-              />
-              <Button 
-                onClick={copyReferralLink}
-                variant="outline"
-                className="flex-shrink-0 px-3"
-                size="sm"
-              >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </Button>
+          <Button 
+            onClick={() => setShareModalOpen(true)}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 h-auto"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            Start Inviting Friends
+          </Button>
+        </div>
+
+        {/* Rewards Display */}
+        <div className="mb-6">
+          <div className="flex items-center space-x-2 mb-3">
+            <span className="text-2xl font-bold text-primary">1000 NCTR</span>
+            <span className="text-lg text-foreground">each in</span>
+            <span className="text-2xl font-bold text-secondary">360LOCK</span>
+          </div>
+          <p className="text-muted-foreground">Most popular way to earn</p>
+        </div>
+
+        {/* Earnings Breakdown */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="flex items-center justify-center space-x-2 py-4 bg-primary/5 rounded-xl">
+            <span className="text-3xl font-bold text-primary">1000</span>
+            <img src={nctrLogo} alt="NCTR" className="h-6 w-auto" />
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground">for</div>
+              <div className="text-sm font-medium">you</div>
             </div>
           </div>
-
-          <div className="flex gap-2 flex-wrap">
-            <Button onClick={shareViaEmail} variant="outline" size="sm" className="flex-1 sm:flex-none min-h-[44px]">
-              <Mail className="w-4 h-4 mr-1 sm:mr-2" />
-              <span className="text-xs sm:text-sm">Email</span>
-            </Button>
-            <Button onClick={shareViaText} variant="outline" size="sm" className="flex-1 sm:flex-none min-h-[44px]">
-              <MessageCircle className="w-4 h-4 mr-1 sm:mr-2" />
-              <span className="text-xs sm:text-sm">Text</span>
-            </Button>
-            <Button onClick={shareViaWhatsApp} variant="outline" size="sm" className="flex-1 sm:flex-none min-h-[44px]">
-              <MessageCircle className="w-4 h-4 mr-1 sm:mr-2" />
-              <span className="text-xs sm:text-sm">WhatsApp</span>
-            </Button>
-            <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px]">
-                  <Share2 className="w-4 h-4 mr-1 sm:mr-2" />
-                  <span className="text-xs sm:text-sm">More Options</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Share Your Referral Link</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Alert>
-                    <Gift className="h-4 w-4" />
-                    <AlertDescription>
-                      Share this message with your friends to help them discover The Garden:
-                    </AlertDescription>
-                  </Alert>
-                  
-                  <div className="p-4 bg-muted/50 rounded-lg text-sm">
-                    <p className="mb-2">🌱 <strong>Join The Garden and Start Earning NCTR!</strong></p>
-                    <p className="mb-2">
-                      I wanted to invite you to The Garden, where you can earn NCTR tokens through everyday activities like shopping - no investment required!
-                    </p>
-                    <p className="mb-2">
-                      Use my referral link: <span className="font-mono text-xs">{getReferralLink()}</span>
-                    </p>
-                    <p>
-                    We both earn 1000 NCTR in 360LOCK when you sign up. It's a great way to get started with crypto without any risk! 🚀
-                    </p>
-                  </div>
-
-                  <Button 
-                    onClick={() => {
-                      copyReferralLink();
-                      setShareModalOpen(false);
-                    }}
-                    className="w-full bg-white border-2 border-primary text-foreground hover:bg-section-highlight"
-                  >
-                    Copy Message & Link
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+          
+          <div className="flex items-center justify-center space-x-2 py-4 bg-secondary/5 rounded-xl">
+            <span className="text-3xl font-bold text-secondary">1000</span>
+            <img src={nctrLogo} alt="NCTR" className="h-6 w-auto" />
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground">for</div>
+              <div className="text-sm font-medium">friend</div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        {/* Referral Code */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-muted-foreground">Referral code:</span>
+            <Badge variant="outline" className="font-mono text-primary border-primary/30">
+              {referralCode}
+            </Badge>
+          </div>
+          
+          {/* Share Link */}
+          <div className="flex space-x-2">
+            <Input
+              value={getReferralLink()}
+              readOnly
+              className="flex-1 text-sm font-mono"
+            />
+            <Button 
+              onClick={copyReferralLink}
+              variant="outline"
+              size="sm"
+              className="px-4"
+            >
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            </Button>
+          </div>
+        </div>
+
+        {/* Quick Share Options */}
+        <div className="grid grid-cols-3 gap-3">
+          <Button 
+            onClick={copyReferralLink}
+            variant="outline" 
+            size="sm" 
+            className="h-12 flex flex-col items-center justify-center space-y-1"
+          >
+            <Copy className="w-4 h-4" />
+          </Button>
+          
+          <Button 
+            onClick={shareViaWhatsApp}
+            variant="outline" 
+            size="sm" 
+            className="h-12 flex flex-col items-center justify-center space-y-1"
+          >
+            <MessageCircle className="w-4 h-4" />
+          </Button>
+          
+          <Button 
+            onClick={shareViaEmail}
+            variant="outline" 
+            size="sm" 
+            className="h-12 flex flex-col items-center justify-center space-y-1"
+          >
+            <Mail className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Stats Row */}
+        {(referralStats.total_referrals > 0 || referralStats.total_earned_from_referrals > 0) && (
+          <div className="mt-6 pt-6 border-t border-border/50">
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-primary">{referralStats.total_referrals}</div>
+                <div className="text-xs text-muted-foreground">Friends Invited</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-secondary">
+                  {referralStats.total_earned_from_referrals.toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground">NCTR Earned</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Share Modal */}
+        <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Share Your Referral Link</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-4 bg-muted/50 rounded-lg text-sm">
+                <p className="mb-2">🌱 <strong>Join The Garden and Start Earning NCTR!</strong></p>
+                <p className="mb-2">
+                  I wanted to invite you to The Garden, where you can earn NCTR tokens through everyday activities like shopping - no investment required!
+                </p>
+                <p className="mb-2">
+                  Use my referral link: <span className="font-mono text-xs break-all">{getReferralLink()}</span>
+                </p>
+                <p>
+                We both earn 1000 NCTR in 360LOCK when you sign up. It's a great way to get started with crypto without any risk! 🚀
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Button onClick={shareViaEmail} variant="outline" className="h-auto py-3 flex flex-col">
+                  <Mail className="w-5 h-5 mb-1" />
+                  <span className="text-xs">Email</span>
+                </Button>
+                <Button onClick={shareViaText} variant="outline" className="h-auto py-3 flex flex-col">
+                  <MessageCircle className="w-5 h-5 mb-1" />
+                  <span className="text-xs">Text</span>
+                </Button>
+              </div>
+
+              <Button 
+                onClick={() => {
+                  copyReferralLink();
+                  setShareModalOpen(false);
+                }}
+                className="w-full"
+              >
+                Copy Message & Link
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   );
 };
 
