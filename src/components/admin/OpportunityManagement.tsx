@@ -40,6 +40,7 @@ interface EarningOpportunity {
   video_title?: string;
   video_description?: string;
   is_active: boolean;
+  featured: boolean;
   created_at: string;
   // New reward structure fields
   available_nctr_reward?: number;
@@ -93,6 +94,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     video_title: '',
     video_description: '',
     is_active: true,
+    featured: false,
     // New reward structure fields
     available_nctr_reward: 0,
     lock_90_nctr_reward: 0,
@@ -218,6 +220,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_title: '',
       video_description: '',
       is_active: true,
+      featured: false,
       // New reward structure fields
       available_nctr_reward: 0,
       lock_90_nctr_reward: 0,
@@ -247,6 +250,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_title: opportunity.video_title || '',
       video_description: opportunity.video_description || '',
       is_active: opportunity.is_active,
+      featured: opportunity.featured || false,
       // New reward structure fields
       available_nctr_reward: opportunity.available_nctr_reward || 0,
       lock_90_nctr_reward: opportunity.lock_90_nctr_reward || 0,
@@ -415,6 +419,39 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       toast({
         title: "Error",
         description: "Failed to update opportunity status.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleOpportunityFeatured = async (opportunity: EarningOpportunity) => {
+    try {
+      const { error } = await supabase
+        .from('earning_opportunities')
+        .update({ featured: !opportunity.featured })
+        .eq('id', opportunity.id);
+
+      if (error) throw error;
+
+      await logActivity(
+        opportunity.featured ? 'unfeatured' : 'featured', 
+        'opportunity', 
+        opportunity.id, 
+        { title: opportunity.title }
+      );
+
+      toast({
+        title: `Opportunity ${opportunity.featured ? 'Unfeatured' : 'Featured'}`,
+        description: `${opportunity.title} has been ${opportunity.featured ? 'removed from featured' : 'featured'}.`,
+      });
+
+      fetchOpportunities();
+      onStatsUpdate();
+    } catch (error) {
+      console.error('Error toggling opportunity featured status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update featured status.",
         variant: "destructive",
       });
     }
@@ -1137,6 +1174,17 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       Activate opportunity immediately
                     </Label>
                   </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="featured"
+                      checked={formData.featured}
+                      onCheckedChange={(checked) => setFormData({...formData, featured: checked})}
+                    />
+                    <Label htmlFor="featured" className="text-sm font-medium">
+                      ⭐ Feature this opportunity (highlight for users)
+                    </Label>
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-6 border-t border-section-border">
@@ -1191,13 +1239,23 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <IconComponent className="w-5 h-5 text-foreground" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground">{opportunity.title}</h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-foreground">{opportunity.title}</h4>
+                          {opportunity.featured && <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
+                        </div>
                         <p className="text-sm text-muted-foreground">{opportunity.partner_name || 'No Partner'}</p>
                       </div>
                     </div>
-                    <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
-                      {opportunity.is_active ? 'Active' : 'Inactive'}
-                    </Badge>
+                    <div className="flex gap-2">
+                      {opportunity.featured && (
+                        <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
+                          Featured
+                        </Badge>
+                      )}
+                      <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
+                        {opportunity.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </div>
                   </div>
 
                   <div className="space-y-3 mb-4">
@@ -1296,6 +1354,15 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     >
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
+                    </Button>
+                    <Button
+                      variant={opportunity.featured ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleOpportunityFeatured(opportunity)}
+                      className={`${opportunity.featured ? 'bg-yellow-500 hover:bg-yellow-600 text-white border-0' : ''}`}
+                      title={opportunity.featured ? 'Remove from featured' : 'Feature this opportunity'}
+                    >
+                      <Star className={`w-4 h-4 ${opportunity.featured ? 'fill-white text-white' : 'text-muted-foreground'}`} />
                     </Button>
                     <Button
                       variant={opportunity.is_active ? "secondary" : "default"}

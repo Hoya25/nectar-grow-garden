@@ -138,6 +138,7 @@ export type Database = {
           cta_text: string | null
           default_lock_type: string | null
           description: string | null
+          featured: boolean
           id: string
           is_active: boolean
           lock_360_nctr_reward: number | null
@@ -166,6 +167,7 @@ export type Database = {
           cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
+          featured?: boolean
           id?: string
           is_active?: boolean
           lock_360_nctr_reward?: number | null
@@ -194,6 +196,7 @@ export type Database = {
           cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
+          featured?: boolean
           id?: string
           is_active?: boolean
           lock_360_nctr_reward?: number | null
