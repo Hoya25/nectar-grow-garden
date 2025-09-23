@@ -58,6 +58,10 @@ const formatNCTR = (amount: number): string => {
   return amount.toLocaleString();
 };
 
+const formatUSD = (amount: number): string => {
+  return amount.toFixed(2);
+};
+
 export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
   portfolio,
   locks,
@@ -127,7 +131,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
               {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_360_nctr || 0) + (portfolio?.lock_90_nctr || 0))} NCTR
             </span>
             <span className="text-green-600 font-medium">
-              ${formatPrice(calculatePortfolioValue(
+              ${formatUSD(calculatePortfolioValue(
                 (portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0)
               ))}
             </span>
@@ -166,7 +170,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   <div className="flex flex-col">
                     <p className="text-xs text-muted-foreground">Ready to commit</p>
                     <p className="text-xs text-green-600 font-medium">
-                      ${formatPrice(calculatePortfolioValue(portfolio?.available_nctr || 0))}
+                      ${formatUSD(calculatePortfolioValue(portfolio?.available_nctr || 0))}
                     </p>
                   </div>
                   {portfolio?.available_nctr && portfolio.available_nctr > 0 && (
@@ -206,7 +210,12 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   {formatNCTR(portfolio?.lock_90_nctr || 0)}
                 </p>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-blue-600">Standard</p>
+                  <div className="flex flex-col">
+                    <p className="text-xs text-blue-600">Standard</p>
+                    <p className="text-xs text-blue-700 font-medium">
+                      ${formatUSD(calculatePortfolioValue(portfolio?.lock_90_nctr || 0))}
+                    </p>
+                  </div>
                   {portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0 && (
                     <Button
                       onClick={handleCommitTo360LOCK}
@@ -247,7 +256,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   <div className="flex flex-col">
                     <p className="text-xs text-primary/80">Alliance</p>
                     <p className="text-xs text-primary font-medium">
-                      ${formatPrice(calculatePortfolioValue(portfolio?.lock_360_nctr || 0))}
+                      ${formatUSD(calculatePortfolioValue(portfolio?.lock_360_nctr || 0))}
                     </p>
                   </div>
                 </div>
@@ -276,7 +285,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   <div className="flex flex-col">
                     <p className="text-xs text-muted-foreground">Lifetime</p>
                     <p className="text-xs text-green-600 font-medium">
-                      ${formatPrice(calculatePortfolioValue(portfolio?.total_earned || 0))}
+                      ${formatUSD(calculatePortfolioValue(portfolio?.total_earned || 0))}
                     </p>
                   </div>
                 </div>
@@ -307,7 +316,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
             <div className="mt-3 pt-3 border-t border-section-border">
               <p className="text-xs text-muted-foreground mb-1">Total Portfolio Value</p>
               <p className="text-lg font-bold text-primary">
-                ${formatPrice(calculatePortfolioValue(
+                ${formatUSD(calculatePortfolioValue(
                   (portfolio?.available_nctr || 0) + 
                   (portfolio?.lock_90_nctr || 0) + 
                   (portfolio?.lock_360_nctr || 0)
