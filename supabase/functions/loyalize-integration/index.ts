@@ -68,7 +68,8 @@ serve(async (req) => {
         try {
           return await syncFromLoyalizeAPI(loyalizeApiKey, supabase)
         } catch (apiError) {
-          console.error('Loyalize API failed, falling back to sample data:', apiError)
+          console.error('🚫 Loyalize API sync failed:', apiError)
+          console.log('🔄 Using fallback brand data...')
           return await syncSampleBrands(supabase, true)
         }
       }
@@ -222,56 +223,37 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     let allStores: any[] = [];
     let page = 0;
     let hasMorePages = true;
-    const maxPageSize = 1000; // Increase from 200 to 1000 for faster sync
+    const maxPageSize = 1000;
     
-    // First, try to get all stores with pagination
+    // Fetch all stores with pagination using ONLY the correct auth method
     while (hasMorePages) {
       const endpoint = `https://api.loyalize.com/v1/stores?page=${page}&size=${maxPageSize}`;
-      // Try different authentication methods common in affiliate APIs
-      const authHeaders: Record<string, any> = {
+      
+      console.log(`🔄 Fetching page ${page} from: ${endpoint}`);
+      console.log(`🔑 Using API key: ${apiKey ? 'Present (length: ' + apiKey.length + ')' : 'Missing'}`);
+      
+      // Use ONLY the authentication method confirmed by Loyalize support
+      const authHeaders = {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': apiKey // Direct Authorization header as confirmed by support
       };
-
-      // Use correct Loyalize authentication method as confirmed by support
-      authHeaders['Authorization'] = apiKey;
-        console.log(`🔑 Trying direct Authorization header authentication`);
-      }
       
-      // Method 4: API key in URL (fallback)
-      const finalEndpoint = page <= 2 ? endpoint : `${endpoint}&api_key=${apiKey}`;
-      if (page === 3) {
-        console.log(`🔑 Trying API key in URL parameter`);
-      }
-      
-      console.log(`🔄 Fetching page ${page} from: ${finalEndpoint}`);
-      console.log(`🔑 Using API key: ${apiKey ? 'Present' : 'Missing'} (length: ${apiKey?.length || 0})`);
-      console.log(`🔑 Auth headers:`, authHeaders);
-      
-      const response = await fetch(finalEndpoint, {
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: authHeaders
       });
       
       console.log(`📊 API response status: ${response.status}`);
-      console.log(`📊 API response headers:`, Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
         console.error(`❌ API request failed: ${response.status} ${response.statusText}`);
         console.error(`❌ Error response body:`, errorText);
-        console.error(`❌ Request URL:`, finalEndpoint);
-        console.error(`❌ Auth method ${page + 1}/4:`, page === 0 ? 'Bearer' : page === 1 ? 'X-API-Key' : page === 2 ? 'Direct Auth' : 'URL Parameter');
+        console.error(`❌ Request URL:`, endpoint);
         
-        // If this is not the last auth method to try, continue to next page/method
-        if (page < 3) {
-          console.log(`🔄 Trying next authentication method...`);
-          page++;
-          continue;
-        } else {
-          // All auth methods failed, throw error for fallback
-          throw new Error(`All authentication methods failed. Last error: ${response.status} - ${errorText || response.statusText}`);
-        }
+        // Throw error for fallback
+        throw new Error(`Loyalize API failed: ${response.status} - ${errorText || response.statusText}`);
       }
       
       const data = await response.json().catch((err) => {
@@ -294,18 +276,13 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
       console.log(`✅ Retrieved ${stores.length} stores from page ${page} (Total so far: ${allStores.length + stores.length})`);
       allStores = allStores.concat(stores);
       
-      // Check if there are more pages - be more flexible with pagination detection
+      // Check if there are more pages
       hasMorePages = !data.last && stores.length > 0 && (data.totalPages ? page < data.totalPages - 1 : stores.length === maxPageSize);
       page++;
       
-      // Log progress every 5 pages
-      if (page % 5 === 0) {
-        console.log(`🔄 Progress: Page ${page}, Total brands: ${allStores.length}`);
-      }
-      
-      // Safety limit to prevent infinite loops
-      if (page > 50) {
-        console.log('⚠️ Reached maximum page limit (50), stopping pagination');
+      // Safety check to prevent infinite loops
+      if (page > 10) {
+        console.log('⚠️ Safety limit reached - stopping at page 10');
         break;
       }
     }
@@ -435,8 +412,9 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
       brands_count: syncedCount,
       brands_synced: syncedCount,
       total_pages_fetched: page,
-      uber_included: foundUberStores.length > 0 || true, // Always true since we add manually if not found
-      is_live_data: true
+      uber_gift_cards_included: foundUberStores.length > 0 || true, // Always true since we add manually if not found
+      is_sample_data: false,
+      is_fallback_data: false
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -457,172 +435,160 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       name: 'Uber Gift Cards',
       description: 'Purchase Uber gift cards for rides and food delivery. Get up to 1% cashback on gift card purchases through MyGiftCardsPlus.',
       logo_url: 'https://logo.clearbit.com/uber.com',
-      commission_rate: 0.0100, // NUMERIC(10,4) max 999,999.9999
-      nctr_per_dollar: 100.0000, // Now supports 100+ values with NUMERIC(10,4)
+      commission_rate: 0.01, // 1%
+      nctr_per_dollar: 100.0,
       category: 'Gift Cards',
       website_url: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR',
       is_active: true,
-      featured: true,
+      featured: true
     },
     {
-      loyalize_id: 'gc-amazon-001',
+      loyalize_id: 'uber-001',
+      name: 'Uber',
+      description: 'Uber ride sharing and food delivery platform. Get rides, order food, and more with Uber services.',
+      logo_url: 'https://logo.clearbit.com/uber.com',
+      commission_rate: 0.045, // 4.5%
+      nctr_per_dollar: 0.0045,
+      category: 'Transportation',
+      website_url: 'https://www.uber.com',
+      is_active: true,
+      featured: true
+    },
+    {
+      loyalize_id: 'uber-eats-001',
+      name: 'Uber Eats',
+      description: 'Food delivery service from Uber. Order from local restaurants and get delivery straight to your door.',
+      logo_url: 'https://logo.clearbit.com/ubereats.com',
+      commission_rate: 0.055, // 5.5%
+      nctr_per_dollar: 0.0055,
+      category: 'Food Delivery',
+      website_url: 'https://www.ubereats.com',
+      is_active: true,
+      featured: true
+    },
+    {
+      loyalize_id: 'amazon-gc-001',
       name: 'Amazon Gift Cards',
       description: 'Digital and physical gift cards for the world\'s largest online retailer. Perfect for any occasion.',
       logo_url: 'https://logo.clearbit.com/amazon.com',
-      commission_rate: 0.04,
-      nctr_per_dollar: 100.0, // Fixed default rate
+      commission_rate: 0.04, // 4%
+      nctr_per_dollar: 100.0,
       category: 'Gift Cards',
       website_url: 'https://amazon.com/gift-cards',
       is_active: true,
-      featured: true,
+      featured: true
     },
     {
-      loyalize_id: 'gc-apple-001', 
-      name: 'Apple Store Gift Cards',
-      description: 'Gift cards for Apple products, apps, music, movies, and more from the App Store and iTunes.',
-      logo_url: 'https://logo.clearbit.com/apple.com',
-      commission_rate: 0.035,
-      nctr_per_dollar: 100.0, // Fixed default rate
-      category: 'Gift Cards',
-      website_url: 'https://apple.com/gift-cards',
-      is_active: true,
-      featured: true,
-    },
-    {
-      loyalize_id: 'gc-target-001',
-      name: 'Target Gift Cards',
-      description: 'Versatile gift cards for retail shopping, groceries, and online purchases at Target.',  
-      logo_url: 'https://logo.clearbit.com/target.com',
-      commission_rate: 0.055,
-      nctr_per_dollar: 100.0, // Fixed default rate
-      category: 'Gift Cards',
-      website_url: 'https://target.com/gift-cards',
-      is_active: true,
-      featured: false,
-    },
-    {
-      loyalize_id: 'gc-starbucks-001',
+      loyalize_id: 'starbucks-gc-001',
       name: 'Starbucks Gift Cards',
       description: 'Perfect for coffee lovers - reload and use at any Starbucks location worldwide.',
       logo_url: 'https://logo.clearbit.com/starbucks.com',
-      commission_rate: 0.052,
-      nctr_per_dollar: 100.0, // Fixed default rate
+      commission_rate: 0.052, // 5.2%
+      nctr_per_dollar: 100.0,
       category: 'Gift Cards',
       website_url: 'https://starbucks.com/gift-cards',
       is_active: true,
-      featured: true,
+      featured: true
     },
     {
-      loyalize_id: 'gc-walmart-001',
+      loyalize_id: 'walmart-gc-001',
       name: 'Walmart Gift Cards',
       description: 'Gift cards for America\'s largest retailer - use in-store or online for groceries and more.',
       logo_url: 'https://logo.clearbit.com/walmart.com',
-      commission_rate: 0.045,
-      nctr_per_dollar: 100.0, // Fixed default rate
+      commission_rate: 0.045, // 4.5%
+      nctr_per_dollar: 100.0,
       category: 'Gift Cards',
       website_url: 'https://walmart.com/gift-cards',
       is_active: true,
-      featured: true,
+      featured: true
+    },
+    {
+      loyalize_id: 'apple-gc-001',
+      name: 'Apple Store Gift Cards',
+      description: 'Gift cards for Apple products, apps, music, movies, and more from the App Store and iTunes.',
+      logo_url: 'https://logo.clearbit.com/apple.com',
+      commission_rate: 0.035, // 3.5%
+      nctr_per_dollar: 100.0,
+      category: 'Gift Cards',
+      website_url: 'https://apple.com/gift-cards',
+      is_active: true,
+      featured: true
     },
     {
       loyalize_id: 'bestbuy-001',
       name: 'Best Buy',
       description: 'Electronics and tech retailer with the latest gadgets, gaming, and home entertainment.',
       logo_url: 'https://logo.clearbit.com/bestbuy.com',
-      commission_rate: 0.038,
-      nctr_per_dollar: 100.0, // Fixed default rate
+      commission_rate: 0.038, // 3.8%
+      nctr_per_dollar: 100.0,
       category: 'Electronics',
       website_url: 'https://bestbuy.com',
       is_active: true,
-      featured: false,
-    },
-    {
-      loyalize_id: 'nike-001',
-      name: 'Nike',
-      description: 'Athletic footwear, apparel, and equipment from the world\'s leading sports brand.',
-      logo_url: 'https://logo.clearbit.com/nike.com',
-      commission_rate: 0.065,
-      nctr_per_dollar: 100.0, // Fixed default rate
-      category: 'Athletic',
-      website_url: 'https://nike.com',
-      is_active: true,
-      featured: false,
+      featured: false
     },
     {
       loyalize_id: 'adidas-001',
       name: 'Adidas',
       description: 'Premium athletic wear and footwear for all sports and lifestyle activities.',
       logo_url: 'https://logo.clearbit.com/adidas.com',
-      commission_rate: 0.062,
-      nctr_per_dollar: 100.0, // Fixed default rate
+      commission_rate: 0.062, // 6.2%
+      nctr_per_dollar: 100.0,
       category: 'Athletic',
       website_url: 'https://adidas.com',
       is_active: true,
-      featured: false,
+      featured: false
     }
-  ]
+  ];
   
-  const { data: upsertData, error: upsertError } = await supabase
+  console.log(`🔄 Upserting ${enhancedBrands.length} sample/fallback brands...`);
+  
+  const { error: upsertError } = await supabase
     .from('brands')
     .upsert(enhancedBrands, {
       onConflict: 'loyalize_id',
       ignoreDuplicates: false
-    })
+    });
   
   if (upsertError) {
-    console.error('Error upserting enhanced brands:', upsertError)
-    throw upsertError
+    console.error('Database upsert error:', upsertError);
+    throw upsertError;
   }
   
-  const message = isFallback 
-    ? `API unavailable, synced ${enhancedBrands.length} fallback brands including Uber`
-    : `Successfully synced ${enhancedBrands.length} enhanced brands including Uber (API key not configured)`
+  console.log(`✅ ${isFallback ? 'API unavailable, synced' : 'Successfully synced'} ${enhancedBrands.length} ${isFallback ? 'fallback' : 'sample'} brands including Uber`);
   
-  console.log(`✅ ${message}`)
-  
-  return new Response(
-    JSON.stringify({
-      success: true,
-      message,
-      brands_count: enhancedBrands.length,
-      brands_synced: enhancedBrands.length,
-      uber_gift_cards_included: true,
-      is_sample_data: !isFallback,
-      is_fallback_data: isFallback,
-      brand_types: ['Transportation', 'Gift Cards', 'Electronics', 'Athletic']
-    }),
-    { 
-      headers: { 
-        ...corsHeaders,
-        'Content-Type': 'application/json'
-      }
-    }
-  );
+  return new Response(JSON.stringify({
+    success: true,
+    message: `${isFallback ? 'API unavailable, synced' : 'Successfully synced'} ${enhancedBrands.length} ${isFallback ? 'fallback' : 'sample'} brands including Uber`,
+    brands_count: enhancedBrands.length,
+    brands_synced: enhancedBrands.length,
+    uber_gift_cards_included: true,
+    is_sample_data: !isFallback,
+    is_fallback_data: isFallback,
+    brand_types: [...new Set(enhancedBrands.map(b => b.category))]
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
 }
 
-// Generate tracking URL with user tracking parameters
-function generateTrackingUrl(baseUrl: string, userId: string, brandId: string): string {
-  if (!baseUrl) return '';
+function generateTrackingUrl(baseUrl: string, userId: string, storeId: string, subId?: string): string {
+  if (!baseUrl) return '#';
   
-  try {
-    const url = new URL(baseUrl);
-    url.searchParams.set('ref', 'nctr_platform');
-    url.searchParams.set('brand_id', brandId);
-    url.searchParams.set('user_id', userId); // Will be replaced with actual user ID
-    url.searchParams.set('tracking_id', `nctr_${Date.now()}`); // Will be replaced with actual tracking ID
-    return url.toString();
-  } catch (error) {
-    // If URL parsing fails, return the original URL with query parameters
-    const separator = baseUrl.includes('?') ? '&' : '?';
-    return `${baseUrl}${separator}ref=nctr_platform&brand_id=${brandId}&user_id=${userId}&tracking_id=nctr_${Date.now()}`;
+  const url = new URL(baseUrl);
+  url.searchParams.set('ref', 'nctr_platform');
+  url.searchParams.set('source', storeId);
+  url.searchParams.set('user_id', userId);
+  
+  if (subId) {
+    url.searchParams.set('sub_id', subId);
   }
+  
+  return url.toString();
 }
 
 async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> {
-  console.log('🖼️ Fetching store logos from sku-details endpoint');
+  const logoMap: Record<string, string> = {};
   
   try {
-    let logoMap: Record<string, string> = {};
     let page = 0;
     let hasMorePages = true;
     const pageSize = 1000; // Maximum per API docs
@@ -645,36 +611,29 @@ async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> 
       }
       
       const data = await response.json();
-      const items = data.content || [];
+      const skuDetails = data.content || data || [];
       
-      console.log(`✅ Retrieved ${items.length} logo items from page ${page}`);
-      
-      // Extract store logos from sku details
-      items.forEach((item: any) => {
-        if (item.storeId && item.storeLogo) {
-          logoMap[item.storeId.toString()] = item.storeLogo;
-        }
-        // Also try alternative field names that might contain logo data
-        if (item.store_id && item.store_logo) {
-          logoMap[item.store_id.toString()] = item.store_logo;
-        }
-        if (item.merchant_id && item.merchant_logo) {
-          logoMap[item.merchant_id.toString()] = item.merchant_logo;
+      // Extract store logos from SKU details
+      skuDetails.forEach((sku: any) => {
+        if (sku.storeId && sku.storeLogo) {
+          logoMap[sku.storeId.toString()] = sku.storeLogo;
         }
       });
       
-      // Check if there are more pages
-      hasMorePages = !data.last && items.length === pageSize;
+      console.log(`✅ Processed ${skuDetails.length} SKUs from page ${page}, total logos: ${Object.keys(logoMap).length}`);
+      
+      // Check pagination
+      hasMorePages = !data.last && skuDetails.length === pageSize;
       page++;
       
       // Safety limit
-      if (page > 10) {
-        console.log('⚠️ Reached logo fetch page limit (10), stopping');
+      if (page >= 5) {
+        console.log('⚠️ Reached logo fetch page limit (5)');
         break;
       }
     }
     
-    console.log(`🎯 Collected logos for ${Object.keys(logoMap).length} stores`);
+    console.log(`🖼️ Total logos collected: ${Object.keys(logoMap).length}`);
     return logoMap;
     
   } catch (error) {
