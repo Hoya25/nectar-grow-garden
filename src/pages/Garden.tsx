@@ -786,80 +786,69 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           <ReferralSystem />
         </div>
 
-        {/* Portfolio Section - Secondary Priority */}
-        <div className="mt-12 bg-section-highlight/50 rounded-xl p-6 border border-section-border">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold section-heading">Portfolio Overview</h2>
-              <p className="text-sm text-muted-foreground">Manage your NCTR holdings and commitments</p>
+          {/* Portfolio Section - Simplified Overview */}
+          <div className="bg-section-highlight/50 rounded-xl p-6 border border-section-border">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold section-heading">Quick Portfolio Overview</h2>
+                <p className="text-sm text-muted-foreground">Summary of your NCTR holdings</p>
+              </div>
             </div>
-            <Button 
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/profile')}
-              className="flex items-center gap-2 border-primary/50 hover:bg-primary/10"
-            >
-              <User className="w-4 h-4" />
-              Manage in Profile
-            </Button>
-          </div>
-          
-          {/* Simplified Portfolio Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card className="bg-white shadow-sm">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Coins className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium text-muted-foreground">Available</span>
-                </div>
-                <p className="text-2xl font-bold text-primary mb-1">
-                  {formatNCTR(portfolio?.available_nctr || 0)}
-                </p>
-                <p className="text-xs text-muted-foreground">NCTR Ready to commit</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-primary/10 to-primary/20">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Gift className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium text-primary">360LOCK</span>
-                </div>
-                <p className="text-2xl font-bold text-primary mb-1">
-                  {formatNCTR(portfolio?.lock_360_nctr || 0)}
-                </p>
-                <p className="text-xs text-primary/80">Alliance Benefits</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white shadow-sm">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-medium text-muted-foreground">Total Earned</span>
-                </div>
-                <p className="text-2xl font-bold text-green-600 mb-1">
-                  {formatNCTR(portfolio?.total_earned || 0)}
-                </p>
-                <p className="text-xs text-muted-foreground">Lifetime NCTR</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Portfolio Actions */}
-          <div className="flex flex-wrap gap-3 justify-center">
-            <LockCommitmentModal onLockCreated={fetchUserData} availableNCTR={portfolio?.available_nctr || 0} />
             
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/profile')}
-              className="flex items-center gap-2"
-            >
-              <User className="w-4 h-4" />
-              Portfolio Details & Sync
-            </Button>
+            {/* Simplified Portfolio Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-white shadow-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Coins className="w-5 h-5 text-primary" />
+                    <span className="text-sm font-medium text-muted-foreground">Available</span>
+                  </div>
+                  <p className="text-2xl font-bold text-primary mb-1">
+                    {formatNCTR(portfolio?.available_nctr || 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">NCTR Ready to commit</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-primary/10 to-primary/20">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Gift className="w-5 h-5 text-primary" />
+                    <span className="text-sm font-medium text-primary">360LOCK</span>
+                  </div>
+                  <p className="text-2xl font-bold text-primary mb-1">
+                    {formatNCTR(portfolio?.lock_360_nctr || 0)}
+                  </p>
+                  <p className="text-xs text-primary/80">Alliance Benefits</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white shadow-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    <span className="text-sm font-medium text-muted-foreground">Total Earned</span>
+                  </div>
+                  <p className="text-2xl font-bold text-green-600 mb-1">
+                    {formatNCTR(portfolio?.total_earned || 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Lifetime NCTR</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Call to Action */}
+            <div className="flex justify-center mt-6">
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/garden')}
+                className="flex items-center gap-2"
+              >
+                <TrendingUp className="w-4 h-4" />
+                Earn More NCTR
+              </Button>
+            </div>
           </div>
-        </div>
       </main>
 
       {/* Invite Friends Modal */}

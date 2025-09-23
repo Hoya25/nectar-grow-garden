@@ -14,6 +14,7 @@ import { toast } from '@/hooks/use-toast';
 import WalletConnection from '@/components/WalletConnection';
 import { WingsStatusBar } from '@/components/WingsStatusBar';
 import { LevelUpModal } from '@/components/LevelUpModal';
+import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 
 interface UserProfile {
   id: string;
@@ -33,6 +34,8 @@ interface Portfolio {
   available_nctr: number;
   total_earned: number;
   lock_360_nctr: number;
+  lock_90_nctr: number;
+  pending_nctr: number;
 }
 
 interface StatusLevel {
@@ -48,6 +51,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [locks, setLocks] = useState<any[]>([]);
   const [statusLevels, setStatusLevels] = useState<StatusLevel[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -100,12 +104,26 @@ const Profile = () => {
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
-        .select('opportunity_status, available_nctr, total_earned, lock_360_nctr')
+        .select('opportunity_status, available_nctr, total_earned, lock_360_nctr, lock_90_nctr, pending_nctr')
         .eq('user_id', user?.id)
         .maybeSingle();
 
       if (portfolioError && portfolioError.code !== 'PGRST116') {
         console.error('Portfolio error:', portfolioError);
+      }
+
+      // Fetch lock commitments
+      const { data: locksData, error: locksError } = await supabase
+        .from('nctr_locks')
+        .select('*, lock_category, commitment_days')
+        .eq('user_id', user?.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (locksError) {
+        console.error('Locks error:', locksError);
+      } else {
+        setLocks(locksData || []);
       }
 
       // Fetch status levels
@@ -712,13 +730,13 @@ const Profile = () => {
                      </div>
                    </div>
 
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => navigate('/garden')}
-                  >
-                    View Full Portfolio
-                  </Button>
+                   <Button 
+                     variant="outline" 
+                     className="w-full"
+                     onClick={() => navigate('/garden')}
+                   >
+                     Earn More NCTR
+                   </Button>
                 </CardContent>
               </Card>
             )}
