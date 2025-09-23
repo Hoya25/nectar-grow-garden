@@ -508,11 +508,146 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                 </p>
               </div>
 
+              {/* TOP PRIORITY: Invite Friends Opportunity */}
+              <div className="mb-12">
+                <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/30 shadow-glow-intense hover:shadow-glow-intense transition-all duration-500 relative overflow-hidden">
+                  {/* Decorative Elements */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-xl"></div>
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-primary/15 to-transparent rounded-full blur-lg"></div>
+                  
+                  <CardContent className="p-6 sm:p-8 relative z-10">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                      {/* Left Side - Content */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-3 bg-primary/20 rounded-xl">
+                            <Users className="w-8 h-8 text-primary" />
+                          </div>
+                          <div>
+                            <Badge className="bg-primary text-primary-foreground border-0 mb-2 px-3 py-1 text-sm font-semibold">
+                              🚀 TOP EARNING OPPORTUNITY
+                            </Badge>
+                            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+                              Invite Friends & Earn Together
+                            </h2>
+                          </div>
+                        </div>
+                        
+                        <p className="text-base sm:text-lg text-muted-foreground mb-6 leading-relaxed">
+                          Share The Garden with friends and <strong className="text-primary">both earn 1000 NCTR in 360LOCK instantly!</strong> 
+                          Build your community and multiply your rewards together.
+                        </p>
+                        
+                        {/* Value Proposition */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                          <div className="text-center p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-primary/20">
+                            <div className="flex items-center justify-center space-x-2 mb-2">
+                              <span className="text-2xl font-bold text-primary">1000</span>
+                              <img src={nctrLogo} alt="NCTR" className="h-12 w-auto" />
+                            </div>
+                            <p className="text-xs text-muted-foreground font-medium">For You</p>
+                          </div>
+                          <div className="text-center p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-primary/20">
+                            <div className="flex items-center justify-center space-x-2 mb-2">
+                              <span className="text-2xl font-bold text-primary">1000</span>
+                              <img src={nctrLogo} alt="NCTR" className="h-12 w-auto" />
+                            </div>
+                            <p className="text-xs text-muted-foreground font-medium">For Friend</p>
+                          </div>
+                          <div className="text-center p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-primary/20 sm:block hidden">
+                            <div className="flex items-center justify-center mb-2">
+                              <Badge variant="outline" className="text-primary border-primary/50 bg-primary/10 text-xs">
+                                360LOCK
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground font-medium">Auto-Locked</p>
+                          </div>
+                        </div>
+                        
+                        {/* Social Proof */}
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+                          <div className="flex items-center gap-2">
+                            <div className="flex -space-x-2">
+                              <div className="w-6 h-6 bg-gradient-to-r from-primary to-primary-light rounded-full border-2 border-white"></div>
+                              <div className="w-6 h-6 bg-gradient-to-r from-accent to-accent-light rounded-full border-2 border-white"></div>
+                              <div className="w-6 h-6 bg-gradient-to-r from-secondary to-secondary-accent rounded-full border-2 border-white"></div>
+                            </div>
+                            <span className="font-medium">500+ users earning together</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <TrendingUp className="w-4 h-4 text-primary" />
+                            <span>Most popular way to earn</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Right Side - Action */}
+                      <div className="lg:w-80 flex flex-col gap-4">
+                        <Button 
+                          onClick={() => setInviteModalOpen(true)}
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 h-14 rounded-xl shadow-large hover:shadow-glow-intense transition-all duration-300 font-semibold"
+                        >
+                          <Share2 className="w-5 h-5 mr-3" />
+                          Start Inviting Friends
+                        </Button>
+                        
+                        {/* Quick Share Options */}
+                        <div className="grid grid-cols-3 gap-2">
+                          <Button 
+                            onClick={copyInviteLink}
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center justify-center gap-1 py-3 border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                          >
+                            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                            <span className="text-xs">Copy</span>
+                          </Button>
+                          <Button 
+                            onClick={shareViaWhatsApp}
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center justify-center gap-1 py-3 border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span className="text-xs">WhatsApp</span>
+                          </Button>
+                          <Button 
+                            onClick={shareViaEmail}
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center justify-center gap-1 py-3 border-primary/30 hover:bg-primary/10 hover:border-primary/50"
+                          >
+                            <Mail className="w-4 h-4" />
+                            <span className="text-xs">Email</span>
+                          </Button>
+                        </div>
+                        
+                        <p className="text-xs text-center text-muted-foreground">
+                          Your referral code: <span className="font-mono font-semibold text-primary">{referralCode}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Other Earning Opportunities */}
+              {opportunities.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
+                    Partner Shopping Opportunities
+                  </h2>
+                  <p className="text-center text-muted-foreground mb-8">
+                    Earn NCTR from your everyday purchases with our brand partners
+                  </p>
+                </div>
+              )}
+
             {opportunities.length === 0 ? (
               <Card className="bg-white border border-section-border shadow-soft">
                 <CardContent className="p-12 text-center">
                   <Gift className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Opportunities Available</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Partner Opportunities Available</h3>
                   <p className="text-muted-foreground mb-4">We're working on bringing you amazing earning opportunities with top brands!</p>
                   <p className="text-sm text-muted-foreground">Check back soon for exciting partnership launches.</p>
                 </CardContent>
