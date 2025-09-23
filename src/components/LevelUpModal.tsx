@@ -156,11 +156,148 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
 
           <Separator />
 
-          {/* Level Up Options */}
+          {/* Easy Buy Buttons for All Status Levels */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
+              <ShoppingCart className="w-5 h-5 text-primary" />
+              <span>Quick Status Upgrades</span>
+            </h3>
+            
+            <div className="grid gap-3">
+              {/* Bronze Level */}
+              {current360NCTR < 1000 && (
+                <Card className="border border-amber-200 bg-gradient-to-r from-amber-50/50 to-orange-50/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center">
+                          <Trophy className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-amber-800">BRONZE ALLIANCE</h4>
+                          <p className="text-sm text-amber-700">1.10x multiplier • 1,000 NCTR in 360LOCK</p>
+                        </div>
+                      </div>
+                      <BuyNCTRButton
+                        suggestedAmount={1000 - current360NCTR}
+                        className="bg-amber-600 hover:bg-amber-700 text-white border-0"
+                      >
+                        Buy {formatNCTR(1000 - current360NCTR)} NCTR
+                      </BuyNCTRButton>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Silver Level */}
+              {current360NCTR < 2500 && (
+                <Card className="border border-slate-200 bg-gradient-to-r from-slate-50/50 to-slate-100/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
+                          <Trophy className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-slate-700">SILVER ALLIANCE</h4>
+                          <p className="text-sm text-slate-600">1.25x multiplier • 2,500 NCTR in 360LOCK</p>
+                        </div>
+                      </div>
+                      <BuyNCTRButton
+                        suggestedAmount={2500 - current360NCTR}
+                        className="bg-slate-500 hover:bg-slate-600 text-white border-0"
+                      >
+                        Buy {formatNCTR(2500 - current360NCTR)} NCTR
+                      </BuyNCTRButton>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Gold Level */}
+              {current360NCTR < 5000 && (
+                <Card className="border border-yellow-200 bg-gradient-to-r from-yellow-50/50 to-yellow-100/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                          <Trophy className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-yellow-800">GOLD ALLIANCE</h4>
+                          <p className="text-sm text-yellow-700">1.40x multiplier • 5,000 NCTR in 360LOCK</p>
+                        </div>
+                      </div>
+                      <BuyNCTRButton
+                        suggestedAmount={5000 - current360NCTR}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-0"
+                      >
+                        Buy {formatNCTR(5000 - current360NCTR)} NCTR
+                      </BuyNCTRButton>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Platinum Level */}
+              {current360NCTR < 10000 && (
+                <Card className="border border-purple-200 bg-gradient-to-r from-purple-50/50 to-purple-100/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
+                          <Trophy className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-purple-800">PLATINUM ALLIANCE</h4>
+                          <p className="text-sm text-purple-700">1.50x multiplier • 10,000 NCTR in 360LOCK</p>
+                        </div>
+                      </div>
+                      <BuyNCTRButton
+                        suggestedAmount={10000 - current360NCTR}
+                        className="bg-purple-600 hover:bg-purple-700 text-white border-0"
+                      >
+                        Buy {formatNCTR(10000 - current360NCTR)} NCTR
+                      </BuyNCTRButton>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Diamond Level */}
+              {current360NCTR < 25000 && (
+                <Card className="border border-blue-200 bg-gradient-to-r from-blue-50/50 to-blue-100/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                          <Trophy className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-blue-800">DIAMOND ALLIANCE</h4>
+                          <p className="text-sm text-blue-700">2.00x multiplier • 25,000 NCTR in 360LOCK</p>
+                        </div>
+                      </div>
+                      <BuyNCTRButton
+                        suggestedAmount={25000 - current360NCTR}
+                        className="bg-blue-600 hover:bg-blue-700 text-white border-0"
+                      >
+                        Buy {formatNCTR(25000 - current360NCTR)} NCTR
+                      </BuyNCTRButton>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Alternative Options */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2">
               <Zap className="w-5 h-5 text-primary" />
-              <span>Choose Your Path to Level Up</span>
+              <span>Alternative Options</span>
             </h3>
             
             <div className="grid gap-4">
@@ -199,82 +336,37 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                 </CardContent>
               </Card>
 
-              {/* Option 2: Purchase & Lock */}
-              <Card className="border-2 border-primary/30 hover:border-primary/50 transition-colors">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center space-x-2 text-primary">
-                    <ShoppingCart className="w-5 h-5" />
-                    <span>Purchase & Lock NCTR</span>
-                    <Badge className="bg-primary text-primary-foreground">
-                      Instant
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Buy NCTR directly and lock it in 360LOCK to immediately upgrade your Alliance status.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <p className="font-medium text-primary">Total needed:</p>
-                      <p className="text-muted-foreground">
-                        {formatNCTR(neededNCTR)} NCTR → 360LOCK
-                      </p>
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      {canUpgradeWithAvailable ? (
-                        <Button 
-                          onClick={() => {
-                            setOpen(false);
-                            onLockCommitmentClick?.();
-                          }}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                        >
-                          <Lock className="w-4 h-4 mr-1" />
-                          Lock Available NCTR
-                        </Button>
-                      ) : (
-                        <BuyNCTRButton
-                          suggestedAmount={shortfall}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
-                        >
-                          <ShoppingCart className="w-4 h-4 mr-2" />
-                          Buy {formatNCTR(shortfall)} NCTR
-                        </BuyNCTRButton>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Option 3: Mixed Approach (if user has some available) */}
-              {availableNCTR > 0 && availableNCTR < neededNCTR && (
-                <Card className="border-2 border-secondary/30 hover:border-secondary/50 transition-colors">
+              {/* Option 2: Lock Available NCTR */}
+              {availableNCTR > 0 && (
+                <Card className="border-2 border-green-200 hover:border-green-300 transition-colors">
                   <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center space-x-2 text-secondary-foreground">
-                      <Gift className="w-5 h-5" />
-                      <span>Mixed Approach</span>
-                      <Badge variant="outline" className="bg-secondary/10">
-                        Smart
+                    <CardTitle className="flex items-center space-x-2 text-green-700">
+                      <Lock className="w-5 h-5" />
+                      <span>Lock Available NCTR</span>
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                        {formatNCTR(availableNCTR)} Available
                       </Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Use your available {formatNCTR(availableNCTR)} NCTR and purchase the remaining {formatNCTR(shortfall)} NCTR.
+                      Commit your available {formatNCTR(availableNCTR)} NCTR to 360LOCK to improve your Alliance status.
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="text-sm">
-                        <p className="font-medium">Available: {formatNCTR(availableNCTR)} NCTR</p>
-                        <p className="text-muted-foreground">Need: {formatNCTR(shortfall)} more</p>
+                        <p className="font-medium text-green-700">Available Balance:</p>
+                        <p className="text-muted-foreground">{formatNCTR(availableNCTR)} NCTR ready to lock</p>
                       </div>
-                      <BuyNCTRButton
-                        suggestedAmount={shortfall}
-                        variant="outline"
-                        className="border-secondary text-secondary hover:bg-secondary/10"
+                      <Button 
+                        onClick={() => {
+                          setOpen(false);
+                          onLockCommitmentClick?.();
+                        }}
+                        className="bg-green-600 hover:bg-green-700 text-white"
                       >
-                        Buy {formatNCTR(shortfall)} More
-                      </BuyNCTRButton>
+                        <Lock className="w-4 h-4 mr-1" />
+                        Lock {formatNCTR(availableNCTR)} NCTR
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
