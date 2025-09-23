@@ -14,6 +14,7 @@ interface PurchaseWebhookPayload {
   payment_method: 'credit_card' | 'crypto' | 'bank_transfer';
   timestamp: string;
   source?: string; // 'garden' for purchases from The Garden
+  lock_type?: '360LOCK' | '90LOCK' | 'available'; // Specify where tokens should go
 }
 
 serve(async (req) => {
@@ -99,29 +100,69 @@ serve(async (req) => {
       portfolioData = currentPortfolio;
     }
 
-    // Update user's portfolio with purchased NCTR
-    const { error: portfolioError } = await supabase
-      .from('nctr_portfolio')
-      .update({
-        available_nctr: portfolioData.available_nctr + payload.amount,
-        total_earned: portfolioData.total_earned + payload.amount,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', payload.user_id);
+    // Handle token allocation based on lock_type
+    let lockId: string | null = null;
+    
+    if (payload.lock_type === '360LOCK') {
+      // Add to total_earned only, tokens go directly to 360LOCK
+      const { error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .update({
+          total_earned: portfolioData.total_earned + payload.amount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', payload.user_id);
 
-    if (portfolioError) {
-      console.error('Error updating portfolio:', portfolioError);
-      throw portfolioError;
+      if (portfolioError) {
+        console.error('Error updating portfolio for 360LOCK:', portfolioError);
+        throw portfolioError;
+      }
+
+      // Auto-lock in 360LOCK using the database function
+      const { data: lockResult, error: lockError } = await supabase.rpc('auto_lock_earned_nctr', {
+        p_user_id: payload.user_id,
+        p_nctr_amount: payload.amount,
+        p_earning_source: 'token_purchase',
+        p_opportunity_type: 'bonus' // This ensures it goes to 360LOCK
+      });
+
+      if (lockError) {
+        console.error('Error creating 360LOCK:', lockError);
+        throw lockError;
+      }
+      
+      lockId = lockResult;
+      console.log(`Created 360LOCK with ID: ${lockId}`);
+      
+    } else {
+      // Default behavior - add to available_nctr
+      const { error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .update({
+          available_nctr: portfolioData.available_nctr + payload.amount,
+          total_earned: portfolioData.total_earned + payload.amount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', payload.user_id);
+
+      if (portfolioError) {
+        console.error('Error updating portfolio:', portfolioError);
+        throw portfolioError;
+      }
     }
 
     // Record the purchase transaction
+    const transactionDescription = payload.lock_type === '360LOCK' 
+      ? `NCTR purchase via ${payload.payment_method} (locked in 360LOCK) - ${payload.transaction_id}`
+      : `NCTR purchase via ${payload.payment_method} - ${payload.transaction_id}`;
+      
     const { error: transactionError } = await supabase
       .from('nctr_transactions')
       .insert({
         user_id: payload.user_id,
         transaction_type: 'earned',
         nctr_amount: payload.amount,
-        description: `NCTR purchase via ${payload.payment_method} - ${payload.transaction_id}`,
+        description: transactionDescription,
         earning_source: 'token_purchase',
         status: 'completed',
         external_transaction_id: payload.transaction_id,
@@ -167,7 +208,9 @@ serve(async (req) => {
         success: true,
         message: 'Purchase processed successfully',
         portfolio: updatedPortfolio,
-        transaction_id: payload.transaction_id
+        transaction_id: payload.transaction_id,
+        lock_type: payload.lock_type,
+        lock_id: lockId
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

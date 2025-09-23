@@ -23,7 +23,7 @@ interface WebhookTesterProps {
 
 const WebhookTester = ({ className }: WebhookTesterProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState('PURCHASE_COMPLETED');
+  const [selectedEvent, setSelectedEvent] = useState('PURCHASE_360LOCK');
   const [webhookUrl, setWebhookUrl] = useState('');
   const [customPayload, setCustomPayload] = useState('');
   const [lastResponse, setLastResponse] = useState<any>(null);
@@ -40,6 +40,20 @@ const WebhookTester = ({ className }: WebhookTesterProps) => {
         payment_method: "credit_card",
         timestamp: new Date().toISOString(),
         source: "garden"
+      }
+    },
+    'PURCHASE_360LOCK': {
+      name: 'Purchase to 360LOCK',
+      description: 'NCTR purchase that goes directly to 360LOCK',
+      payload: {
+        user_id: "fb8c3f0c-ea80-46f4-8dbd-65d945aaa8ff",
+        amount: 500.0,
+        transaction_id: `test_360_txn_${Date.now()}`,
+        status: "completed",
+        payment_method: "crypto",
+        timestamp: new Date().toISOString(),
+        source: "token.nctr.live",
+        lock_type: "360LOCK"
       }
     },
     'NEW_TRANSACTION': {
