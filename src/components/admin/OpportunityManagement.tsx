@@ -75,7 +75,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     description: '',
     opportunity_type: 'shopping',
     nctr_reward: 0,
-    reward_per_dollar: 100.0, // Default 100 NCTR per $1 spent
+    reward_per_dollar: 100, // Default 100 NCTR per $1 spent
     partner_name: '',
     partner_logo_url: '',
     affiliate_link: '',
@@ -169,7 +169,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       description: '',
       opportunity_type: 'shopping',
       nctr_reward: 0,
-      reward_per_dollar: 100.0,
+      reward_per_dollar: 100,
       partner_name: '',
       partner_logo_url: '',
       affiliate_link: '',
@@ -561,11 +561,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     <Input
                       id="reward_per_dollar"
                       type="number"
-                      step="0.01"
+                      step="1"
                       min="0"
                       value={formData.reward_per_dollar}
-                      onChange={(e) => setFormData({...formData, reward_per_dollar: parseFloat(e.target.value) || 100})}
-                      placeholder="100.00"
+                      onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 100})}
+                      placeholder="100"
                     />
                     <p className="text-xs text-muted-foreground">
                       Default: 100 NCTR per $1 spent (independent of brand commission rates)
@@ -577,11 +577,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     <Input
                       id="nctr_reward"
                       type="number"
-                      step="0.01"
+                      step="1"
                       min="0"
                       value={formData.nctr_reward}
-                      onChange={(e) => setFormData({...formData, nctr_reward: parseFloat(e.target.value) || 0})}
-                      placeholder="1000.00"
+                      onChange={(e) => setFormData({...formData, nctr_reward: parseInt(e.target.value) || 0})}
+                      placeholder="1000"
                     />
                   </div>
                 </div>
