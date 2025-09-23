@@ -12,7 +12,6 @@ import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import UserAffiliateLinks from '@/components/UserAffiliateLinks';
-import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';

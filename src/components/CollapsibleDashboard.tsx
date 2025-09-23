@@ -16,7 +16,7 @@ import {
   Lock
 } from 'lucide-react';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
-import SimpleWalletConnection from '@/components/SimpleWalletConnection';
+import WalletConnection from '@/components/WalletConnection';
 import { useNavigate } from 'react-router-dom';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import LockUpgradeModal from '@/components/LockUpgradeModal';
@@ -363,7 +363,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
       {/* Wallet Connection - Mobile Compact */}
       <div>
         <h3 className="text-xs sm:text-sm font-medium mb-2">Wallet</h3>
-        <SimpleWalletConnection />
+        <WalletConnection />
       </div>
     </aside>
     </div>

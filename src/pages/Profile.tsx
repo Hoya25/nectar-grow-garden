@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import SimpleWalletConnection from '@/components/SimpleWalletConnection';
+import WalletConnection from '@/components/WalletConnection';
 import { WingsStatusBar } from '@/components/WingsStatusBar';
 import { LevelUpModal } from '@/components/LevelUpModal';
 
@@ -410,7 +410,7 @@ const Profile = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <SimpleWalletConnection />
+              <WalletConnection />
             </CardContent>
           </Card>
         </div>

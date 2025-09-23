@@ -162,6 +162,27 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
         throw updateError;
       }
 
+      // Check if profile is now complete and award bonus if eligible
+      try {
+        const { data: completionCheck } = await supabase.rpc('calculate_profile_completion', {
+          p_user_id: currentUser.id
+        });
+        
+        if (completionCheck && typeof completionCheck === 'object' && 'eligible_for_bonus' in completionCheck && completionCheck.eligible_for_bonus) {
+          await supabase.rpc('award_profile_completion_bonus', {
+            p_user_id: currentUser.id
+          });
+          
+          toast({
+            title: "Profile Complete! 🎉",
+            description: "You've earned 500 NCTR for completing your profile!",
+          });
+        }
+      } catch (profileError) {
+        console.error('Error checking profile completion:', profileError);
+        // Don't throw - wallet connection should still succeed
+      }
+
       setAddress(walletAddress);
       setIsConnected(true);
       setProvider(new BrowserProvider(ethereum));
