@@ -64,6 +64,10 @@ interface EarningOpportunity {
   lock_360_nctr_reward?: number;
   reward_distribution_type?: string;
   reward_structure?: any;
+  // Social media fields
+  social_platform?: string;
+  social_handle?: string;
+  cta_text?: string;
 }
 
 import ProfileModal from '@/components/ProfileModal';
@@ -241,6 +245,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       case 'bonus':
         handleBonusOpportunity(opportunity);
         break;
+      case 'social_follow':
+        await handleSocialFollowOpportunity(opportunity);
+        break;
       case 'shopping':
       case 'partner':
         handleShoppingOpportunity(opportunity);
@@ -258,6 +265,171 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       title: "🎉 Invite Friends",
       description: "Share your link and earn 1000 NCTR in 360LOCK for each friend who joins!",
     });
+  };
+
+  const handleSocialFollowOpportunity = async (opportunity: EarningOpportunity) => {
+    try {
+      // Check if user already completed this social follow opportunity
+      const { data: existingTransaction } = await supabase
+        .from('nctr_transactions')
+        .select('id')
+        .eq('user_id', user?.id)
+        .eq('opportunity_id', opportunity.id)
+        .maybeSingle();
+
+      if (existingTransaction) {
+        toast({
+          title: "Already Followed!",
+          description: "You've already completed this social follow opportunity.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Open social media link in new tab
+      if (opportunity.affiliate_link) {
+        window.open(opportunity.affiliate_link, '_blank');
+      }
+
+      // Instantly award NCTR based on new reward distribution system
+      await awardDistributedNCTR(opportunity, opportunity.cta_text || `Social follow completed: ${opportunity.title}`);
+      
+    } catch (error) {
+      console.error('Error handling social follow opportunity:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process social follow. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const awardDistributedNCTR = async (opportunity: EarningOpportunity, description: string) => {
+    try {
+      const availableAmount = opportunity.available_nctr_reward || 0;
+      const lock90Amount = opportunity.lock_90_nctr_reward || 0;
+      const lock360Amount = opportunity.lock_360_nctr_reward || 0;
+      const totalReward = availableAmount + lock90Amount + lock360Amount;
+      
+      if (totalReward <= 0) {
+        toast({
+          title: "No Reward",
+          description: "This opportunity doesn't have an NCTR reward.",
+        });
+        return;
+      }
+
+      // Create transaction record
+      const { error: transactionError } = await supabase
+        .from('nctr_transactions')
+        .insert({
+          user_id: user?.id,
+          transaction_type: 'earned',
+          nctr_amount: totalReward,
+          opportunity_id: opportunity.id,
+          description: description,
+          partner_name: opportunity.partner_name,
+          earning_source: opportunity.opportunity_type,
+          status: 'completed'
+        });
+
+      if (transactionError) throw transactionError;
+
+      // Update user portfolio with available NCTR
+      if (availableAmount > 0) {
+        const { error: portfolioError } = await supabase
+          .from('nctr_portfolio')
+          .update({
+            available_nctr: (portfolio?.available_nctr || 0) + availableAmount,
+            total_earned: (portfolio?.total_earned || 0) + availableAmount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user?.id);
+
+        if (portfolioError) throw portfolioError;
+      }
+
+      // Create 90LOCK if specified
+      if (lock90Amount > 0) {
+        const { error: lock90Error } = await supabase
+          .from('nctr_locks')
+          .insert({
+            user_id: user?.id,
+            nctr_amount: lock90Amount,
+            lock_type: '90LOCK',
+            lock_category: '90LOCK',
+            commitment_days: 90,
+            unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+            can_upgrade: true,
+            original_lock_type: '90LOCK'
+          });
+
+        if (lock90Error) throw lock90Error;
+
+        // Update total earned for locked amounts too
+        const { error: portfolioError } = await supabase
+          .from('nctr_portfolio')
+          .update({
+            total_earned: (portfolio?.total_earned || 0) + lock90Amount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user?.id);
+
+        if (portfolioError) throw portfolioError;
+      }
+
+      // Create 360LOCK if specified
+      if (lock360Amount > 0) {
+        const { error: lock360Error } = await supabase
+          .from('nctr_locks')
+          .insert({
+            user_id: user?.id,
+            nctr_amount: lock360Amount,
+            lock_type: '360LOCK',
+            lock_category: '360LOCK',
+            commitment_days: 360,
+            unlock_date: new Date(Date.now() + 360 * 24 * 60 * 60 * 1000).toISOString(),
+            can_upgrade: false,
+            original_lock_type: '360LOCK'
+          });
+
+        if (lock360Error) throw lock360Error;
+
+        // Update total earned for locked amounts too
+        const { error: portfolioError } = await supabase
+          .from('nctr_portfolio')
+          .update({
+            total_earned: (portfolio?.total_earned || 0) + lock360Amount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user?.id);
+
+        if (portfolioError) throw portfolioError;
+      }
+
+      // Refresh user data to show updated balances
+      await fetchUserData();
+
+      // Build reward breakdown message
+      let rewardMessage = `🎉 ${formatNCTR(totalReward)} NCTR earned from ${opportunity.title}!`;
+      const rewardBreakdown = [];
+      if (availableAmount > 0) rewardBreakdown.push(`${formatNCTR(availableAmount)} available`);
+      if (lock90Amount > 0) rewardBreakdown.push(`${formatNCTR(lock90Amount)} in 90LOCK`);
+      if (lock360Amount > 0) rewardBreakdown.push(`${formatNCTR(lock360Amount)} in 360LOCK`);
+      
+      if (rewardBreakdown.length > 0) {
+        rewardMessage += `\n(${rewardBreakdown.join(', ')})`;
+      }
+
+      toast({
+        title: "Success!",
+        description: rewardMessage,
+      });
+
+    } catch (error) {
+      console.error('Error awarding distributed NCTR:', error);
+      throw error;
+    }
   };
 
   const handleBonusOpportunity = async (opportunity: EarningOpportunity) => {
@@ -726,13 +898,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       </p>
                     )}
 
-                    <Button 
-                      onClick={() => handleOpportunityClick(opportunities[0])}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300"
-                    >
-                      <ExternalLink className="w-5 h-5 mr-3" />
-                      Start Earning with {opportunities[0].partner_name || 'This Brand'}
-                    </Button>
+                      <Button 
+                        onClick={() => handleOpportunityClick(opportunities[0])}
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300"
+                      >
+                        <ExternalLink className="w-5 h-5 mr-3" />
+                        {opportunities[0].opportunity_type === 'social_follow' 
+                          ? `Follow & Earn ${formatNCTR((opportunities[0].available_nctr_reward || 0) + (opportunities[0].lock_90_nctr_reward || 0) + (opportunities[0].lock_360_nctr_reward || 0))} NCTR`
+                          : `Start Earning with ${opportunities[0].partner_name || 'This Brand'}`}
+                      </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -826,13 +1000,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                          {/* CTA Button - Consistent size and alignment */}
                          <div className="mt-auto">
-                           <Button 
-                             onClick={() => handleOpportunityClick(opportunity)}
-                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]"
-                           >
-                             <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
-                             <span className="truncate">Start Earning</span>
-                           </Button>
+                            <Button 
+                              onClick={() => handleOpportunityClick(opportunity)}
+                              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]"
+                            >
+                              <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
+                              <span className="truncate">
+                                {opportunity.opportunity_type === 'social_follow' 
+                                  ? `Follow & Earn ${formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))} NCTR`
+                                  : 'Start Earning'}
+                              </span>
+                            </Button>
                          </div>
                       </CardContent>
                     </Card>
@@ -903,13 +1081,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                          {/* Button - Consistent alignment */}
                          <div className="mt-auto">
-                           <Button 
-                             onClick={() => handleOpportunityClick(opportunity)}
-                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300"
-                           >
-                             <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
-                             <span className="truncate">Earn Now</span>
-                           </Button>
+                              <Button 
+                                onClick={() => handleOpportunityClick(opportunity)}
+                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300"
+                              >
+                                <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
+                                <span className="truncate">
+                                  {opportunity.opportunity_type === 'social_follow' 
+                                    ? 'Follow & Earn'
+                                    : 'Earn Now'}
+                                </span>
+                              </Button>
                          </div>
                       </CardContent>
                     </Card>
