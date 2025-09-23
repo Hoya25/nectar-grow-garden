@@ -18,7 +18,19 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 export const useWallet = () => {
   const context = useContext(WalletContext);
   if (!context) {
-    throw new Error('useWallet must be used within a WalletProvider');
+    // Return default values instead of throwing error during initial load
+    return {
+      isConnected: false,
+      address: null,
+      provider: null,
+      connectWallet: async () => {
+        throw new Error('useWallet must be used within a WalletProvider');
+      },
+      disconnectWallet: async () => {
+        throw new Error('useWallet must be used within a WalletProvider');
+      },
+      loading: false
+    };
   }
   return context;
 };
