@@ -225,10 +225,10 @@ async function handleTransactionStatusUpdate(data: any, supabase: any) {
           continue
         }
         
-        // Apply bounty structure: 25 available + 1225 in 90LOCK + 250 in 360LOCK
-        const availableAmount = 25  // Fixed 25 NCTR available
-        const lock90Amount = 1225   // Fixed 1225 NCTR in 90LOCK
-        const lock360Amount = 250   // Fixed 250 NCTR in 360LOCK
+        // Apply bounty structure: 25% to 90LOCK + 75% to 360LOCK (nothing available immediately)
+        const availableAmount = 0           // No immediate availability for shopping rewards
+        const lock90Amount = nctrReward * 0.25    // 25% to 90LOCK (375 NCTR)
+        const lock360Amount = nctrReward * 0.75   // 75% to 360LOCK (1,125 NCTR)
         
         // Update or create portfolio
         const { data: existingPortfolio } = await supabase
@@ -238,22 +238,21 @@ async function handleTransactionStatusUpdate(data: any, supabase: any) {
           .single()
         
         if (existingPortfolio) {
-          // Update existing portfolio
+          // Update existing portfolio - no available_nctr increase for shopping rewards
           await supabase
             .from('nctr_portfolio')
             .update({
-              available_nctr: existingPortfolio.available_nctr + availableAmount,
               total_earned: existingPortfolio.total_earned + nctrReward,
               updated_at: new Date().toISOString()
             })
             .eq('user_id', transactionData.user_id)
         } else {
-          // Create new portfolio
+          // Create new portfolio - no available_nctr for shopping rewards
           await supabase
             .from('nctr_portfolio')
             .insert({
               user_id: transactionData.user_id,
-              available_nctr: availableAmount,
+              available_nctr: 0,  // Shopping rewards go straight to locks
               total_earned: nctrReward
             })
         }
