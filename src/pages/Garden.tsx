@@ -924,15 +924,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-                          <div className="bg-section-highlight rounded-xl p-4 sm:p-6 text-center">
-                            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-                              {opportunity.reward_per_dollar}% NCTR
-                            </div>
-                            <div className="text-xs sm:text-sm text-muted-foreground">Cashback on purchases</div>
-                            <div className="text-xs text-primary mt-1">Automatically locked in 90LOCK</div>
-                          </div>
-                        </div>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                           <div className="bg-section-highlight rounded-xl p-4 sm:p-6 text-center">
+                             <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
+                               {formatNCTR(opportunity.reward_per_dollar)} NCTR
+                             </div>
+                             <div className="text-xs sm:text-sm text-muted-foreground">Per $1 spent</div>
+                             <div className="text-xs text-primary mt-1">Automatically locked in 90LOCK</div>
+                           </div>
+                         </div>
 
                         <Button 
                           className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6"
