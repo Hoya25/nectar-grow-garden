@@ -1,21 +1,17 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useAdmin } from '@/hooks/useAdmin';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { User, UserPlus } from 'lucide-react';
-import ReferralSystem from '@/components/ReferralSystem';
-import ProfileModal from '@/components/ProfileModal';
-import MobileDrawer from '@/components/MobileDrawer';
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
+import { useNavigate } from "react-router-dom";
+import ProfileModal from "@/components/ProfileModal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { User, Settings, Share2 } from "lucide-react";
+import ReferralSystem from "@/components/ReferralSystem";
 
 const Header = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   const getInitials = (email: string) => {
     return email
@@ -40,151 +36,190 @@ const Header = () => {
     navigate('/');
   };
 
-  if (isMobile) {
-    return (
-      <header className="section-highlight backdrop-blur-sm border-b border-section-border sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex justify-between items-center">
-            <MobileDrawer />
-            
-            <h1 className="text-xl font-bold nctr-text cursor-pointer" onClick={() => navigate('/')}>
-              The Garden
-            </h1>
-            
-            {!user && (
-              <Button 
-                size="sm"
-                onClick={handleAuthAction}
-                className="bg-primary hover:bg-primary-glow text-primary-foreground text-sm px-4 py-2 h-10 min-h-[44px] touch-manipulation"
-              >
-                Sign In
+  return (
+    <header className="w-full border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-minimal">
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+        <div className="flex items-center space-x-3 cursor-pointer group"
+          onClick={() => navigate('/')}>
+          <span className="text-2xl font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300">The Garden</span>
+        </div>
+        
+        <nav className="hidden md:flex items-center space-x-8">
+          {!user ? (
+            <>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Invite a Friend
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto mx-4 sm:mx-0">
+                  <DialogHeader>
+                    <DialogTitle>Invite Friends & Earn Together</DialogTitle>
+                  </DialogHeader>
+                  {user ? (
+                    <ReferralSystem />
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground mb-4">Sign up to access your referral program and start inviting friends!</p>
+              <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                Join The Garden
               </Button>
-            )}
-            
-            {user && (
-              <ProfileModal>
-                <Button
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+              <Button 
+                variant="ghost" 
+                className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6"
+                onClick={() => navigate('/auth')}
+              >
+                Sign Up
+              </Button>
+              <Button 
+                className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
+                onClick={handleAuthAction}
+              >
+                <span className="relative z-10">{user ? 'My Garden' : 'Enter The Garden'}</span>
+                <div className="absolute inset-0 bg-section-highlight opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </Button>
+              {isAdmin && (
+                <Button 
                   variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 border-primary/30 section-text hover:bg-primary/10 hover:text-primary h-10 px-3 min-h-[44px] touch-manipulation"
+                  onClick={() => navigate('/admin')}
+                  className="ml-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 rounded-xl"
                 >
-                  <User className="w-4 h-4" />
-                  <span className="text-xs font-medium">
-                    {getInitials(user.email || '')}
-                  </span>
+                  Admin
+                </Button>
+              )}
+            </>
+          ) : (
+            <>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" className="text-foreground hover:text-primary-glow hover:bg-primary-glow/10 transition-all duration-300 rounded-xl px-6">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Invite a Friend
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto mx-4 sm:mx-0">
+                  <DialogHeader>
+                    <DialogTitle>Invite Friends & Earn Together</DialogTitle>
+                  </DialogHeader>
+                  <ReferralSystem />
+                </DialogContent>
+              </Dialog>
+              <Button 
+                variant="default" 
+                className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105 rounded-xl px-8 relative overflow-hidden group"
+                onClick={handleAuthAction}
+              >
+                <span className="relative z-10">{user ? 'My Garden' : 'Enter The Garden'}</span>
+                <div className="absolute inset-0 bg-section-highlight opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </Button>
+              
+              {isAdmin && (
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/admin')}
+                  className="ml-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 rounded-xl"
+                >
+                  Admin
+                </Button>
+              )}
+
+              <ProfileModal>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2 hover:bg-primary-glow/10 transition-all duration-300 rounded-xl"
+                >
+                  <Avatar className="h-8 w-8 ring-2 ring-primary-glow/20 transition-all duration-300 hover:ring-primary-glow/40">
+                    <AvatarImage src="" />
+                    <AvatarFallback className="text-sm bg-white border-2 border-primary text-foreground font-medium">
+                      {getInitials(user.email || 'User')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Settings className="h-4 w-4" />
                 </Button>
               </ProfileModal>
-            )}
-          </div>
-        </div>
-      </header>
-    );
-  }
+              
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/profile')}
+                className="flex items-center gap-2 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all duration-300 rounded-xl"
+              >
+                <User className="h-4 w-4" />
+                Profile
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={handleSignOut}
+                className="border-border/50 hover:border-destructive/50 hover:bg-destructive/5 hover:text-destructive transition-all duration-300 rounded-xl"
+              >
+                Sign Out
+              </Button>
+            </>
+          )}
+        </nav>
 
-  return (
-    <header className="section-highlight backdrop-blur-sm border-b border-section-border sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        {/* Desktop Navigation */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-8">
-            <h1 className="text-2xl font-bold nctr-text cursor-pointer" onClick={() => navigate('/')}>
-              The Garden
-            </h1>
-            
-            {user && (
-              <nav className="flex items-center space-x-6">
-                <Button 
-                  variant="ghost" 
-                  onClick={() => navigate('/garden')}
-                  className="section-text hover:text-primary transition-colors h-10"
-                >
-                  My Garden
+        <div className="md:hidden">
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-xl p-2">
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="mx-4 max-w-[calc(100vw-2rem)] max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-base">Invite Friends & Earn</DialogTitle>
+                  </DialogHeader>
+                  <ReferralSystem />
+                </DialogContent>
+              </Dialog>
+              <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl px-3 py-2 text-sm">
+                Garden
+              </Button>
+              <ProfileModal>
+                <Button variant="ghost" size="sm" className="rounded-xl p-2">
+                  <Avatar className="h-7 w-7 ring-2 ring-primary-glow/20">
+                    <AvatarImage src="" />
+                    <AvatarFallback className="text-xs bg-white border-2 border-primary text-foreground">
+                      {getInitials(user.email || 'User')}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
-                
-                {/* Invite a Friend with Dialog */}
-                <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="ghost"
-                      className="section-text hover:text-primary transition-colors h-10"
-                    >
-                      Invite a Friend
+              </ProfileModal>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-xl p-2">
+                    <Share2 className="w-5 h-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="mx-4 max-w-[calc(100vw-2rem)] max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-base">Invite Friends & Earn</DialogTitle>
+                  </DialogHeader>
+                  <div className="text-center py-6">
+                    <p className="text-muted-foreground mb-4 text-sm">Sign up to access your referral program!</p>
+                    <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-primary-foreground w-full">
+                      Join The Garden
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-md border border-border/50 z-50">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-bold nctr-text">
-                        Invite Friends to The Garden
-                      </DialogTitle>
-                    </DialogHeader>
-                    <ReferralSystem />
-                  </DialogContent>
-                </Dialog>
-              </nav>
-            )}
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            {!user ? (
-              <>
-                <Button 
-                  variant="outline" 
-                  onClick={handleAuthAction}
-                  className="border-primary/30 section-text hover:bg-primary/10 hover:text-primary h-10"
-                >
-                  Sign Up
-                </Button>
-                <Button 
-                  onClick={handleAuthAction}
-                  className="bg-primary hover:bg-primary-glow text-primary-foreground shadow-soft h-10"
-                >
-                  Enter The Garden →
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => navigate('/garden')}
-                  className="section-text hover:text-primary transition-colors h-10"
-                >
-                  My Garden
-                </Button>
-                
-                {isAdmin && (
-                  <Button 
-                    variant="ghost" 
-                    onClick={() => navigate('/admin')}
-                    className="section-text hover:text-primary transition-colors h-10"
-                  >
-                    Admin
-                  </Button>
-                )}
-                
-                {/* Profile Access */}
-                <ProfileModal>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2 border-primary/30 section-text hover:bg-primary/10 hover:text-primary h-10"
-                  >
-                    <User className="w-4 h-4" />
-                    <span className="font-medium">
-                      {getInitials(user.email || '')}
-                    </span>
-                  </Button>
-                </ProfileModal>
-                
-                <Button 
-                  variant="ghost" 
-                  onClick={handleSignOut}
-                  className="section-text hover:text-primary transition-colors h-10"
-                >
-                  Sign Out
-                </Button>
-              </>
-            )}
-          </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button variant="ghost" size="sm" onClick={handleAuthAction} className="rounded-xl px-3 py-2 text-sm">
+                Sign In
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </header>

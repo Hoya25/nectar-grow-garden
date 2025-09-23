@@ -58,10 +58,6 @@ const formatNCTR = (amount: number): string => {
   return amount.toLocaleString();
 };
 
-const formatUSD = (amount: number): string => {
-  return amount.toFixed(2);
-};
-
 export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
   portfolio,
   locks,
@@ -131,7 +127,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
               {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_360_nctr || 0) + (portfolio?.lock_90_nctr || 0))} NCTR
             </span>
             <span className="text-green-600 font-medium">
-              ${formatUSD(calculatePortfolioValue(
+              ${formatPrice(calculatePortfolioValue(
                 (portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0)
               ))}
             </span>
@@ -170,7 +166,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   <div className="flex flex-col">
                     <p className="text-xs text-muted-foreground">Ready to commit</p>
                     <p className="text-xs text-green-600 font-medium">
-                      ${formatUSD(calculatePortfolioValue(portfolio?.available_nctr || 0))}
+                      ${formatPrice(calculatePortfolioValue(portfolio?.available_nctr || 0))}
                     </p>
                   </div>
                   {portfolio?.available_nctr && portfolio.available_nctr > 0 && (
@@ -210,44 +206,10 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   {formatNCTR(portfolio?.lock_90_nctr || 0)}
                 </p>
                 <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <p className="text-xs text-blue-600">Standard</p>
-                    <p className="text-xs text-blue-700 font-medium">
-                      ${formatUSD(calculatePortfolioValue(portfolio?.lock_90_nctr || 0))}
-                    </p>
-                  </div>
+                  <p className="text-xs text-blue-600">Standard</p>
                   {portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0 && (
                     <Button
-                      onClick={async () => {
-                        if (!user) return;
-                        setIsCommitting(true);
-                        try {
-                          const { data, error } = await supabase.rpc('commit_all_nctr_to_360lock', {
-                            p_user_id: user.id
-                          }) as { data: any, error: any };
-
-                          if (error) throw error;
-
-                          if (data?.success) {
-                            toast({
-                              title: "🚀 Upgraded to 360LOCK!",
-                              description: `Successfully upgraded ${formatNCTR(portfolio.lock_90_nctr)} NCTR from 90LOCK to 360LOCK for maximum alliance benefits!`,
-                            });
-                            onLockCreated(); // Refresh data
-                          } else {
-                            throw new Error(data?.message || 'Upgrade failed');
-                          }
-                        } catch (error: any) {
-                          console.error('Error upgrading to 360LOCK:', error);
-                          toast({
-                            title: "Upgrade Failed",
-                            description: error.message || "Failed to upgrade to 360LOCK. Please try again.",
-                            variant: "destructive",
-                          });
-                        } finally {
-                          setIsCommitting(false);
-                        }
-                      }}
+                      onClick={handleCommitTo360LOCK}
                       disabled={isCommitting}
                       size="sm"
                       className="h-6 px-2 text-xs bg-primary hover:bg-primary-glow text-primary-foreground"
@@ -285,7 +247,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   <div className="flex flex-col">
                     <p className="text-xs text-primary/80">Alliance</p>
                     <p className="text-xs text-primary font-medium">
-                      ${formatUSD(calculatePortfolioValue(portfolio?.lock_360_nctr || 0))}
+                      ${formatPrice(calculatePortfolioValue(portfolio?.lock_360_nctr || 0))}
                     </p>
                   </div>
                 </div>
@@ -314,7 +276,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   <div className="flex flex-col">
                     <p className="text-xs text-muted-foreground">Lifetime</p>
                     <p className="text-xs text-green-600 font-medium">
-                      ${formatUSD(calculatePortfolioValue(portfolio?.total_earned || 0))}
+                      ${formatPrice(calculatePortfolioValue(portfolio?.total_earned || 0))}
                     </p>
                   </div>
                 </div>
@@ -345,7 +307,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
             <div className="mt-3 pt-3 border-t border-section-border">
               <p className="text-xs text-muted-foreground mb-1">Total Portfolio Value</p>
               <p className="text-lg font-bold text-primary">
-                ${formatUSD(calculatePortfolioValue(
+                ${formatPrice(calculatePortfolioValue(
                   (portfolio?.available_nctr || 0) + 
                   (portfolio?.lock_90_nctr || 0) + 
                   (portfolio?.lock_360_nctr || 0)
@@ -453,6 +415,10 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
             onLockCreated={onLockCreated}
           />
         </div>
+        <Button variant="outline" size="sm" className="w-full text-xs sm:text-sm border-primary/50 text-primary hover:bg-primary/10 min-h-[44px]" onClick={() => navigate('/profile')}>
+          <User className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+          Alliance Profile
+        </Button>
       </div>
 
       {/* Batch Lock Upgrade - Hidden temporarily */}

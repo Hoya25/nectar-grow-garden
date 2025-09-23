@@ -9,7 +9,6 @@ interface RewardDisplayProps {
     lock_90_nctr_reward?: number;
     lock_360_nctr_reward?: number;
     reward_distribution_type?: string;
-    opportunity_type?: string;
   };
   size?: 'sm' | 'md' | 'lg';
   showPerDollar?: boolean;
@@ -27,15 +26,13 @@ export const RewardDisplay = ({
     }).format(Math.floor(amount));
   };
 
-  const isLegacyReward = opportunity.reward_distribution_type === 'legacy';
+  const isLegacyReward = opportunity.reward_distribution_type === 'legacy' || 
+                        (!opportunity.reward_distribution_type && 
+                         (opportunity.nctr_reward > 0 || opportunity.reward_per_dollar > 0));
 
   const hasNewRewards = (opportunity.available_nctr_reward || 0) > 0 || 
                        (opportunity.lock_90_nctr_reward || 0) > 0 || 
                        (opportunity.lock_360_nctr_reward || 0) > 0;
-
-  // Only show "per $1 spent" for shopping opportunities
-  const isShoppingOpportunity = opportunity.opportunity_type === 'shopping' || opportunity.opportunity_type === 'partner';
-  const shouldShowPerDollar = showPerDollar && isShoppingOpportunity;
 
   // Size configurations
   const sizeConfigs = {
@@ -72,7 +69,7 @@ export const RewardDisplay = ({
       {/* Legacy Reward Display */}
       {isLegacyReward && (
         <>
-          {shouldShowPerDollar && opportunity.reward_per_dollar > 0 && (
+          {showPerDollar && opportunity.reward_per_dollar > 0 && (
             <div className="text-center">
               <div className={config.flex + ' justify-center'}>
                 <span className={`${config.amountText} text-primary`}>
@@ -125,7 +122,7 @@ export const RewardDisplay = ({
             )}
           </div>
           
-          {shouldShowPerDollar && opportunity.reward_per_dollar > 0 && (
+          {showPerDollar && opportunity.reward_per_dollar > 0 && (
             <div className="text-center">
               <div className={config.flex + ' justify-center'}>
                 <span className={`${config.amountText} text-green-600`}>

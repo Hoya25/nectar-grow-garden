@@ -19,10 +19,10 @@ const buttonVariants = cva(
         accent: "bg-accent text-accent-foreground hover:bg-accent/90 shadow-soft border border-accent/30",
       },
       size: {
-        default: "h-12 px-4 py-2", // Increased from h-10 for better mobile touch
-        sm: "h-10 rounded-md px-3", // Increased from h-9 for mobile
-        lg: "h-12 rounded-md px-8", // Increased from h-11 for mobile
-        icon: "h-12 w-12", // Increased from h-10 for mobile touch targets
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {

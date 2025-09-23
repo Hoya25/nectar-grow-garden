@@ -40,7 +40,6 @@ interface EarningOpportunity {
   video_title?: string;
   video_description?: string;
   is_active: boolean;
-  featured: boolean;
   created_at: string;
   // New reward structure fields
   available_nctr_reward?: number;
@@ -48,10 +47,6 @@ interface EarningOpportunity {
   lock_360_nctr_reward?: number;
   reward_distribution_type?: string;
   reward_structure?: any;
-  // Social media fields
-  social_platform?: string;
-  social_handle?: string;
-  cta_text?: string;
 }
 
 interface Brand {
@@ -86,7 +81,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     description: '',
     opportunity_type: 'shopping',
     nctr_reward: 0,
-    reward_per_dollar: 0, // No default legacy allocation
+    reward_per_dollar: 100, // Default 100 NCTR per $1 spent
     partner_name: '',
     partner_logo_url: '',
     affiliate_link: '',
@@ -94,44 +89,17 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     video_title: '',
     video_description: '',
     is_active: true,
-    featured: false,
     // New reward structure fields
     available_nctr_reward: 0,
     lock_90_nctr_reward: 0,
     lock_360_nctr_reward: 0,
-    reward_distribution_type: 'combined', // Default to new system
-    // Social media fields
-    social_platform: '',
-    social_handle: '',
-    cta_text: ''
+    reward_distribution_type: 'legacy'
   });
 
   useEffect(() => {
     fetchOpportunities();
     fetchBrands();
   }, []);
-
-  // Auto-clear inappropriate legacy fields when opportunity type or reward distribution changes
-  useEffect(() => {
-    // If not shopping or not legacy, clear reward_per_dollar
-    if (formData.opportunity_type !== 'shopping' || formData.reward_distribution_type !== 'legacy') {
-      if (formData.reward_per_dollar > 0) {
-        setFormData(prev => ({ ...prev, reward_per_dollar: 0 }));
-      }
-    }
-
-    // If not legacy reward distribution, clear nctr_reward
-    if (formData.reward_distribution_type !== 'legacy') {
-      if (formData.nctr_reward > 0) {
-        setFormData(prev => ({ ...prev, nctr_reward: 0 }));
-      }
-    }
-
-    // If social_follow, ensure it uses combined distribution
-    if (formData.opportunity_type === 'social_follow' && formData.reward_distribution_type === 'legacy') {
-      setFormData(prev => ({ ...prev, reward_distribution_type: 'combined' }));
-    }
-  }, [formData.opportunity_type, formData.reward_distribution_type]);
 
   // Debug logging for brands loading
   useEffect(() => {
@@ -212,7 +180,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       description: '',
       opportunity_type: 'shopping',
       nctr_reward: 0,
-      reward_per_dollar: 0, // No default legacy allocation
+      reward_per_dollar: 100,
       partner_name: '',
       partner_logo_url: '',
       affiliate_link: '',
@@ -220,16 +188,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_title: '',
       video_description: '',
       is_active: true,
-      featured: false,
       // New reward structure fields
       available_nctr_reward: 0,
       lock_90_nctr_reward: 0,
       lock_360_nctr_reward: 0,
-      reward_distribution_type: 'combined', // Default to new system
-      // Social media fields
-      social_platform: '',
-      social_handle: '',
-      cta_text: ''
+      reward_distribution_type: 'legacy'
     });
     setEditingOpportunity(null);
     setSelectedBrand(null);
@@ -250,16 +213,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_title: opportunity.video_title || '',
       video_description: opportunity.video_description || '',
       is_active: opportunity.is_active,
-      featured: opportunity.featured || false,
       // New reward structure fields
       available_nctr_reward: opportunity.available_nctr_reward || 0,
       lock_90_nctr_reward: opportunity.lock_90_nctr_reward || 0,
       lock_360_nctr_reward: opportunity.lock_360_nctr_reward || 0,
-      reward_distribution_type: opportunity.reward_distribution_type || 'combined', // Default to new system
-      // Social media fields
-      social_platform: opportunity.social_platform || '',
-      social_handle: opportunity.social_handle || '',
-      cta_text: opportunity.cta_text || ''
+      reward_distribution_type: opportunity.reward_distribution_type || 'legacy'
     });
     
     // Set selected brand if available
@@ -424,45 +382,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
   };
 
-  const toggleOpportunityFeatured = async (opportunity: EarningOpportunity) => {
-    try {
-      const { error } = await supabase
-        .from('earning_opportunities')
-        .update({ featured: !opportunity.featured })
-        .eq('id', opportunity.id);
-
-      if (error) throw error;
-
-      await logActivity(
-        opportunity.featured ? 'unfeatured' : 'featured', 
-        'opportunity', 
-        opportunity.id, 
-        { title: opportunity.title }
-      );
-
-      toast({
-        title: `Opportunity ${opportunity.featured ? 'Unfeatured' : 'Featured'}`,
-        description: `${opportunity.title} has been ${opportunity.featured ? 'removed from featured' : 'featured'}.`,
-      });
-
-      fetchOpportunities();
-      onStatsUpdate();
-    } catch (error) {
-      console.error('Error toggling opportunity featured status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update featured status.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const getOpportunityIcon = (type: string) => {
     switch (type) {
       case 'invite': return Users;
       case 'shopping': return ShoppingBag;
       case 'partner': return Star;
-      case 'social_follow': return Users;
       default: return Gift;
     }
   };
@@ -523,7 +447,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
               <SelectItem value="shopping">Shopping</SelectItem>
               <SelectItem value="invite">Invite</SelectItem>
               <SelectItem value="partner">Partner</SelectItem>
-              <SelectItem value="social_follow">Social Follow</SelectItem>
               <SelectItem value="bonus">Bonus</SelectItem>
             </SelectContent>
           </Select>
@@ -573,7 +496,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <SelectItem value="shopping">Shopping Rewards</SelectItem>
                         <SelectItem value="invite">Invite Friends</SelectItem>
                         <SelectItem value="partner">Partner Bonus</SelectItem>
-                        <SelectItem value="social_follow">Social Media Follow</SelectItem>
                         <SelectItem value="bonus">Special Bonus</SelectItem>
                       </SelectContent>
                     </Select>
@@ -591,106 +513,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   />
                 </div>
 
-                {/* Social Media Follow Configuration */}
-                {formData.opportunity_type === 'social_follow' && (
-                  <div className="bg-blue-50 dark:bg-blue-950/20 p-6 rounded-lg border-2 border-blue-200 dark:border-blue-800 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Users className="w-5 h-5 text-blue-600" />
-                      <h4 className="font-bold text-lg text-blue-800 dark:text-blue-300">Social Media Follow Setup</h4>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="social_platform">Platform *</Label>
-                        <Select
-                          value={formData.social_platform || 'twitter'}
-                          onValueChange={(value) => {
-                            setFormData({...formData, social_platform: value});
-                            // Update default titles based on platform
-                            if (value === 'twitter') {
-                              setFormData(prev => ({
-                                ...prev,
-                                social_platform: value,
-                                title: prev.title || 'Follow Us on X (Twitter)',
-                                partner_name: prev.partner_name || 'The Garden'
-                              }));
-                            } else if (value === 'instagram') {
-                              setFormData(prev => ({
-                                ...prev,
-                                social_platform: value,
-                                title: prev.title || 'Follow Us on Instagram',
-                                partner_name: prev.partner_name || 'The Garden'
-                              }));
-                            } else if (value === 'substack') {
-                              setFormData(prev => ({
-                                ...prev,
-                                social_platform: value,
-                                title: prev.title || 'Subscribe to Our Substack',
-                                partner_name: prev.partner_name || 'The Garden'
-                              }));
-                            }
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="twitter">🐦 X (Twitter)</SelectItem>
-                            <SelectItem value="instagram">📸 Instagram</SelectItem>
-                            <SelectItem value="substack">📝 Substack</SelectItem>
-                            <SelectItem value="youtube">🎥 YouTube</SelectItem>
-                            <SelectItem value="linkedin">💼 LinkedIn</SelectItem>
-                            <SelectItem value="other">🌐 Other Platform</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="social_handle">Account Handle/Username *</Label>
-                        <Input
-                          id="social_handle"
-                          value={formData.social_handle || ''}
-                          onChange={(e) => setFormData({...formData, social_handle: e.target.value})}
-                          placeholder="@thegarden or thegarden"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="social_url">Full Account URL *</Label>
-                      <Input
-                        id="social_url"
-                        type="url"
-                        value={formData.affiliate_link}
-                        onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
-                        placeholder="https://x.com/thegarden"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="cta_text">Call-to-Action Text</Label>
-                      <Input
-                        id="cta_text"
-                        value={formData.cta_text || ''}
-                        onChange={(e) => setFormData({...formData, cta_text: e.target.value})}
-                        placeholder="Follow us for the latest updates and earning tips!"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Optional: Customize the text users see when they complete this opportunity
-                      </p>
-                    </div>
-
-                    <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded border border-blue-300 dark:border-blue-700">
-                      <p className="text-xs text-blue-700 dark:text-blue-400">
-                        💡 <strong>Tip:</strong> You can create follow opportunities for any social account, not just your own. 
-                        This is perfect for partner collaborations or promoting influencer accounts.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Brand Selection - Hide for social follow */}
-                {formData.opportunity_type !== 'social_follow' && (
+                {/* Brand Selection */}
                 <div className="bg-section-highlight p-4 rounded-lg space-y-4">
                   <h4 className="font-semibold text-foreground flex items-center gap-2">
                     <ShoppingBag className="w-4 h-4" />
@@ -751,9 +574,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize
                   </div>
                 </div>
-                )}
 
-                {/* NCTR Bounty Configuration - Simplified for Social Follow */}
+                {/* NCTR Bounty Configuration */}
                 <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-6 rounded-lg border-2 border-primary/20 space-y-6">
                   <div className="flex items-center gap-3">
                     <Gift className="w-5 h-5 text-primary" />
@@ -764,9 +586,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     <h5 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 How Bounties Work</h5>
                     <div className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
                       <p><strong>One-time Bounty:</strong> Fixed NCTR reward when user completes the opportunity</p>
-                      {formData.opportunity_type !== 'social_follow' && (
-                        <p><strong>Per-Dollar Rewards:</strong> NCTR distributed <strong>using the same ratios</strong> as your bounty breakdown for each $1 spent</p>
-                      )}
+                      <p><strong>Per-Dollar Rewards:</strong> NCTR distributed <strong>using the same ratios</strong> as your bounty breakdown for each $1 spent</p>
                       <p><strong>Active Status:</strong> Immediately available • <strong>90LOCK:</strong> 90-day lock • <strong>360LOCK:</strong> 360-day premium lock</p>
                     </div>
                   </div>
@@ -809,7 +629,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     </Select>
                   </div>
 
-                  {/* Per Dollar NCTR for Shopping Only */}
+                  {/* Per Dollar NCTR for Shopping */}
                   {formData.opportunity_type === 'shopping' && formData.reward_distribution_type !== 'legacy' && (
                     <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
                       <div className="flex items-center gap-2 mb-3">
@@ -868,8 +688,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     </div>
                   )}
 
-                  {/* Legacy Rewards (backward compatibility) - Not for Social Follow */}
-                  {formData.reward_distribution_type === 'legacy' && formData.opportunity_type !== 'social_follow' && (
+                  {/* Legacy Rewards (backward compatibility) */}
+                  {formData.reward_distribution_type === 'legacy' && (
                     <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                       <h5 className="font-medium mb-3 text-gray-700 dark:text-gray-300">Legacy Reward System</h5>
                       <div className="grid grid-cols-2 gap-4">
@@ -881,7 +701,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             step="1"
                             min="0"
                             value={formData.reward_per_dollar}
-                            onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 0})}
+                            onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 100})}
                             placeholder="100"
                           />
                         </div>
@@ -1053,7 +873,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             {(formData.available_nctr_reward || 0) + (formData.lock_90_nctr_reward || 0) + (formData.lock_360_nctr_reward || 0) + (formData.nctr_reward || 0)} NCTR
                           </div>
                         </div>
-                        {formData.reward_per_dollar > 0 && formData.opportunity_type !== 'social_follow' && (
+                        {formData.reward_per_dollar > 0 && (
                           <div>
                             <p className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-2">
                               {formData.opportunity_type === 'shopping' ? 'Per Dollar (Distributed by Ratios):' : 'Per Dollar:'}
@@ -1174,17 +994,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       Activate opportunity immediately
                     </Label>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="featured"
-                      checked={formData.featured}
-                      onCheckedChange={(checked) => setFormData({...formData, featured: checked})}
-                    />
-                    <Label htmlFor="featured" className="text-sm font-medium">
-                      ⭐ Feature this opportunity (highlight for users)
-                    </Label>
-                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-6 border-t border-section-border">
@@ -1239,23 +1048,13 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <IconComponent className="w-5 h-5 text-foreground" />
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-foreground">{opportunity.title}</h4>
-                          {opportunity.featured && <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
-                        </div>
+                        <h4 className="font-semibold text-foreground">{opportunity.title}</h4>
                         <p className="text-sm text-muted-foreground">{opportunity.partner_name || 'No Partner'}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      {opportunity.featured && (
-                        <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
-                          Featured
-                        </Badge>
-                      )}
-                      <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
-                        {opportunity.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </div>
+                    <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
+                      {opportunity.is_active ? 'Active' : 'Inactive'}
+                    </Badge>
                   </div>
 
                   <div className="space-y-3 mb-4">
@@ -1354,15 +1153,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     >
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
-                    </Button>
-                    <Button
-                      variant={opportunity.featured ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleOpportunityFeatured(opportunity)}
-                      className={`${opportunity.featured ? 'bg-yellow-500 hover:bg-yellow-600 text-white border-0' : ''}`}
-                      title={opportunity.featured ? 'Remove from featured' : 'Feature this opportunity'}
-                    >
-                      <Star className={`w-4 h-4 ${opportunity.featured ? 'fill-white text-white' : 'text-muted-foreground'}`} />
                     </Button>
                     <Button
                       variant={opportunity.is_active ? "secondary" : "default"}

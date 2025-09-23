@@ -19,8 +19,6 @@ import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
-import { NCTRSyncButton } from '@/components/NCTRSyncButton';
-import { PortfolioBreakdown } from '@/components/PortfolioBreakdown';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -34,10 +32,6 @@ interface Portfolio {
   opportunity_status: string;
   lock_90_nctr: number;
   lock_360_nctr: number;
-  nctr_live_available?: number;
-  nctr_live_lock_360?: number;
-  nctr_live_total?: number;
-  last_sync_at?: string;
 }
 
 interface LockCommitment {
@@ -70,10 +64,6 @@ interface EarningOpportunity {
   lock_360_nctr_reward?: number;
   reward_distribution_type?: string;
   reward_structure?: any;
-  // Social media fields
-  social_platform?: string;
-  social_handle?: string;
-  cta_text?: string;
 }
 
 import ProfileModal from '@/components/ProfileModal';
@@ -87,8 +77,6 @@ const Garden = () => {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<LockCommitment[]>([]);
   const [opportunities, setOpportunities] = useState<EarningOpportunity[]>([]);
-  const [completedOpportunities, setCompletedOpportunities] = useState<EarningOpportunity[]>([]);
-  const [userTransactions, setUserTransactions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -164,7 +152,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
-        .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr, nctr_live_available, nctr_live_lock_360, nctr_live_total, last_sync_at')
+        .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr')
         .eq('user_id', user?.id)
         .single();
 
@@ -195,34 +183,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      // Fetch user's completed transactions to determine completed opportunities
-      const { data: transactionsData, error: transactionsError } = await supabase
-        .from('nctr_transactions')
-        .select('opportunity_id')
-        .eq('user_id', user?.id)
-        .not('opportunity_id', 'is', null);
-
       if (opportunitiesError) {
         console.error('Opportunities error:', opportunitiesError);
-      } else if (transactionsError) {
-        console.error('Transactions error:', transactionsError);
       } else {
-        // Get list of completed opportunity IDs
-        const completedOpportunityIds = new Set(
-          (transactionsData || []).map(t => t.opportunity_id).filter(Boolean)
-        );
-        
-        // Separate active and completed opportunities
-        const allOpportunities = opportunitiesData || [];
-        const activeOpportunities = allOpportunities.filter(
-          opportunity => !completedOpportunityIds.has(opportunity.id)
-        );
-        const completedOpps = allOpportunities.filter(
-          opportunity => completedOpportunityIds.has(opportunity.id)
-        );
-
-        // Sort active opportunities: Live (shopping) first, then Complete (bonus, invite)
-        const sortedActiveOpportunities = activeOpportunities.sort((a, b) => {
+        // Sort opportunities: Live (shopping) first, then Complete (bonus, invite)
+        const sortedOpportunities = (opportunitiesData || []).sort((a, b) => {
           // Define priority: shopping (Live) = 1, bonus/invite (Complete) = 2
           const getPriority = (type: string) => {
             if (type === 'shopping') return 1; // Live opportunities first
@@ -240,14 +205,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           return priorityA - priorityB;
         });
         
-        // Sort completed opportunities by completion date (newest first)
-        const sortedCompletedOpportunities = completedOpps.sort((a, b) => {
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        });
-        
-        setOpportunities(sortedActiveOpportunities);
-        setCompletedOpportunities(sortedCompletedOpportunities);
-        setUserTransactions(Array.from(completedOpportunityIds));
+        setOpportunities(sortedOpportunities);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -283,9 +241,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       case 'bonus':
         handleBonusOpportunity(opportunity);
         break;
-      case 'social_follow':
-        await handleSocialFollowOpportunity(opportunity);
-        break;
       case 'shopping':
       case 'partner':
         handleShoppingOpportunity(opportunity);
@@ -303,171 +258,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       title: "🎉 Invite Friends",
       description: "Share your link and earn 1000 NCTR in 360LOCK for each friend who joins!",
     });
-  };
-
-  const handleSocialFollowOpportunity = async (opportunity: EarningOpportunity) => {
-    try {
-      // Check if user already completed this social follow opportunity
-      const { data: existingTransaction } = await supabase
-        .from('nctr_transactions')
-        .select('id')
-        .eq('user_id', user?.id)
-        .eq('opportunity_id', opportunity.id)
-        .maybeSingle();
-
-      if (existingTransaction) {
-        toast({
-          title: "Already Followed!",
-          description: "You've already completed this social follow opportunity.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Open social media link in new tab
-      if (opportunity.affiliate_link) {
-        window.open(opportunity.affiliate_link, '_blank');
-      }
-
-      // Instantly award NCTR based on new reward distribution system
-      await awardDistributedNCTR(opportunity, opportunity.cta_text || `Social follow completed: ${opportunity.title}`);
-      
-    } catch (error) {
-      console.error('Error handling social follow opportunity:', error);
-      toast({
-        title: "Error",
-        description: "Failed to process social follow. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const awardDistributedNCTR = async (opportunity: EarningOpportunity, description: string) => {
-    try {
-      const availableAmount = opportunity.available_nctr_reward || 0;
-      const lock90Amount = opportunity.lock_90_nctr_reward || 0;
-      const lock360Amount = opportunity.lock_360_nctr_reward || 0;
-      const totalReward = availableAmount + lock90Amount + lock360Amount;
-      
-      if (totalReward <= 0) {
-        toast({
-          title: "No Reward",
-          description: "This opportunity doesn't have an NCTR reward.",
-        });
-        return;
-      }
-
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('nctr_transactions')
-        .insert({
-          user_id: user?.id,
-          transaction_type: 'earned',
-          nctr_amount: totalReward,
-          opportunity_id: opportunity.id,
-          description: description,
-          partner_name: opportunity.partner_name,
-          earning_source: opportunity.opportunity_type,
-          status: 'completed'
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Update user portfolio with available NCTR
-      if (availableAmount > 0) {
-        const { error: portfolioError } = await supabase
-          .from('nctr_portfolio')
-          .update({
-            available_nctr: (portfolio?.available_nctr || 0) + availableAmount,
-            total_earned: (portfolio?.total_earned || 0) + availableAmount,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user?.id);
-
-        if (portfolioError) throw portfolioError;
-      }
-
-      // Create 90LOCK if specified
-      if (lock90Amount > 0) {
-        const { error: lock90Error } = await supabase
-          .from('nctr_locks')
-          .insert({
-            user_id: user?.id,
-            nctr_amount: lock90Amount,
-            lock_type: '90LOCK',
-            lock_category: '90LOCK',
-            commitment_days: 90,
-            unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-            can_upgrade: true,
-            original_lock_type: '90LOCK'
-          });
-
-        if (lock90Error) throw lock90Error;
-
-        // Update total earned for locked amounts too
-        const { error: portfolioError } = await supabase
-          .from('nctr_portfolio')
-          .update({
-            total_earned: (portfolio?.total_earned || 0) + lock90Amount,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user?.id);
-
-        if (portfolioError) throw portfolioError;
-      }
-
-      // Create 360LOCK if specified
-      if (lock360Amount > 0) {
-        const { error: lock360Error } = await supabase
-          .from('nctr_locks')
-          .insert({
-            user_id: user?.id,
-            nctr_amount: lock360Amount,
-            lock_type: '360LOCK',
-            lock_category: '360LOCK',
-            commitment_days: 360,
-            unlock_date: new Date(Date.now() + 360 * 24 * 60 * 60 * 1000).toISOString(),
-            can_upgrade: false,
-            original_lock_type: '360LOCK'
-          });
-
-        if (lock360Error) throw lock360Error;
-
-        // Update total earned for locked amounts too
-        const { error: portfolioError } = await supabase
-          .from('nctr_portfolio')
-          .update({
-            total_earned: (portfolio?.total_earned || 0) + lock360Amount,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user?.id);
-
-        if (portfolioError) throw portfolioError;
-      }
-
-      // Refresh user data to show updated balances
-      await fetchUserData();
-
-      // Build reward breakdown message
-      let rewardMessage = `🎉 ${formatNCTR(totalReward)} NCTR earned from ${opportunity.title}!`;
-      const rewardBreakdown = [];
-      if (availableAmount > 0) rewardBreakdown.push(`${formatNCTR(availableAmount)} available`);
-      if (lock90Amount > 0) rewardBreakdown.push(`${formatNCTR(lock90Amount)} in 90LOCK`);
-      if (lock360Amount > 0) rewardBreakdown.push(`${formatNCTR(lock360Amount)} in 360LOCK`);
-      
-      if (rewardBreakdown.length > 0) {
-        rewardMessage += `\n(${rewardBreakdown.join(', ')})`;
-      }
-
-      toast({
-        title: "Success!",
-        description: rewardMessage,
-      });
-
-    } catch (error) {
-      console.error('Error awarding distributed NCTR:', error);
-      throw error;
-    }
   };
 
   const handleBonusOpportunity = async (opportunity: EarningOpportunity) => {
@@ -661,15 +451,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   alt="NCTR" 
                   className="h-16 sm:h-28 w-auto opacity-90"
                 />
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">
+              </div>{/* End of flex items-center space-x-2 */}
+              <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">{/* Status badge removed */}
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/profile')}
-                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[44px] text-xs sm:text-sm px-3 sm:px-4"
+                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
                 >
-                  <User className="w-4 h-4" />
+                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Profile</span>
                   <span className="sm:hidden">Profile</span>
                 </Button>
@@ -678,23 +468,23 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/admin')}
-                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[44px] text-xs sm:text-sm px-3 sm:px-4"
+                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Admin</span>
-                  <span className="sm:hidden">Admin</span>
+                  <span className="sm:hidden">Adm</span>
                 </Button>
               )}
               <Button 
                 variant="outline" 
                 onClick={handleSignOut}
-                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[44px] text-xs sm:text-sm px-3 sm:px-4"
+                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
               >
-                <LogOut className="w-4 h-4 mr-1 sm:mr-2" />
+                <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Sign Out</span>
-                <span className="sm:hidden">Sign Out</span>
+                <span className="sm:hidden">Out</span>
               </Button>
-              </div>
+              </div>{/* End of flex items-center gap-2 */}
             </div>{/* End of flex items-center justify-between */}
           </div>{/* End of flex flex-col sm:flex-row */}
         </div>{/* End of container */}
@@ -708,21 +498,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           locks={locks as any} // Type compatibility fix
           onLockCreated={fetchUserData}
         />
-        
-        {/* NCTR Live Sync */}
-        <div className="px-4 sm:px-6 pb-4">
-          <NCTRSyncButton variant="card" className="w-full" />
-        </div>
-        
-        {/* Portfolio Breakdown */}
-        <div className="px-4 sm:px-6 pb-4">
-          {portfolio && (
-            <PortfolioBreakdown 
-              portfolio={portfolio}
-              currentPrice={currentPrice}
-            />
-          )}
-        </div>
         </div>
 
         {/* Main Content - Earning Opportunities */}
@@ -868,10 +643,10 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               {opportunities.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
-                    🌟 Active Earning Opportunities
+                    Partner Shopping Opportunities
                   </h2>
                   <p className="text-center text-muted-foreground mb-8">
-                    Start earning NCTR tokens with these available opportunities
+                    Earn NCTR from your everyday purchases with our brand partners
                   </p>
                 </div>
               )}
@@ -880,9 +655,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               <Card className="bg-white border border-section-border shadow-soft">
                 <CardContent className="p-12 text-center">
                   <Gift className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Active Opportunities Available</h3>
-                  <p className="text-muted-foreground mb-4">All current opportunities have been completed!</p>
-                  <p className="text-sm text-muted-foreground">Check back soon for new earning opportunities.</p>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Partner Opportunities Available</h3>
+                  <p className="text-muted-foreground mb-4">We're working on bringing you amazing earning opportunities with top brands!</p>
+                  <p className="text-sm text-muted-foreground">Check back soon for exciting partnership launches.</p>
                 </CardContent>
               </Card>
             ) : opportunities.length === 1 ? (
@@ -951,15 +726,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       </p>
                     )}
 
-                      <Button 
-                        onClick={() => handleOpportunityClick(opportunities[0])}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300"
-                      >
-                        <ExternalLink className="w-5 h-5 mr-3" />
-                        {opportunities[0].opportunity_type === 'social_follow' 
-                          ? `Follow & Earn ${formatNCTR((opportunities[0].available_nctr_reward || 0) + (opportunities[0].lock_90_nctr_reward || 0) + (opportunities[0].lock_360_nctr_reward || 0))} NCTR`
-                          : `Start Earning with ${opportunities[0].partner_name || 'This Brand'}`}
-                      </Button>
+                    <Button 
+                      onClick={() => handleOpportunityClick(opportunities[0])}
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300"
+                    >
+                      <ExternalLink className="w-5 h-5 mr-3" />
+                      Start Earning with {opportunities[0].partner_name || 'This Brand'}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -1053,17 +826,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                          {/* CTA Button - Consistent size and alignment */}
                          <div className="mt-auto">
-                            <Button 
-                              onClick={() => handleOpportunityClick(opportunity)}
-                              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]"
-                            >
-                              <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
-                              <span className="truncate">
-                                {opportunity.opportunity_type === 'social_follow' 
-                                  ? `Follow & Earn ${formatNCTR((opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))} NCTR`
-                                  : 'Start Earning'}
-                              </span>
-                            </Button>
+                           <Button 
+                             onClick={() => handleOpportunityClick(opportunity)}
+                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]"
+                           >
+                             <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
+                             <span className="truncate">Start Earning</span>
+                           </Button>
                          </div>
                       </CardContent>
                     </Card>
@@ -1134,17 +903,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                          {/* Button - Consistent alignment */}
                          <div className="mt-auto">
-                              <Button 
-                                onClick={() => handleOpportunityClick(opportunity)}
-                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300"
-                              >
-                                <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
-                                <span className="truncate">
-                                  {opportunity.opportunity_type === 'social_follow' 
-                                    ? 'Follow & Earn'
-                                    : 'Earn Now'}
-                                </span>
-                              </Button>
+                           <Button 
+                             onClick={() => handleOpportunityClick(opportunity)}
+                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300"
+                           >
+                             <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
+                             <span className="truncate">Earn Now</span>
+                           </Button>
                          </div>
                       </CardContent>
                     </Card>
@@ -1153,95 +918,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               </div>
             )}
 
-            {/* Completed Opportunities Section */}
-            {completedOpportunities.length > 0 && (
-              <div className="mt-16 mb-8">
-                <div className="mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
-                    ✅ Completed Opportunities
-                  </h2>
-                  <p className="text-center text-muted-foreground mb-8">
-                    Well done! You've completed {completedOpportunities.length} earning opportunity{completedOpportunities.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {completedOpportunities.map((opportunity) => (
-                    <Card key={opportunity.id} className="bg-green-50/50 border border-green-200/50 shadow-sm">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3 mb-3">
-                          {opportunity.partner_logo_url ? (
-                            <img 
-                              src={opportunity.partner_logo_url} 
-                              alt={`${opportunity.partner_name} logo`}
-                              className="w-8 h-8 rounded-lg object-cover opacity-60 flex-shrink-0"
-                            />
-                          ) : (
-                            <img 
-                              src={nctrNLogo}
-                              alt="The Garden Logo"
-                              className="w-8 h-8 rounded-lg object-cover opacity-60 flex-shrink-0"
-                            />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-semibold text-gray-700 leading-tight mb-1 line-clamp-2">
-                              {opportunity.title}
-                            </h3>
-                            {opportunity.partner_name && (
-                              <p className="text-xs text-gray-500">{opportunity.partner_name}</p>
-                            )}
-                          </div>
-                          <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200 text-xs px-2 py-1 flex-shrink-0">
-                            ✓ Completed
-                          </Badge>
-                        </div>
-
-                        {/* Compact Reward Display */}
-                        <div className="bg-white/60 rounded-lg p-3 border border-green-200/30">
-                          <div className="text-center">
-                            <div className="text-xs text-gray-500 mb-1">REWARD BREAKDOWN</div>
-                            <div className="space-y-1">
-                              {((opportunity.available_nctr_reward || 0) > 0 || 
-                                (opportunity.lock_90_nctr_reward || 0) > 0 || 
-                                (opportunity.lock_360_nctr_reward || 0) > 0) ? (
-                                <div className="flex flex-wrap gap-1 justify-center">
-                                  {(opportunity.available_nctr_reward || 0) > 0 && (
-                                    <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                                      {opportunity.available_nctr_reward} Available
-                                    </span>
-                                  )}
-                                  {(opportunity.lock_90_nctr_reward || 0) > 0 && (
-                                    <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
-                                      <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                                      {opportunity.lock_90_nctr_reward} 90LOCK
-                                    </span>
-                                  )}
-                                  {(opportunity.lock_360_nctr_reward || 0) > 0 && (
-                                    <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                                      {opportunity.lock_360_nctr_reward} 360LOCK
-                                    </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="text-sm font-medium text-green-700">
-                                  +{Math.floor(opportunity.nctr_reward || 0)} NCTR
-                                </div>
-                              )}
-                            </div>
-                            <div className="text-xs text-green-600 mt-2 font-medium">NCTR Earned ✓</div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Affiliate Links Section - Hidden for now */}
-            {false && (
+            {/* Affiliate Links Section */}
             <div className="mt-12" data-affiliate-links>
               <Card className="bg-white border-2 border-primary shadow-soft">
                 <CardHeader>
@@ -1258,7 +935,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                 </CardContent>
               </Card>
             </div>
-            )}
 
             {/* Community Section - Refreshed */}
             <div className="mt-12" data-referral-system key="referral-system-updated">

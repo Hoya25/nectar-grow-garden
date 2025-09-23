@@ -28,7 +28,6 @@ import LoyalizeApiTester from '@/components/admin/LoyalizeApiTester';
 import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 import WebhookTester from '@/components/WebhookTester';
 import BannerEditor from '@/components/admin/BannerEditor';
-import SocialMediaBountyManager from '@/components/admin/SocialMediaBountyManager';
 
 interface AdminStats {
   total_users: number;
@@ -221,14 +220,10 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="opportunities" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5 bg-section-highlight">
+          <TabsList className="grid w-full grid-cols-4 bg-section-highlight">
             <TabsTrigger value="opportunities" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Gift className="w-4 h-4" />
               Create Opportunities
-            </TabsTrigger>
-            <TabsTrigger value="social" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Users className="w-4 h-4" />
-              Social Bounties
             </TabsTrigger>
             <TabsTrigger value="loyalize" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Sparkles className="w-4 h-4" />
@@ -246,18 +241,6 @@ const Admin = () => {
 
           <TabsContent value="opportunities">
             <OpportunityManagement onStatsUpdate={fetchAdminStats} />
-          </TabsContent>
-
-          <TabsContent value="social">
-            <Card className="bg-section-highlight border border-section-border">
-              <CardHeader>
-                <CardTitle className="text-foreground">Social Media Bounties</CardTitle>
-                <p className="text-muted-foreground">Use the "Create Opportunities" tab and select "Social Media Follow" type for better customization options</p>
-              </CardHeader>
-              <CardContent>
-                <SocialMediaBountyManager />
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="loyalize">
