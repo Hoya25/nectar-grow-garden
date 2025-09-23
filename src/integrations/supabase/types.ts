@@ -542,12 +542,20 @@ export type Database = {
         }
         Returns: string
       }
+      award_profile_completion_bonus: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       calculate_lock_balances: {
         Args: { user_id: string }
         Returns: {
           lock_360_total: number
           lock_90_total: number
         }[]
+      }
+      calculate_profile_completion: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       calculate_user_status: {
         Args: { user_id: string }

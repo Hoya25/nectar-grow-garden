@@ -18,6 +18,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
+import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -516,6 +517,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                 }
               }}
             />
+
+            {/* Profile Completion Banner */}
+            <div className="mb-6">
+              <ProfileCompletionBanner />
+            </div>
 
             {/* Earning Opportunities Section */}
             <div data-earning-opportunities>
