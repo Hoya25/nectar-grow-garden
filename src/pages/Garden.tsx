@@ -78,6 +78,7 @@ const Garden = () => {
   const [locks, setLocks] = useState<LockCommitment[]>([]);
   const [opportunities, setOpportunities] = useState<EarningOpportunity[]>([]);
   const [completedOpportunityIds, setCompletedOpportunityIds] = useState<string[]>([]);
+  const [portfolioExpanded, setPortfolioExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -550,81 +551,103 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           <ProfileCompletionBanner />
         </div>
 
-        {/* Portfolio Section - Prominent Display */}
+        {/* Portfolio Section - Collapsible */}
         <div className="mb-8">
-          <Card className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 shadow-premium">
+          <Card 
+            className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 shadow-premium cursor-pointer hover:shadow-premium-hover transition-all duration-300"
+            onClick={() => setPortfolioExpanded(!portfolioExpanded)}
+          >
             <CardHeader>
-              <CardTitle className="text-xl section-heading flex items-center gap-2">
-                <Coins className="w-6 h-6 text-primary" />
-                Your NCTR Portfolio
+              <CardTitle className="text-xl section-heading flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Coins className="w-6 h-6 text-primary" />
+                  Your NCTR Portfolio
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-primary">
+                      {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Total NCTR</p>
+                  </div>
+                  <div className={`transform transition-transform duration-300 ${portfolioExpanded ? 'rotate-180' : ''}`}>
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                  </div>
+                </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <Card className="bg-white shadow-sm">
-                  <CardContent className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Coins className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm font-medium text-muted-foreground">Available</span>
-                    </div>
-                    <p className="text-xl font-bold text-blue-600 mb-1">
-                      {formatNCTR(portfolio?.available_nctr || 0)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Ready to commit</p>
-                  </CardContent>
-                </Card>
+            
+            {portfolioExpanded && (
+              <CardContent className="p-6 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <Card className="bg-white shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Coins className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium text-muted-foreground">Available</span>
+                      </div>
+                      <p className="text-xl font-bold text-blue-600 mb-1">
+                        {formatNCTR(portfolio?.available_nctr || 0)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Ready to commit</p>
+                    </CardContent>
+                  </Card>
 
-                <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-                  <CardContent className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Gift className="w-5 h-5 text-orange-600" />
-                      <span className="text-sm font-medium text-orange-600">90LOCK</span>
-                    </div>
-                    <p className="text-xl font-bold text-orange-600 mb-1">
-                      {formatNCTR(portfolio?.lock_90_nctr || 0)}
-                    </p>
-                    <p className="text-xs text-orange-600/80">Short commitment</p>
-                  </CardContent>
-                </Card>
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                    <CardContent className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Gift className="w-5 h-5 text-orange-600" />
+                        <span className="text-sm font-medium text-orange-600">90LOCK</span>
+                      </div>
+                      <p className="text-xl font-bold text-orange-600 mb-1">
+                        {formatNCTR(portfolio?.lock_90_nctr || 0)}
+                      </p>
+                      <p className="text-xs text-orange-600/80">Short commitment</p>
+                    </CardContent>
+                  </Card>
 
-                <Card className="bg-gradient-to-br from-primary/10 to-primary/20 border-primary/30">
-                  <CardContent className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Gift className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-medium text-primary">360LOCK</span>
-                    </div>
-                    <p className="text-xl font-bold text-primary mb-1">
-                      {formatNCTR(portfolio?.lock_360_nctr || 0)}
-                    </p>
-                    <p className="text-xs text-primary/80">Alliance Benefits</p>
-                  </CardContent>
-                </Card>
+                  <Card className="bg-gradient-to-br from-primary/10 to-primary/20 border-primary/30">
+                    <CardContent className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Gift className="w-5 h-5 text-primary" />
+                        <span className="text-sm font-medium text-primary">360LOCK</span>
+                      </div>
+                      <p className="text-xl font-bold text-primary mb-1">
+                        {formatNCTR(portfolio?.lock_360_nctr || 0)}
+                      </p>
+                      <p className="text-xs text-primary/80">Alliance Benefits</p>
+                    </CardContent>
+                  </Card>
 
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                  <CardContent className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <TrendingUp className="w-5 h-5 text-green-600" />
-                      <span className="text-sm font-medium text-green-600">Total Earned</span>
-                    </div>
-                    <p className="text-xl font-bold text-green-600 mb-1">
-                      {formatNCTR(portfolio?.total_earned || 0)}
-                    </p>
-                    <p className="text-xs text-green-600/80">Lifetime NCTR</p>
-                  </CardContent>
-                </Card>
-              </div>
+                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                    <CardContent className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <TrendingUp className="w-5 h-5 text-green-600" />
+                        <span className="text-sm font-medium text-green-600">Total Earned</span>
+                      </div>
+                      <p className="text-xl font-bold text-green-600 mb-1">
+                        {formatNCTR(portfolio?.total_earned || 0)}
+                      </p>
+                      <p className="text-xs text-green-600/80">Lifetime NCTR</p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-              <div className="flex justify-center">
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate('/profile')}
-                  className="border-primary/50 text-primary hover:bg-primary/10"
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  Portfolio Details & Sync
-                </Button>
-              </div>
-            </CardContent>
+                <div className="flex justify-center">
+                  <Button 
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/profile');
+                    }}
+                    className="border-primary/50 text-primary hover:bg-primary/10"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Portfolio Details & Sync
+                  </Button>
+                </div>
+              </CardContent>
+            )}
           </Card>
         </div>
 
