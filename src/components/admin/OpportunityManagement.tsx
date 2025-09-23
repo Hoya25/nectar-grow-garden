@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,6 +46,9 @@ interface Brand {
   id: string;
   name: string;
   logo_url: string;
+  description?: string;
+  category?: string;
+  website_url?: string;
 }
 
 interface OpportunityManagementProps {
@@ -61,6 +64,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   const [filterType, setFilterType] = useState<string>('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<EarningOpportunity | null>(null);
+  const [brandSearchTerm, setBrandSearchTerm] = useState('');
+  const [showBrandDropdown, setShowBrandDropdown] = useState(false);
+  const brandSearchRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -79,6 +85,20 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   useEffect(() => {
     fetchOpportunities();
     fetchBrands();
+  }, []);
+
+  // Handle clicking outside brand search dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (brandSearchRef.current && !brandSearchRef.current.contains(event.target as Node)) {
+        setShowBrandDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const fetchOpportunities = async () => {
@@ -106,7 +126,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     try {
       const { data, error } = await supabase
         .from('brands')
-        .select('id, name, logo_url')
+        .select('id, name, logo_url, description, category, website_url')
         .eq('is_active', true)
         .order('name');
 
@@ -116,6 +136,17 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       console.error('Error fetching brands:', error);
     }
   };
+
+  // Filter brands based on search term
+  const filteredBrands = brands.filter(brand => {
+    if (!brandSearchTerm) return true;
+    const searchLower = brandSearchTerm.toLowerCase();
+    return (
+      brand.name.toLowerCase().includes(searchLower) ||
+      (brand.description || '').toLowerCase().includes(searchLower) ||
+      (brand.category || '').toLowerCase().includes(searchLower)
+    );
+  });
 
   const filteredOpportunities = opportunities.filter(opp => {
     const matchesSearch = opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -141,6 +172,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       is_active: true
     });
     setEditingOpportunity(null);
+    setBrandSearchTerm('');
+    setShowBrandDropdown(false);
   };
 
   const handleEdit = (opportunity: EarningOpportunity) => {
@@ -159,6 +192,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_description: opportunity.video_description || '',
       is_active: opportunity.is_active
     });
+    setBrandSearchTerm(opportunity.partner_name || '');
+    setShowBrandDropdown(false);
     setModalOpen(true);
   };
 
@@ -473,31 +508,100 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   </h4>
                   
                   <div className="space-y-3">
-                    <Select onValueChange={handleBrandSelect} value="">
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="🔍 Search and select from existing brands..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <div className="p-2 text-sm text-muted-foreground border-b">
-                          Available Brands ({brands.length})
-                        </div>
-                        {brands.map((brand) => (
-                          <SelectItem key={brand.id} value={brand.id}>
-                            <div className="flex items-center gap-2">
-                              {brand.logo_url && (
-                                <img src={brand.logo_url} alt="" className="w-4 h-4 rounded" />
-                              )}
-                              {brand.name}
-                            </div>
-                          </SelectItem>
-                        ))}
-                        {brands.length === 0 && (
-                          <div className="p-2 text-sm text-muted-foreground">
-                            No brands available. Use Brand Search tab to add brands first.
+                     {/* Searchable Brand Input */}
+                     <div className="relative" ref={brandSearchRef}>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="🔍 Search brands by name, category, or description..."
+                          value={brandSearchTerm}
+                          onChange={(e) => setBrandSearchTerm(e.target.value)}
+                          onFocus={() => setShowBrandDropdown(true)}
+                          className="pl-10"
+                        />
+                      </div>
+                      
+                      {/* Brand Search Results Dropdown */}
+                      {showBrandDropdown && (
+                        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-64 overflow-y-auto">
+                          <div className="p-2 text-sm text-muted-foreground border-b bg-muted">
+                            {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found
+                            {brandSearchTerm && ` matching "${brandSearchTerm}"`}
                           </div>
-                        )}
-                      </SelectContent>
-                    </Select>
+                          
+                          {filteredBrands.length === 0 ? (
+                            <div className="p-4 text-center text-muted-foreground">
+                              {brandSearchTerm ? (
+                                <>
+                                  <p>No brands match your search.</p>
+                                  <p className="text-xs mt-1">Try a different search term or use "Brand Search" tab to add new brands.</p>
+                                </>
+                              ) : (
+                                <p>No brands available. Use "Brand Search" tab to add brands first.</p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="py-1">
+                              {filteredBrands.map((brand) => (
+                                <div
+                                  key={brand.id}
+                                  className="px-3 py-2 hover:bg-muted cursor-pointer border-b border-border/30 last:border-b-0"
+                                  onClick={() => {
+                                    handleBrandSelect(brand.id);
+                                    setBrandSearchTerm(brand.name);
+                                    setShowBrandDropdown(false);
+                                  }}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <div className="flex-shrink-0">
+                                      {brand.logo_url ? (
+                                        <img 
+                                          src={brand.logo_url} 
+                                          alt={brand.name} 
+                                          className="w-8 h-8 rounded object-cover"
+                                          onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                          }}
+                                        />
+                                      ) : (
+                                        <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
+                                          <ShoppingBag className="w-4 h-4 text-muted-foreground" />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-medium text-foreground truncate">
+                                        {brand.name}
+                                      </div>
+                                      {brand.category && (
+                                        <div className="text-xs text-muted-foreground">
+                                          {brand.category}
+                                        </div>
+                                      )}
+                                      {brand.description && (
+                                        <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                          {brand.description}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div className="p-2 border-t bg-muted">
+                            <button
+                              type="button"
+                              onClick={() => setShowBrandDropdown(false)}
+                              className="text-xs text-muted-foreground hover:text-foreground w-full text-center"
+                            >
+                              Close search results
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
                     <div className="text-xs text-muted-foreground">
                       💡 Tip: Use "Brand Search" tab to find and add new brands from Loyalize
