@@ -19,6 +19,7 @@ import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
+import nctrNLogo from "@/assets/nctr-n-logo.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -649,7 +650,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           />
                         ) : (
                           <img 
-                            src="/assets/garden-logo-static.png"
+                            src={nctrNLogo}
                             alt="The Garden Logo"
                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-contain shadow-soft flex-shrink-0"
                           />
@@ -744,7 +745,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                               />
                             ) : (
                               <img 
-                                src="/assets/garden-logo-static.png"
+                                src={nctrNLogo}
                                 alt="The Garden Logo"
                                 className="w-16 h-16 rounded-2xl object-contain shadow-medium"
                               />
@@ -862,7 +863,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                               />
                             ) : (
                               <img 
-                                src="/assets/garden-logo-static.png"
+                                src={nctrNLogo}
                                 alt="The Garden Logo"
                                 className="w-10 h-10 rounded-lg object-contain"
                               />
