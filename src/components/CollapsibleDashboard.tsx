@@ -218,7 +218,36 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   </div>
                   {portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0 && (
                     <Button
-                      onClick={handleCommitTo360LOCK}
+                      onClick={async () => {
+                        if (!user) return;
+                        setIsCommitting(true);
+                        try {
+                          const { data, error } = await supabase.rpc('commit_all_nctr_to_360lock', {
+                            p_user_id: user.id
+                          }) as { data: any, error: any };
+
+                          if (error) throw error;
+
+                          if (data?.success) {
+                            toast({
+                              title: "🚀 Upgraded to 360LOCK!",
+                              description: `Successfully upgraded ${formatNCTR(portfolio.lock_90_nctr)} NCTR from 90LOCK to 360LOCK for maximum alliance benefits!`,
+                            });
+                            onLockCreated(); // Refresh data
+                          } else {
+                            throw new Error(data?.message || 'Upgrade failed');
+                          }
+                        } catch (error: any) {
+                          console.error('Error upgrading to 360LOCK:', error);
+                          toast({
+                            title: "Upgrade Failed",
+                            description: error.message || "Failed to upgrade to 360LOCK. Please try again.",
+                            variant: "destructive",
+                          });
+                        } finally {
+                          setIsCommitting(false);
+                        }
+                      }}
                       disabled={isCommitting}
                       size="sm"
                       className="h-6 px-2 text-xs bg-primary hover:bg-primary-glow text-primary-foreground"
