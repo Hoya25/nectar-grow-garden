@@ -110,7 +110,7 @@ async function generateAffiliateLink(
       const response = await fetch('https://api.loyalize.com/v1/affiliate/generate', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': apiKey, // Correct Loyalize auth format per support
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

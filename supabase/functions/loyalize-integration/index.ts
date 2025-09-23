@@ -233,21 +233,8 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         'Accept': 'application/json'
       };
 
-      // Method 1: Bearer token (current)
-      if (page === 0) {
-        authHeaders['Authorization'] = `Bearer ${apiKey}`;
-        console.log(`🔑 Trying Bearer token authentication`);
-      }
-      
-      // Method 2: API Key header (common for affiliate APIs)
-      else if (page === 1) {
-        authHeaders['X-API-Key'] = apiKey;
-        console.log(`🔑 Trying X-API-Key header authentication`);
-      }
-      
-      // Method 3: Direct Authorization (some APIs)
-      else if (page === 2) {
-        authHeaders['Authorization'] = apiKey;
+      // Use correct Loyalize authentication method as confirmed by support
+      authHeaders['Authorization'] = apiKey;
         console.log(`🔑 Trying direct Authorization header authentication`);
       }
       
@@ -331,7 +318,7 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
       const giftCardResponse = await fetch('https://api.loyalize.com/v1/gift-cards?size=500', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': apiKey, // Correct Loyalize auth format per support
           'Content-Type': 'application/json'
         }
       });
@@ -647,7 +634,7 @@ async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> 
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': apiKey, // Correct Loyalize auth format per support
           'Content-Type': 'application/json'
         }
       });

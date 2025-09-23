@@ -105,7 +105,7 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
 
       const response = await fetch(searchUrl.toString(), {
         headers: {
-          'Authorization': `Bearer ${apiKey}`, // Fixed: Added Bearer prefix
+          'Authorization': apiKey, // Correct Loyalize auth format per support
           'Content-Type': 'application/json'
         }
       });
@@ -209,7 +209,7 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
     
     const response = await fetch(endpoint, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`, // Fixed: Added Bearer prefix
+        'Authorization': apiKey, // Correct Loyalize auth format per support
         'Content-Type': 'application/json'
       }
     });
@@ -337,7 +337,7 @@ async function syncAllBrands(apiKey: string, supabase: any): Promise<Response> {
         // Fetch updated store data from Loyalize
         const response = await fetch(`https://api.loyalize.com/v1/stores/${brand.loyalize_id}`, {
           headers: {
-            'Authorization': `Bearer ${apiKey}`, // Fixed: Added Bearer prefix
+            'Authorization': apiKey, // Correct Loyalize auth format per support
             'Content-Type': 'application/json',
           },
         });
@@ -539,7 +539,7 @@ async function fetchSingleStoreLogo(apiKey: string, storeId: string): Promise<st
     const response = await fetch(endpoint, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': apiKey, // Correct Loyalize auth format per support
         'Content-Type': 'application/json'
       }
     });
@@ -587,7 +587,7 @@ async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> 
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': apiKey, // Correct Loyalize auth format per support
           'Content-Type': 'application/json'
         }
       });
