@@ -8,7 +8,7 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const nctrTokenApiKey = Deno.env.get('NCTR_TOKEN_API_KEY')!;
+const userProfileApiKey = Deno.env.get('USER_PROFILE_API_KEY')!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -24,52 +24,48 @@ async function fetchPortfolioFromNCTRLive(walletAddress: string): Promise<NCTRPo
   try {
     console.log(`Fetching portfolio for wallet: ${walletAddress}`);
     
-    // Try different possible API endpoints and methods
-    const endpoints = [
-      `https://token.nctr.live/api/portfolio/${walletAddress}`,
-      `https://token.nctr.live/api/v1/portfolio/${walletAddress}`,
-      `https://token.nctr.live/portfolio/${walletAddress}`,
-      `https://api.token.nctr.live/portfolio/${walletAddress}`
-    ];
+    // Use the correct NCTR.live API endpoint
+    const endpoint = 'https://arkwiktiehqafjvlhjrt.supabase.co/functions/v1/get-user-portfolio';
+    
+    console.log(`Using endpoint: ${endpoint}`);
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'x-api-key': userProfileApiKey,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        wallet_address: walletAddress
+      })
+    });
 
-    for (const endpoint of endpoints) {
-      console.log(`Trying endpoint: ${endpoint}`);
-      
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${nctrTokenApiKey}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      });
+    console.log(`Response status: ${response.status}, Content-Type: ${response.headers.get('content-type')}`);
 
-      console.log(`Response status: ${response.status}, Content-Type: ${response.headers.get('content-type')}`);
-
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json();
-          console.log('NCTR Live portfolio data:', data);
-          
-          return {
-            user_id: '', // Will be set by caller
-            available_nctr: data.available_nctr || 0,
-            lock_360_nctr: data.lock_360_nctr || 0,
-            total_earned: data.total_earned || 0,
-            wallet_address: walletAddress,
-          };
-        } else {
-          console.log('Non-JSON response received:', await response.text());
-        }
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        console.log('NCTR Live portfolio data:', data);
+        
+        return {
+          user_id: '', // Will be set by caller
+          available_nctr: data.available_nctr || 0,
+          lock_360_nctr: data.lock_360_nctr || 0,
+          total_earned: data.total_earned || 0,
+          wallet_address: walletAddress,
+        };
       } else {
         const responseText = await response.text();
-        console.log(`HTTP ${response.status} error from ${endpoint}:`, responseText);
+        console.log('Non-JSON response received:', responseText);
+        return null;
       }
+    } else {
+      const responseText = await response.text();
+      console.error(`HTTP ${response.status} error from ${endpoint}:`, responseText);
+      return null;
     }
-
-    console.error('All endpoints failed or returned non-JSON responses');
-    return null;
 
   } catch (error) {
     console.error('Error fetching from NCTR Live:', error);
