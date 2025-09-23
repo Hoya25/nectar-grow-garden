@@ -548,6 +548,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      apply_reward_multiplier: {
+        Args: { p_base_amount: number; p_user_id: string }
+        Returns: number
+      }
       auto_lock_earned_nctr: {
         Args: {
           p_earning_source: string
@@ -556,6 +560,14 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      award_affiliate_nctr: {
+        Args: {
+          p_base_nctr_amount: number
+          p_earning_source?: string
+          p_user_id: string
+        }
+        Returns: Json
       }
       award_profile_completion_bonus: {
         Args: { p_user_id: string }
