@@ -135,6 +135,7 @@ export type Database = {
           affiliate_link: string | null
           available_nctr_reward: number | null
           created_at: string
+          cta_text: string | null
           default_lock_type: string | null
           description: string | null
           id: string
@@ -150,6 +151,8 @@ export type Database = {
           reward_distribution_type: string | null
           reward_per_dollar: number | null
           reward_structure: Json | null
+          social_handle: string | null
+          social_platform: string | null
           title: string
           updated_at: string
           video_description: string | null
@@ -160,6 +163,7 @@ export type Database = {
           affiliate_link?: string | null
           available_nctr_reward?: number | null
           created_at?: string
+          cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
           id?: string
@@ -175,6 +179,8 @@ export type Database = {
           reward_distribution_type?: string | null
           reward_per_dollar?: number | null
           reward_structure?: Json | null
+          social_handle?: string | null
+          social_platform?: string | null
           title: string
           updated_at?: string
           video_description?: string | null
@@ -185,6 +191,7 @@ export type Database = {
           affiliate_link?: string | null
           available_nctr_reward?: number | null
           created_at?: string
+          cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
           id?: string
@@ -200,6 +207,8 @@ export type Database = {
           reward_distribution_type?: string | null
           reward_per_dollar?: number | null
           reward_structure?: Json | null
+          social_handle?: string | null
+          social_platform?: string | null
           title?: string
           updated_at?: string
           video_description?: string | null
