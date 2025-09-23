@@ -152,10 +152,10 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-primary" />
-            {!collapsed && "Portfolio Breakdown"}
+            {open && "Portfolio Breakdown"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            {!collapsed && (
+            {open && (
               <div className="p-3 space-y-3">
                 <div className="text-xs text-muted-foreground flex items-center gap-2">
                   <span>⏰ Last synced: 9/23/2025, 3:07:48 PM</span>
@@ -235,10 +235,10 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-primary" />
-            {!collapsed && "NCTR Price"}
+            {open && "NCTR Price"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            {!collapsed && (
+            {open && (
               <Card className="mx-3 bg-white shadow-medium border border-section-border">
                 <CardContent className="p-3">
                   <div className="text-center">
@@ -283,7 +283,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2">
             <User className="h-4 w-4 text-primary" />
-            {!collapsed && "Navigation"}
+            {open && "Navigation"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -295,7 +295,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
                       className="flex items-center gap-2 w-full p-2 hover:bg-muted/50 rounded-md"
                     >
                       <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {open && <span>{item.title}</span>}
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -307,7 +307,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
                     className="flex items-center gap-2 w-full p-2 hover:bg-muted/50 rounded-md text-red-600"
                   >
                     <LogOut className="h-4 w-4" />
-                    {!collapsed && <span>Sign Out</span>}
+                    {open && <span>Sign Out</span>}
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
