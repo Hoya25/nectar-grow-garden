@@ -1100,10 +1100,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           */}
         </div>
 
-        {/* Community Section */}
-        <div className="mt-12" data-referral-system>
-          <ReferralSystem />
-        </div>
       </main>
 
       {/* Invite Friends Modal */}
