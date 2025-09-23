@@ -135,7 +135,7 @@ const Auth = () => {
               {referralCode && (
                 <Alert className="border-green-200 bg-green-50">
                   <AlertDescription className="text-green-800">
-                    🎉 You're signing up with a referral code! You and your referrer will both earn 50 NCTR when you complete signup.
+                    🎉 You're signing up with a referral code! You and your referrer will both earn 1000 NCTR when you complete signup.
                   </AlertDescription>
                 </Alert>
               )}

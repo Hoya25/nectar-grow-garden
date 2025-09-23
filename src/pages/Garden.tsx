@@ -424,31 +424,19 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   alt="NCTR" 
                   className="h-16 sm:h-28 w-auto opacity-90"
                 />
-              </div>
-              <Badge className={`${getStatusColor(portfolio?.opportunity_status || 'starter')} text-foreground border-0 text-xs sm:text-sm px-2 py-1`}>
-                <span className="hidden sm:inline">{portfolio?.opportunity_status?.toUpperCase() || 'STARTER'} • {portfolio?.lock_360_nctr && parseFloat(portfolio.lock_360_nctr.toString()) > 0 ? '360LOCK MEMBER' : 'STANDARD'}</span>
-                <span className="sm:hidden">{portfolio?.opportunity_status?.charAt(0).toUpperCase() || 'S'}</span>
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">
-              <ProfileModal>
-                <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm">
+              </div>{/* End of flex items-center space-x-2 */}
+              <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">{/* Status badge removed */}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
+                >
                   <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Quick Profile</span>
+                  <span className="hidden sm:inline">Profile</span>
                   <span className="sm:hidden">Profile</span>
                 </Button>
-              </ProfileModal>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate('/profile')}
-                className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
-              >
-                <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Profile</span>
-                <span className="sm:hidden">Prof</span>
-              </Button>
-              {isAdmin && (
+                {isAdmin && (
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -469,9 +457,10 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                 <span className="hidden sm:inline">Sign Out</span>
                 <span className="sm:hidden">Out</span>
               </Button>
-            </div>
-          </div>
-        </div>
+              </div>{/* End of flex items-center gap-2 */}
+            </div>{/* End of flex items-center justify-between */}
+          </div>{/* End of flex flex-col sm:flex-row */}
+        </div>{/* End of container */}
       </header>
 
       <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
