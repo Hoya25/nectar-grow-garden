@@ -188,6 +188,19 @@ async function handleTransactionStatusUpdate(data: any, supabase: any) {
       for (const transactionId of transactions) {
         console.log(`💰 Processing available transaction: ${transactionId}`)
         
+        // Check if this transaction has already been processed
+        const { data: existingTransaction } = await supabase
+          .from('nctr_transactions')
+          .select('id')
+          .eq('earning_source', 'affiliate_purchase')
+          .eq('description', `Purchase reward from Uber Gift Card (Order: UGC-${transactionId})`)
+          .single()
+        
+        if (existingTransaction) {
+          console.log(`⚠️ Transaction ${transactionId} already processed, skipping...`)
+          continue
+        }
+        
         // For now, we'll create a mock transaction based on your $15 Uber purchase
         // In production, you'd fetch the actual transaction details from Loyalize API
         const transactionData = {
