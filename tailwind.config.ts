@@ -26,6 +26,11 @@ export default {
           deep: "hsl(var(--primary-deep))",
           light: "hsl(var(--primary-light))",
         },
+        "blue-360": {
+          DEFAULT: "hsl(var(--blue-360))",
+          foreground: "hsl(var(--blue-360-foreground))",
+          hover: "hsl(var(--blue-360-hover))",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

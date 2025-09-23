@@ -174,7 +174,8 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                       onClick={handleCommitTo360LOCK}
                       disabled={isCommitting}
                       size="sm"
-                      className="h-6 px-2 text-xs bg-primary hover:bg-primary-glow text-primary-foreground"
+                      variant="360lock"
+                      className="h-6 px-2 text-xs"
                     >
                       {isCommitting ? 'Committing...' : '→ 360LOCK'}
                     </Button>
@@ -208,12 +209,13 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-blue-600">Standard</p>
                   {portfolio?.lock_90_nctr && portfolio.lock_90_nctr > 0 && (
-                    <Button
-                      onClick={handleCommitTo360LOCK}
-                      disabled={isCommitting}
-                      size="sm"
-                      className="h-6 px-2 text-xs bg-primary hover:bg-primary-glow text-primary-foreground"
-                    >
+                      <Button
+                        onClick={handleCommitTo360LOCK}
+                        disabled={isCommitting}
+                        size="sm"
+                        variant="360lock"
+                        className="h-6 px-2 text-xs"
+                      >
                       {isCommitting ? 'Upgrading...' : '→ 360LOCK'}
                     </Button>
                   )}

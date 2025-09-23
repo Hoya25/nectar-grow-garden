@@ -29,6 +29,11 @@ All colors MUST be HSL to avoid yellow bug issues.
     --primary-deep: 120 100% 30%;
     --primary-light: 120 80% 60%;
     
+    /* 360LOCK Blue - used for all 360LOCK buttons */
+    --blue-360: 217 91% 60%;                  /* 360LOCK primary blue */
+    --blue-360-foreground: 0 0% 100%;         /* White text on blue buttons */
+    --blue-360-hover: 217 91% 50%;            /* Darker blue on hover */
+    
     /* Section styling */
     --section-bg: 0 0% 100%;                  /* White section backgrounds */
     --section-border: 0 0% 85%;               /* Light grey section borders */
@@ -110,6 +115,11 @@ All colors MUST be HSL to avoid yellow bug issues.
     
     --primary: 120 100% 35%;
     --primary-foreground: 240 12% 6%;
+    
+    /* 360LOCK Blue - Dark mode variants */
+    --blue-360: 217 91% 65%;
+    --blue-360-foreground: 0 0% 100%;
+    --blue-360-hover: 217 91% 55%;
     
     --section-bg: 240 12% 8%;
     --section-border: 120 100% 35%;

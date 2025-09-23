@@ -177,7 +177,8 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
                           <Button
                             onClick={handleCommitTo360LOCK}
                             size="sm"
-                            className="mt-2 h-6 text-xs bg-primary hover:bg-primary-glow text-primary-foreground"
+                            variant="360lock"
+                            className="mt-2 h-6 text-xs"
                           >
                             → 360LOCK
                           </Button>

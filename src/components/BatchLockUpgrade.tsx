@@ -142,7 +142,8 @@ const BatchLockUpgrade = ({ locks, onUpgradeComplete, availableNCTR = 0 }: Batch
         <Button 
           onClick={handleBatchCommitment}
           disabled={isUpgrading || totalCommittable === 0}
-          className="w-full bg-primary hover:bg-primary/90"
+          variant="360lock"
+          className="w-full"
           size="sm"
         >
           <ArrowUp className="h-4 w-4 mr-2" />

@@ -312,7 +312,8 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                   <Button 
                     onClick={handleCreateLock}
                     disabled={!isValidAmount || loading}
-                    className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-medium hover:shadow-large transition-all duration-300"
+                    variant={selectedType === '360LOCK' ? '360lock' : 'default'}
+                    className="flex-1 shadow-medium hover:shadow-large transition-all duration-300"
                   >
                     {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     {selectedType === '360LOCK' ? 'Join Elite Alliance' : 'Join Standard Alliance'}

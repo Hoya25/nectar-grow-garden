@@ -154,7 +154,8 @@ const LockUpgradeModal = ({ lock, onUpgradeComplete, children }: LockUpgradeModa
               <Button 
                 onClick={handleUpgrade}
                 disabled={isUpgrading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground min-h-[48px]"
+                variant="360lock"
+                className="w-full min-h-[48px]"
               >
                 {isUpgrading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />

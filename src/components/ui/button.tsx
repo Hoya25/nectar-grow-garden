@@ -17,6 +17,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline hover:text-primary-glow",
         premium: "bg-gradient-hero text-primary-glow border-2 border-primary hover:bg-primary/90 shadow-glow",
         accent: "bg-accent text-accent-foreground hover:bg-accent/90 shadow-soft border border-accent/30",
+        "360lock": "bg-blue-360 text-blue-360-foreground hover:bg-blue-360-hover shadow-soft border border-blue-360/20",
       },
       size: {
         default: "h-10 px-4 py-2",
