@@ -134,23 +134,23 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
     <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 overflow-hidden">
       <CardContent className="p-6">
         {/* Header Section */}
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
+        <div className="mb-6">
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
               <Share2 className="w-8 h-8 text-primary" />
             </div>
-            <div>
+            <div className="min-w-0">
               <Badge variant="secondary" className="mb-2 bg-primary/20 text-primary border-primary/30">
                 🚀 TOP EARNER
               </Badge>
-              <h2 className="text-2xl font-bold text-foreground">Invite Friends</h2>
-              <h3 className="text-xl font-semibold text-muted-foreground">& Earn Together</h3>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Invite Friends</h2>
+              <h3 className="text-lg sm:text-xl font-semibold text-muted-foreground">& Earn Together</h3>
             </div>
           </div>
           
           <Button 
             onClick={() => setShareModalOpen(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 h-auto"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 h-auto"
           >
             <Share2 className="w-4 h-4 mr-2" />
             Start Inviting Friends
