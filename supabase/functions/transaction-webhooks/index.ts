@@ -44,21 +44,30 @@ serve(async (req) => {
     const rawPayload = await req.json()
     console.log('🔔 Received webhook payload:', JSON.stringify(rawPayload, null, 2))
 
+    // Handle Loyalize webhook format - data might be in body field
+    let actualPayload = rawPayload
+    if (rawPayload.body && typeof rawPayload.body === 'object') {
+      actualPayload = rawPayload.body
+      console.log('📦 Extracted from body field:', JSON.stringify(actualPayload, null, 2))
+    }
+
     // Handle Loyalize webhook format
-    if (rawPayload.event_type || rawPayload.eventType || rawPayload.type) {
-      return await handleLoyalizeWebhook(rawPayload, supabase)
+    if (actualPayload.event_type || actualPayload.eventType || actualPayload.type || actualPayload.event) {
+      return await handleLoyalizeWebhook(actualPayload, supabase)
     }
 
     // Handle our custom format (fallback)
-    const webhook: TransactionWebhook = rawPayload
+    const webhook: TransactionWebhook = actualPayload
     
     // Validate webhook structure
     if (!webhook.eventType || !webhook.data || !webhook.data.transactions) {
       console.log('⚠️ Invalid webhook structure - missing required fields')
+      console.log('Available keys:', Object.keys(actualPayload))
       return new Response(JSON.stringify({
         success: false,
         error: 'Invalid webhook payload structure',
-        received: Object.keys(rawPayload)
+        received: Object.keys(rawPayload),
+        actualPayload: Object.keys(actualPayload)
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -102,33 +111,58 @@ async function handleLoyalizeWebhook(payload: any, supabase: any) {
   console.log('🎯 Processing Loyalize webhook:', payload)
   
   try {
-    // Extract event type from Loyalize payload
-    const eventType = payload.event_type || payload.eventType || payload.type
-    const eventData = payload.data || payload
+    // Extract event type from Loyalize payload - check multiple possible fields
+    const eventType = payload.event_type || payload.eventType || payload.type || payload.event
+    const eventData = payload.data || payload.payload || payload
     
     console.log('📊 Event type:', eventType)
     console.log('📊 Event data:', JSON.stringify(eventData, null, 2))
+    
+    // If no clear event type, treat as a generic transaction webhook
+    if (!eventType) {
+      console.log('🔍 No event type found, checking for transaction data')
+      
+      // Look for key transaction fields
+      if (payload.order_id || payload.transaction_id || payload.tracking_id || payload.purchase_amount) {
+        console.log('💰 Found transaction-like data, treating as purchase completion')
+        return await handleLoyalizePurchase(payload, supabase)
+      }
+      
+      // If still no clear data, return success but log everything
+      console.log('⚠️ Unrecognized Loyalize payload structure')
+      return new Response(JSON.stringify({
+        success: true,
+        message: 'Loyalize webhook received but structure not recognized',
+        payload_keys: Object.keys(payload)
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
     
     // Handle different Loyalize event types
     switch (eventType) {
       case 'transaction.completed':
       case 'purchase.completed':
       case 'commission.earned':
+      case 'order.completed':
         return await handleLoyalizePurchase(eventData, supabase)
       
       case 'transaction.pending':
       case 'purchase.pending':
+      case 'order.pending':
         return await handleLoyalizePending(eventData, supabase)
       
       case 'transaction.failed':
       case 'purchase.failed':
+      case 'order.failed':
         return await handleLoyalizeFailed(eventData, supabase)
       
       default:
         console.log(`ℹ️ Unhandled Loyalize event: ${eventType}`)
         return new Response(JSON.stringify({
           success: true,
-          message: `Loyalize event ${eventType} received but not processed`
+          message: `Loyalize event ${eventType} received but not processed`,
+          payload_sample: payload
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })
@@ -137,7 +171,8 @@ async function handleLoyalizeWebhook(payload: any, supabase: any) {
     console.error('❌ Error processing Loyalize webhook:', error)
     return new Response(JSON.stringify({
       success: false,
-      error: error.message || 'Failed to process Loyalize webhook'
+      error: error.message || 'Failed to process Loyalize webhook',
+      payload_received: payload
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
