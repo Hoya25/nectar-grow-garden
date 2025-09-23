@@ -85,7 +85,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     description: '',
     opportunity_type: 'shopping',
     nctr_reward: 0,
-    reward_per_dollar: 100, // Default 100 NCTR per $1 spent
+    reward_per_dollar: 0, // No default legacy allocation
     partner_name: '',
     partner_logo_url: '',
     affiliate_link: '',
@@ -97,7 +97,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     available_nctr_reward: 0,
     lock_90_nctr_reward: 0,
     lock_360_nctr_reward: 0,
-    reward_distribution_type: 'legacy',
+    reward_distribution_type: 'combined', // Default to new system
     // Social media fields
     social_platform: '',
     social_handle: '',
@@ -108,6 +108,28 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     fetchOpportunities();
     fetchBrands();
   }, []);
+
+  // Auto-clear inappropriate legacy fields when opportunity type or reward distribution changes
+  useEffect(() => {
+    // If not shopping or not legacy, clear reward_per_dollar
+    if (formData.opportunity_type !== 'shopping' || formData.reward_distribution_type !== 'legacy') {
+      if (formData.reward_per_dollar > 0) {
+        setFormData(prev => ({ ...prev, reward_per_dollar: 0 }));
+      }
+    }
+
+    // If not legacy reward distribution, clear nctr_reward
+    if (formData.reward_distribution_type !== 'legacy') {
+      if (formData.nctr_reward > 0) {
+        setFormData(prev => ({ ...prev, nctr_reward: 0 }));
+      }
+    }
+
+    // If social_follow, ensure it uses combined distribution
+    if (formData.opportunity_type === 'social_follow' && formData.reward_distribution_type === 'legacy') {
+      setFormData(prev => ({ ...prev, reward_distribution_type: 'combined' }));
+    }
+  }, [formData.opportunity_type, formData.reward_distribution_type]);
 
   // Debug logging for brands loading
   useEffect(() => {
@@ -188,7 +210,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       description: '',
       opportunity_type: 'shopping',
       nctr_reward: 0,
-      reward_per_dollar: 100,
+      reward_per_dollar: 0, // No default legacy allocation
       partner_name: '',
       partner_logo_url: '',
       affiliate_link: '',
@@ -200,7 +222,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       available_nctr_reward: 0,
       lock_90_nctr_reward: 0,
       lock_360_nctr_reward: 0,
-      reward_distribution_type: 'legacy',
+      reward_distribution_type: 'combined', // Default to new system
       // Social media fields
       social_platform: '',
       social_handle: '',
@@ -229,7 +251,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       available_nctr_reward: opportunity.available_nctr_reward || 0,
       lock_90_nctr_reward: opportunity.lock_90_nctr_reward || 0,
       lock_360_nctr_reward: opportunity.lock_360_nctr_reward || 0,
-      reward_distribution_type: opportunity.reward_distribution_type || 'legacy',
+      reward_distribution_type: opportunity.reward_distribution_type || 'combined', // Default to new system
       // Social media fields
       social_platform: opportunity.social_platform || '',
       social_handle: opportunity.social_handle || '',
@@ -822,7 +844,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             step="1"
                             min="0"
                             value={formData.reward_per_dollar}
-                            onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 100})}
+                            onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 0})}
                             placeholder="100"
                           />
                         </div>
