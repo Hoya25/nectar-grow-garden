@@ -8,9 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfileCompletion } from '@/hooks/useProfileCompletion';
 import { toast } from '@/hooks/use-toast';
-import { Lock, TrendingUp, Calendar, Award, Loader2 } from 'lucide-react';
+import { Lock, TrendingUp, Calendar, Award, Loader2, User } from 'lucide-react';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
+import { useNavigate } from 'react-router-dom';
 
 interface LockCommitmentModalProps {
   availableNCTR: number;
@@ -19,10 +21,22 @@ interface LockCommitmentModalProps {
 
 const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentModalProps) => {
   const { user } = useAuth();
+  const { isComplete } = useProfileCompletion();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<'90LOCK' | '360LOCK' | null>(null);
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Hide button entirely if profile is complete
+  if (isComplete) {
+    return null;
+  }
+
+  const handleJoinAlliance = () => {
+    // If profile is not complete, redirect to profile setup
+    navigate('/profile');
+  };
 
   const lockOptions = [
     {
@@ -131,198 +145,13 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-soft"
-        >
-          <Lock className="w-4 h-4 mr-2" />
-          Join Alliance
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-foreground">
-            Join The NCTR Alliance
-          </DialogTitle>
-          <p className="text-muted-foreground">
-            Choose your commitment level to unlock exclusive earning opportunities and Alliance benefits
-          </p>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Available Balance */}
-          <Alert>
-            <TrendingUp className="h-4 w-4" />
-            <AlertDescription className="flex items-center justify-between">
-              <span>Available NCTR: <strong>{availableNCTR.toLocaleString()}</strong></span>
-              {availableNCTR < 100 && (
-                <BuyNCTRButton 
-                  variant="outline" 
-                  size="sm"
-                  className="ml-4"
-                  suggestedAmount={1000}
-                >
-                  Buy More NCTR
-                </BuyNCTRButton>
-              )}
-            </AlertDescription>
-          </Alert>
-
-          {/* Lock Type Selection */}
-          <div className="grid gap-4 md:grid-cols-2">
-            {lockOptions.map((option) => (
-              <Card 
-                key={option.type}
-                className={`cursor-pointer transition-all hover:shadow-glow ${option.bgColor} ${option.borderColor} border-2 ${
-                  selectedType === option.type 
-                    ? 'ring-2 ring-primary shadow-glow-intense scale-[1.02]' 
-                    : 'hover:shadow-medium hover:scale-[1.01]'
-                }`}
-                onClick={() => setSelectedType(option.type)}
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className={`flex items-center ${option.textColor}`}>
-                      <div className={`w-4 h-4 rounded-full ${option.color} mr-3 shadow-sm`} />
-                      {option.title}
-                    </CardTitle>
-                    <Badge className={`${option.color} text-white border-0 shadow-sm`}>
-                      {option.duration}D
-                    </Badge>
-                  </div>
-                  <CardDescription className={option.textColor}>{option.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className={`flex items-center ${option.textColor}`}>
-                        <Calendar className="w-4 h-4 mr-2" />
-                        {option.duration} days
-                      </div>
-                      <div className={`flex items-center ${option.textColor}`}>
-                        <Award className="w-4 h-4 mr-2" />
-                        Min. {option.minAmount.toLocaleString()} NCTR
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <p className={`text-sm font-semibold ${option.textColor}`}>Alliance Benefits:</p>
-                      <ul className={`text-xs space-y-1 ${option.textColor}/80`}>
-                        {option.benefits.map((benefit, idx) => (
-                          <li key={idx} className="flex items-start">
-                            <span className="mr-2">•</span>
-                            <span>{benefit}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Amount Input */}
-          {selectedType && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="lock-amount">Amount to Lock</Label>
-                <div className="relative">
-                  <Input
-                    id="lock-amount"
-                    type="number"
-                    placeholder={`Min. ${selectedOption?.minAmount.toLocaleString()} NCTR`}
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    min={selectedOption?.minAmount}
-                    max={availableNCTR}
-                    step="0.01"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    NCTR
-                  </span>
-                </div>
-                {!isValidAmount && amount && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-destructive">
-                      {numericAmount < (selectedOption?.minAmount || 0) 
-                        ? `Minimum amount is ${selectedOption?.minAmount.toLocaleString()} NCTR`
-                        : `Insufficient balance. Available: ${availableNCTR.toLocaleString()} NCTR`
-                      }
-                    </p>
-                    {numericAmount > availableNCTR && (
-                      <BuyNCTRButton 
-                        variant="outline"
-                        size="sm"
-                        suggestedAmount={Math.ceil((numericAmount - availableNCTR) / 100) * 100}
-                        className="text-primary border-primary"
-                      >
-                        Buy {(numericAmount - availableNCTR).toLocaleString()} More NCTR
-                      </BuyNCTRButton>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Lock Summary */}
-              {isValidAmount && (
-                <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
-                  <CardContent className="p-4">
-                    <h4 className="font-semibold mb-2">Lock Summary</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Amount:</span>
-                        <p className="font-medium">{numericAmount.toLocaleString()} NCTR</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Duration:</span>
-                        <p className="font-medium">{selectedOption.duration} days</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Unlock Date:</span>
-                        <p className="font-medium">
-                          {new Date(Date.now() + selectedOption.duration * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Commitment:</span>
-                        <p className="font-medium text-foreground">{selectedOption.type} Alliance</p>
-                      </div>
-                    </div>
-                    {selectedType === '360LOCK' && (
-                      <div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                        <p className="text-sm text-primary font-medium">
-                          💎 360LOCK qualifies for Wings tiers with earning multipliers up to 2.0x!
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setOpen(false)}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                  <Button 
-                    onClick={handleCreateLock}
-                    disabled={!isValidAmount || loading}
-                    className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-medium hover:shadow-large transition-all duration-300"
-                  >
-                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    {selectedType === '360LOCK' ? 'Join Elite Alliance' : 'Join Standard Alliance'}
-                  </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+    <Button 
+      onClick={handleJoinAlliance}
+      className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-soft"
+    >
+      <User className="w-4 h-4 mr-2" />
+      Complete Profile to Join Alliance
+    </Button>
   );
 };
 
