@@ -179,7 +179,26 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       if (opportunitiesError) {
         console.error('Opportunities error:', opportunitiesError);
       } else {
-        setOpportunities(opportunitiesData || []);
+        // Sort opportunities: Live (shopping) first, then Complete (bonus, invite)
+        const sortedOpportunities = (opportunitiesData || []).sort((a, b) => {
+          // Define priority: shopping (Live) = 1, bonus/invite (Complete) = 2
+          const getPriority = (type: string) => {
+            if (type === 'shopping') return 1; // Live opportunities first
+            return 2; // Complete opportunities (bonus, invite) second
+          };
+          
+          const priorityA = getPriority(a.opportunity_type);
+          const priorityB = getPriority(b.opportunity_type);
+          
+          // If same priority, sort by created_at (newest first)
+          if (priorityA === priorityB) {
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          }
+          
+          return priorityA - priorityB;
+        });
+        
+        setOpportunities(sortedOpportunities);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
