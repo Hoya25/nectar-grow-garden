@@ -101,7 +101,7 @@ serve(async (req) => {
       .from('nctr_transactions')
       .insert({
         user_id: payload.user_id,
-        transaction_type: 'purchased',
+        transaction_type: 'earned',
         nctr_amount: payload.amount,
         description: `NCTR purchase via ${payload.payment_method} - ${payload.transaction_id}`,
         earning_source: 'token_purchase',
