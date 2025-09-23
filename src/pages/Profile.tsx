@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import SimpleWalletConnection from '@/components/SimpleWalletConnection';
 import { WingsStatusBar } from '@/components/WingsStatusBar';
+import { LevelUpModal } from '@/components/LevelUpModal';
 
 interface UserProfile {
   id: string;
@@ -348,11 +349,55 @@ const Profile = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Wings Status Bar - Prominent Position */}
         <div className="mb-8">
-          <WingsStatusBar
-            currentStatus={portfolio?.opportunity_status || 'starter'}
-            current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
-            statusLevels={statusLevels}
-          />
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex-1">
+              <WingsStatusBar
+                currentStatus={portfolio?.opportunity_status || 'starter'}
+                current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
+                statusLevels={statusLevels}
+              />
+            </div>
+            
+            {/* Level Up Button */}
+            {portfolio && statusLevels.length > 0 && (() => {
+              const currentStatus = portfolio.opportunity_status || 'starter';
+              const current360NCTR = parseFloat(portfolio.lock_360_nctr?.toString() || '0');
+              const availableNCTR = parseFloat(portfolio.available_nctr?.toString() || '0');
+              
+              // Find next status level
+              const nextStatusLevel = statusLevels.find(level => 
+                level.min_locked_nctr > current360NCTR
+              );
+              
+              // Don't show button if already at highest level
+              if (!nextStatusLevel) return null;
+              
+              return (
+                <LevelUpModal
+                  currentStatus={currentStatus}
+                  current360NCTR={current360NCTR}
+                  availableNCTR={availableNCTR}
+                  nextStatusInfo={{
+                    status: nextStatusLevel.status_name,
+                    required: nextStatusLevel.min_locked_nctr,
+                    multiplier: nextStatusLevel.reward_multiplier.toString()
+                  }}
+                  onEarnMoreClick={() => navigate('/garden')}
+                  onLockCommitmentClick={() => {
+                    toast({
+                      title: "Lock Commitment",
+                      description: "Lock commitment feature coming soon!",
+                    });
+                  }}
+                >
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Level Up
+                  </Button>
+                </LevelUpModal>
+              );
+            })()}
+          </div>
         </div>
 
         {/* Wallet Connection - High Visibility */}
