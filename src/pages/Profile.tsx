@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import WalletConnection from '@/components/WalletConnection';
+
 import { WingsStatusBar } from '@/components/WingsStatusBar';
 import { LevelUpModal } from '@/components/LevelUpModal';
 
@@ -402,22 +402,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Wallet Connection - Only show prominently if not connected */}
-        {!profile?.wallet_address && (
-          <div className="mb-8">
-            <Card className="bg-card/80 backdrop-blur-sm border-2 border-primary/20">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2">
-                  <Wallet className="h-5 w-5 text-primary" />
-                  Connect Your Coinbase Wallet
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WalletConnection />
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Info */}
@@ -746,20 +730,6 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Connected Wallet Management - Lower Priority */}
-            {profile?.wallet_address && (
-              <Card className="bg-card/50 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Wallet className="h-4 w-4 text-muted-foreground" />
-                    Wallet Management
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <WalletConnection />
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>
