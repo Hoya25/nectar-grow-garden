@@ -648,15 +648,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
                           />
                         ) : (
-                          <video 
-                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                          >
-                            <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
-                          </video>
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-soft flex-shrink-0">
+                            <video 
+                              className="w-full h-full object-cover transform scale-150"
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                            >
+                              <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
+                            </video>
+                          </div>
                         )}
                         <div className="min-w-0 flex-1">
                           <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 truncate">{opportunities[0].title}</h2>
@@ -747,15 +749,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                                 className="w-16 h-16 rounded-2xl object-cover shadow-medium"
                               />
                             ) : (
-                              <video 
-                                className="w-16 h-16 rounded-2xl object-cover shadow-medium"
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                              >
-                                <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
-                              </video>
+                              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-medium">
+                                <video 
+                                  className="w-full h-full object-cover transform scale-150"
+                                  autoPlay
+                                  loop
+                                  muted
+                                  playsInline
+                                >
+                                  <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
+                                </video>
+                              </div>
                             )}
                           </div>
                           
@@ -869,15 +873,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                                 className="w-10 h-10 rounded-lg object-cover"
                               />
                             ) : (
-                              <video 
-                                className="w-10 h-10 rounded-lg object-cover"
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                              >
-                                <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
-                              </video>
+                              <div className="w-10 h-10 rounded-lg overflow-hidden">
+                                <video 
+                                  className="w-full h-full object-cover transform scale-150"
+                                  autoPlay
+                                  loop
+                                  muted
+                                  playsInline
+                                >
+                                  <source src="/assets/garden-logo-animation.mp4" type="video/mp4" />
+                                </video>
+                              </div>
                             )}
                             <div>
                               <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
