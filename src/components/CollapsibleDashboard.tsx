@@ -19,6 +19,7 @@ import LockCommitmentModal from '@/components/LockCommitmentModal';
 import WalletConnection from '@/components/WalletConnection';
 import { useNavigate } from 'react-router-dom';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
+import { useWallet } from '@/hooks/useWallet';
 import LockUpgradeModal from '@/components/LockUpgradeModal';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -64,6 +65,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
   const [isCommitting, setIsCommitting] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isConnected } = useWallet();
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor } = useNCTRPrice();
 
   const handleCommitTo360LOCK = async () => {
@@ -360,9 +362,11 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         </Button>
       </div>
 
-      {/* Wallet Connection - Mobile Compact */}
+      {/* Wallet Connection - Conditional Priority */}
       <div>
-        <h3 className="text-xs sm:text-sm font-medium mb-2">Wallet</h3>
+        <h3 className="text-xs sm:text-sm font-medium mb-2">
+          {!isConnected ? "Connect Wallet" : "Wallet"}
+        </h3>
         <WalletConnection />
       </div>
     </aside>
