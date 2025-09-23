@@ -1100,7 +1100,8 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               </div>
             )}
 
-            {/* Affiliate Links Section */}
+            {/* Affiliate Links Section - Hidden for now */}
+            {false && (
             <div className="mt-12" data-affiliate-links>
               <Card className="bg-white border-2 border-primary shadow-soft">
                 <CardHeader>
@@ -1117,6 +1118,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                 </CardContent>
               </Card>
             </div>
+            )}
 
             {/* Community Section - Refreshed */}
             <div className="mt-12" data-referral-system key="referral-system-updated">
