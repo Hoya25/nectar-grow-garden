@@ -694,7 +694,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                 </div>
                 )}
 
-                {/* NCTR Bounty Configuration */}
+                {/* NCTR Bounty Configuration - Simplified for Social Follow */}
                 <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-6 rounded-lg border-2 border-primary/20 space-y-6">
                   <div className="flex items-center gap-3">
                     <Gift className="w-5 h-5 text-primary" />
@@ -705,7 +705,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     <h5 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 How Bounties Work</h5>
                     <div className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
                       <p><strong>One-time Bounty:</strong> Fixed NCTR reward when user completes the opportunity</p>
-                      <p><strong>Per-Dollar Rewards:</strong> NCTR distributed <strong>using the same ratios</strong> as your bounty breakdown for each $1 spent</p>
+                      {formData.opportunity_type !== 'social_follow' && (
+                        <p><strong>Per-Dollar Rewards:</strong> NCTR distributed <strong>using the same ratios</strong> as your bounty breakdown for each $1 spent</p>
+                      )}
                       <p><strong>Active Status:</strong> Immediately available • <strong>90LOCK:</strong> 90-day lock • <strong>360LOCK:</strong> 360-day premium lock</p>
                     </div>
                   </div>
@@ -748,7 +750,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     </Select>
                   </div>
 
-                  {/* Per Dollar NCTR for Shopping */}
+                  {/* Per Dollar NCTR for Shopping Only */}
                   {formData.opportunity_type === 'shopping' && formData.reward_distribution_type !== 'legacy' && (
                     <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
                       <div className="flex items-center gap-2 mb-3">
@@ -807,8 +809,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     </div>
                   )}
 
-                  {/* Legacy Rewards (backward compatibility) */}
-                  {formData.reward_distribution_type === 'legacy' && (
+                  {/* Legacy Rewards (backward compatibility) - Not for Social Follow */}
+                  {formData.reward_distribution_type === 'legacy' && formData.opportunity_type !== 'social_follow' && (
                     <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                       <h5 className="font-medium mb-3 text-gray-700 dark:text-gray-300">Legacy Reward System</h5>
                       <div className="grid grid-cols-2 gap-4">
@@ -992,7 +994,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             {(formData.available_nctr_reward || 0) + (formData.lock_90_nctr_reward || 0) + (formData.lock_360_nctr_reward || 0) + (formData.nctr_reward || 0)} NCTR
                           </div>
                         </div>
-                        {formData.reward_per_dollar > 0 && (
+                        {formData.reward_per_dollar > 0 && formData.opportunity_type !== 'social_follow' && (
                           <div>
                             <p className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-2">
                               {formData.opportunity_type === 'shopping' ? 'Per Dollar (Distributed by Ratios):' : 'Per Dollar:'}
