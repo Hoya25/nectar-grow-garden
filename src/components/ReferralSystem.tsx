@@ -158,57 +158,63 @@ Check it out: The Garden is democratizing crypto by removing financial barriers 
         </div>
 
         {/* Rewards Display */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-2 mb-3">
-            <span className="text-2xl font-bold text-primary">1000 NCTR</span>
-            <span className="text-lg text-foreground">each in</span>
-            <span className="text-2xl font-bold text-secondary">360LOCK</span>
+        <div className="mb-8">
+          <div className="mb-3">
+            <div className="flex flex-wrap items-baseline gap-2 mb-2">
+              <span className="text-2xl font-bold text-primary">1000 NCTR</span>
+              <span className="text-lg text-foreground">each in</span>
+              <span className="text-2xl font-bold text-secondary">360LOCK</span>
+            </div>
+            <p className="text-sm text-muted-foreground">Most popular way to earn</p>
           </div>
-          <p className="text-muted-foreground">Most popular way to earn</p>
         </div>
 
         {/* Earnings Breakdown */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="flex items-center justify-center space-x-2 py-4 bg-primary/5 rounded-xl">
-            <span className="text-3xl font-bold text-primary">1000</span>
-            <img src={nctrLogo} alt="NCTR" className="h-6 w-auto" />
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="flex flex-col items-center justify-center py-6 bg-primary/5 rounded-xl space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl font-bold text-primary">1000</span>
+              <img src={nctrLogo} alt="NCTR" className="h-5 w-auto" />
+            </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground">for</div>
-              <div className="text-sm font-medium">you</div>
+              <div className="text-sm font-medium text-foreground">you</div>
             </div>
           </div>
           
-          <div className="flex items-center justify-center space-x-2 py-4 bg-secondary/5 rounded-xl">
-            <span className="text-3xl font-bold text-secondary">1000</span>
-            <img src={nctrLogo} alt="NCTR" className="h-6 w-auto" />
+          <div className="flex flex-col items-center justify-center py-6 bg-secondary/5 rounded-xl space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl font-bold text-secondary">1000</span>
+              <img src={nctrLogo} alt="NCTR" className="h-5 w-auto" />
+            </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground">for</div>
-              <div className="text-sm font-medium">friend</div>
+              <div className="text-sm font-medium text-foreground">friend</div>
             </div>
           </div>
         </div>
 
         {/* Referral Code */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
+        <div className="mb-8 space-y-4">
+          <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Referral code:</span>
-            <Badge variant="outline" className="font-mono text-primary border-primary/30">
+            <Badge variant="outline" className="font-mono text-primary border-primary/30 px-3 py-1">
               {referralCode}
             </Badge>
           </div>
           
           {/* Share Link */}
-          <div className="flex space-x-2">
+          <div className="flex gap-2">
             <Input
               value={getReferralLink()}
               readOnly
-              className="flex-1 text-sm font-mono"
+              className="flex-1 text-xs font-mono bg-muted/50"
             />
             <Button 
               onClick={copyReferralLink}
               variant="outline"
               size="sm"
-              className="px-4"
+              className="px-4 min-w-[44px]"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </Button>
