@@ -178,10 +178,10 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         setLocks(locksData || []);
       }
 
-      // Fetch completed opportunities
+      // Fetch completed opportunities - but exclude certain types that have special handling
       const { data: completedData, error: completedError } = await supabase
         .from('nctr_transactions')
-        .select('opportunity_id')
+        .select('opportunity_id, earning_source')
         .eq('user_id', user?.id)
         .eq('status', 'completed')
         .not('opportunity_id', 'is', null);
@@ -189,7 +189,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       if (completedError) {
         console.error('Completed opportunities error:', completedError);
       } else {
-        const completedIds = (completedData || []).map(item => item.opportunity_id).filter(Boolean);
+        // Only mark as completed if it's a true one-time bonus (not social follows or profile completion)
+        const completedIds = (completedData || [])
+          .filter(item => {
+            // Don't mark social follows as completed - they should remain visible
+            return item.earning_source !== 'profile_completion' && 
+                   item.earning_source !== 'social_follow';
+          })
+          .map(item => item.opportunity_id)
+          .filter(Boolean);
         setCompletedOpportunityIds(completedIds);
       }
 
@@ -813,7 +821,55 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </div>
           )}
 
-          {/* Bonus Opportunities */}
+          {/* Social Media & Other Opportunities */}
+          {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
+                <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
+                🔗 Social & Bonus Opportunities
+              </h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
+                  <Card 
+                    key={opportunity.id}
+                    className="cursor-pointer hover:shadow-medium transition-all duration-300 group bg-gradient-to-br from-white to-section-highlight border border-section-border hover:border-primary/30"
+                    onClick={() => handleOpportunityClick(opportunity)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
+                            {opportunity.opportunity_type === 'social_follow' ? (
+                              <ExternalLink className="w-6 h-6 text-primary" />
+                            ) : (
+                              <Gift className="w-6 h-6 text-primary" />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold section-heading text-sm mb-1">{opportunity.title}</h4>
+                            <p className="section-text text-xs line-clamp-2">{opportunity.description}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-center mb-4">
+                        <RewardDisplay opportunity={opportunity} size="sm" />
+                      </div>
+
+                      <Button 
+                        className="w-full bg-primary hover:bg-primary-glow text-primary-foreground py-3 text-sm group-hover:scale-105 transition-all duration-300"
+                        size="sm"
+                      >
+                        {opportunity.opportunity_type === 'social_follow' ? 'Follow & Earn →' : 'Complete Task →'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Bonus Opportunities - Separate section for pure bonus tasks */}
           <div className="space-y-8">
             <div className="text-center mb-12">
               <h3 className="text-2xl font-semibold section-heading mb-2">Complete & Earn</h3>
@@ -821,7 +877,12 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </div>
 
             <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
-              {opportunities.filter(op => op.opportunity_type === 'bonus' && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
+              {/* Keep only true one-time bonus tasks here */}
+              {opportunities.filter(op => 
+                op.opportunity_type === 'bonus' && 
+                !completedOpportunityIds.includes(op.id) &&
+                !['social_follow'].includes(op.opportunity_type)
+              ).map((opportunity) => (
                 <Card 
                   key={opportunity.id}
                   className="cursor-pointer hover:shadow-medium transition-all duration-300 group bg-gradient-to-br from-white to-section-highlight border border-section-border hover:border-primary/30"
