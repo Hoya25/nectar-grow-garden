@@ -124,6 +124,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
   const fetchBrands = async () => {
     try {
+      console.log('Fetching brands...');
       const { data, error } = await supabase
         .from('brands')
         .select('id, name, logo_url, description, category, website_url')
@@ -131,6 +132,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         .order('name');
 
       if (error) throw error;
+      console.log(`Fetched ${data?.length || 0} brands`, data?.slice(0, 5)); // Log first 5 brands
       setBrands(data || []);
     } catch (error) {
       console.error('Error fetching brands:', error);
@@ -141,12 +143,31 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   const filteredBrands = brands.filter(brand => {
     if (!brandSearchTerm) return true;
     const searchLower = brandSearchTerm.toLowerCase();
-    return (
+    const matches = (
       brand.name.toLowerCase().includes(searchLower) ||
       (brand.description || '').toLowerCase().includes(searchLower) ||
       (brand.category || '').toLowerCase().includes(searchLower)
     );
+    
+    // Debug logging for Uber searches
+    if (searchLower.includes('uber')) {
+      console.log(`Checking brand: "${brand.name}" against search: "${brandSearchTerm}" - matches: ${matches}`);
+    }
+    
+    return matches;
   });
+
+  // Debug logging for brands
+  useEffect(() => {
+    console.log(`Brands loaded: ${brands.length}`);
+    if (brandSearchTerm) {
+      console.log(`Search term: "${brandSearchTerm}", Filtered results: ${filteredBrands.length}`);
+      if (brandSearchTerm.toLowerCase().includes('uber')) {
+        const uberBrands = brands.filter(b => b.name.toLowerCase().includes('uber'));
+        console.log('Uber brands found in data:', uberBrands.map(b => b.name));
+      }
+    }
+  }, [brands, brandSearchTerm, filteredBrands.length]);
 
   const filteredOpportunities = opportunities.filter(opp => {
     const matchesSearch = opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
