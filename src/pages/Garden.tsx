@@ -904,7 +904,8 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </div>
           )}
 
-          {/* Affiliate Links Section */}
+          {/* Affiliate Links Section - Hidden */}
+          {/* 
           <Card className="bg-gradient-to-br from-section-highlight to-white border border-section-border shadow-medium">
             <CardHeader>
               <CardTitle className="text-xl section-heading flex items-center gap-2">
@@ -916,6 +917,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               <UserAffiliateLinks />
             </CardContent>
           </Card>
+          */}
         </div>
 
         {/* Community Section */}
