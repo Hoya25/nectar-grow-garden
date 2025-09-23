@@ -135,8 +135,10 @@ export type Database = {
           affiliate_link: string | null
           available_nctr_reward: number | null
           created_at: string
+          cta_text: string | null
           default_lock_type: string | null
           description: string | null
+          featured: boolean
           id: string
           is_active: boolean
           lock_360_nctr_reward: number | null
@@ -150,6 +152,8 @@ export type Database = {
           reward_distribution_type: string | null
           reward_per_dollar: number | null
           reward_structure: Json | null
+          social_handle: string | null
+          social_platform: string | null
           title: string
           updated_at: string
           video_description: string | null
@@ -160,8 +164,10 @@ export type Database = {
           affiliate_link?: string | null
           available_nctr_reward?: number | null
           created_at?: string
+          cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
+          featured?: boolean
           id?: string
           is_active?: boolean
           lock_360_nctr_reward?: number | null
@@ -175,6 +181,8 @@ export type Database = {
           reward_distribution_type?: string | null
           reward_per_dollar?: number | null
           reward_structure?: Json | null
+          social_handle?: string | null
+          social_platform?: string | null
           title: string
           updated_at?: string
           video_description?: string | null
@@ -185,8 +193,10 @@ export type Database = {
           affiliate_link?: string | null
           available_nctr_reward?: number | null
           created_at?: string
+          cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
+          featured?: boolean
           id?: string
           is_active?: boolean
           lock_360_nctr_reward?: number | null
@@ -200,6 +210,8 @@ export type Database = {
           reward_distribution_type?: string | null
           reward_per_dollar?: number | null
           reward_structure?: Json | null
+          social_handle?: string | null
+          social_platform?: string | null
           title?: string
           updated_at?: string
           video_description?: string | null
@@ -261,8 +273,12 @@ export type Database = {
           available_nctr: number
           created_at: string
           id: string
+          last_sync_at: string | null
           lock_360_nctr: number | null
           lock_90_nctr: number | null
+          nctr_live_available: number | null
+          nctr_live_lock_360: number | null
+          nctr_live_total: number | null
           opportunity_status: string
           pending_nctr: number
           total_earned: number
@@ -273,8 +289,12 @@ export type Database = {
           available_nctr?: number
           created_at?: string
           id?: string
+          last_sync_at?: string | null
           lock_360_nctr?: number | null
           lock_90_nctr?: number | null
+          nctr_live_available?: number | null
+          nctr_live_lock_360?: number | null
+          nctr_live_total?: number | null
           opportunity_status?: string
           pending_nctr?: number
           total_earned?: number
@@ -285,8 +305,12 @@ export type Database = {
           available_nctr?: number
           created_at?: string
           id?: string
+          last_sync_at?: string | null
           lock_360_nctr?: number | null
           lock_90_nctr?: number | null
+          nctr_live_available?: number | null
+          nctr_live_lock_360?: number | null
+          nctr_live_total?: number | null
           opportunity_status?: string
           pending_nctr?: number
           total_earned?: number
@@ -301,6 +325,7 @@ export type Database = {
           created_at: string
           description: string | null
           earning_source: string | null
+          external_transaction_id: string | null
           id: string
           nctr_amount: number
           opportunity_id: string | null
@@ -315,6 +340,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           earning_source?: string | null
+          external_transaction_id?: string | null
           id?: string
           nctr_amount: number
           opportunity_id?: string | null
@@ -329,6 +355,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           earning_source?: string | null
+          external_transaction_id?: string | null
           id?: string
           nctr_amount?: number
           opportunity_id?: string | null
