@@ -110,7 +110,6 @@ const BrandSearchInterface = ({
     }
   };
 
-  // Filter brands
   const filteredBrands = brands.filter(brand => {
     if (!searchTerm && selectedCategory === 'all') return true;
     
@@ -127,9 +126,19 @@ const BrandSearchInterface = ({
     
     const matchesCategory = selectedCategory === 'all' || brandCategory.includes(selectedCategory);
     
+    // Filter out non-Loyalize gift card sources for Uber
+    const isUberGiftCard = brandName.includes('uber') && (brandName.includes('gift') || brandCategory.includes('gift'));
+    const isLoyalizeSourced = brand.loyalize_id && /^\d+$/.test(brand.loyalize_id); // Numeric loyalize_id indicates real API source
+    
+    // For Uber gift cards, only show Loyalize API sourced ones
+    if (isUberGiftCard && !isLoyalizeSourced) {
+      console.log(`Filtering out non-Loyalize Uber gift card: ${brand.name} (ID: ${brand.loyalize_id})`);
+      return false;
+    }
+    
     // Debug logging for Uber searches
     if (searchLower.includes('uber')) {
-      console.log(`Checking brand: "${brand.name}" - matches search: ${matchesSearch}, matches category: ${matchesCategory}`);
+      console.log(`Checking brand: "${brand.name}" - matches search: ${matchesSearch}, matches category: ${matchesCategory}, loyalize_id: ${brand.loyalize_id}`);
     }
     
     return matchesSearch && matchesCategory;
@@ -279,6 +288,12 @@ const BrandSearchInterface = ({
                               {brand.featured && <Star className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
                               {(brand.category?.toLowerCase().includes('gift') || brand.name.toLowerCase().includes('gift')) && (
                                 <Gift className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              )}
+                              {/* Show Loyalize badge for verified API sources */}
+                              {brand.loyalize_id && /^\d+$/.test(brand.loyalize_id) && (
+                                <Badge variant="outline" className="text-xs px-1 py-0 h-4 bg-blue-50 text-blue-700 border-blue-200">
+                                  Loyalize
+                                </Badge>
                               )}
                             </div>
                             {brand.category && (
