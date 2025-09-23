@@ -635,17 +635,22 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                 {/* Links & Activation */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="affiliate_link">Affiliate Link *</Label>
+                    <Label htmlFor="affiliate_link">
+                      Affiliate Link {formData.opportunity_type !== 'bonus' ? '*' : '(Optional for Bonus Opportunities)'}
+                    </Label>
                     <Input
                       id="affiliate_link"
                       type="url"
                       value={formData.affiliate_link}
                       onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
                       placeholder="https://partner-tracking-url.com/?user_id={{USER_ID}}"
-                      required
+                      required={formData.opportunity_type !== 'bonus'}
                     />
                     <p className="text-xs text-muted-foreground">
-                      ✅ Auto-populated from selected brand with user tracking. {'{USER_ID}'} and {'{TRACKING_ID}'} will be replaced dynamically.
+                      {formData.opportunity_type === 'bonus' 
+                        ? '💡 Bonus opportunities typically don\'t require external links - they\'re internal rewards like daily check-ins or profile completion.'
+                        : '✅ Auto-populated from selected brand with user tracking. {USER_ID} and {TRACKING_ID} will be replaced dynamically.'
+                      }
                     </p>
                   </div>
                   
