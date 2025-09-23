@@ -47,16 +47,40 @@ const ReferralSystem = () => {
     if (!user) return;
 
     try {
-      // In a real implementation, you'd fetch actual referral data
-      // For now, we'll use mock data
-      const mockStats = {
-        total_referrals: 3,
-        pending_rewards: 150,
-        total_earned_from_referrals: 450
-      };
-      setReferralStats(mockStats);
+      // Fetch real referral stats
+      const { data: referrals, error } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referrer_user_id', user.id);
+
+      if (error) throw error;
+
+      // Fetch referral transactions
+      const { data: transactions, error: transError } = await supabase
+        .from('nctr_transactions')
+        .select('nctr_amount')
+        .eq('user_id', user.id)
+        .eq('earning_source', 'referral');
+
+      if (transError) throw transError;
+
+      const totalEarned = transactions?.reduce((sum, t) => sum + Number(t.nctr_amount), 0) || 0;
+      const completedReferrals = referrals?.filter(r => r.reward_credited).length || 0;
+      const pendingReferrals = referrals?.filter(r => !r.reward_credited).length || 0;
+
+      setReferralStats({
+        total_referrals: completedReferrals,
+        pending_rewards: pendingReferrals * 50, // 50 NCTR per pending referral
+        total_earned_from_referrals: totalEarned
+      });
     } catch (error) {
       console.error('Error fetching referral stats:', error);
+      // Fallback to empty stats
+      setReferralStats({
+        total_referrals: 0,
+        pending_rewards: 0,
+        total_earned_from_referrals: 0
+      });
     }
   };
 

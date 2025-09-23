@@ -16,14 +16,23 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('signin');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check for referral code in URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode);
+      // Switch to signup tab if they came via referral link
+      setActiveTab('signup');
+    }
+
     if (user) {
       // Check if there's a redirect URL in the query params or session storage
-      const urlParams = new URLSearchParams(window.location.search);
       const redirectTo = urlParams.get('redirect') || sessionStorage.getItem('authRedirect') || '/garden';
       
       // Clear stored redirect
@@ -53,12 +62,16 @@ const Auth = () => {
     setLoading(true);
     setError(null);
 
-    const { error } = await signUp(email, password, fullName);
+    const { error } = await signUp(email, password, fullName, referralCode);
     
     if (error) {
       setError(error.message);
     } else {
-      setError('Check your email for the confirmation link!');
+      if (referralCode) {
+        setError('Welcome! Check your email for the confirmation link. You and your referrer will both receive 50 NCTR once confirmed!');
+      } else {
+        setError('Check your email for the confirmation link!');
+      }
     }
     
     setLoading(false);
@@ -121,6 +134,13 @@ const Auth = () => {
             </TabsContent>
             
             <TabsContent value="signup" className="space-y-4">
+              {referralCode && (
+                <Alert className="bg-green-50 border-green-200">
+                  <AlertDescription className="text-green-800">
+                    🎉 You're joining via referral! You and your referrer will both earn 50 NCTR when you confirm your account.
+                  </AlertDescription>
+                </Alert>
+              )}
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-fullname">Full Name</Label>
