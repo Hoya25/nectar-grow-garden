@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import { useWallet } from '@/hooks/useWallet';
 import LockUpgradeModal from '@/components/LockUpgradeModal';
+import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -42,6 +43,7 @@ interface Lock {
   nctr_amount: number;
   lock_category: string;
   can_upgrade?: boolean;
+  status: string;
 }
 
 interface CollapsibleDashboardProps {
@@ -361,6 +363,13 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
           Alliance Profile
         </Button>
       </div>
+
+      {/* Batch Lock Upgrade - Easy Button */}
+      <BatchLockUpgrade 
+        locks={locks}
+        onUpgradeComplete={onLockCreated}
+        show90LockTotal={portfolio?.lock_90_nctr}
+      />
 
       {/* Wallet Connection - Conditional Priority */}
       <div>

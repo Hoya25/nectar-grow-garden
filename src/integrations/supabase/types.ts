@@ -689,6 +689,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: Json
       }
+      upgrade_all_90locks_to_360: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       upgrade_lock_to_360: {
         Args: { p_lock_id: string }
         Returns: Json
