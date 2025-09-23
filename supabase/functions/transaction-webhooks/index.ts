@@ -40,13 +40,29 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Parse webhook payload
-    const webhook: TransactionWebhook = await req.json()
-    console.log('🔔 Received transaction webhook:', JSON.stringify(webhook, null, 2))
+    // Parse webhook payload - handle both our format and Loyalize format
+    const rawPayload = await req.json()
+    console.log('🔔 Received webhook payload:', JSON.stringify(rawPayload, null, 2))
 
+    // Handle Loyalize webhook format
+    if (rawPayload.event_type || rawPayload.eventType || rawPayload.type) {
+      return await handleLoyalizeWebhook(rawPayload, supabase)
+    }
+
+    // Handle our custom format (fallback)
+    const webhook: TransactionWebhook = rawPayload
+    
     // Validate webhook structure
     if (!webhook.eventType || !webhook.data || !webhook.data.transactions) {
-      throw new Error('Invalid webhook payload structure')
+      console.log('⚠️ Invalid webhook structure - missing required fields')
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Invalid webhook payload structure',
+        received: Object.keys(rawPayload)
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
     // Handle different event types
@@ -81,6 +97,238 @@ serve(async (req) => {
     })
   }
 })
+
+async function handleLoyalizeWebhook(payload: any, supabase: any) {
+  console.log('🎯 Processing Loyalize webhook:', payload)
+  
+  try {
+    // Extract event type from Loyalize payload
+    const eventType = payload.event_type || payload.eventType || payload.type
+    const eventData = payload.data || payload
+    
+    console.log('📊 Event type:', eventType)
+    console.log('📊 Event data:', JSON.stringify(eventData, null, 2))
+    
+    // Handle different Loyalize event types
+    switch (eventType) {
+      case 'transaction.completed':
+      case 'purchase.completed':
+      case 'commission.earned':
+        return await handleLoyalizePurchase(eventData, supabase)
+      
+      case 'transaction.pending':
+      case 'purchase.pending':
+        return await handleLoyalizePending(eventData, supabase)
+      
+      case 'transaction.failed':
+      case 'purchase.failed':
+        return await handleLoyalizeFailed(eventData, supabase)
+      
+      default:
+        console.log(`ℹ️ Unhandled Loyalize event: ${eventType}`)
+        return new Response(JSON.stringify({
+          success: true,
+          message: `Loyalize event ${eventType} received but not processed`
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+    }
+  } catch (error) {
+    console.error('❌ Error processing Loyalize webhook:', error)
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message || 'Failed to process Loyalize webhook'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
+  }
+}
+
+async function handleLoyalizePurchase(data: any, supabase: any) {
+  console.log('💰 Processing Loyalize purchase completion:', data)
+  
+  try {
+    // Extract key data from Loyalize payload
+    const {
+      order_id,
+      purchase_amount,
+      commission_amount,
+      tracking_id,
+      user_id,
+      brand_id,
+      brand_name
+    } = data
+    
+    if (!tracking_id) {
+      console.log('⚠️ No tracking ID found in Loyalize webhook')
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'No tracking ID found in webhook'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    
+    // Parse tracking ID to get user and brand info
+    const parsedIds = parseTrackingId(tracking_id)
+    const userId = parsedIds.userId
+    const brandIdFromTracking = parsedIds.brandId
+    
+    if (!userId) {
+      console.log('⚠️ Could not extract user ID from tracking ID:', tracking_id)
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Invalid tracking ID format'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    
+    // Get brand info to calculate NCTR reward
+    const { data: brand, error: brandError } = await supabase
+      .from('brands')
+      .select('*')
+      .eq('id', brandIdFromTracking)
+      .single()
+    
+    if (brandError) {
+      console.error('Brand lookup error:', brandError)
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Brand not found'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    
+    // Calculate NCTR reward (100 NCTR per $1 for gift cards)
+    const purchaseAmountNum = parseFloat(purchase_amount) || 0
+    const nctrReward = purchaseAmountNum * (brand.nctr_per_dollar || 100)
+    
+    console.log(`💎 Awarding ${nctrReward} NCTR to user ${userId} for $${purchaseAmountNum} purchase`)
+    
+    // Create completed transaction
+    const { error: transactionError } = await supabase
+      .from('nctr_transactions')
+      .insert({
+        user_id: userId,
+        transaction_type: 'earned',
+        nctr_amount: nctrReward,
+        purchase_amount: purchaseAmountNum,
+        description: `Purchase reward from ${brand.name} (Order: ${order_id || 'N/A'})`,
+        partner_name: brand.name,
+        status: 'completed',
+        earning_source: 'affiliate_purchase'
+      })
+    
+    if (transactionError) {
+      console.error('Transaction creation error:', transactionError)
+      throw new Error('Failed to create transaction record')
+    }
+    
+    // Auto-lock the NCTR reward according to bounty structure (25 active + 1225 in 90LOCK + 250 in 360LOCK)
+    const availableAmount = nctrReward * 0.025  // 2.5% = 25/1000
+    const lock90Amount = nctrReward * 0.8125    // 81.25% = 1225/1500  
+    const lock360Amount = nctrReward * 0.1667   // 16.67% = 250/1500
+    
+    // Update portfolio
+    await supabase
+      .from('nctr_portfolio')
+      .upsert({
+        user_id: userId,
+        available_nctr: availableAmount,
+        total_earned: nctrReward
+      }, { 
+        onConflict: 'user_id',
+        ignoreDuplicates: false 
+      })
+    
+    // Create 90LOCK
+    if (lock90Amount > 0) {
+      await supabase
+        .from('nctr_locks')
+        .insert({
+          user_id: userId,
+          nctr_amount: lock90Amount,
+          lock_type: '90LOCK',
+          lock_category: '90LOCK',
+          commitment_days: 90,
+          unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+          can_upgrade: true,
+          original_lock_type: '90LOCK'
+        })
+    }
+    
+    // Create 360LOCK  
+    if (lock360Amount > 0) {
+      await supabase
+        .from('nctr_locks')
+        .insert({
+          user_id: userId,
+          nctr_amount: lock360Amount,
+          lock_type: '360LOCK',
+          lock_category: '360LOCK', 
+          commitment_days: 360,
+          unlock_date: new Date(Date.now() + 360 * 24 * 60 * 60 * 1000).toISOString(),
+          can_upgrade: false,
+          original_lock_type: '360LOCK'
+        })
+    }
+    
+    console.log(`✅ Successfully processed Loyalize purchase for user ${userId}`)
+    
+    return new Response(JSON.stringify({
+      success: true,
+      user_id: userId,
+      nctr_earned: nctrReward,
+      purchase_amount: purchaseAmountNum,
+      brand_name: brand.name,
+      breakdown: {
+        available: availableAmount,
+        lock_90: lock90Amount,
+        lock_360: lock360Amount
+      }
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
+    
+  } catch (error) {
+    console.error('❌ Error processing Loyalize purchase:', error)
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
+  }
+}
+
+async function handleLoyalizePending(data: any, supabase: any) {
+  console.log('⏳ Processing Loyalize pending transaction:', data)
+  
+  return new Response(JSON.stringify({
+    success: true,
+    message: 'Loyalize pending transaction noted'
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  })
+}
+
+async function handleLoyalizeFailed(data: any, supabase: any) {
+  console.log('❌ Processing Loyalize failed transaction:', data)
+  
+  return new Response(JSON.stringify({
+    success: true,
+    message: 'Loyalize failed transaction noted'
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  })
+}
 
 async function handleNewTransaction(webhook: TransactionWebhook, supabase: any) {
   console.log('💰 Processing new transaction(s):', webhook.data.transactions)
@@ -360,4 +608,24 @@ async function simulateTransactionFetch(transactionId: number): Promise<Transact
 // Calculate NCTR reward based on purchase amount (100 NCTR per $1)
 function calculateNCTRReward(purchaseAmount: number): number {
   return purchaseAmount * 100 // 100 NCTR per dollar spent
+}
+
+function parseTrackingId(trackingId: string): { userId: string, brandId: string } {
+  // Enhanced parser with better error handling
+  try {
+    const parts = trackingId.split('_');
+    if (parts.length < 4 || parts[0] !== 'tgn') {
+      throw new Error('Invalid tracking ID format');
+    }
+    return {
+      userId: parts[1] || '',
+      brandId: parts[2] || ''
+    };
+  } catch (error) {
+    console.error('Error parsing tracking ID:', trackingId, error);
+    return {
+      userId: '',
+      brandId: ''
+    };
+  }
 }
