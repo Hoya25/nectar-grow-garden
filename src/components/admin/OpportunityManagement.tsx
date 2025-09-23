@@ -131,27 +131,45 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         .eq('is_active', true)
         .order('name');
 
-      if (error) throw error;
-      console.log(`Fetched ${data?.length || 0} brands`, data?.slice(0, 5)); // Log first 5 brands
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log(`Fetched ${data?.length || 0} brands successfully`);
+      
+      // Log some Uber brands for debugging
+      const uberBrands = data?.filter(b => b.name.toLowerCase().includes('uber')) || [];
+      console.log('Uber brands in fetched data:', uberBrands.map(b => ({ name: b.name, id: b.id })));
+      
       setBrands(data || []);
     } catch (error) {
       console.error('Error fetching brands:', error);
+      setBrands([]); // Ensure we set empty array on error
     }
   };
 
   // Filter brands based on search term
   const filteredBrands = brands.filter(brand => {
     if (!brandSearchTerm) return true;
-    const searchLower = brandSearchTerm.toLowerCase();
+    
+    const searchLower = brandSearchTerm.toLowerCase().trim();
+    const brandName = (brand.name || '').toLowerCase();
+    const brandDescription = (brand.description || '').toLowerCase();
+    const brandCategory = (brand.category || '').toLowerCase();
+    
     const matches = (
-      brand.name.toLowerCase().includes(searchLower) ||
-      (brand.description || '').toLowerCase().includes(searchLower) ||
-      (brand.category || '').toLowerCase().includes(searchLower)
+      brandName.includes(searchLower) ||
+      brandDescription.includes(searchLower) ||
+      brandCategory.includes(searchLower)
     );
     
-    // Debug logging for Uber searches
+    // Debug logging for specific searches
     if (searchLower.includes('uber')) {
-      console.log(`Checking brand: "${brand.name}" against search: "${brandSearchTerm}" - matches: ${matches}`);
+      console.log(`Checking brand: "${brand.name}" (${brand.id}) against search: "${brandSearchTerm}" - matches: ${matches}`);
+      console.log(`  Brand name: "${brandName}"`);
+      console.log(`  Search term: "${searchLower}"`);
+      console.log(`  Name includes: ${brandName.includes(searchLower)}`);
     }
     
     return matches;
