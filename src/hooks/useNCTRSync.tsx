@@ -53,7 +53,7 @@ export const useNCTRSync = () => {
       if (data.success) {
         toast({
           title: "Portfolio Synced! 🎉",
-          description: `Successfully synced ${data.data.total_earned} NCTR from NCTR Live. Status: ${data.data.new_status}`,
+          description: `Synced from NCTR Live: ${data.data.available_nctr} available, ${data.data.lock_360_nctr} in 360LOCK. Status: ${data.data.new_status}`,
         });
         
         // Trigger a page refresh to show updated data

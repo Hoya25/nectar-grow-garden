@@ -273,8 +273,12 @@ export type Database = {
           available_nctr: number
           created_at: string
           id: string
+          last_sync_at: string | null
           lock_360_nctr: number | null
           lock_90_nctr: number | null
+          nctr_live_available: number | null
+          nctr_live_lock_360: number | null
+          nctr_live_total: number | null
           opportunity_status: string
           pending_nctr: number
           total_earned: number
@@ -285,8 +289,12 @@ export type Database = {
           available_nctr?: number
           created_at?: string
           id?: string
+          last_sync_at?: string | null
           lock_360_nctr?: number | null
           lock_90_nctr?: number | null
+          nctr_live_available?: number | null
+          nctr_live_lock_360?: number | null
+          nctr_live_total?: number | null
           opportunity_status?: string
           pending_nctr?: number
           total_earned?: number
@@ -297,8 +305,12 @@ export type Database = {
           available_nctr?: number
           created_at?: string
           id?: string
+          last_sync_at?: string | null
           lock_360_nctr?: number | null
           lock_90_nctr?: number | null
+          nctr_live_available?: number | null
+          nctr_live_lock_360?: number | null
+          nctr_live_total?: number | null
           opportunity_status?: string
           pending_nctr?: number
           total_earned?: number

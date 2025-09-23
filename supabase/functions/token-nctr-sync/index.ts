@@ -62,13 +62,39 @@ async function syncUserPortfolio(userId: string, walletAddress: string): Promise
   }
 
   try {
-    // Update local portfolio with NCTR Live data
+    // Get current portfolio to calculate Garden-earned amounts
+    const { data: currentPortfolio, error: getCurrentError } = await supabase
+      .from('nctr_portfolio')
+      .select('available_nctr, lock_360_nctr, total_earned, nctr_live_available, nctr_live_lock_360, nctr_live_total')
+      .eq('user_id', userId)
+      .single();
+
+    if (getCurrentError) {
+      console.error('Error getting current portfolio:', getCurrentError);
+      return { success: false, message: 'Failed to get current portfolio' };
+    }
+
+    // Calculate Garden-only amounts (current totals minus previous NCTR Live amounts)
+    const gardenAvailable = (currentPortfolio.available_nctr || 0) - (currentPortfolio.nctr_live_available || 0);
+    const gardenLock360 = (currentPortfolio.lock_360_nctr || 0) - (currentPortfolio.nctr_live_lock_360 || 0);
+    const gardenTotal = (currentPortfolio.total_earned || 0) - (currentPortfolio.nctr_live_total || 0);
+
+    // Calculate new totals (Garden amounts + new NCTR Live amounts)
+    const newAvailable = Math.max(0, gardenAvailable) + nctrLiveData.available_nctr;
+    const newLock360 = Math.max(0, gardenLock360) + nctrLiveData.lock_360_nctr;
+    const newTotal = Math.max(0, gardenTotal) + nctrLiveData.total_earned;
+
+    // Update local portfolio with combined data and NCTR Live tracking
     const { data: portfolioData, error: portfolioError } = await supabase
       .from('nctr_portfolio')
       .update({
-        available_nctr: nctrLiveData.available_nctr,
-        lock_360_nctr: nctrLiveData.lock_360_nctr,
-        total_earned: nctrLiveData.total_earned,
+        available_nctr: newAvailable,
+        lock_360_nctr: newLock360,
+        total_earned: newTotal,
+        nctr_live_available: nctrLiveData.available_nctr,
+        nctr_live_lock_360: nctrLiveData.lock_360_nctr,
+        nctr_live_total: nctrLiveData.total_earned,
+        last_sync_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', userId)

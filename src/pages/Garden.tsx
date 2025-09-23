@@ -20,6 +20,7 @@ import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
 import { NCTRSyncButton } from '@/components/NCTRSyncButton';
+import { PortfolioBreakdown } from '@/components/PortfolioBreakdown';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -33,6 +34,10 @@ interface Portfolio {
   opportunity_status: string;
   lock_90_nctr: number;
   lock_360_nctr: number;
+  nctr_live_available?: number;
+  nctr_live_lock_360?: number;
+  nctr_live_total?: number;
+  last_sync_at?: string;
 }
 
 interface LockCommitment {
@@ -159,7 +164,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
-        .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr')
+        .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr, nctr_live_available, nctr_live_lock_360, nctr_live_total, last_sync_at')
         .eq('user_id', user?.id)
         .single();
 
@@ -707,6 +712,16 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         {/* NCTR Live Sync */}
         <div className="px-4 sm:px-6 pb-4">
           <NCTRSyncButton variant="card" className="w-full" />
+        </div>
+        
+        {/* Portfolio Breakdown */}
+        <div className="px-4 sm:px-6 pb-4">
+          {portfolio && (
+            <PortfolioBreakdown 
+              portfolio={portfolio}
+              currentPrice={currentPrice}
+            />
+          )}
         </div>
         </div>
 
