@@ -28,7 +28,17 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
   onPurchaseComplete
 }) => {
   const handleBuyClick = () => {
-    const targetUrl = buyPageUrl || 'https://token.nctr.live/';
+    let targetUrl = buyPageUrl || 'https://token.nctr.live/';
+    
+    // Add amount parameter if suggestedAmount is provided
+    if (suggestedAmount && suggestedAmount > 0) {
+      const urlObj = new URL(targetUrl);
+      urlObj.searchParams.set('amount', suggestedAmount.toString());
+      urlObj.searchParams.set('type', 'nctr');
+      urlObj.searchParams.set('source', 'garden');
+      targetUrl = urlObj.toString();
+    }
+    
     window.open(targetUrl, '_blank');
   };
 
