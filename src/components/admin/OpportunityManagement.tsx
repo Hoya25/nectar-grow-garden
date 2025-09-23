@@ -575,16 +575,25 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   </div>
                 </div>
 
-                {/* Rewards Configuration */}
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-6 rounded-lg space-y-6">
-                  <h4 className="font-semibold text-foreground flex items-center gap-2">
-                    <Gift className="w-4 h-4" />
-                    NCTR Reward Configuration
-                  </h4>
+                {/* NCTR Bounty Configuration */}
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-6 rounded-lg border-2 border-primary/20 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <Gift className="w-5 h-5 text-primary" />
+                    <h4 className="font-bold text-lg text-foreground">NCTR Bounty Configuration</h4>
+                  </div>
                   
-                  {/* Reward Distribution Type Selector */}
-                  <div className="space-y-2">
-                    <Label htmlFor="reward_distribution_type">Reward Distribution Type</Label>
+                  <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <h5 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 Bounty Types Explained</h5>
+                    <div className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
+                      <p><strong>Active Status:</strong> Immediately available NCTR that can be used or withdrawn</p>
+                      <p><strong>90LOCK:</strong> NCTR locked for 90 days, can be upgraded to 360LOCK</p>
+                      <p><strong>360LOCK:</strong> Premium NCTR locked for 360 days, highest reward multiplier</p>
+                    </div>
+                  </div>
+
+                  {/* Bounty Distribution Type Selector */}
+                  <div className="space-y-3">
+                    <Label htmlFor="reward_distribution_type" className="text-base font-semibold">Distribution Strategy</Label>
                     <Select
                       value={formData.reward_distribution_type}
                       onValueChange={(value) => {
@@ -607,71 +616,63 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         }
                       }}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="legacy">Legacy (Simple NCTR)</SelectItem>
-                        <SelectItem value="available">Available NCTR Only</SelectItem>
-                        <SelectItem value="lock_90">90LOCK Only</SelectItem>
-                        <SelectItem value="lock_360">360LOCK Only</SelectItem>
-                        <SelectItem value="combined">Combined Rewards</SelectItem>
+                        <SelectItem value="legacy">🔄 Legacy Mode (Backward Compatible)</SelectItem>
+                        <SelectItem value="available">🟢 Active Status Only</SelectItem>
+                        <SelectItem value="lock_90">🟠 90LOCK Only</SelectItem>
+                        <SelectItem value="lock_360">🔵 360LOCK Only</SelectItem>
+                        <SelectItem value="combined">🎯 Multi-Tier Bounty</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-muted-foreground">
-                      Choose how NCTR rewards will be distributed to users
-                    </p>
                   </div>
 
                   {/* Legacy Rewards (backward compatibility) */}
                   {formData.reward_distribution_type === 'legacy' && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="reward_per_dollar">NCTR per Dollar Spent *</Label>
-                        <Input
-                          id="reward_per_dollar"
-                          type="number"
-                          step="1"
-                          min="0"
-                          value={formData.reward_per_dollar}
-                          onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 100})}
-                          placeholder="100"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Default: 100 NCTR per $1 spent
-                        </p>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="nctr_reward">Sign-up Bonus NCTR</Label>
-                        <Input
-                          id="nctr_reward"
-                          type="number"
-                          step="1"
-                          min="0"
-                          value={formData.nctr_reward}
-                          onChange={(e) => setFormData({...formData, nctr_reward: parseInt(e.target.value) || 0})}
-                          placeholder="1000"
-                        />
+                    <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <h5 className="font-medium mb-3 text-gray-700 dark:text-gray-300">Legacy Reward System</h5>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="reward_per_dollar">NCTR per Dollar Spent</Label>
+                          <Input
+                            id="reward_per_dollar"
+                            type="number"
+                            step="1"
+                            min="0"
+                            value={formData.reward_per_dollar}
+                            onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 100})}
+                            placeholder="100"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="nctr_reward">Sign-up Bonus NCTR</Label>
+                          <Input
+                            id="nctr_reward"
+                            type="number"
+                            step="1"
+                            min="0"
+                            value={formData.nctr_reward}
+                            onChange={(e) => setFormData({...formData, nctr_reward: parseInt(e.target.value) || 0})}
+                            placeholder="1000"
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Available NCTR Only */}
+                  {/* Active Status Only */}
                   {formData.reward_distribution_type === 'available' && (
-                    <div className="space-y-4">
-                      <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          <span className="font-medium text-green-700 dark:text-green-300">Available NCTR</span>
-                        </div>
-                        <p className="text-sm text-green-600 dark:text-green-400">
-                          Rewards immediately available for use or withdrawal
-                        </p>
+                    <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                        <h5 className="font-semibold text-green-800 dark:text-green-300">Active Status Bounty</h5>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="available_nctr_reward">Available NCTR Reward</Label>
+                          <Label htmlFor="available_nctr_reward">Active Status NCTR Bounty</Label>
                           <Input
                             id="available_nctr_reward"
                             type="number"
@@ -681,9 +682,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             onChange={(e) => setFormData({...formData, available_nctr_reward: parseInt(e.target.value) || 0})}
                             placeholder="500"
                           />
+                          <p className="text-xs text-green-600 dark:text-green-400">Immediately available for use</p>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="reward_per_dollar">NCTR per Dollar (Available)</Label>
+                          <Label htmlFor="reward_per_dollar">Additional NCTR per $1</Label>
                           <Input
                             id="reward_per_dollar"
                             type="number"
@@ -700,19 +702,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
                   {/* 90LOCK Only */}
                   {formData.reward_distribution_type === 'lock_90' && (
-                    <div className="space-y-4">
-                      <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                          <span className="font-medium text-orange-700 dark:text-orange-300">90LOCK NCTR</span>
-                        </div>
-                        <p className="text-sm text-orange-600 dark:text-orange-400">
-                          Rewards locked for 90 days, eligible for upgrade to 360LOCK
-                        </p>
+                    <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
+                        <h5 className="font-semibold text-orange-800 dark:text-orange-300">90LOCK Bounty</h5>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="lock_90_nctr_reward">90LOCK NCTR Reward</Label>
+                          <Label htmlFor="lock_90_nctr_reward">90LOCK NCTR Bounty</Label>
                           <Input
                             id="lock_90_nctr_reward"
                             type="number"
@@ -722,9 +719,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             onChange={(e) => setFormData({...formData, lock_90_nctr_reward: parseInt(e.target.value) || 0})}
                             placeholder="750"
                           />
+                          <p className="text-xs text-orange-600 dark:text-orange-400">Locked for 90 days, upgradeable</p>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="reward_per_dollar">NCTR per Dollar (90LOCK)</Label>
+                          <Label htmlFor="reward_per_dollar">Additional NCTR per $1</Label>
                           <Input
                             id="reward_per_dollar"
                             type="number"
@@ -741,19 +739,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
                   {/* 360LOCK Only */}
                   {formData.reward_distribution_type === 'lock_360' && (
-                    <div className="space-y-4">
-                      <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                          <span className="font-medium text-blue-700 dark:text-blue-300">360LOCK NCTR</span>
-                        </div>
-                        <p className="text-sm text-blue-600 dark:text-blue-400">
-                          Premium rewards locked for 360 days, highest reward multiplier
-                        </p>
+                    <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                        <h5 className="font-semibold text-blue-800 dark:text-blue-300">360LOCK Bounty</h5>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="lock_360_nctr_reward">360LOCK NCTR Reward</Label>
+                          <Label htmlFor="lock_360_nctr_reward">360LOCK NCTR Bounty</Label>
                           <Input
                             id="lock_360_nctr_reward"
                             type="number"
@@ -763,9 +756,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             onChange={(e) => setFormData({...formData, lock_360_nctr_reward: parseInt(e.target.value) || 0})}
                             placeholder="1000"
                           />
+                          <p className="text-xs text-blue-600 dark:text-blue-400">Premium rewards, 360-day lock</p>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="reward_per_dollar">NCTR per Dollar (360LOCK)</Label>
+                          <Label htmlFor="reward_per_dollar">Additional NCTR per $1</Label>
                           <Input
                             id="reward_per_dollar"
                             type="number"
@@ -780,68 +774,75 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     </div>
                   )}
 
-                  {/* Combined Rewards */}
+                  {/* Multi-Tier Bounty */}
                   {formData.reward_distribution_type === 'combined' && (
                     <div className="space-y-4">
-                      <div className="bg-gradient-to-r from-green-50 via-orange-50 to-blue-50 dark:from-green-950/20 dark:via-orange-950/20 dark:to-blue-950/20 p-4 rounded-lg">
-                        <h5 className="font-medium mb-2">Combined Reward Distribution</h5>
+                      <div className="bg-gradient-to-r from-green-50 via-orange-50 to-blue-50 dark:from-green-950/20 dark:via-orange-950/20 dark:to-blue-950/20 p-4 rounded-lg border border-primary/30">
+                        <h5 className="font-semibold mb-2 text-primary">🎯 Multi-Tier NCTR Bounty</h5>
                         <p className="text-sm text-muted-foreground">
-                          Configure multiple reward types for a single opportunity
+                          Configure different bounty amounts for each NCTR type
                         </p>
                       </div>
                       
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="available_nctr_reward" className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            Available NCTR
-                          </Label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Active Status Bounty */}
+                        <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <Label className="font-medium text-green-800 dark:text-green-300">Active Status</Label>
+                          </div>
                           <Input
-                            id="available_nctr_reward"
                             type="number"
                             step="1"
                             min="0"
                             value={formData.available_nctr_reward}
                             onChange={(e) => setFormData({...formData, available_nctr_reward: parseInt(e.target.value) || 0})}
-                            placeholder="100"
+                            placeholder="200"
+                            className="mb-2"
                           />
+                          <p className="text-xs text-green-600 dark:text-green-400">Immediately usable</p>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="lock_90_nctr_reward" className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                            90LOCK NCTR
-                          </Label>
+                        {/* 90LOCK Bounty */}
+                        <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                            <Label className="font-medium text-orange-800 dark:text-orange-300">90LOCK</Label>
+                          </div>
                           <Input
-                            id="lock_90_nctr_reward"
                             type="number"
                             step="1"
                             min="0"
                             value={formData.lock_90_nctr_reward}
                             onChange={(e) => setFormData({...formData, lock_90_nctr_reward: parseInt(e.target.value) || 0})}
-                            placeholder="200"
+                            placeholder="300"
+                            className="mb-2"
                           />
+                          <p className="text-xs text-orange-600 dark:text-orange-400">90-day lock</p>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="lock_360_nctr_reward" className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            360LOCK NCTR
-                          </Label>
+                        {/* 360LOCK Bounty */}
+                        <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <Label className="font-medium text-blue-800 dark:text-blue-300">360LOCK</Label>
+                          </div>
                           <Input
-                            id="lock_360_nctr_reward"
                             type="number"
                             step="1"
                             min="0"
                             value={formData.lock_360_nctr_reward}
                             onChange={(e) => setFormData({...formData, lock_360_nctr_reward: parseInt(e.target.value) || 0})}
-                            placeholder="700"
+                            placeholder="500"
+                            className="mb-2"
                           />
+                          <p className="text-xs text-blue-600 dark:text-blue-400">360-day premium lock</p>
                         </div>
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="reward_per_dollar">Additional NCTR per Dollar Spent</Label>
+                      {/* Additional per dollar spending */}
+                      <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <Label htmlFor="reward_per_dollar" className="font-medium">Additional NCTR per $1 Spent</Label>
                         <Input
                           id="reward_per_dollar"
                           type="number"
@@ -850,36 +851,63 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                           value={formData.reward_per_dollar}
                           onChange={(e) => setFormData({...formData, reward_per_dollar: parseInt(e.target.value) || 0})}
                           placeholder="50"
+                          className="mt-2"
                         />
-                        <p className="text-xs text-muted-foreground">
-                          This will be distributed as available NCTR per dollar spent
+                        <p className="text-xs text-muted-foreground mt-1">
+                          This will be distributed as Active Status NCTR per dollar spent
                         </p>
                       </div>
-                      
-                      <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
-                        <p className="text-sm font-medium mb-1">Total Reward Preview:</p>
-                        <div className="flex flex-wrap gap-2 text-xs">
-                          {formData.available_nctr_reward > 0 && (
-                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                              {formData.available_nctr_reward} Available
-                            </span>
-                          )}
-                          {formData.lock_90_nctr_reward > 0 && (
-                            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded">
-                              {formData.lock_90_nctr_reward} 90LOCK
-                            </span>
-                          )}
-                          {formData.lock_360_nctr_reward > 0 && (
-                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                              {formData.lock_360_nctr_reward} 360LOCK
-                            </span>
-                          )}
-                          {formData.reward_per_dollar > 0 && (
-                            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                              +{formData.reward_per_dollar}/$ Available
-                            </span>
-                          )}
+                    </div>
+                  )}
+                  
+                  {/* Total Bounty Display */}
+                  {(formData.available_nctr_reward > 0 || formData.lock_90_nctr_reward > 0 || formData.lock_360_nctr_reward > 0 || formData.nctr_reward > 0) && (
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 p-4 rounded-lg border-2 border-purple-200 dark:border-purple-800">
+                      <h5 className="font-bold text-lg text-purple-800 dark:text-purple-300 mb-3 flex items-center gap-2">
+                        <Gift className="w-5 h-5" />
+                        Total NCTR Bounty
+                      </h5>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-2">One-Time Bounty:</p>
+                          <div className="text-2xl font-bold text-purple-800 dark:text-purple-300">
+                            {(formData.available_nctr_reward || 0) + (formData.lock_90_nctr_reward || 0) + (formData.lock_360_nctr_reward || 0) + (formData.nctr_reward || 0)} NCTR
+                          </div>
                         </div>
+                        <div>
+                          <p className="text-sm font-medium text-purple-700 dark:text-purple-400 mb-2">Per Dollar:</p>
+                          <div className="text-2xl font-bold text-purple-800 dark:text-purple-300">
+                            +{formData.reward_per_dollar || 0} NCTR
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Breakdown */}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {(formData.available_nctr_reward || 0) > 0 && (
+                          <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            {formData.available_nctr_reward} Active
+                          </span>
+                        )}
+                        {(formData.lock_90_nctr_reward || 0) > 0 && (
+                          <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-sm px-3 py-1 rounded-full">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                            {formData.lock_90_nctr_reward} 90LOCK
+                          </span>
+                        )}
+                        {(formData.lock_360_nctr_reward || 0) > 0 && (
+                          <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            {formData.lock_360_nctr_reward} 360LOCK
+                          </span>
+                        )}
+                        {(formData.nctr_reward || 0) > 0 && (
+                          <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full">
+                            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                            {formData.nctr_reward} Legacy
+                          </span>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1027,12 +1055,39 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   </div>
 
                   <div className="space-y-3 mb-4">
+                    {/* Total NCTR Bounty Display */}
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 p-3 rounded-lg border border-purple-200 dark:border-purple-800">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Gift className="w-4 h-4 text-purple-600" />
+                        <span className="font-semibold text-purple-800 dark:text-purple-300">Total NCTR Bounty</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-lg font-bold text-purple-800 dark:text-purple-300">
+                            {(() => {
+                              const total = (opportunity.available_nctr_reward || 0) + 
+                                          (opportunity.lock_90_nctr_reward || 0) + 
+                                          (opportunity.lock_360_nctr_reward || 0) + 
+                                          (opportunity.nctr_reward || 0);
+                              return total > 0 ? `${total} NCTR` : 'No bounty set';
+                            })()}
+                          </div>
+                          {opportunity.reward_per_dollar > 0 && (
+                            <div className="text-sm text-purple-600 dark:text-purple-400">
+                              +{opportunity.reward_per_dollar} NCTR per $1
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Legacy Rewards Display */}
-                    {(opportunity.nctr_reward > 0 || opportunity.reward_per_dollar > 0) && (
+                    {(opportunity.nctr_reward > 0 || opportunity.reward_per_dollar > 0) && 
+                     !(opportunity.available_nctr_reward > 0 || opportunity.lock_90_nctr_reward > 0 || opportunity.lock_360_nctr_reward > 0) && (
                       <>
                         {opportunity.nctr_reward > 0 && (
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Sign-up Bonus:</span>
+                            <span className="text-muted-foreground">Legacy Bounty:</span>
                             <span className="font-medium text-section-accent">{opportunity.nctr_reward} NCTR</span>
                           </div>
                         )}
@@ -1048,12 +1103,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     {/* New Reward Structure Display */}
                     {(opportunity.available_nctr_reward > 0 || opportunity.lock_90_nctr_reward > 0 || opportunity.lock_360_nctr_reward > 0) && (
                       <div className="space-y-2">
-                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Reward Breakdown</div>
+                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Bounty Breakdown</div>
                         <div className="flex flex-wrap gap-1">
                           {opportunity.available_nctr_reward > 0 && (
                             <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              {opportunity.available_nctr_reward} Available
+                              {opportunity.available_nctr_reward} Active
                             </span>
                           )}
                           {opportunity.lock_90_nctr_reward > 0 && (
