@@ -70,12 +70,23 @@ serve(async (req) => {
       });
     }
 
+    // Get current portfolio to update amounts
+    const { data: currentPortfolio } = await supabase
+      .from('nctr_portfolio')
+      .select('available_nctr, total_earned')
+      .eq('user_id', payload.user_id)
+      .single();
+
+    if (!currentPortfolio) {
+      throw new Error('User portfolio not found');
+    }
+
     // Update user's portfolio with purchased NCTR
     const { error: portfolioError } = await supabase
       .from('nctr_portfolio')
       .update({
-        available_nctr: supabase.sql`available_nctr + ${payload.amount}`,
-        total_earned: supabase.sql`total_earned + ${payload.amount}`,
+        available_nctr: currentPortfolio.available_nctr + payload.amount,
+        total_earned: currentPortfolio.total_earned + payload.amount,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', payload.user_id);
