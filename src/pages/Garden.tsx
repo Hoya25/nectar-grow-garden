@@ -16,9 +16,10 @@ import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
-import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
+import { AppSidebar } from '@/components/AppSidebar';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -436,513 +437,313 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-page">
-      {/* Header */}
-      <header className="section-highlight backdrop-blur-sm border-b border-section-border">
-        <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <h1 className="text-xl sm:text-2xl font-bold nctr-text">
-                  The Garden
-                </h1>
-                <img 
-                  src={nctrLogo} 
-                  alt="NCTR" 
-                  className="h-16 sm:h-28 w-auto opacity-90"
-                />
-              </div>{/* End of flex items-center space-x-2 */}
-              <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">{/* Status badge removed */}
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigate('/profile')}
-                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
-                >
-                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Profile</span>
-                  <span className="sm:hidden">Profile</span>
-                </Button>
-                {isAdmin && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigate('/admin')}
-                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
-                >
-                  <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Admin</span>
-                  <span className="sm:hidden">Adm</span>
-                </Button>
-              )}
-              <Button 
-                variant="outline" 
-                onClick={handleSignOut}
-                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
-              >
-                <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Sign Out</span>
-                <span className="sm:hidden">Out</span>
-              </Button>
-              </div>{/* End of flex items-center gap-2 */}
-            </div>{/* End of flex items-center justify-between */}
-          </div>{/* End of flex flex-col sm:flex-row */}
-        </div>{/* End of container */}
-      </header>
-
-      <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
-        {/* Collapsible Dashboard */}
-        <div className="lg:w-80 xl:w-96">
-        <CollapsibleDashboard 
-          portfolio={portfolio}
-          locks={locks as any} // Type compatibility fix
-          onLockCreated={fetchUserData}
-        />
-        </div>
-
-        {/* Main Content - Earning Opportunities */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Member Status Banner - Compact */}
-            <MemberStatusBanner 
-              currentStatus={portfolio?.opportunity_status || 'starter'}
-              current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
-              availableNCTR={portfolio?.available_nctr || 0}
-              onUpgradeClick={() => {
-                // Scroll to lock commitment modal or trigger it
-                const lockButton = document.querySelector('[data-lock-commitment]');
-                if (lockButton) {
-                  (lockButton as HTMLElement).click();
-                }
-              }}
-              onEarnMoreClick={() => {
-                // Scroll to earning opportunities
-                const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
-                if (opportunitiesSection) {
-                  opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            />
-
-            {/* Profile Completion Banner */}
-            <div className="mb-6">
-              <ProfileCompletionBanner />
+    <SidebarProvider>
+      <div className="min-h-screen bg-gradient-page flex w-full">
+        <AppSidebar portfolio={portfolio} onLockCreated={fetchUserData} />
+        
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <header className="section-highlight backdrop-blur-sm border-b border-section-border">
+            <div className="container mx-auto px-4 py-3 sm:py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <SidebarTrigger className="mr-2" />
+                  <h1 className="text-xl sm:text-2xl font-bold nctr-text">
+                    The Garden
+                  </h1>
+                  <img 
+                    src={nctrLogo} 
+                    alt="NCTR" 
+                    className="h-16 sm:h-28 w-auto opacity-90"
+                  />
+                </div>
+              </div>
             </div>
+          </header>
 
-            {/* Earning Opportunities Section */}
-            <div data-earning-opportunities>
-              <div className="mb-8 sm:mb-12 text-center">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 nctr-glow">
-                  {getSetting?.('earning_opportunities_banner_title', 'Earning Opportunities') || 'Earning Opportunities'}
-                </h1>
-                <p className="text-base sm:text-lg lg:text-xl text-section-text/90 max-w-2xl mx-auto px-4 sm:px-0">
-                  {getSetting?.('earning_opportunities_banner_subtitle', 'Support NCTR Alliance partners and earn NCTR with every transaction') || 'Support NCTR Alliance partners and earn NCTR with every transaction'}
-                </p>
+          {/* Main Content - Earning Opportunities */}
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+              {/* Member Status Banner - Compact */}
+              <MemberStatusBanner 
+                currentStatus={portfolio?.opportunity_status || 'starter'}
+                current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
+                availableNCTR={portfolio?.available_nctr || 0}
+                onUpgradeClick={() => {
+                  // Scroll to lock commitment modal or trigger it
+                  const lockButton = document.querySelector('[data-lock-commitment]');
+                  if (lockButton) {
+                    (lockButton as HTMLElement).click();
+                  }
+                }}
+                onEarnMoreClick={() => {
+                  // Scroll to earning opportunities
+                  const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
+                  if (opportunitiesSection) {
+                    opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              />
+
+              {/* Profile Completion Banner */}
+              <div className="mb-6">
+                <ProfileCompletionBanner />
               </div>
 
-              {/* TOP PRIORITY: Invite Friends Opportunity */}
-              <div className="mb-8">
-                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-                  <CardContent className="p-4 space-y-4">
-                    
-                    {/* Header with Badge and Title */}
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <Users className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <Badge variant="secondary" className="mb-1 bg-primary text-primary-foreground text-xs px-2 py-0.5">
-                          🚀 TOP EARNER
-                        </Badge>
-                        <h2 className="text-lg font-bold text-foreground">Invite Friends & Earn Together</h2>
-                      </div>
-                    </div>
+              {/* Main Earning Opportunities */}
+              <div data-earning-opportunities>
+                <div className="mb-8 sm:mb-12 text-center">
+                  <h2 className="text-2xl sm:text-3xl font-bold section-heading mb-3 sm:mb-4">
+                    {getSetting('earning_opportunities_banner_title') || 'Turn Your Everyday Activities Into NCTR Rewards'}
+                  </h2>
+                  <p className="text-base sm:text-lg section-text max-w-3xl mx-auto">
+                    {getSetting('earning_opportunities_banner_subtitle') || 'Simple activities, real rewards – start earning today'}
+                  </p>
+                </div>
 
-                    {/* Reward Info */}
-                    <div className="text-center py-2">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <span className="text-xl font-bold text-green-500">1000 NCTR</span>
-                        <span className="text-sm text-foreground">each in</span>
-                        <span className="text-xl font-bold text-blue-500">360LOCK</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">Most popular way to earn</p>
-                    </div>
-
-                    {/* Action Button */}
-                    <Button 
-                      onClick={() => setInviteModalOpen(true)}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2.5 font-semibold"
-                    >
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Start Inviting Friends
-                    </Button>
-
-                    {/* Earnings Display */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="text-center py-3 bg-green-50 rounded-lg border border-green-100">
-                        <div className="flex items-center justify-center gap-1 mb-1">
-                          <span className="text-lg font-bold text-green-500">1000</span>
-                          <img src={nctrLogo} alt="NCTR" className="h-3 w-auto" />
+                {/* Invite Section - Premium Design */}
+                <div className="mb-8">
+                  {opportunities.filter(op => op.opportunity_type === 'invite').map(opportunity => (
+                    <Card key={opportunity.id} className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
+                      <CardContent className="p-6 sm:p-8">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <Users className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-primary mb-1">{opportunity.title}</h3>
+                            <p className="text-sm text-muted-foreground">{opportunity.description}</p>
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">for you</div>
-                      </div>
-                      
-                      <div className="text-center py-3 bg-green-50 rounded-lg border border-green-100">
-                        <div className="flex items-center justify-center gap-1 mb-1">
-                          <span className="text-lg font-bold text-green-500">1000</span>
-                          <img src={nctrLogo} alt="NCTR" className="h-3 w-auto" />
+
+                        <div className="text-center py-2">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <span className="text-2xl font-bold text-primary">{formatNCTR(opportunity.nctr_reward)} NCTR</span>
+                            <Badge className="bg-primary text-primary-foreground">360LOCK</Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Locked for maximum alliance benefits</p>
                         </div>
-                        <div className="text-xs text-muted-foreground">for friend</div>
-                      </div>
-                    </div>
 
-                    {/* Quick Share Options & Referral Code */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
                         <Button 
-                          onClick={copyInviteLink}
-                          variant="outline" 
-                          size="sm"
-                          className="h-10 w-10 border-primary/20 hover:bg-primary/5"
+                          className="w-full bg-primary hover:bg-primary-glow text-primary-foreground text-base py-6 group-hover:scale-[1.02] transition-all duration-300"
+                          size="lg"
                         >
-                          {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+                          {opportunity.title} →
                         </Button>
-                        
-                        <Button 
-                          onClick={shareViaWhatsApp}
-                          variant="outline" 
-                          size="sm"
-                          className="h-10 w-10 border-primary/20 hover:bg-primary/5"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                        </Button>
-                        
-                        <Button 
-                          onClick={shareViaEmail}
-                          variant="outline" 
-                          size="sm"
-                          className="h-10 w-10 border-primary/20 hover:bg-primary/5"
-                        >
-                          <Mail className="w-4 h-4" />
-                        </Button>
-                      </div>
 
-                      <div className="text-right">
-                        <div className="text-xs text-muted-foreground">Code</div>
-                        <Badge variant="outline" className="font-mono text-primary border-primary/30 px-2 py-0.5 text-xs">
-                          {referralCode}
-                        </Badge>
-                      </div>
-                    </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="text-center py-3 bg-green-50 rounded-lg border border-green-100">
+                            <div className="flex items-center justify-center gap-1 mb-1">
+                              <span className="text-lg font-bold text-green-600">{formatNCTR(opportunity.nctr_reward)}</span>
+                              <span className="text-xs text-green-600 font-semibold">NCTR</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">for you</div>
+                          </div>
 
+                          <div className="text-center py-3 bg-green-50 rounded-lg border border-green-100">
+                            <div className="flex items-center justify-center gap-1 mb-1">
+                              <span className="text-lg font-bold text-green-600">{formatNCTR(opportunity.nctr_reward)}</span>
+                              <span className="text-xs text-green-600 font-semibold">NCTR</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">for friend</div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            <Button onClick={(e) => { e.stopPropagation(); shareViaEmail(); }} variant="outline" size="sm" className="text-xs">
+                              <Mail className="w-3 h-3 mr-1" />
+                              Email
+                            </Button>
+                            <Button onClick={(e) => { e.stopPropagation(); shareViaText(); }} variant="outline" size="sm" className="text-xs">
+                              <MessageCircle className="w-3 h-3 mr-1" />
+                              Text
+                            </Button>
+                            <Button onClick={(e) => { e.stopPropagation(); shareViaWhatsApp(); }} variant="outline" size="sm" className="text-xs">
+                              <MessageCircle className="w-3 h-3 mr-1" />
+                              WhatsApp
+                            </Button>
+                          </div>
+
+                          <div className="text-right">
+                            <div className="text-xs text-muted-foreground">Code</div>
+                            <div className="text-sm font-mono font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
+                              {referralCode}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Shopping Opportunities */}
+                {opportunities.filter(op => op.opportunity_type === 'shopping').length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
+                      <div className="w-2 h-6 bg-green-500 rounded-full"></div>
+                      🟢 Live Opportunities
+                    </h3>
+                    {opportunities.filter(op => op.opportunity_type === 'shopping').map((opportunity) => (
+                      <Card 
+                        key={opportunity.id} 
+                        className="mb-4 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-4 border-l-green-500 bg-gradient-to-r from-green-50/50 to-transparent"
+                        onClick={() => handleOpportunityClick(opportunity)}
+                      >
+                        <CardContent className="p-0">
+                          <div className="flex flex-col lg:flex-row">
+                            <div className="relative">
+                              {opportunity.partner_logo_url && (
+                                <img 
+                                  src={opportunity.partner_logo_url} 
+                                  alt={opportunity.partner_name}
+                                  className="w-full lg:w-48 h-32 lg:h-auto object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none"
+                                />
+                              )}
+                              <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
+                                <Badge className="bg-green-600 text-white font-bold">
+                                  LIVE
+                                </Badge>
+                              </div>
+                            </div>
+
+                            <div className="p-4 sm:p-6 lg:p-8">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-4">
+                                <div className="flex items-center space-x-3 sm:space-x-4">
+                                  {opportunity.partner_logo_url && (
+                                    <img 
+                                      src={opportunity.partner_logo_url} 
+                                      alt={opportunity.partner_name}
+                                      className="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-lg bg-white p-2 shadow-sm"
+                                    />
+                                  )}
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="text-lg sm:text-xl font-semibold section-heading mb-1 truncate">
+                                      {opportunity.title}
+                                    </h3>
+                                    <p className="text-sm sm:text-base section-text line-clamp-2">
+                                      {opportunity.description}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                                <div className="bg-section-highlight rounded-xl p-4 sm:p-6 text-center">
+                                  <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
+                                    {opportunity.reward_per_dollar}% NCTR
+                                  </div>
+                                  <div className="text-xs sm:text-sm text-muted-foreground">Cashback on purchases</div>
+                                  <div className="text-xs text-primary mt-1">Automatically locked in 90LOCK</div>
+                                </div>
+                              </div>
+
+                              <Button 
+                                className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6"
+                                size="lg"
+                              >
+                                🛍️ Shop & Earn →
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Bonus Opportunities */}
+                <div className="space-y-8">
+                  <div className="text-center mb-12">
+                    <h3 className="text-2xl font-semibold section-heading mb-2">Complete & Earn</h3>
+                    <p className="section-text">Simple tasks for instant NCTR rewards</p>
+                  </div>
+
+                  <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
+                    {opportunities.filter(op => op.opportunity_type === 'bonus').map((opportunity) => (
+                      <Card 
+                        key={opportunity.id}
+                        className="cursor-pointer hover:shadow-medium transition-all duration-300 group bg-gradient-to-br from-white to-section-highlight border border-section-border hover:border-primary/30"
+                        onClick={() => handleOpportunityClick(opportunity)}
+                      >
+                        <CardContent className="p-6 sm:p-8">
+                          <div className="text-center mb-8">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4 group-hover:bg-primary/20 transition-colors">
+                              <Gift className="w-8 h-8 text-primary" />
+                            </div>
+                            <h3 className="text-xl font-semibold section-heading mb-2">{opportunity.title}</h3>
+                            <p className="section-text text-sm leading-relaxed">
+                              {opportunity.description}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-center mb-4">
+                            <div className="text-center">
+                              <div className="text-3xl font-bold text-primary mb-1">
+                                {formatNCTR(opportunity.nctr_reward)}
+                              </div>
+                              <div className="text-sm text-muted-foreground">NCTR Reward</div>
+                              <Badge variant="outline" className="mt-2 border-primary text-primary">
+                                360LOCK
+                              </Badge>
+                            </div>
+                          </div>
+
+                          {opportunity.video_url && (
+                            <div className="mb-8">
+                              <div className="relative rounded-2xl overflow-hidden shadow-large">
+                                <video 
+                                  className="w-full aspect-video object-cover"
+                                  controls
+                                  poster={opportunity.partner_logo_url}
+                                >
+                                  <source src={opportunity.video_url} type="video/mp4" />
+                                </video>
+                              </div>
+                              {opportunity.video_title && (
+                                <div className="mt-4 text-center">
+                                  <h4 className="font-semibold text-sm mb-1">{opportunity.video_title}</h4>
+                                  {opportunity.video_description && (
+                                    <p className="text-xs text-muted-foreground">{opportunity.video_description}</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <Button 
+                            className="w-full bg-primary hover:bg-primary-glow text-primary-foreground py-6 group-hover:scale-105 transition-all duration-300"
+                            size="lg"
+                          >
+                            Complete Task →
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Affiliate Links Section */}
+                <Card className="bg-gradient-to-br from-section-highlight to-white border border-section-border shadow-medium">
+                  <CardHeader>
+                    <CardTitle className="text-xl section-heading flex items-center gap-2">
+                      <ExternalLink className="w-5 h-5" />
+                      Partner Links & Opportunities
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <UserAffiliateLinks />
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Other Earning Opportunities */}
-              {opportunities.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
-                    Partner Shopping Opportunities
-                  </h2>
-                  <p className="text-center text-muted-foreground mb-8">
-                    Earn NCTR from your everyday purchases with our brand partners
-                  </p>
-                </div>
-              )}
-
-            {opportunities.length === 0 ? (
-              <Card className="bg-white border border-section-border shadow-soft">
-                <CardContent className="p-12 text-center">
-                  <Gift className="w-16 h-16 text-muted-foreground mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Partner Opportunities Available</h3>
-                  <p className="text-muted-foreground mb-4">We're working on bringing you amazing earning opportunities with top brands!</p>
-                  <p className="text-sm text-muted-foreground">Check back soon for exciting partnership launches.</p>
-                </CardContent>
-              </Card>
-            ) : opportunities.length === 1 ? (
-              // Single opportunity - Featured layout
-              <Card className="bg-white border-2 border-primary shadow-large hover:shadow-glow-intense transition-all duration-500 max-w-4xl mx-auto">
-                <CardContent className="p-0">
-                  {opportunities[0].video_url && (
-                    <div className="relative">
-                      <video 
-                        className="w-full h-48 sm:h-64 md:h-80 object-cover rounded-t-lg"
-                        controls
-                        poster={opportunities[0].partner_logo_url}
-                      >
-                        <source src={opportunities[0].video_url} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                      <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-                        <Badge variant="secondary" className="bg-primary/90 text-primary-foreground border-0 text-xs sm:text-sm">
-                          FEATURED
-                        </Badge>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="p-4 sm:p-6 lg:p-8">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-4">
-                      <div className="flex items-center space-x-3 sm:space-x-4">
-                        {opportunities[0].partner_logo_url ? (
-                          <img 
-                            src={opportunities[0].partner_logo_url} 
-                            alt={`${opportunities[0].partner_name} logo`}
-                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
-                          />
-                        ) : (
-                          <img 
-                            src={nctrNLogo}
-                            alt="The Garden Logo"
-                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover shadow-soft flex-shrink-0"
-                          />
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 truncate">{opportunities[0].title}</h2>
-                          {opportunities[0].partner_name && (
-                            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground truncate">{opportunities[0].partner_name}</p>
-                          )}
-                          <Badge variant="outline" className="mt-2 bg-section-highlight text-xs sm:text-sm">
-                            {opportunities[0].opportunity_type.replace('_', ' ').toUpperCase()}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-                      <div className="bg-section-highlight rounded-xl p-4 sm:p-6 text-center">
-                        <RewardDisplay 
-                          opportunity={opportunities[0]} 
-                          size="lg" 
-                          showPerDollar={true}
-                        />
-                      </div>
-                    </div>
-
-                    {opportunities[0].description && (
-                      <p className="text-sm sm:text-base lg:text-lg text-foreground leading-relaxed mb-4 sm:mb-6">
-                        {opportunities[0].description}
-                      </p>
-                    )}
-
-                    <Button 
-                      onClick={() => handleOpportunityClick(opportunities[0])}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg py-4 rounded-xl shadow-medium hover:shadow-large transition-all duration-300"
-                    >
-                      <ExternalLink className="w-5 h-5 mr-3" />
-                      Start Earning with {opportunities[0].partner_name || 'This Brand'}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : opportunities.length <= 3 ? (
-              // Few opportunities - Showcase layout with elegant spacing
-              <div className="space-y-8">
-                <div className="text-center mb-12">
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 mb-4 px-6 py-2 text-sm">
-                    {opportunities.length} Premium Opportunities Available
-                  </Badge>
-                </div>
-                
-                <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
-                  {opportunities.map((opportunity, index) => (
-                    <Card key={opportunity.id} className={`bg-white shadow-large hover:shadow-glow-intense transition-all duration-500 border-2 ${index === 0 ? 'border-primary' : 'border-section-border'} group flex flex-col h-full`}>
-                      <CardContent className="p-8 flex flex-col h-full">
-                        {/* Header with elegant spacing */}
-                        <div className="text-center mb-8">
-                          {index === 0 && (
-                            <Badge className="bg-primary text-primary-foreground border-0 mb-4 px-4 py-1">
-                              FEATURED OPPORTUNITY
-                            </Badge>
-                          )}
-                          
-                          <div className="flex items-center justify-center mb-4">
-                            {opportunity.partner_logo_url ? (
-                              <img 
-                                src={opportunity.partner_logo_url} 
-                                alt={`${opportunity.partner_name} logo`}
-                                className="w-16 h-16 rounded-2xl object-cover shadow-medium"
-                              />
-                            ) : (
-                              <img 
-                                src={nctrNLogo}
-                                alt="The Garden Logo"
-                                className="w-16 h-16 rounded-2xl object-cover shadow-medium"
-                              />
-                            )}
-                          </div>
-                          
-                          <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                            {opportunity.title}
-                          </h3>
-                          {opportunity.partner_name && (
-                            <p className="text-lg text-muted-foreground">{opportunity.partner_name}</p>
-                          )}
-                        </div>
-
-                        {/* Video Section with elegant presentation */}
-                        {opportunity.video_url && (
-                          <div className="mb-8">
-                            <div className="relative rounded-2xl overflow-hidden shadow-large">
-                              <video 
-                                className="w-full h-56 object-cover"
-                                controls
-                                poster={opportunity.partner_logo_url}
-                              >
-                                <source src={opportunity.video_url} type="video/mp4" />
-                              </video>
-                            </div>
-                            {(opportunity.video_title || opportunity.video_description) && (
-                              <div className="mt-4 text-center">
-                                {opportunity.video_title && (
-                                  <p className="font-medium text-foreground mb-1">{opportunity.video_title}</p>
-                                )}
-                                {opportunity.video_description && (
-                                  <p className="text-sm text-muted-foreground">{opportunity.video_description}</p>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Earning Display - Updated with RewardDisplay */}
-                        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-6 mb-6 text-center border border-primary/20 min-h-[140px] flex flex-col justify-center">
-                          <RewardDisplay 
-                            opportunity={opportunity} 
-                            size="md" 
-                            showPerDollar={true}
-                          />
-                        </div>
-
-                        {/* Description with elegant typography */}
-                        <div className="flex-grow mb-6">
-                          {opportunity.description && (
-                            <p className="text-foreground leading-relaxed text-center">
-                              {opportunity.description}
-                            </p>
-                          )}
-                        </div>
-
-                         {/* CTA Button - Consistent size and alignment */}
-                         <div className="mt-auto">
-                           <Button 
-                             onClick={() => handleOpportunityClick(opportunity)}
-                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-3 h-12 rounded-2xl shadow-large hover:shadow-glow-intense transition-all duration-300 group-hover:scale-[1.02]"
-                           >
-                             <ExternalLink className="w-5 h-5 mr-2 flex-shrink-0" />
-                             <span className="truncate">Start Earning</span>
-                           </Button>
-                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+              {/* Community Section - Refreshed */}
+              <div className="mt-12" data-referral-system key="referral-system-updated">
+                <ReferralSystem />
               </div>
-            ) : (
-              // Many opportunities - Grid layout with filters
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <div className="text-center sm:text-left">
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                      {opportunities.length} Opportunities Available
-                    </Badge>
-                  </div>
-                  
-                  <div className="flex gap-2 flex-wrap">
-                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">All</Badge>
-                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">Shopping</Badge>
-                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">Partner</Badge>
-                    <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">Bonus</Badge>
-                  </div>
-                </div>
-
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {opportunities.map((opportunity, index) => (
-                    <Card key={opportunity.id} className="bg-white border border-section-border shadow-soft hover:shadow-medium transition-all duration-300 group flex flex-col">
-                      <CardContent className="p-6 flex flex-col h-full">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            {opportunity.partner_logo_url ? (
-                              <img 
-                                src={opportunity.partner_logo_url} 
-                                alt={`${opportunity.partner_name} logo`}
-                                className="w-10 h-10 rounded-lg object-cover"
-                              />
-                            ) : (
-                              <img 
-                                src={nctrNLogo}
-                                alt="The Garden Logo"
-                                className="w-10 h-10 rounded-lg object-cover"
-                              />
-                            )}
-                            <div>
-                              <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                                {opportunity.title}
-                              </h4>
-                              {opportunity.partner_name && (
-                                <p className="text-xs text-muted-foreground">{opportunity.partner_name}</p>
-                              )}
-                            </div>
-                          </div>
-                          {opportunity.video_url && (
-                            <div className="text-section-accent">
-                              <Play className="w-4 h-4" />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* NCTR Display - Updated with RewardDisplay */}
-                        <div className="bg-section-highlight rounded-lg p-4 mb-4 text-center min-h-[80px] flex flex-col justify-center flex-grow">
-                          <RewardDisplay 
-                            opportunity={opportunity} 
-                            size="sm" 
-                            showPerDollar={true}
-                          />
-                        </div>
-
-                         {/* Button - Consistent alignment */}
-                         <div className="mt-auto">
-                           <Button 
-                             onClick={() => handleOpportunityClick(opportunity)}
-                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm py-2 h-10 rounded-lg group-hover:shadow-medium transition-all duration-300"
-                           >
-                             <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
-                             <span className="truncate">Earn Now</span>
-                           </Button>
-                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Affiliate Links Section */}
-            <div className="mt-12" data-affiliate-links>
-              <Card className="bg-white border-2 border-primary shadow-soft">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-xl text-foreground">
-                    <Link className="w-5 h-5" />
-                    Your Personalized Affiliate Links
-                  </CardTitle>
-                  <p className="text-muted-foreground">
-                    Generate trackable links that credit earnings directly to your Garden account
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <UserAffiliateLinks />
-                </CardContent>
-              </Card>
             </div>
-
-            {/* Community Section - Refreshed */}
-            <div className="mt-12" data-referral-system key="referral-system-updated">
-              <ReferralSystem />
-            </div>
-            </div>
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
 
       {/* Invite Friends Modal */}
@@ -1008,7 +809,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </SidebarProvider>
   );
 };
 
