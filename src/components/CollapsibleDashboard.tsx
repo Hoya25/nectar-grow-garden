@@ -368,7 +368,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
       <BatchLockUpgrade 
         locks={locks}
         onUpgradeComplete={onLockCreated}
-        show90LockTotal={portfolio?.lock_90_nctr}
+        availableNCTR={portfolio?.available_nctr}
       />
 
       {/* Wallet Connection - Conditional Priority */}

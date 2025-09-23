@@ -596,6 +596,10 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      commit_all_nctr_to_360lock: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       commit_available_to_360lock: {
         Args: { p_amount: number; p_user_id: string }
         Returns: Json
