@@ -51,16 +51,6 @@ export const RewardDisplay = ({
                        (opportunity.lock_90_nctr_reward || 0) > 0 || 
                        (opportunity.lock_360_nctr_reward || 0) > 0;
 
-  // Debug logging
-  console.log('RewardDisplay Debug:', {
-    isInviteOpportunity,
-    userMultiplier,
-    userStatus,
-    shouldUseStatusColor: isInviteOpportunity && userMultiplier > 1,
-    opportunityType: opportunity.opportunity_type,
-    hasNewRewards
-  });
-
   // Size configurations
   const sizeConfigs = {
     sm: {
@@ -104,7 +94,9 @@ export const RewardDisplay = ({
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
-              <div className={`${config.perDollarText} text-muted-foreground`}>per $1 spent</div>
+              <div className={`${config.perDollarText} text-muted-foreground`}>
+                {isInviteOpportunity ? 'per friend who joins' : 'per $1 spent'}
+              </div>
             </div>
           )}
           
