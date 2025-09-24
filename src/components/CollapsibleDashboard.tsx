@@ -309,11 +309,11 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
             <div className="mt-3 pt-3 border-t border-section-border">
               <p className="text-xs text-muted-foreground mb-1">Total Portfolio Value</p>
               <p className="text-lg font-bold text-primary">
-                ${formatPrice(calculatePortfolioValue(
+                {formatUSD(
                   (portfolio?.available_nctr || 0) + 
                   (portfolio?.lock_90_nctr || 0) + 
                   (portfolio?.lock_360_nctr || 0)
-                ))}
+                )}
               </p>
               <p className="text-xs text-muted-foreground">
                 {formatNCTR(
