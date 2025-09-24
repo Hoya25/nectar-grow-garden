@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const { error: mailchimpError } = await supabaseClient.functions.invoke('mailchimp-integration', {
             body: {
               action: 'subscribe',
-              listId: 'REPLACE_WITH_YOUR_AUDIENCE_ID', // Replace with actual list ID
+              listId: 'ac31586d64', // Your Mailchimp Audience ID
               contact: {
                 email,
                 firstName,
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             await supabaseClient.functions.invoke('mailchimp-integration', {
               body: {
                 action: 'send_confirmation',
-                listId: 'REPLACE_WITH_YOUR_AUDIENCE_ID', // Replace with actual list ID
+                listId: 'ac31586d64', // Your Mailchimp Audience ID
                 contact: { email, firstName, lastName },
                 emailTemplate: {
                   templateId: 123, // Replace with actual template ID
