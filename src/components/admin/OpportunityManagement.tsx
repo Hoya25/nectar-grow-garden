@@ -135,7 +135,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       const { data, error } = await supabase
         .from('earning_opportunities')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
       setOpportunities(data || []);
@@ -184,6 +185,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                          (opp.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     const matchesType = filterType === 'all' || opp.opportunity_type === filterType;
     return matchesSearch && matchesType;
+  }).sort((a, b) => {
+    // Sort by display_order first, then by created_at as fallback
+    if (a.display_order !== b.display_order) {
+      return (a.display_order || 0) - (b.display_order || 0);
+    }
+    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
   });
 
   const resetForm = () => {
