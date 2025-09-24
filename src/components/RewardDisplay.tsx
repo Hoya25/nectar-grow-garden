@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import nctrLogo from "@/assets/nctr-logo-grey.png";
+import nctrLogo from "@/assets/nctr-logo-dark.png";
 
 interface RewardDisplayProps {
   opportunity: {

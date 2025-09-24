@@ -1049,11 +1049,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     <div className="text-center py-4 mb-4">
                       {/* Total Available Bonus */}
                       <div className="flex items-center justify-center gap-2 mb-3">
-                        <span className="text-3xl font-bold text-green-600">
+                        <span className="text-2xl font-bold text-primary">
                           {(() => {
                             const total = (opportunity.available_nctr_reward || 0) + 
-                                        (opportunity.lock_90_nctr_reward || 0) + 
-                                        (opportunity.lock_360_nctr_reward || 0);
+                                         (opportunity.lock_90_nctr_reward || 0) + 
+                                         (opportunity.lock_360_nctr_reward || 0);
                             return formatNCTR(total || 50);
                           })()} NCTR
                         </span>
@@ -1232,12 +1232,13 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                          <div className="text-center mb-4 sm:mb-6">
                            {/* Total NCTR Earn Opportunity */}
-                           <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-                             {(() => {
-                               const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                               const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
-                               return formatNCTR(totalReward);
-                             })()} NCTR
+                            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
+                              {(() => {
+                                const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                                const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
+                                return formatNCTR(totalReward);
+                              })()} NCTR
+                            </div>
                            </div>
                            <div className="text-xs sm:text-sm text-muted-foreground mb-4">Per $1 Spent</div>
                            
@@ -1338,6 +1339,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                               const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
                               return formatNCTR(totalReward);
                             })()} NCTR
+                          </div>
                           </div>
                           <div className="text-xs text-muted-foreground mb-3">Per $1 Spent</div>
                           
