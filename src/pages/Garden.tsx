@@ -964,12 +964,40 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   </div>
 
                   <div className="text-center py-4 mb-4">
+                    {/* Total Available Bonus */}
                     <div className="flex items-center justify-center gap-2 mb-3">
                       <span className="text-3xl font-bold text-green-600">
-                        {formatNCTR(opportunity.available_nctr_reward || 50)} NCTR
+                        {(() => {
+                          const total = (opportunity.available_nctr_reward || 0) + 
+                                      (opportunity.lock_90_nctr_reward || 0) + 
+                                      (opportunity.lock_360_nctr_reward || 0);
+                          return formatNCTR(total || 50);
+                        })()} NCTR
                       </span>
                     </div>
-                    <p className="text-sm text-green-600 mb-4">Daily Available Bonus</p>
+                    <p className="text-sm text-green-600 mb-4">Total Available Bonus</p>
+                    
+                    {/* Reward Breakdown */}
+                    <div className="bg-white/50 rounded-lg p-3 mb-4">
+                      <p className="text-xs font-semibold text-green-700 mb-2">Daily Reward Breakdown:</p>
+                      <div className="flex flex-wrap justify-center gap-2 text-xs">
+                        {(opportunity.available_nctr_reward || 0) > 0 && (
+                          <span className="bg-green-200 text-green-800 px-2 py-1 rounded-full">
+                            {formatNCTR(opportunity.available_nctr_reward || 0)} Active
+                          </span>
+                        )}
+                        {(opportunity.lock_90_nctr_reward || 0) > 0 && (
+                          <span className="bg-orange-200 text-orange-800 px-2 py-1 rounded-full">
+                            {formatNCTR(opportunity.lock_90_nctr_reward || 0)} 90LOCK
+                          </span>
+                        )}
+                        {(opportunity.lock_360_nctr_reward || 0) > 0 && (
+                          <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded-full">
+                            {formatNCTR(opportunity.lock_360_nctr_reward || 0)} 360LOCK
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     
                     <RewardDisplay opportunity={opportunity} size="md" />
                   </div>
