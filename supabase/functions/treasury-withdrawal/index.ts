@@ -109,8 +109,8 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
       throw new Error('Insufficient treasury balance')
     }
 
-    // Execute the transfer (no gas fee calculation needed)
-    console.log(`💸 Sending ${withdrawal.net_amount_nctr} NCTR to ${withdrawal.wallet_address}`)
+    // Execute the transfer (completely fee-free)
+    console.log(`💸 Sending ${withdrawal.net_amount_nctr} NCTR to ${withdrawal.wallet_address} (fee-free withdrawal)`)
     const tx = await nctrContract.transfer(withdrawal.wallet_address, amountInWei)
     
     console.log(`📋 Transaction hash: ${tx.hash}`)
