@@ -1234,7 +1234,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     )}
                     
                     {/* Bounty Breakdown */}
-                    <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
+                    <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
                   </div>
 
                   <Button 
@@ -1365,7 +1365,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                             )}
                            
                            {/* Bounty Breakdown */}
-                           <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
+                           <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
                          </div>
 
                         <Button 
@@ -1480,7 +1480,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                           )}
                           
                           {/* Bounty Breakdown */}
-                          <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} />
+                          <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
                         </div>
 
                         <Button 

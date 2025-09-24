@@ -9,15 +9,20 @@ interface RewardDisplayProps {
     lock_90_nctr_reward?: number;
     lock_360_nctr_reward?: number;
     reward_distribution_type?: string;
+    opportunity_type?: string;
   };
   size?: 'sm' | 'md' | 'lg';
   showPerDollar?: boolean;
+  userMultiplier?: number;
+  userStatus?: string;
 }
 
 export const RewardDisplay = ({ 
   opportunity, 
   size = 'md', 
-  showPerDollar = true 
+  showPerDollar = true,
+  userMultiplier = 1,
+  userStatus = 'starter'
 }: RewardDisplayProps) => {
   const formatNCTR = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -25,6 +30,18 @@ export const RewardDisplay = ({
       maximumFractionDigits: 0,
     }).format(Math.floor(amount));
   };
+
+  const getStatusTextColor = (status: string) => {
+    switch (status) {
+      case 'vip': return 'text-yellow-500';
+      case 'premium': return 'text-purple-500';
+      case 'platinum': return 'text-purple-500';
+      case 'advanced': return 'text-blue-500';
+      default: return 'text-primary';
+    }
+  };
+
+  const isInviteOpportunity = opportunity.opportunity_type === 'invite';
 
   const isLegacyReward = opportunity.reward_distribution_type === 'legacy' || 
                         (!opportunity.reward_distribution_type && 
@@ -72,8 +89,8 @@ export const RewardDisplay = ({
           {showPerDollar && opportunity.reward_per_dollar > 0 && (
             <div className="text-center">
               <div className={config.flex + ' justify-center'}>
-                <span className={`${config.amountText} text-primary`}>
-                  {formatNCTR(opportunity.reward_per_dollar)}
+                <span className={`${config.amountText} ${isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary'}`}>
+                  {formatNCTR(opportunity.reward_per_dollar * userMultiplier)}
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
@@ -84,8 +101,8 @@ export const RewardDisplay = ({
           {opportunity.nctr_reward > 0 && (
             <div className="bg-primary/10 rounded-lg p-3 text-center border border-primary/20">
               <div className={config.flex + ' justify-center mb-1'}>
-                <span className={`${config.amountText} text-primary`}>
-                  +{formatNCTR(opportunity.nctr_reward)}
+                <span className={`${config.amountText} ${isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary'}`}>
+                  +{formatNCTR(opportunity.nctr_reward * userMultiplier)}
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
@@ -105,19 +122,19 @@ export const RewardDisplay = ({
             {(opportunity.available_nctr_reward || 0) > 0 && (
               <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                {formatNCTR(opportunity.available_nctr_reward)} Available
+                {formatNCTR((opportunity.available_nctr_reward || 0) * userMultiplier)} Available
               </Badge>
             )}
             {(opportunity.lock_90_nctr_reward || 0) > 0 && (
               <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
                 <div className="w-2 h-2 bg-orange-500 rounded-full mr-1"></div>
-                {formatNCTR(opportunity.lock_90_nctr_reward)} 90LOCK
+                {formatNCTR((opportunity.lock_90_nctr_reward || 0) * userMultiplier)} 90LOCK
               </Badge>
             )}
             {(opportunity.lock_360_nctr_reward || 0) > 0 && (
               <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                {formatNCTR(opportunity.lock_360_nctr_reward)} 360LOCK
+                {formatNCTR((opportunity.lock_360_nctr_reward || 0) * userMultiplier)} 360LOCK
               </Badge>
             )}
           </div>
@@ -125,8 +142,8 @@ export const RewardDisplay = ({
           {showPerDollar && opportunity.reward_per_dollar > 0 && (
             <div className="text-center">
               <div className={config.flex + ' justify-center'}>
-                <span className={`${config.amountText} text-green-600`}>
-                  +{formatNCTR(opportunity.reward_per_dollar)}
+                <span className={`${config.amountText} ${isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-green-600'}`}>
+                  +{formatNCTR((opportunity.reward_per_dollar || 0) * userMultiplier)}
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
