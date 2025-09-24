@@ -829,6 +829,10 @@ export type Database = {
         Args: { x: number }
         Returns: number
       }
+      get_admin_financial_access: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       get_admin_profiles_safe: {
         Args: Record<PropertyKey, never>
         Returns: {
