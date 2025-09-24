@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -47,7 +47,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
     }
   }, [user]);
 
-  const fetchUserReferrals = async () => {
+  const fetchUserReferrals = useCallback(async () => {
     if (!user) {
       console.log('No user available for fetching referrals');
       return;
@@ -143,7 +143,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, isOpen, toast]);
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(referralCode);
@@ -164,11 +164,12 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
 
   // Fetch referrals when modal opens
   useEffect(() => {
+    console.log('Effect triggered - isOpen:', isOpen, 'user:', !!user, 'user.id:', user?.id);
     if (isOpen && user) {
-      console.log('Modal opened, triggering fetchUserReferrals');
+      console.log('Modal opened, triggering fetchUserReferrals for user:', user.id);
       fetchUserReferrals();
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, fetchUserReferrals]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
@@ -184,6 +185,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
             <Users className="w-5 h-5" />
             My Invites ({stats.total})
           </DialogTitle>
+          <div className="sr-only">View your invite history and track referral rewards</div>
         </DialogHeader>
 
         {loading ? (
