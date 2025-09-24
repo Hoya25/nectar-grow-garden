@@ -38,6 +38,7 @@ import AffiliateLinksManagement from '@/components/admin/AffiliateLinksManagemen
 import SecurityMonitor from '@/components/admin/SecurityMonitor';
 import EmergencyActions from '@/components/admin/EmergencyActions';
 import SecurityStatus from '@/components/admin/SecurityStatus';
+import ReferralTestComponent from '@/components/admin/ReferralTestComponent';
 
 interface AdminStats {
   total_users: number;
@@ -314,6 +315,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="referrals">
+            <ReferralTestComponent />
             <ReferralManagement />
           </TabsContent>
 

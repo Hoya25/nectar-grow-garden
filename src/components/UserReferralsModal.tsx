@@ -81,12 +81,19 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
 
       // Get profile data for referred users
       const userIds = referralsData.map(r => r.referred_user_id);
+      console.log('Fetching profiles for user IDs:', userIds);
+      
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .in('user_id', userIds);
 
-      console.log('Profiles data:', profilesData);
+      console.log('Profiles data result:', profilesData, 'Error:', profilesError);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        // Don't throw here, just continue with empty profile data
+      }
 
       // Combine referral and profile data
       const enrichedReferrals = referralsData.map(referral => {

@@ -1010,6 +1010,23 @@ export type Database = {
           wallet_connected_at: string
         }[]
       }
+      get_user_referrals_with_names: {
+        Args: { p_user_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          referee_email: string
+          referee_name: string
+          referral_code: string
+          referred_user_id: string
+          referrer_email: string
+          referrer_name: string
+          referrer_user_id: string
+          reward_credited: boolean
+          rewarded_at: string
+          status: string
+        }[]
+      }
       get_user_status_details: {
         Args: { target_user_id?: string }
         Returns: {

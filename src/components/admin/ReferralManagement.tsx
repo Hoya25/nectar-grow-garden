@@ -47,53 +47,31 @@ const ReferralManagement = () => {
     try {
       setLoading(true);
 
-      // Fetch referrals
-      const { data: referralsData, error } = await supabase
-        .from('referrals')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Get unique user IDs
-      const userIds = new Set<string>();
-      referralsData?.forEach(referral => {
-        userIds.add(referral.referrer_user_id);
-        userIds.add(referral.referred_user_id);
+      // Use the new database function to get referrals with names
+      const { data: referralsData, error } = await supabase.rpc('get_user_referrals_with_names', {
+        p_user_id: null // Pass null to get all referrals for admin view
       });
 
-      // Fetch profile data for all users
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, email, avatar_url')
-        .in('user_id', Array.from(userIds));
+      if (error) {
+        console.error('Error fetching referral data with names:', error);
+        throw error;
+      }
 
-      if (profilesError) throw profilesError;
-
-      // Create profile lookup map
-      const profileMap: Record<string, any> = {};
-      profilesData?.forEach(profile => {
-        profileMap[profile.user_id] = profile;
-      });
+      console.log('Fetched referrals with names:', referralsData);
 
       // Transform data for display
-      const transformedReferrals: ReferralData[] = (referralsData || []).map(referral => {
-        const referrerProfile = profileMap[referral.referrer_user_id];
-        const refereeProfile = profileMap[referral.referred_user_id];
-        
-        return {
-          id: referral.id,
-          referral_code: referral.referral_code,
-          status: referral.status,
-          reward_credited: referral.reward_credited,
-          created_at: referral.created_at,
-          rewarded_at: referral.rewarded_at,
-          referrer_name: referrerProfile?.full_name || null,
-          referrer_email: referrerProfile?.email || '',
-          referee_name: refereeProfile?.full_name || null,
-          referee_email: refereeProfile?.email || ''
-        };
-      });
+      const transformedReferrals: ReferralData[] = (referralsData || []).map(referral => ({
+        id: referral.id,
+        referral_code: referral.referral_code,
+        status: referral.status,
+        reward_credited: referral.reward_credited,
+        created_at: referral.created_at,
+        rewarded_at: referral.rewarded_at,
+        referrer_name: referral.referrer_name || null,
+        referrer_email: referral.referrer_email || '',
+        referee_name: referral.referee_name || null,
+        referee_email: referral.referee_email || ''
+      }));
 
       setReferrals(transformedReferrals);
 
