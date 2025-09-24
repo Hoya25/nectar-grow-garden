@@ -24,13 +24,11 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
   const { toast } = useToast();
 
   const calculateFees = (withdrawalAmount: number) => {
-    const withdrawalFeePercent = 0.02; // 2%
-    const gasFee = 0.5; // Fixed gas fee
-    const withdrawalFee = withdrawalAmount * withdrawalFeePercent;
-    const netAmount = withdrawalAmount - withdrawalFee - gasFee;
+    const gasFee = 0.5; // Fixed gas fee only
+    const netAmount = withdrawalAmount - gasFee;
     
     setFees({
-      withdrawalFee,
+      withdrawalFee: 0, // No withdrawal fee
       gasFee,
       netAmount: Math.max(0, netAmount)
     });
@@ -198,10 +196,6 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
                 <span>{parseFloat(amount).toFixed(2)} NCTR</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Withdrawal Fee (2%):</span>
-                <span>-{fees.withdrawalFee.toFixed(2)} NCTR</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
                 <span>Gas Fee:</span>
                 <span>-{fees.gasFee.toFixed(2)} NCTR</span>
               </div>
@@ -216,7 +210,7 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                The withdrawal amount is too small after fees. Minimum withdrawal is approximately 3 NCTR.
+                The withdrawal amount is too small after gas fees. Minimum withdrawal is 1 NCTR.
               </AlertDescription>
             </Alert>
           )}
