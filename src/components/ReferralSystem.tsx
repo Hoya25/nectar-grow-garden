@@ -78,17 +78,22 @@ const ReferralSystem = () => {
 
       if (statusError) throw statusError;
 
-      setUserStatus({
+      const newStatus = {
         opportunity_status: portfolio?.opportunity_status || 'starter',
         reward_multiplier: statusLevel?.reward_multiplier || 1.0
-      });
+      };
+
+      console.log('ReferralSystem: User status updated:', newStatus);
+      setUserStatus(newStatus);
     } catch (error) {
       console.error('Error fetching user status:', error);
       // Default to starter status
-      setUserStatus({
+      const defaultStatus = {
         opportunity_status: 'starter',
         reward_multiplier: 1.0
-      });
+      };
+      console.log('ReferralSystem: Using default status:', defaultStatus);
+      setUserStatus(defaultStatus);
     }
   };
 
@@ -250,7 +255,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and 
           <div className="text-center py-4 bg-primary/5 rounded-xl">
             <div className="flex items-center justify-center gap-1 mb-1">
               <span className="text-2xl font-bold text-primary">
-                {Math.round(1000 * userStatus.reward_multiplier)}
+                {Math.round(1000 * (userStatus.reward_multiplier || 1))}
               </span>
               <img src={nctrLogo} alt="NCTR" className="h-4 w-auto" />
             </div>
