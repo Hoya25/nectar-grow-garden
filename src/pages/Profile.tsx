@@ -354,7 +354,7 @@ const Profile = () => {
       case 'bronze': return 'bg-amber-700';
       case 'silver': return 'bg-gray-400';
       case 'gold': return 'bg-yellow-500';
-      case 'platinum': return 'bg-purple-600';
+      case 'platinum': return 'bg-slate-400';
       case 'diamond': return 'bg-blue-500';
       default: return 'bg-gray-600';
     }

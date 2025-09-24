@@ -35,7 +35,7 @@ export const RewardDisplay = ({
     switch (status) {
       case 'vip': return 'text-yellow-500';
       case 'premium': return 'text-purple-500';
-      case 'platinum': return 'text-purple-500';
+      case 'platinum': return 'text-slate-300';
       case 'advanced': return 'text-blue-500';
       default: return 'text-primary';
     }

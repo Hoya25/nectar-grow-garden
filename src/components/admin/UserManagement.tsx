@@ -178,6 +178,7 @@ const UserManagement = () => {
     switch (status) {
       case 'vip': return 'bg-gradient-to-r from-yellow-400 to-yellow-600';
       case 'premium': return 'bg-gradient-to-r from-purple-400 to-purple-600';
+      case 'platinum': return 'bg-gradient-to-r from-slate-300 to-slate-400';
       case 'advanced': return 'bg-gradient-to-r from-blue-400 to-blue-600';
       default: return 'bg-gradient-to-r from-green-400 to-green-600';
     }

@@ -236,6 +236,7 @@ const ProfileModal = ({ children }: ProfileModalProps) => {
       case 'starter': return 'bg-gray-500';
       case 'advanced': return 'bg-blue-500';
       case 'premium': return 'bg-purple-500';
+      case 'platinum': return 'bg-slate-400';
       case 'vip': return 'bg-yellow-500';
       default: return 'bg-gray-500';
     }

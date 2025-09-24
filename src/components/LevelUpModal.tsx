@@ -256,21 +256,21 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
 
               {/* Platinum Level */}
               {current360NCTR < 10000 && (
-                <Card className="border border-purple-200 bg-gradient-to-r from-purple-50/50 to-purple-100/50">
+                <Card className="border border-slate-200 bg-gradient-to-r from-slate-50/50 to-slate-100/50">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
                           <Trophy className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-purple-800">PLATINUM ALLIANCE</h4>
-                          <p className="text-sm text-purple-700">1.5x Earning Amplification • 50% Boost • 10,000 NCTR in 360LOCK</p>
+                          <h4 className="font-semibold text-slate-700">PLATINUM ALLIANCE</h4>
+                          <p className="text-sm text-slate-600">1.5x Earning Amplification • 50% Boost • 10,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <BuyNCTRButton
                         suggestedAmount={Math.max(1, 10000 - current360NCTR)}
-                        className="bg-purple-600 hover:bg-purple-700 text-white border-0"
+                        className="bg-slate-500 hover:bg-slate-600 text-white border-0"
                       >
                         Buy {formatNCTR(Math.max(1, 10000 - current360NCTR))} NCTR
                       </BuyNCTRButton>

@@ -43,7 +43,7 @@ const getStatusColor = (status: string) => {
     case 'bronze': return 'from-amber-600 to-amber-800';
     case 'silver': return 'from-gray-400 to-gray-600';
     case 'gold': return 'from-yellow-400 to-yellow-600';
-    case 'platinum': return 'from-purple-400 to-purple-600';
+    case 'platinum': return 'from-slate-300 to-slate-400';
     case 'diamond': return 'from-blue-400 to-blue-600';
     default: return 'from-green-400 to-green-600';
   }
@@ -55,7 +55,7 @@ const getStatusGlow = (status: string) => {
     case 'bronze': return 'shadow-amber-500/20';
     case 'silver': return 'shadow-gray-500/20';
     case 'gold': return 'shadow-yellow-500/20';
-    case 'platinum': return 'shadow-purple-500/20';
+    case 'platinum': return 'shadow-slate-400/20';
     case 'diamond': return 'shadow-blue-500/20';
     default: return 'shadow-green-500/20';
   }
