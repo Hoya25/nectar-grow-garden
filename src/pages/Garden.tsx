@@ -88,6 +88,7 @@ const Garden = () => {
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [withdrawalModalOpen, setWithdrawalModalOpen] = useState(false);
+  const [userMultiplier, setUserMultiplier] = useState(1.0);
   const [copied, setCopied] = useState(false);
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
@@ -166,12 +167,13 @@ const Garden = () => {
   };
 
   const shareViaEmail = () => {
+    const userReward = Math.round(1000 * userMultiplier);
     const subject = "Join The Garden and Start Earning NCTR!";
     const body = `Hey! I wanted to invite you to join The Garden, where you can earn NCTR tokens through everyday activities.
 
 Use my referral link to get started: ${getReferralLink()}
 
-We both earn 1000 NCTR in 360LOCK when you sign up!`;
+I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
@@ -199,6 +201,19 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         console.error('Portfolio error:', portfolioError);
       } else {
         setPortfolio(portfolioData);
+        
+        // Fetch user's reward multiplier based on their status
+        if (portfolioData?.opportunity_status) {
+          const { data: statusLevel, error: statusError } = await supabase
+            .from('opportunity_status_levels')
+            .select('reward_multiplier')
+            .eq('status_name', portfolioData.opportunity_status)
+            .single();
+
+          if (!statusError && statusLevel) {
+            setUserMultiplier(statusLevel.reward_multiplier || 1.0);
+          }
+        }
       }
 
       // Fetch lock commitments
@@ -561,10 +576,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
   const handleInviteOpportunity = (opportunity: EarningOpportunity) => {
     // For invite opportunities, open a direct share link modal
+    const userReward = Math.round(1000 * userMultiplier);
     setInviteModalOpen(true);
     toast({
       title: "🎉 Invite Friends",
-      description: "Share your link and earn 1000 NCTR in 360LOCK for each friend who joins!",
+      description: `Share your link and earn ${userReward} NCTR in 360LOCK for each friend who joins!`,
     });
   };
 
@@ -1486,7 +1502,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           <DialogHeader>
             <DialogTitle className="flex items-center text-base sm:text-lg">
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              🎉 Invite Friends & Earn 1000 NCTR in 360LOCK
+              🎉 Invite Friends & Earn {Math.round(1000 * userMultiplier)} NCTR in 360LOCK
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -1495,7 +1511,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               <ul className="text-xs sm:text-sm space-y-1 text-muted-foreground">
                 <li>• Share your unique link below</li>
                 <li>• Friends join using your link</li>
-                <li>• You both earn 1000 NCTR in 360LOCK instantly!</li>
+                <li>• You earn {Math.round(1000 * userMultiplier)} NCTR {userMultiplier > 1 && `(${userMultiplier}x Wings bonus)`} & they get 1000 NCTR in 360LOCK!</li>
               </ul>
             </div>
             

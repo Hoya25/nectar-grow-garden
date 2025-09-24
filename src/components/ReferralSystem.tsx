@@ -15,6 +15,11 @@ interface ReferralStats {
   total_earned_from_referrals: number;
 }
 
+interface UserStatus {
+  opportunity_status: string;
+  reward_multiplier: number;
+}
+
 const ReferralSystem = () => {
   console.log('ReferralSystem component rendering - updated version');
   const { user } = useAuth();
@@ -24,12 +29,17 @@ const ReferralSystem = () => {
     pending_rewards: 0,
     total_earned_from_referrals: 0
   });
+  const [userStatus, setUserStatus] = useState<UserStatus>({
+    opportunity_status: 'starter',
+    reward_multiplier: 1.0
+  });
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (user) {
       generateReferralCode();
       fetchReferralStats();
+      fetchUserStatus();
     }
   }, [user]);
 
@@ -37,6 +47,42 @@ const ReferralSystem = () => {
     if (user) {
       const code = user.id.slice(0, 8).toUpperCase();
       setReferralCode(code);
+    }
+  };
+
+  const fetchUserStatus = async () => {
+    if (!user) return;
+
+    try {
+      // First get the portfolio
+      const { data: portfolio, error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .select('opportunity_status')
+        .eq('user_id', user.id)
+        .single();
+
+      if (portfolioError) throw portfolioError;
+
+      // Then get the status level details
+      const { data: statusLevel, error: statusError } = await supabase
+        .from('opportunity_status_levels')
+        .select('reward_multiplier')
+        .eq('status_name', portfolio?.opportunity_status || 'starter')
+        .single();
+
+      if (statusError) throw statusError;
+
+      setUserStatus({
+        opportunity_status: portfolio?.opportunity_status || 'starter',
+        reward_multiplier: statusLevel?.reward_multiplier || 1.0
+      });
+    } catch (error) {
+      console.error('Error fetching user status:', error);
+      // Default to starter status
+      setUserStatus({
+        opportunity_status: 'starter',
+        reward_multiplier: 1.0
+      });
     }
   };
 
@@ -65,7 +111,7 @@ const ReferralSystem = () => {
 
       setReferralStats({
         total_referrals: completedReferrals,
-        pending_rewards: pendingReferrals * 1000,
+        pending_rewards: pendingReferrals * (1000 * userStatus.reward_multiplier),
         total_earned_from_referrals: totalEarned
       });
     } catch (error) {
@@ -103,12 +149,13 @@ const ReferralSystem = () => {
   };
 
   const shareViaEmail = () => {
+    const userReward = Math.round(1000 * userStatus.reward_multiplier);
     const subject = "Join The Garden and Start Earning NCTR!";
     const body = `Hey! I wanted to invite you to join The Garden, where you can earn NCTR tokens through everyday activities like shopping.
 
 Use my referral link to get started: ${getReferralLink()}
 
-We both earn 1000 NCTR in 360LOCK when you sign up and start participating!`;
+I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and start participating!`;
     
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
@@ -119,7 +166,8 @@ We both earn 1000 NCTR in 360LOCK when you sign up and start participating!`;
   };
 
   const shareViaWhatsApp = () => {
-    const message = `🌱 Join The Garden and start earning NCTR tokens through everyday activities! Use my referral link: ${getReferralLink()}`;
+    const userReward = Math.round(1000 * userStatus.reward_multiplier);
+    const message = `🌱 Join The Garden and start earning NCTR tokens through everyday activities! I earn ${userReward} NCTR and you get 1000 NCTR when you join! Use my referral link: ${getReferralLink()}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
   };
 
@@ -143,11 +191,16 @@ We both earn 1000 NCTR in 360LOCK when you sign up and start participating!`;
         {/* Reward Info */}
         <div className="text-center py-4">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-2xl font-bold text-primary">1000 NCTR</span>
-            <span className="text-lg text-foreground">each in</span>
-            <span className="text-2xl font-bold text-secondary">360LOCK</span>
+            <span className="text-2xl font-bold text-primary">
+              {Math.round(1000 * userStatus.reward_multiplier)} NCTR
+            </span>
+            <span className="text-lg text-foreground">for you,</span>
+            <span className="text-2xl font-bold text-secondary">1000 NCTR</span>
+            <span className="text-lg text-foreground">for them</span>
           </div>
-          <p className="text-sm text-muted-foreground">Most popular way to earn</p>
+          <p className="text-sm text-muted-foreground">
+            {userStatus.reward_multiplier > 1 ? `Wings ${userStatus.opportunity_status} bonus: ${userStatus.reward_multiplier}x multiplier` : 'Most popular way to earn'}
+          </p>
         </div>
 
         {/* Action Button */}
@@ -190,10 +243,14 @@ We both earn 1000 NCTR in 360LOCK when you sign up and start participating!`;
         <div className="grid grid-cols-2 gap-4">
           <div className="text-center py-4 bg-primary/5 rounded-xl">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <span className="text-2xl font-bold text-primary">1000</span>
+              <span className="text-2xl font-bold text-primary">
+                {Math.round(1000 * userStatus.reward_multiplier)}
+              </span>
               <img src={nctrLogo} alt="NCTR" className="h-4 w-auto" />
             </div>
-            <div className="text-xs text-muted-foreground">for you</div>
+            <div className="text-xs text-muted-foreground">
+              for you {userStatus.reward_multiplier > 1 && `(${userStatus.reward_multiplier}x)`}
+            </div>
           </div>
           
           <div className="text-center py-4 bg-secondary/5 rounded-xl">
