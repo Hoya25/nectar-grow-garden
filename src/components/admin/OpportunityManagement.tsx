@@ -34,9 +34,14 @@ interface EarningOpportunity {
 interface Brand {
   id: string;
   name: string;
-  logo_url: string;
-  website_url: string;
+  description?: string;
+  logo_url?: string;
+  website_url?: string;
+  category?: string;
+  commission_rate?: number;
+  nctr_per_dollar?: number;
   is_active: boolean;
+  featured?: boolean;
 }
 
 interface OpportunityManagementProps {
@@ -372,10 +377,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   <div className="space-y-2">
                     <Label>Partner Brand (Optional)</Label>
                     <BrandSearchInterface
-                      brands={brands}
                       selectedBrand={selectedBrand}
-                      onBrandSelect={setSelectedBrand}
-                      onBrandClear={() => setSelectedBrand(null)}
+                      onBrandSelect={(brand) => setSelectedBrand(brand)}
                     />
                   </div>
 
