@@ -1082,7 +1082,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     <p className="text-sm text-muted-foreground mb-4">Total Earn Opportunity</p>
                     
                     {/* Bounty Breakdown */}
-                    <RewardDisplay opportunity={opportunity} size="md" />
+                    <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
                   </div>
 
                   <Button 
@@ -1201,7 +1201,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                            <div className="text-xs sm:text-sm text-muted-foreground mb-4">Total Earn Opportunity</div>
                            
                            {/* Bounty Breakdown */}
-                           <RewardDisplay opportunity={opportunity} size="md" />
+                           <RewardDisplay opportunity={opportunity} size="md" showPerDollar={true} />
                          </div>
 
                         <Button 
@@ -1282,7 +1282,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                           <div className="text-xs text-muted-foreground mb-3">Total Earn Opportunity</div>
                           
                           {/* Bounty Breakdown */}
-                          <RewardDisplay opportunity={opportunity} size="sm" />
+                          <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} />
                         </div>
 
                         <Button 
