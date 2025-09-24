@@ -36,6 +36,7 @@ const Index = () => {
         title="How We're Democratizing Crypto"
         description="We're breaking down the barriers that have kept crypto out of reach. No complex wallets, no technical knowledge required, no upfront investment. Just simple activities that earn you real crypto rewards."
         buttonText="Learn More →"
+        buttonHref="https://substack.com/home/post/p-166993122"
         icon=""
         gradient={true}
       />
@@ -45,6 +46,7 @@ const Index = () => {
         title="Harvest NCTR"
         description="Stack NCTR in your portfolio to open new opportunities across the crypto universe–like experiences, new product releases from our partners and amplified earning opportunities."
         buttonText="Learn More About NCTR →"
+        buttonHref="https://substack.com/home/post/p-166993122"
         icon=""
         gradient={true}
       />
