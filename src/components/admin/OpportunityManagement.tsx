@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BrandLogo } from '@/components/ui/brand-logo';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
@@ -1357,38 +1358,50 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <p className="text-sm text-muted-foreground">{opportunity.partner_name || 'No Partner'}</p>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
-                        {opportunity.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
-                      
-                      {/* Display Order Controls */}
-                      <div className="flex items-center gap-1 bg-gray-50 rounded-md p-1">
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs text-muted-foreground font-mono">#{opportunity.display_order}</span>
-                          <ArrowUpDown className="w-3 h-3 text-muted-foreground" />
-                        </div>
-                        <div className="flex flex-col">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => moveOpportunityUp(opportunity)}
-                            disabled={opportunity.display_order <= 1}
-                            className="h-4 w-4 p-0 hover:bg-gray-100"
-                            title="Move up in display order"
-                          >
-                            <ChevronUp className="w-3 h-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => moveOpportunityDown(opportunity)}
-                            disabled={opportunity.display_order >= Math.max(...opportunities.map(o => o.display_order || 0))}
-                            className="h-4 w-4 p-0 hover:bg-gray-100"
-                            title="Move down in display order"
-                          >
-                            <ChevronDown className="w-3 h-3" />
-                          </Button>
+                    <div className="flex items-start gap-2">
+                      {/* Partner Logo */}
+                      {opportunity.partner_logo_url && (
+                        <BrandLogo 
+                          src={opportunity.partner_logo_url} 
+                          alt={opportunity.partner_name || 'Partner logo'}
+                          size="lg"
+                          variant="auto"
+                          className="flex-shrink-0"
+                        />
+                      )}
+                      <div className="flex flex-col items-end gap-2">
+                        <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
+                          {opportunity.is_active ? 'LIVE' : 'Inactive'}
+                        </Badge>
+                        
+                        {/* Display Order Controls */}
+                        <div className="flex items-center gap-1 bg-gray-50 rounded-md p-1">
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-muted-foreground font-mono">#{opportunity.display_order}</span>
+                            <ArrowUpDown className="w-3 h-3 text-muted-foreground" />
+                          </div>
+                          <div className="flex flex-col">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => moveOpportunityUp(opportunity)}
+                              disabled={opportunity.display_order <= 1}
+                              className="h-4 w-4 p-0 hover:bg-gray-100"
+                              title="Move up in display order"
+                            >
+                              <ChevronUp className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => moveOpportunityDown(opportunity)}
+                              disabled={opportunity.display_order >= Math.max(...opportunities.map(o => o.display_order || 0))}
+                              className="h-4 w-4 p-0 hover:bg-gray-100"
+                              title="Move down in display order"
+                            >
+                              <ChevronDown className="w-3 h-3" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
