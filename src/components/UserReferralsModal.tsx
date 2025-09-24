@@ -47,103 +47,85 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
     }
   }, [user]);
 
-  const fetchUserReferrals = useCallback(async () => {
-    if (!user) {
-      console.log('No user available for fetching referrals');
+  // Simplified data fetching function
+  const fetchUserReferrals = async () => {
+    if (!user?.id) {
+      console.log('No user ID available');
       return;
     }
     
-    console.log('Fetching referrals for user:', user.id);
+    console.log('Starting to fetch referrals for user:', user.id);
     setLoading(true);
     
     try {
-      // Get user's referrals - fetch all referrals data
+      // Direct query to get referrals with profile data
       const { data: referralsData, error: referralsError } = await supabase
         .from('referrals')
-        .select(`
-          id,
-          referrer_user_id,
-          referred_user_id,
-          created_at,
-          rewarded_at,
-          referral_code,
-          status,
-          reward_credited
-        `)
+        .select('*')
         .eq('referrer_user_id', user.id)
         .order('created_at', { ascending: false });
 
-      console.log('Referrals query result:', { referralsData, referralsError });
+      console.log('Raw referrals data:', referralsData);
 
       if (referralsError) {
-        console.error('Referrals query error:', referralsError);
+        console.error('Error fetching referrals:', referralsError);
         throw referralsError;
       }
 
-      if (referralsData && referralsData.length > 0) {
-        // Get referred users' names and profile data
-        const referredUserIds = referralsData.map(r => r.referred_user_id);
-        
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('user_id, full_name, username, email, created_at')
-          .in('user_id', referredUserIds);
-
-        console.log('Profiles query result:', { profilesData, profilesError });
-
-        // Create profile lookup map (handle missing profiles gracefully)
-        const profileMap = new Map(
-          profilesData?.map(p => [
-            p.user_id, 
-            {
-              name: p.full_name || p.username || p.email?.split('@')[0] || 'Unknown User',
-              email: p.email || '',
-              joinDate: p.created_at || ''
-            }
-          ]) || []
-        );
-
-        // Enrich referrals with profile data
-        const enrichedReferrals = referralsData.map(referral => ({
-          ...referral,
-          referred_name: profileMap.get(referral.referred_user_id)?.name || 'Unknown User',
-          referred_email: profileMap.get(referral.referred_user_id)?.email || '',
-          join_date: profileMap.get(referral.referred_user_id)?.joinDate || referral.created_at,
-        }));
-
-        console.log('Enriched referrals:', enrichedReferrals);
-        setReferrals(enrichedReferrals);
-
-        // Calculate stats
-        const completed = enrichedReferrals.filter(r => r.status === 'completed' && r.reward_credited).length;
-        const pending = enrichedReferrals.filter(r => r.status !== 'completed' || !r.reward_credited).length;
-        
-        const newStats = {
-          total: enrichedReferrals.length,
-          completed,
-          pending,
-          totalRewards: completed * 1000 // 1000 NCTR per successful referral
-        };
-        
-        setStats(newStats);
-        console.log('Updated stats:', newStats);
-        
-      } else {
-        console.log('No referrals found for user');
+      if (!referralsData || referralsData.length === 0) {
+        console.log('No referrals found');
         setReferrals([]);
         setStats({ total: 0, completed: 0, pending: 0, totalRewards: 0 });
+        return;
       }
+
+      // Get profile data for referred users
+      const userIds = referralsData.map(r => r.referred_user_id);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('user_id', userIds);
+
+      console.log('Profiles data:', profilesData);
+
+      // Combine referral and profile data
+      const enrichedReferrals = referralsData.map(referral => {
+        const profile = profilesData?.find(p => p.user_id === referral.referred_user_id);
+        return {
+          ...referral,
+          referred_name: profile?.full_name || profile?.username || profile?.email?.split('@')[0] || 'Unknown User',
+          referred_email: profile?.email || '',
+          join_date: profile?.created_at || referral.created_at,
+        };
+      });
+
+      console.log('Final enriched referrals:', enrichedReferrals);
+      setReferrals(enrichedReferrals);
+
+      // Calculate stats
+      const completed = enrichedReferrals.filter(r => r.status === 'completed' && r.reward_credited).length;
+      const pending = enrichedReferrals.length - completed;
+      
+      setStats({
+        total: enrichedReferrals.length,
+        completed,
+        pending,
+        totalRewards: completed * 1000
+      });
+
     } catch (error) {
-      console.error('Error fetching user referrals:', error);
+      console.error('Error in fetchUserReferrals:', error);
       toast({
         title: "Error",
-        description: "Failed to load invite data. Please try again.",
+        description: "Failed to load your invites. Please try again.",
         variant: "destructive",
       });
+      setReferrals([]);
+      setStats({ total: 0, completed: 0, pending: 0, totalRewards: 0 });
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  };
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(referralCode);
@@ -162,20 +144,20 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
     });
   };
 
-  // Fetch referrals when modal opens
-  useEffect(() => {
-    console.log('Effect triggered - isOpen:', isOpen, 'user:', !!user, 'user.id:', user?.id);
-    if (isOpen && user) {
-      console.log('Modal opened, triggering fetchUserReferrals for user:', user.id);
+  // Handle modal opening and data fetching
+  const handleModalOpenChange = (open: boolean) => {
+    console.log('Modal state changing to:', open);
+    setIsOpen(open);
+    
+    // Fetch data immediately when modal opens
+    if (open && user?.id) {
+      console.log('Modal opened, fetching referrals...');
       fetchUserReferrals();
     }
-  }, [isOpen, user?.id]); // Simplified dependencies
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      console.log('Modal open state changing to:', open);
-      setIsOpen(open);
-    }}>
+    <Dialog open={isOpen} onOpenChange={handleModalOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
