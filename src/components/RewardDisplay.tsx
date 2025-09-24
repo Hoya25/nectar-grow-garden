@@ -90,7 +90,7 @@ export const RewardDisplay = ({
             <div className="text-center">
               <div className={config.flex + ' justify-center'}>
                 <span className={`${config.amountText} ${isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary'}`}>
-                  {formatNCTR(opportunity.reward_per_dollar * userMultiplier)}
+                  {formatNCTR(opportunity.reward_per_dollar * (isInviteOpportunity ? userMultiplier : 1))}
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
@@ -101,8 +101,8 @@ export const RewardDisplay = ({
           {opportunity.nctr_reward > 0 && (
             <div className="bg-primary/10 rounded-lg p-3 text-center border border-primary/20">
               <div className={config.flex + ' justify-center mb-1'}>
-                <span className={`${config.amountText} ${isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary'}`}>
-                  +{formatNCTR(opportunity.nctr_reward * userMultiplier)}
+                <span className={`${config.amountText} text-primary`}>
+                  +{formatNCTR(opportunity.nctr_reward)}
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
@@ -122,19 +122,19 @@ export const RewardDisplay = ({
             {(opportunity.available_nctr_reward || 0) > 0 && (
               <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                {formatNCTR((opportunity.available_nctr_reward || 0) * userMultiplier)} Available
+                {formatNCTR((opportunity.available_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} Available
               </Badge>
             )}
             {(opportunity.lock_90_nctr_reward || 0) > 0 && (
               <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
                 <div className="w-2 h-2 bg-orange-500 rounded-full mr-1"></div>
-                {formatNCTR((opportunity.lock_90_nctr_reward || 0) * userMultiplier)} 90LOCK
+                {formatNCTR((opportunity.lock_90_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} 90LOCK
               </Badge>
             )}
             {(opportunity.lock_360_nctr_reward || 0) > 0 && (
               <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                {formatNCTR((opportunity.lock_360_nctr_reward || 0) * userMultiplier)} 360LOCK
+                {formatNCTR((opportunity.lock_360_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} 360LOCK
               </Badge>
             )}
           </div>
@@ -143,7 +143,7 @@ export const RewardDisplay = ({
             <div className="text-center">
               <div className={config.flex + ' justify-center'}>
                 <span className={`${config.amountText} ${isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-green-600'}`}>
-                  +{formatNCTR((opportunity.reward_per_dollar || 0) * userMultiplier)}
+                  +{formatNCTR((opportunity.reward_per_dollar || 0) * (isInviteOpportunity ? userMultiplier : 1))}
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
