@@ -18,7 +18,8 @@ import {
   ArrowLeft,
   Shield,
   Sparkles,
-  Webhook
+  Webhook,
+  UserCheck
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
@@ -29,6 +30,7 @@ import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 import WebhookTester from '@/components/WebhookTester';
 import BannerEditor from '@/components/admin/BannerEditor';
 import ReferralManagement from '@/components/admin/ReferralManagement';
+import InvitesModal from '@/components/admin/InvitesModal';
 
 interface AdminStats {
   total_users: number;
@@ -36,6 +38,7 @@ interface AdminStats {
   active_opportunities: number;
   total_nctr_locked: number;
   recent_activity: number;
+  successful_invites: number;
 }
 
 const Admin = () => {
@@ -47,7 +50,8 @@ const Admin = () => {
     active_brands: 0,
     active_opportunities: 0,
     total_nctr_locked: 0,
-    recent_activity: 0
+    recent_activity: 0,
+    successful_invites: 0
   });
 
   useEffect(() => {
@@ -88,12 +92,20 @@ const Admin = () => {
 
       const totalLocked = lockData?.reduce((sum, lock) => sum + parseFloat(lock.nctr_amount.toString()), 0) || 0;
 
+      // Fetch successful invites count
+      const { count: invitesCount } = await supabase
+        .from('referrals')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'completed')
+        .eq('reward_credited', true);
+
       setStats({
         total_users: userCount || 0,
         active_brands: brandCount || 0,
         active_opportunities: opportunityCount || 0,
         total_nctr_locked: totalLocked,
-        recent_activity: 0 // Would need to implement activity tracking
+        recent_activity: 0, // Would need to implement activity tracking
+        successful_invites: invitesCount || 0
       });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
@@ -157,7 +169,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
           <Card className="bg-card/80 backdrop-blur-sm shadow-medium">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -205,6 +217,23 @@ const Admin = () => {
               </div>
             </CardContent>
           </Card>
+
+          <InvitesModal>
+            <Card className="bg-card/80 backdrop-blur-sm shadow-medium cursor-pointer hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Successful Invites</CardTitle>
+                <UserCheck className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-emerald-500">
+                  {stats.successful_invites}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Click to view details
+                </p>
+              </CardContent>
+            </Card>
+          </InvitesModal>
 
           <Card className="bg-card/80 backdrop-blur-sm shadow-medium">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
