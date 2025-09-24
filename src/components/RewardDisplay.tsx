@@ -26,25 +26,6 @@ export const RewardDisplay = ({
   userStatus = 'starter'
 }: RewardDisplayProps) => {
   
-  // Debug logging
-  useEffect(() => {
-    if (opportunity.opportunity_type === 'invite') {
-      console.log('RewardDisplay - Full Invite Opportunity Data:', {
-        userStatus,
-        userMultiplier,
-        colorClass: userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary',
-        opportunity: opportunity,
-        availableReward: opportunity.available_nctr_reward,
-        lock90Reward: opportunity.lock_90_nctr_reward,
-        lock360Reward: opportunity.lock_360_nctr_reward,
-        nctrReward: opportunity.nctr_reward,
-        rewardPerDollar: opportunity.reward_per_dollar,
-        hasNewRewards: (opportunity.available_nctr_reward || 0) > 0 || 
-                      (opportunity.lock_90_nctr_reward || 0) > 0 || 
-                      (opportunity.lock_360_nctr_reward || 0) > 0
-      });
-    }
-  }, [userStatus, userMultiplier, opportunity]);
   const formatNCTR = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
@@ -124,8 +105,8 @@ export const RewardDisplay = ({
           {opportunity.nctr_reward > 0 && (
             <div className="bg-primary/10 rounded-lg p-3 text-center border border-primary/20">
               <div className={config.flex + ' justify-center mb-1'}>
-                <span className={`${config.amountText} text-primary`}>
-                  +{formatNCTR(opportunity.nctr_reward)}
+                <span className={`${config.amountText} ${isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary'}`}>
+                  +{formatNCTR(opportunity.nctr_reward * (isInviteOpportunity ? userMultiplier : 1))}
                 </span>
                 <img src={nctrLogo} alt="NCTR" className={config.logo} />
               </div>
