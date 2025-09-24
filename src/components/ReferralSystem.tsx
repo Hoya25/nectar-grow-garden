@@ -34,6 +34,20 @@ const ReferralSystem = () => {
   });
   const [copied, setCopied] = useState(false);
 
+  const getStatusTextColor = (status: string) => {
+    switch (status) {
+      case 'vip': return 'text-yellow-500';
+      case 'premium': return 'text-purple-500';
+      case 'platinum': return 'text-slate-400';
+      case 'advanced': return 'text-blue-500';
+      case 'bronze': return 'text-amber-600';
+      case 'silver': return 'text-gray-500';
+      case 'gold': return 'text-yellow-500';
+      case 'diamond': return 'text-blue-500';
+      default: return 'text-primary';
+    }
+  };
+
   useEffect(() => {
     if (user) {
       generateReferralCode();
@@ -206,7 +220,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and 
             <span className="text-lg text-foreground">for them</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            {userStatus.reward_multiplier > 1 ? `Wings ${userStatus.opportunity_status} bonus: ${userStatus.reward_multiplier}x multiplier` : 'Most popular way to earn'}
+            {userStatus.reward_multiplier > 1 ? (
+              <span>
+                Wings <span className={`font-semibold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.opportunity_status}</span> bonus: <span className={`font-bold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.reward_multiplier}x</span> multiplier
+              </span>
+            ) : 'Most popular way to earn'}
           </p>
         </div>
 
@@ -256,7 +274,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and 
               <img src={nctrLogo} alt="NCTR" className="h-4 w-auto" />
             </div>
             <div className="text-xs text-muted-foreground">
-              for you {userStatus.reward_multiplier > 1 && `(${userStatus.reward_multiplier}x)`}
+              for you {userStatus.reward_multiplier > 1 && (
+                <span className={`${getStatusTextColor(userStatus.opportunity_status)}`}>
+                  ({userStatus.reward_multiplier}x)
+                </span>
+              )}
             </div>
           </div>
           

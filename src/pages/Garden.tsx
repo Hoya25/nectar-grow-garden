@@ -729,6 +729,20 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     }
   };
 
+  const getStatusTextColor = (status: string) => {
+    switch (status) {
+      case 'vip': return 'text-yellow-500';
+      case 'premium': return 'text-purple-500';
+      case 'platinum': return 'text-slate-400';
+      case 'advanced': return 'text-blue-500';
+      case 'bronze': return 'text-amber-600';
+      case 'silver': return 'text-gray-500';
+      case 'gold': return 'text-yellow-500';
+      case 'diamond': return 'text-blue-500';
+      default: return 'text-primary';
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'vip': return 'bg-gradient-to-r from-yellow-400 to-yellow-600';
@@ -1230,7 +1244,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     )}
                     {opportunity.opportunity_type === 'invite' && (
                       <p className="text-sm text-muted-foreground mb-4">
-                        {userMultiplier > 1 ? `Wings ${portfolio?.opportunity_status} bonus: ${userMultiplier}x multiplier` : 'Per friend who joins'}
+                        {userMultiplier > 1 ? (
+                          <span>
+                            Wings <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus: <span className={`font-bold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{userMultiplier}x</span> multiplier
+                          </span>
+                        ) : 'Per friend who joins'}
                       </p>
                     )}
                     
@@ -1361,7 +1379,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                             )}
                             {opportunity.opportunity_type === 'invite' && (
                               <div className="text-xs sm:text-sm text-muted-foreground mb-4">
-                                {userMultiplier > 1 ? `Wings ${portfolio?.opportunity_status} bonus` : 'Per friend who joins'}
+                                {userMultiplier > 1 ? (
+                                  <span>
+                                    Wings <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
+                                  </span>
+                                ) : 'Per friend who joins'}
                               </div>
                             )}
                            
@@ -1476,7 +1498,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                           )}
                           {opportunity.opportunity_type === 'invite' && (
                             <div className="text-xs text-muted-foreground mb-3">
-                              {userMultiplier > 1 ? `Wings ${portfolio?.opportunity_status} bonus` : 'Per friend who joins'}
+                              {userMultiplier > 1 ? (
+                                <span>
+                                  Wings <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
+                                </span>
+                              ) : 'Per friend who joins'}
                             </div>
                           )}
                           
@@ -1557,7 +1583,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
               <ul className="text-xs sm:text-sm space-y-1 text-muted-foreground">
                 <li>• Share your unique link below</li>
                 <li>• Friends join using your link</li>
-                <li>• You earn {Math.round(1000 * userMultiplier)} NCTR {userMultiplier > 1 && `(${userMultiplier}x Wings bonus)`} & they get 1000 NCTR in 360LOCK!</li>
+                <li>• You earn {Math.round(1000 * userMultiplier)} NCTR {userMultiplier > 1 && (
+                  <span>
+                    (<span className={`font-bold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{userMultiplier}x</span> Wings bonus)
+                  </span>
+                )} & they get 1000 NCTR in 360LOCK!</li>
               </ul>
             </div>
             
