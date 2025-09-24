@@ -919,6 +919,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      emergency_revoke_admin_access: {
+        Args: { p_user_email: string }
+        Returns: Json
+      }
       get_admin_financial_access: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -961,6 +965,10 @@ export type Database = {
           id: string
           username: string
         }[]
+      }
+      get_security_dashboard_data: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       get_sensitive_profile_data: {
         Args: { target_user_id: string }
