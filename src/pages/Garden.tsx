@@ -1210,13 +1210,28 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     <div className="flex items-center justify-center gap-2 mb-3">
                       <span className="text-3xl font-bold text-primary">
                         {(() => {
-                          const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                          const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
-                          return formatNCTR(totalReward);
+                          if (opportunity.opportunity_type === 'invite') {
+                            // For invite opportunities, show user's multiplied reward
+                            const baseReward = 1000;
+                            return formatNCTR(baseReward * userMultiplier);
+                          } else {
+                            // For other opportunities, show the configured reward
+                            const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                            const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
+                            return formatNCTR(totalReward);
+                          }
                         })()} NCTR
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4">Per $1 Spent</p>
+                    {/* Only show "Per $1 Spent" for shopping opportunities */}
+                    {opportunity.opportunity_type === 'shopping' && (
+                      <p className="text-sm text-muted-foreground mb-4">Per $1 Spent</p>
+                    )}
+                    {opportunity.opportunity_type === 'invite' && (
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {userMultiplier > 1 ? `Wings ${portfolio?.opportunity_status} bonus: ${userMultiplier}x multiplier` : 'Per friend who joins'}
+                      </p>
+                    )}
                     
                     {/* Bounty Breakdown */}
                     <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
@@ -1325,14 +1340,29 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
 
                          <div className="text-center mb-4 sm:mb-6">
                            {/* Total NCTR Earn Opportunity */}
-                           <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-                             {(() => {
-                               const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                               const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
-                               return formatNCTR(totalReward);
-                             })()} NCTR
-                           </div>
-                           <div className="text-xs sm:text-sm text-muted-foreground mb-4">Per $1 Spent</div>
+                            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
+                              {(() => {
+                                if (opportunity.opportunity_type === 'invite') {
+                                  // For invite opportunities, show user's multiplied reward
+                                  const baseReward = 1000;
+                                  return formatNCTR(baseReward * userMultiplier);
+                                } else {
+                                  // For other opportunities, show the configured reward
+                                  const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                                  const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
+                                  return formatNCTR(totalReward);
+                                }
+                              })()} NCTR
+                            </div>
+                            {/* Only show "Per $1 Spent" for shopping opportunities */}
+                            {opportunity.opportunity_type === 'shopping' && (
+                              <div className="text-xs sm:text-sm text-muted-foreground mb-4">Per $1 Spent</div>
+                            )}
+                            {opportunity.opportunity_type === 'invite' && (
+                              <div className="text-xs sm:text-sm text-muted-foreground mb-4">
+                                {userMultiplier > 1 ? `Wings ${portfolio?.opportunity_status} bonus` : 'Per friend who joins'}
+                              </div>
+                            )}
                            
                            {/* Bounty Breakdown */}
                            <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
@@ -1427,12 +1457,27 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                           {/* Total NCTR Earn Opportunity */}
                           <div className="text-lg font-bold text-primary mb-2">
                             {(() => {
-                              const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                              const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
-                              return formatNCTR(totalReward);
+                              if (opportunity.opportunity_type === 'invite') {
+                                // For invite opportunities, show user's multiplied reward
+                                const baseReward = 1000;
+                                return formatNCTR(baseReward * userMultiplier);
+                              } else {
+                                // For other opportunities, show the configured reward
+                                const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                                const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
+                                return formatNCTR(totalReward);
+                              }
                             })()} NCTR
                           </div>
-                          <div className="text-xs text-muted-foreground mb-3">Per $1 Spent</div>
+                          {/* Only show "Per $1 Spent" for shopping opportunities */}
+                          {opportunity.opportunity_type === 'shopping' && (
+                            <div className="text-xs text-muted-foreground mb-3">Per $1 Spent</div>
+                          )}
+                          {opportunity.opportunity_type === 'invite' && (
+                            <div className="text-xs text-muted-foreground mb-3">
+                              {userMultiplier > 1 ? `Wings ${portfolio?.opportunity_status} bonus` : 'Per friend who joins'}
+                            </div>
+                          )}
                           
                           {/* Bounty Breakdown */}
                           <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} />

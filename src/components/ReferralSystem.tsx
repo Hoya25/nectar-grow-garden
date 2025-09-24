@@ -38,10 +38,16 @@ const ReferralSystem = () => {
   useEffect(() => {
     if (user) {
       generateReferralCode();
-      fetchReferralStats();
       fetchUserStatus();
     }
   }, [user]);
+
+  // Separate effect for fetching stats when multiplier changes
+  useEffect(() => {
+    if (user && userStatus.reward_multiplier) {
+      fetchReferralStats();
+    }
+  }, [user, userStatus.reward_multiplier]);
 
   const generateReferralCode = () => {
     if (user) {
