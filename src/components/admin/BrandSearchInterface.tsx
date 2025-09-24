@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BrandLogo } from '@/components/ui/brand-logo';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Search, 
@@ -265,20 +266,12 @@ const BrandSearchInterface = ({
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
-                            {brand.logo_url ? (
-                              <img 
-                                src={brand.logo_url} 
-                                alt={brand.name} 
-                                className="w-8 h-8 rounded object-cover"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
-                            ) : (
-                              <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
-                                <Building2 className="w-4 h-4 text-muted-foreground" />
-                              </div>
-                            )}
+                            <BrandLogo 
+                              src={brand.logo_url} 
+                              alt={brand.name}
+                              size="sm"
+                              variant="auto"
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
@@ -355,13 +348,12 @@ const BrandSearchInterface = ({
         <Card className="bg-muted/50">
           <CardContent className="p-3">
             <div className="flex items-center gap-3">
-              {selectedBrand.logo_url && (
-                <img 
-                  src={selectedBrand.logo_url} 
-                  alt={selectedBrand.name}
-                  className="w-8 h-8 rounded object-cover"
-                />
-              )}
+              <BrandLogo 
+                src={selectedBrand.logo_url} 
+                alt={selectedBrand.name}
+                size="sm"
+                variant="auto"
+              />
               <div className="flex-1">
                 <div className="font-medium text-sm">{selectedBrand.name}</div>
                 {selectedBrand.category && (

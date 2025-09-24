@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { BrandLogo } from '@/components/ui/brand-logo';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
@@ -331,13 +332,12 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
                                   )}
                                 </div>
                               </div>
-                              {brand.logo_url && (
-                                <img 
-                                  src={brand.logo_url} 
-                                  alt={brand.name}
-                                  className="w-10 h-10 object-contain rounded"
-                                />
-                              )}
+              <BrandLogo 
+                src={brand.logo_url} 
+                alt={brand.name}
+                size="md"
+                variant="auto"
+              />
                             </div>
                           </CardHeader>
                           <CardContent className="pt-0">
