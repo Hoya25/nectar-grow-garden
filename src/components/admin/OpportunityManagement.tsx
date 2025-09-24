@@ -23,7 +23,10 @@ import {
   Star,
   Loader2,
   ExternalLink,
-  Video
+  Video,
+  Upload,
+  X,
+  Image
 } from 'lucide-react';
 
 interface EarningOpportunity {
@@ -76,6 +79,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   const [modalOpen, setModalOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<EarningOpportunity | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -196,6 +202,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     });
     setEditingOpportunity(null);
     setSelectedBrand(null);
+    setLogoFile(null);
+    setLogoPreview('');
   };
 
   const handleEdit = (opportunity: EarningOpportunity) => {
@@ -219,6 +227,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       lock_360_nctr_reward: opportunity.lock_360_nctr_reward || 0,
       reward_distribution_type: opportunity.reward_distribution_type || 'legacy'
     });
+    
+    // Set logo preview for existing logo
+    if (opportunity.partner_logo_url) {
+      setLogoPreview(opportunity.partner_logo_url);
+    }
     
     // Set selected brand if available
     if (opportunity.partner_name) {
@@ -258,44 +271,141 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     return url.toString();
   };
 
+  const handleLogoFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid File Type",
+          description: "Please select an image file (PNG, JPG, SVG, etc.)",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File Too Large",
+          description: "Please select an image smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setLogoFile(file);
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setLogoPreview(previewUrl);
+      
+      // Clear any existing URL
+      setFormData(prev => ({ ...prev, partner_logo_url: '' }));
+    }
+  };
+
+  const uploadLogoFile = async () => {
+    if (!logoFile) return null;
+
+    try {
+      setUploadingLogo(true);
+      
+      // Create a unique filename
+      const fileExt = logoFile.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `brand-logos/${fileName}`;
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('brand-logos')
+        .upload(filePath, logoFile);
+
+      if (error) {
+        throw error;
+      }
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-logos')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload logo. Please try again.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const clearLogo = () => {
+    setLogoFile(null);
+    setLogoPreview('');
+    setFormData(prev => ({ ...prev, partner_logo_url: '' }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      let logoUrl = formData.partner_logo_url;
+      
+      // Upload logo file if selected
+      if (logoFile) {
+        const uploadedUrl = await uploadLogoFile();
+        if (uploadedUrl) {
+          logoUrl = uploadedUrl;
+        } else {
+          // Upload failed, don't proceed
+          return;
+        }
+      }
+
+      const submitData = {
+        ...formData,
+        partner_logo_url: logoUrl
+      };
+
       if (editingOpportunity) {
         const { error } = await supabase
           .from('earning_opportunities')
-          .update(formData)
+          .update(submitData)
           .eq('id', editingOpportunity.id);
 
         if (error) throw error;
 
         await logActivity('updated', 'opportunity', editingOpportunity.id, { 
-          title: formData.title,
-          changes: formData 
+          title: submitData.title,
+          changes: submitData 
         });
 
         toast({
           title: "Opportunity Updated",
-          description: `${formData.title} has been updated successfully.`,
+          description: `${submitData.title} has been updated successfully.`,
         });
       } else {
         const { data, error } = await supabase
           .from('earning_opportunities')
-          .insert(formData)
+          .insert(submitData)
           .select()
           .single();
 
         if (error) throw error;
 
         await logActivity('created', 'opportunity', data.id, { 
-          title: formData.title 
+          title: submitData.title 
         });
 
         toast({
           title: "Opportunity Created",
-          description: `${formData.title} has been created successfully.`,
+          description: `${submitData.title} has been created successfully.`,
         });
       }
 
@@ -547,31 +657,93 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   />
 
                   {/* Manual Brand Entry */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="partner_name">Brand Name</Label>
-                      <Input
-                        id="partner_name"
-                        value={formData.partner_name}
-                        onChange={(e) => setFormData({...formData, partner_name: e.target.value})}
-                        placeholder="Enter brand name"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="partner_logo_url">Brand Logo URL</Label>
-                      <Input
-                        id="partner_logo_url"
-                        type="url"
-                        value={formData.partner_logo_url}
-                        onChange={(e) => setFormData({...formData, partner_logo_url: e.target.value})}
-                        placeholder="https://example.com/logo.png"
-                      />
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="partner_name">Brand Name</Label>
+                        <Input
+                          id="partner_name"
+                          value={formData.partner_name}
+                          onChange={(e) => setFormData({...formData, partner_name: e.target.value})}
+                          placeholder="Enter brand name"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>Brand Logo</Label>
+                        
+                        {/* Logo Preview */}
+                        {logoPreview && (
+                          <div className="relative w-20 h-20 border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                            <img 
+                              src={logoPreview} 
+                              alt="Logo preview" 
+                              className="w-full h-full object-cover"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={clearLogo}
+                              className="absolute top-1 right-1 w-6 h-6 p-0 bg-red-500 hover:bg-red-600 text-white rounded-full"
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {/* Upload Option */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleLogoFileSelect}
+                              className="hidden"
+                              id="logo-upload"
+                              disabled={uploadingLogo}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => document.getElementById('logo-upload')?.click()}
+                              disabled={uploadingLogo}
+                              className="flex items-center gap-2"
+                            >
+                              {uploadingLogo ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Upload className="w-4 h-4" />
+                              )}
+                              {uploadingLogo ? 'Uploading...' : 'Upload Logo'}
+                            </Button>
+                            <span className="text-sm text-muted-foreground">or</span>
+                          </div>
+                          
+                          {/* URL Option */}
+                          <Input
+                            type="url"
+                            value={formData.partner_logo_url}
+                            onChange={(e) => {
+                              setFormData({...formData, partner_logo_url: e.target.value});
+                              if (e.target.value) {
+                                setLogoPreview(e.target.value);
+                                setLogoFile(null);
+                              }
+                            }}
+                            placeholder="https://example.com/logo.png"
+                            disabled={!!logoFile}
+                          />
+                          <div className="text-xs text-muted-foreground">
+                            💡 Max 5MB • Supports PNG, JPG, SVG formats
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
                   <div className="text-xs text-muted-foreground">
-                    💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize
+                    💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize, or upload/link brand logos directly
                   </div>
                 </div>
 
