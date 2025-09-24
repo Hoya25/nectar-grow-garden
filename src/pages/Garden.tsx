@@ -551,18 +551,48 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
     }
   };
 
-  const handleShoppingOpportunity = (opportunity: EarningOpportunity) => {
-    if (opportunity.affiliate_link) {
-      // Open affiliate link in new tab
+  const handleShoppingOpportunity = async (opportunity: EarningOpportunity) => {
+    if (!opportunity.affiliate_link) {
+      toast({
+        title: "Link Not Available",
+        description: "This shopping opportunity doesn't have a configured affiliate link yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Create a user-tracked affiliate URL through our redirect system
+      const response = await supabase.functions.invoke('affiliate-redirect', {
+        body: {
+          action: 'create',
+          userId: user?.id,
+          originalUrl: opportunity.affiliate_link,
+          platformName: opportunity.partner_name || 'Partner',
+          description: `${opportunity.title} - User: ${user?.id?.slice(0, 8)}`
+        }
+      });
+
+      if (response.error) throw response.error;
+      
+      const { tracked_url } = response.data;
+      
+      // Open the tracked URL
+      window.open(tracked_url, '_blank');
+      
+      toast({
+        title: "Redirecting with User Tracking...",
+        description: `Opening ${opportunity.partner_name || 'partner'} - Your purchases will be tracked for NCTR rewards!`,
+      });
+      
+    } catch (error) {
+      console.error('Error creating tracked link:', error);
+      // Fallback to direct link if tracking fails
       window.open(opportunity.affiliate_link, '_blank');
       toast({
         title: "Redirecting...",
-        description: `Opening ${opportunity.partner_name || 'partner'} - NCTR from purchases locked in 90LOCK (upgradeable to 360LOCK anytime)!`,
-      });
-    } else {
-      toast({
-        title: "Coming Soon!",
-        description: "This shopping opportunity will be available soon. NCTR from purchases are locked in 90LOCK by default.",
+        description: `Opening ${opportunity.partner_name || 'partner'} - NCTR tracking may be limited.`,
+        variant: "destructive",
       });
     }
   };

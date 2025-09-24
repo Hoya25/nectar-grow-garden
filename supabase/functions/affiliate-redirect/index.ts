@@ -242,12 +242,16 @@ function enhanceAffiliateUrl(originalUrl: string, userId: string, linkId: string
   try {
     const url = new URL(originalUrl);
     
-    // Add our tracking parameters while preserving existing ones
-    url.searchParams.set('nctr_user', userId.substring(0, 8)); // Short user ID
+    // Add comprehensive user tracking parameters while preserving existing ones
+    url.searchParams.set('nctr_user', userId.substring(0, 8)); // Short user ID for tracking
     url.searchParams.set('nctr_ref', linkId.substring(0, 8)); // Short link ID
     url.searchParams.set('nctr_source', 'garden_platform');
     url.searchParams.set('nctr_campaign', platformName.toLowerCase().replace(/\s+/g, '_'));
     url.searchParams.set('nctr_timestamp', Date.now().toString());
+    url.searchParams.set('user_id', userId); // Full user ID for backend tracking
+    url.searchParams.set('tracking_id', `${userId.substring(0, 8)}_${linkId.substring(0, 8)}_${Date.now()}`);
+    
+    console.log('🎯 Enhanced affiliate URL:', url.toString());
 
     return url.toString();
   } catch (error) {
