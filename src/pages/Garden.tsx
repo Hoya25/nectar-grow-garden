@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { BrandLogo } from '@/components/ui/brand-logo';
 import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
@@ -1166,39 +1167,36 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                 >
                   <CardContent className="p-0">
                     <div className="flex flex-col lg:flex-row">
-                      <div className="relative">
-                        {opportunity.partner_logo_url && (
-                          <img 
+                      <div className="relative flex items-center justify-center lg:w-48 h-32 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
+                        {opportunity.partner_logo_url ? (
+                          <BrandLogo 
                             src={opportunity.partner_logo_url} 
                             alt={opportunity.partner_name}
-                            className="w-full lg:w-48 h-32 lg:h-auto object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none"
+                            size="xl"
+                            variant="auto"
+                            className="p-4"
                           />
+                        ) : (
+                          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                            <Gift className="w-8 h-8 text-muted-foreground" />
+                          </div>
                         )}
-                        <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-                          <Badge className="bg-green-600 text-white font-bold">
-                            LIVE
-                          </Badge>
-                        </div>
                       </div>
 
-                      <div className="p-4 sm:p-6 lg:p-8">
+                      <div className="p-4 sm:p-6 lg:p-8 flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-4">
-                          <div className="flex items-center space-x-3 sm:space-x-4">
-                            {opportunity.partner_logo_url && (
-                              <img 
-                                src={opportunity.partner_logo_url} 
-                                alt={opportunity.partner_name}
-                                className="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-lg bg-white p-2 shadow-sm"
-                              />
-                            )}
-                            <div className="min-w-0 flex-1">
-                              <h3 className="text-lg sm:text-xl font-semibold section-heading mb-1 truncate">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-lg sm:text-xl font-semibold section-heading truncate">
                                 {opportunity.title}
                               </h3>
-                              <p className="text-sm sm:text-base section-text line-clamp-2">
-                                {opportunity.description}
-                              </p>
+                              <Badge className="bg-green-600 text-white font-bold ml-2">
+                                LIVE
+                              </Badge>
                             </div>
+                            <p className="text-sm sm:text-base section-text line-clamp-2">
+                              {opportunity.description}
+                            </p>
                           </div>
                         </div>
 
