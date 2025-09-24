@@ -67,7 +67,6 @@ interface EarningOpportunity {
 }
 
 import ProfileModal from '@/components/ProfileModal';
-import UserReferralsModal from '@/components/UserReferralsModal';
 
 const Garden = () => {
   const { user, signOut } = useAuth();
@@ -818,27 +817,28 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     </CardContent>
                   </Card>
 
-                  <UserReferralsModal>
-                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 cursor-pointer hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                          <UserCheck className="w-5 h-5 text-purple-600" />
-                          <span className="text-sm font-medium text-purple-600">My Invites</span>
-                        </div>
-                        <p className="text-xl font-bold text-purple-600 mb-1">
-                          {referralStats.successful}
-                        </p>
-                        <p className="text-xs text-purple-600/80">
-                          {referralStats.total > referralStats.successful && (
-                            <span className="text-xs text-muted-foreground">
-                              ({referralStats.total - referralStats.successful} pending)
-                            </span>
-                          )}
-                          {referralStats.total === 0 ? "Click to invite" : "Click for details"}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </UserReferralsModal>
+                  <Card 
+                    className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => navigate('/referrals')}
+                  >
+                    <CardContent className="p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <UserCheck className="w-5 h-5 text-purple-600" />
+                        <span className="text-sm font-medium text-purple-600">My Invites</span>
+                      </div>
+                      <p className="text-xl font-bold text-purple-600 mb-1">
+                        {referralStats.successful}
+                      </p>
+                      <p className="text-xs text-purple-600/80">
+                        {referralStats.total > referralStats.successful && (
+                          <span className="text-xs text-muted-foreground">
+                            ({referralStats.total - referralStats.successful} pending)
+                          </span>
+                        )}
+                        {referralStats.total === 0 ? "Click to invite" : "Click for details"}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 <div className="flex justify-center">
