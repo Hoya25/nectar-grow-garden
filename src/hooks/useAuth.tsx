@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useMailchimp } from './useMailchimp';
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +25,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { subscribeUser, sendWelcomeEmail } = useMailchimp();
 
   useEffect(() => {
     // Set up auth state listener
@@ -87,24 +85,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // This won't block the signup process if it fails
       setTimeout(async () => {
         try {
-          await subscribeUser({
-            email,
-            firstName,
-            lastName,
-            status: 'subscribed',
-            tags: ['new-signup', 'garden-member'],
-            mergeFields: {
-              SIGNUP_DATE: new Date().toISOString().split('T')[0],
-              REFERRAL: referralCode || '',
+          // Import and use Mailchimp integration dynamically to avoid initialization issues
+          const { supabase: supabaseClient } = await import('@/integrations/supabase/client');
+          
+          const { error: mailchimpError } = await supabaseClient.functions.invoke('mailchimp-integration', {
+            body: {
+              action: 'subscribe',
+              listId: 'your-mailchimp-list-id', // Replace with actual list ID
+              contact: {
+                email,
+                firstName,
+                lastName,
+                status: 'subscribed',
+                tags: ['new-signup', 'garden-member'],
+                mergeFields: {
+                  SIGNUP_DATE: new Date().toISOString().split('T')[0],
+                  REFERRAL: referralCode || '',
+                }
+              }
             }
           });
           
-          // Also send a branded welcome email
-          await sendWelcomeEmail({
-            email,
-            firstName,
-            lastName
-          });
+          if (!mailchimpError) {
+            console.log('User successfully subscribed to Mailchimp');
+            
+            // Also send a branded welcome email
+            await supabaseClient.functions.invoke('mailchimp-integration', {
+              body: {
+                action: 'send_confirmation',
+                listId: 'your-mailchimp-list-id', // Replace with actual list ID
+                contact: { email, firstName, lastName },
+                emailTemplate: {
+                  templateId: 123, // Replace with actual template ID
+                  subject: `Welcome to The Garden, ${firstName}! 🌱`,
+                  customData: {
+                    from_name: 'The Garden Team',
+                    reply_to: 'support@nctr.live'
+                  }
+                }
+              }
+            });
+          }
         } catch (mailchimpError) {
           console.error('Mailchimp integration failed (non-blocking):', mailchimpError);
         }
