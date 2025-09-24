@@ -566,6 +566,81 @@ export type Database = {
         }
         Relationships: []
       }
+      treasury_config: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      withdrawal_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          failure_reason: string | null
+          gas_fee_nctr: number | null
+          id: string
+          nctr_amount: number
+          net_amount_nctr: number
+          processed_at: string | null
+          request_hash: string | null
+          status: string
+          transaction_hash: string | null
+          user_id: string
+          wallet_address: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          failure_reason?: string | null
+          gas_fee_nctr?: number | null
+          id?: string
+          nctr_amount: number
+          net_amount_nctr: number
+          processed_at?: string | null
+          request_hash?: string | null
+          status?: string
+          transaction_hash?: string | null
+          user_id: string
+          wallet_address: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          failure_reason?: string | null
+          gas_fee_nctr?: number | null
+          id?: string
+          nctr_amount?: number
+          net_amount_nctr?: number
+          processed_at?: string | null
+          request_hash?: string | null
+          status?: string
+          transaction_hash?: string | null
+          user_id?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -629,6 +704,10 @@ export type Database = {
       }
       commit_available_to_360lock: {
         Args: { p_amount: number; p_user_id: string }
+        Returns: Json
+      }
+      create_withdrawal_request: {
+        Args: { p_nctr_amount: number; p_wallet_address: string }
         Returns: Json
       }
       decrement: {
