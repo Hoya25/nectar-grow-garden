@@ -1,0 +1,198 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { ethers } from "https://esm.sh/ethers@6.7.0"
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+interface WithdrawalRequest {
+  id: string
+  user_id: string
+  wallet_address: string
+  nctr_amount: number
+  net_amount_nctr: number
+  gas_fee_nctr: number
+  status: string
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    const { action, request_id } = await req.json()
+
+    if (action === 'process_withdrawal') {
+      return await processWithdrawal(supabaseClient, request_id)
+    }
+
+    if (action === 'get_pending_withdrawals') {
+      return await getPendingWithdrawals(supabaseClient)
+    }
+
+    return new Response(
+      JSON.stringify({ error: 'Invalid action' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+    )
+
+  } catch (error) {
+    console.error('Treasury withdrawal error:', error)
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    )
+  }
+})
+
+async function processWithdrawal(supabaseClient: any, requestId: string) {
+  console.log(`🏦 Processing withdrawal request: ${requestId}`)
+
+  // Get withdrawal request details
+  const { data: withdrawal, error: withdrawalError } = await supabaseClient
+    .from('withdrawal_requests')
+    .select('*')
+    .eq('id', requestId)
+    .eq('status', 'pending')
+    .single()
+
+  if (withdrawalError || !withdrawal) {
+    console.error('❌ Withdrawal request not found:', withdrawalError)
+    return new Response(
+      JSON.stringify({ error: 'Withdrawal request not found' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
+    )
+  }
+
+  try {
+    // Update status to processing
+    await supabaseClient
+      .from('withdrawal_requests')
+      .update({ status: 'processing' })
+      .eq('id', requestId)
+
+    // Get treasury wallet private key
+    const privateKey = Deno.env.get('TREASURY_WALLET_PRIVATE_KEY')
+    if (!privateKey) {
+      throw new Error('Treasury wallet private key not configured')
+    }
+
+    // Set up Ethereum provider and wallet
+    const provider = new ethers.JsonRpcProvider('https://mainnet.infura.io/v3/YOUR_INFURA_KEY') // Replace with actual RPC URL
+    const wallet = new ethers.Wallet(privateKey, provider)
+
+    // NCTR Token Contract Address (replace with actual contract address)
+    const NCTR_CONTRACT_ADDRESS = '0x973104fAa7F2B11787557e85953ECA6B4e262328'
+    
+    // ERC-20 ABI for transfer function
+    const ERC20_ABI = [
+      "function transfer(address to, uint256 amount) returns (bool)",
+      "function balanceOf(address owner) view returns (uint256)",
+      "function decimals() view returns (uint8)"
+    ]
+
+    const nctrContract = new ethers.Contract(NCTR_CONTRACT_ADDRESS, ERC20_ABI, wallet)
+
+    // Convert NCTR amount to wei (assuming 18 decimals)
+    const amountInWei = ethers.parseUnits(withdrawal.net_amount_nctr.toString(), 18)
+
+    // Check treasury balance
+    const balance = await nctrContract.balanceOf(wallet.address)
+    if (balance < amountInWei) {
+      throw new Error('Insufficient treasury balance')
+    }
+
+    // Execute the transfer
+    console.log(`💸 Sending ${withdrawal.net_amount_nctr} NCTR to ${withdrawal.wallet_address}`)
+    const tx = await nctrContract.transfer(withdrawal.wallet_address, amountInWei)
+    
+    console.log(`📋 Transaction hash: ${tx.hash}`)
+    
+    // Wait for confirmation
+    const receipt = await tx.wait()
+    console.log(`✅ Transaction confirmed in block: ${receipt.blockNumber}`)
+
+    // Update withdrawal request as completed
+    await supabaseClient
+      .from('withdrawal_requests')
+      .update({
+        status: 'completed',
+        transaction_hash: tx.hash,
+        processed_at: new Date().toISOString()
+      })
+      .eq('id', requestId)
+
+    // Update user's transaction status
+    await supabaseClient
+      .from('nctr_transactions')
+      .update({ status: 'completed' })
+      .eq('user_id', withdrawal.user_id)
+      .eq('transaction_type', 'withdrawal')
+      .eq('status', 'pending')
+
+    console.log(`🎉 Withdrawal completed successfully for user ${withdrawal.user_id}`)
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        transaction_hash: tx.hash,
+        net_amount: withdrawal.net_amount_nctr
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+
+  } catch (error) {
+    console.error('❌ Withdrawal processing failed:', error)
+
+    // Update withdrawal as failed
+    await supabaseClient
+      .from('withdrawal_requests')
+      .update({
+        status: 'failed',
+        failure_reason: error.message
+      })
+      .eq('id', requestId)
+
+    // Refund user's available balance
+    await supabaseClient.rpc('move_pending_to_available', {
+      p_user_id: withdrawal.user_id,
+      p_amount: withdrawal.nctr_amount
+    })
+
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    )
+  }
+}
+
+async function getPendingWithdrawals(supabaseClient: any) {
+  const { data, error } = await supabaseClient
+    .from('withdrawal_requests')
+    .select(`
+      *,
+      profiles!inner(username, full_name, email)
+    `)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching pending withdrawals:', error)
+    return new Response(
+      JSON.stringify({ error: 'Failed to fetch pending withdrawals' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    )
+  }
+
+  return new Response(
+    JSON.stringify({ withdrawals: data }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  )
+}

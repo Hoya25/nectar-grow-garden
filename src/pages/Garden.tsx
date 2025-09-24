@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useWallet } from '@/hooks/useWallet';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import UserAffiliateLinks from '@/components/UserAffiliateLinks';
+import { WithdrawalModal } from '@/components/WithdrawalModal';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
@@ -70,6 +72,7 @@ import ProfileModal from '@/components/ProfileModal';
 
 const Garden = () => {
   const { user, signOut } = useAuth();
+  const { address: connectedWallet } = useWallet();
   const { isAdmin } = useAdmin();
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress } = useNCTRPrice();
   const { getSetting, loading: settingsLoading } = useSiteSettings(['earning_opportunities_banner_title', 'earning_opportunities_banner_subtitle']);
@@ -81,6 +84,7 @@ const Garden = () => {
   const [portfolioExpanded, setPortfolioExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [withdrawalModalOpen, setWithdrawalModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
@@ -841,7 +845,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                   </Card>
                 </div>
 
-                <div className="flex justify-center">
+                <div className="flex justify-center gap-4 flex-wrap">
                   <Button 
                     variant="outline"
                     onClick={(e) => {
@@ -853,6 +857,20 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     <User className="w-4 h-4 mr-2" />
                     Portfolio Details & Sync
                   </Button>
+                  
+                  {(portfolio?.available_nctr && portfolio.available_nctr > 0) && (
+                    <Button 
+                      variant="default"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setWithdrawalModalOpen(true);
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Wallet className="w-4 h-4 mr-2" />
+                      Withdraw NCTR
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             )}
@@ -1250,6 +1268,14 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Withdrawal Modal */}
+      <WithdrawalModal 
+        isOpen={withdrawalModalOpen}
+        onClose={() => setWithdrawalModalOpen(false)}
+        availableNCTR={portfolio?.available_nctr || 0}
+        walletAddress={connectedWallet}
+      />
     </div>
   );
 };
