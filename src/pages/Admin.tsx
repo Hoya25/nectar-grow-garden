@@ -28,6 +28,7 @@ import LoyalizeApiTester from '@/components/admin/LoyalizeApiTester';
 import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
 import WebhookTester from '@/components/WebhookTester';
 import BannerEditor from '@/components/admin/BannerEditor';
+import ReferralManagement from '@/components/admin/ReferralManagement';
 
 interface AdminStats {
   total_users: number;
@@ -220,14 +221,18 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="opportunities" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 bg-section-highlight">
+          <TabsList className="grid w-full grid-cols-5 bg-section-highlight">
             <TabsTrigger value="opportunities" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Gift className="w-4 h-4" />
-              Create Opportunities
+              Opportunities
+            </TabsTrigger>
+            <TabsTrigger value="referrals" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Users className="w-4 h-4" />
+              Referrals
             </TabsTrigger>
             <TabsTrigger value="loyalize" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Sparkles className="w-4 h-4" />
-              Find Brands
+              Brands
             </TabsTrigger>
             <TabsTrigger value="webhooks" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Webhook className="w-4 h-4" />
@@ -241,6 +246,10 @@ const Admin = () => {
 
           <TabsContent value="opportunities">
             <OpportunityManagement onStatsUpdate={fetchAdminStats} />
+          </TabsContent>
+
+          <TabsContent value="referrals">
+            <ReferralManagement />
           </TabsContent>
 
           <TabsContent value="loyalize">
