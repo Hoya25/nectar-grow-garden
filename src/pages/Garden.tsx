@@ -90,7 +90,6 @@ const Garden = () => {
   const [copied, setCopied] = useState(false);
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
-  const [dailyCheckinAvailable, setDailyCheckinAvailable] = useState<boolean>(true);
 
   useEffect(() => {
     if (!user) {
@@ -103,7 +102,6 @@ const Garden = () => {
     fetchUserData();
     generateReferralCode();
     fetchReferralStats();
-    checkDailyCheckinAvailability();
   }, [user, navigate]);
 
   const generateReferralCode = () => {
@@ -184,20 +182,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
   const shareViaWhatsApp = () => {
     const message = `🌱 Join The Garden and start earning NCTR tokens! Use my referral link: ${getReferralLink()}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
-  };
-
-  const checkDailyCheckinAvailability = async () => {
-    if (!user) return;
-    
-    try {
-      const { data: isAvailable } = await supabase.rpc('is_daily_checkin_available', {
-        p_user_id: user.id
-      });
-      setDailyCheckinAvailable(isAvailable || false);
-    } catch (error) {
-      console.error('Error checking daily checkin availability:', error);
-      setDailyCheckinAvailable(false);
-    }
   };
 
   const fetchUserData = async () => {
@@ -351,16 +335,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
   const handleDailyCheckinOpportunity = async (opportunity: EarningOpportunity) => {
     try {
-      // Check if daily checkin is available first
-      if (!dailyCheckinAvailable) {
-        toast({
-          title: "Already Claimed Today",
-          description: "You've already claimed your daily bonus today. Come back tomorrow!",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Check if daily checkin is available
       const { data: isAvailable } = await supabase.rpc('is_daily_checkin_available', {
         p_user_id: user?.id
@@ -372,7 +346,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           description: "You've already claimed your daily bonus today. Come back tomorrow!",
           variant: "destructive",
         });
-        setDailyCheckinAvailable(false);
         return;
       }
 
@@ -393,8 +366,6 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         
         // Refresh user data to show updated balance
         fetchUserData();
-        // Update daily checkin availability
-        setDailyCheckinAvailable(false);
       } else {
         throw new Error(checkinResult.error || 'Failed to claim daily bonus');
       }
@@ -977,79 +948,40 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </p>
           </div>
 
-          {/* Daily Check-in Section - Premium Design with Availability Check */}
+          {/* Daily Check-in Section - Premium Design */}
           <div className="mb-8">
             {opportunities.filter(op => op.opportunity_type === 'daily_checkin').map(opportunity => (
-              <div key={opportunity.id}>
-                {dailyCheckinAvailable ? (
-                  // Full Card - Available for claiming
-                  <Card className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 border-green-200 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
-                    <CardContent className="p-6 sm:p-8">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-                          <Gift className="w-5 h-5 text-green-600" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-green-700 mb-1">{opportunity.title}</h3>
-                          <p className="text-sm text-green-600">{opportunity.description}</p>
-                        </div>
-                      </div>
+              <Card key={opportunity.id} className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 border-green-200 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
+                <CardContent className="p-6 sm:p-8">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                      <Gift className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-700 mb-1">{opportunity.title}</h3>
+                      <p className="text-sm text-green-600">{opportunity.description}</p>
+                    </div>
+                  </div>
 
-                      <div className="text-center py-4 mb-4">
-                        <div className="flex items-center justify-center gap-2 mb-3">
-                          <span className="text-3xl font-bold text-green-600">
-                            {formatNCTR(
-                              (opportunity.available_nctr_reward || 0) + 
-                              (opportunity.lock_90_nctr_reward || 0) + 
-                              (opportunity.lock_360_nctr_reward || 0) + 
-                              (opportunity.nctr_reward || 0)
-                            )} NCTR
-                          </span>
-                        </div>
-                        <p className="text-sm text-green-600 mb-4">Daily Reward Available</p>
-                        
-                        <RewardDisplay opportunity={opportunity} size="md" />
-                      </div>
+                  <div className="text-center py-4 mb-4">
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <span className="text-3xl font-bold text-green-600">
+                        {formatNCTR(opportunity.available_nctr_reward || 50)} NCTR
+                      </span>
+                    </div>
+                    <p className="text-sm text-green-600 mb-4">Daily Available Bonus</p>
+                    
+                    <RewardDisplay opportunity={opportunity} size="md" />
+                  </div>
 
-                      <Button 
-                        className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6 group-hover:scale-105 transition-transform"
-                        size="lg"
-                      >
-                        <Gift className="w-5 h-5 mr-2" />
-                        Claim Daily Bonus
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  // Minimized Card - Already claimed today
-                  <Card className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 opacity-75">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-gray-400/20 rounded-lg flex items-center justify-center">
-                            <Check className="w-4 h-4 text-gray-500" />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-semibold text-gray-600">{opportunity.title}</h4>
-                            <p className="text-xs text-gray-500">Claimed for today</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium text-gray-600">
-                            {formatNCTR(
-                              (opportunity.available_nctr_reward || 0) + 
-                              (opportunity.lock_90_nctr_reward || 0) + 
-                              (opportunity.lock_360_nctr_reward || 0) + 
-                              (opportunity.nctr_reward || 0)
-                            )} NCTR
-                          </div>
-                          <p className="text-xs text-gray-400">Come back tomorrow</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6 group-hover:scale-105 transition-transform"
+                    size="lg"
+                  >
+                    {opportunity.cta_text || '✅ Claim Daily Bonus'}
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
