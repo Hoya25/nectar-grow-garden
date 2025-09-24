@@ -35,7 +35,10 @@ const ReferralSystem = () => {
   });
   const [copied, setCopied] = useState(false);
 
+  console.log('ReferralSystem: Current user status:', userStatus, 'User ID:', user?.id);
+
   useEffect(() => {
+    console.log('ReferralSystem: useEffect triggered with user:', !!user);
     if (user) {
       generateReferralCode();
       fetchUserStatus();
@@ -44,6 +47,7 @@ const ReferralSystem = () => {
 
   // Separate effect for fetching stats when multiplier changes
   useEffect(() => {
+    console.log('ReferralSystem: Stats useEffect triggered, multiplier:', userStatus.reward_multiplier);
     if (user && userStatus.reward_multiplier) {
       fetchReferralStats();
     }
@@ -57,6 +61,7 @@ const ReferralSystem = () => {
   };
 
   const fetchUserStatus = async () => {
+    console.log('ReferralSystem: fetchUserStatus called for user:', user?.id);
     if (!user) return;
 
     try {
@@ -67,6 +72,8 @@ const ReferralSystem = () => {
         .eq('user_id', user.id)
         .single();
 
+      console.log('ReferralSystem: Portfolio data:', portfolio, 'Error:', portfolioError);
+
       if (portfolioError) throw portfolioError;
 
       // Then get the status level details
@@ -75,6 +82,8 @@ const ReferralSystem = () => {
         .select('reward_multiplier')
         .eq('status_name', portfolio?.opportunity_status || 'starter')
         .single();
+
+      console.log('ReferralSystem: Status level data:', statusLevel, 'Error:', statusError);
 
       if (statusError) throw statusError;
 
@@ -86,7 +95,7 @@ const ReferralSystem = () => {
       console.log('ReferralSystem: User status updated:', newStatus);
       setUserStatus(newStatus);
     } catch (error) {
-      console.error('Error fetching user status:', error);
+      console.error('ReferralSystem: Error fetching user status:', error);
       // Default to starter status
       const defaultStatus = {
         opportunity_status: 'starter',
