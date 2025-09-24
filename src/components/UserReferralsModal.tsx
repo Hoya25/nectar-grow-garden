@@ -53,7 +53,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
       return;
     }
     
-    console.log('Fetching referrals for user:', user.id, 'Modal open:', isOpen);
+    console.log('Fetching referrals for user:', user.id);
     setLoading(true);
     
     try {
@@ -143,7 +143,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
     } finally {
       setLoading(false);
     }
-  }, [user, isOpen, toast]);
+  }, [user, toast]);
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(referralCode);
@@ -169,7 +169,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
       console.log('Modal opened, triggering fetchUserReferrals for user:', user.id);
       fetchUserReferrals();
     }
-  }, [isOpen, user, fetchUserReferrals]);
+  }, [isOpen, user?.id]); // Simplified dependencies
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
