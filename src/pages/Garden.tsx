@@ -1237,42 +1237,61 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
               <div className="grid gap-4 md:grid-cols-2">
                 {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type)).map((opportunity) => {
                   const isCompleted = completedOpportunityIds.includes(opportunity.id);
+                  
+                  // Show minimized completed state
+                  if (isCompleted) {
+                    return (
+                      <Card key={opportunity.id} className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                <Check className="w-4 h-4 text-green-600" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-700">{opportunity.title}</h4>
+                                <p className="text-xs text-gray-500">Completed & rewarded</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
+                                +{formatNCTR(
+                                  (opportunity.available_nctr_reward || 0) + 
+                                  (opportunity.lock_90_nctr_reward || 0) + 
+                                  (opportunity.lock_360_nctr_reward || 0) ||
+                                  opportunity.nctr_reward || 0
+                                )} NCTR
+                              </span>
+                              <span className="text-xs text-gray-500">✓ Done</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  }
+                  
+                  // Show full active state
                   return (
                     <Card 
                       key={opportunity.id}
-                      className={`cursor-pointer hover:shadow-medium transition-all duration-300 group border ${
-                        isCompleted 
-                          ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-200' 
-                          : 'bg-gradient-to-br from-white to-section-highlight border-section-border hover:border-primary/30'
-                      }`}
-                      onClick={() => !isCompleted && handleOpportunityClick(opportunity)}
+                      className="cursor-pointer hover:shadow-medium transition-all duration-300 group border bg-gradient-to-br from-white to-section-highlight border-section-border hover:border-primary/30"
+                      onClick={() => handleOpportunityClick(opportunity)}
                     >
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full transition-colors ${
-                              isCompleted 
-                                ? 'bg-green-100' 
-                                : 'bg-primary/10 group-hover:bg-primary/20'
-                            }`}>
-                              {isCompleted ? (
-                                <Check className="w-6 h-6 text-green-600" />
-                              ) : opportunity.opportunity_type === 'social_follow' ? (
+                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full transition-colors bg-primary/10 group-hover:bg-primary/20">
+                              {opportunity.opportunity_type === 'social_follow' ? (
                                 <ExternalLink className="w-6 h-6 text-primary" />
                               ) : (
                                 <Gift className="w-6 h-6 text-primary" />
                               )}
                             </div>
                             <div>
-                              <h4 className={`font-semibold text-sm mb-1 ${
-                                isCompleted ? 'text-green-800' : 'section-heading'
-                              }`}>
+                              <h4 className="font-semibold text-sm mb-1 section-heading">
                                 {opportunity.title}
-                                {isCompleted && <span className="ml-2 text-xs">✓ Completed</span>}
                               </h4>
-                              <p className={`text-xs line-clamp-2 ${
-                                isCompleted ? 'text-green-600' : 'section-text'
-                              }`}>
+                              <p className="text-xs line-clamp-2 section-text">
                                 {opportunity.description}
                               </p>
                             </div>
@@ -1295,68 +1314,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                         </div>
 
                         <Button 
-                          className={`w-full py-3 text-sm transition-all duration-300 ${
-                            isCompleted 
-                              ? 'bg-green-600 text-white cursor-default' 
-                              : 'bg-primary hover:bg-primary-glow text-primary-foreground group-hover:scale-105'
-                          }`}
-                          size="sm"
-                          disabled={isCompleted}
+                          className="w-full py-3 text-sm transition-all duration-300 bg-primary hover:bg-primary-glow text-primary-foreground"
                         >
-                          {isCompleted 
-                            ? '✅ Completed & Rewarded' 
-                            : opportunity.opportunity_type === 'social_follow' 
-                              ? 'Follow & Earn →' 
-                              : 'Complete Task →'
+                          {opportunity.opportunity_type === 'social_follow' 
+                            ? 'Follow & Earn →' 
+                            : 'Complete Task →'
                           }
                         </Button>
                       </CardContent>
                     </Card>
                   );
                 })}
-              </div>
-            </div>
-          )}
-
-          {/* Completed Opportunities Section */}
-          {opportunities.filter(op => completedOpportunityIds.includes(op.id)).length > 0 && (
-            <div className="mb-8">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-semibold section-heading mb-2 flex items-center justify-center gap-2">
-                  <Check className="w-6 h-6 text-green-600" />
-                  Completed Opportunities
-                </h3>
-                <p className="section-text">Great job! You've completed these opportunities</p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {opportunities.filter(op => completedOpportunityIds.includes(op.id)).map((opportunity) => (
-                  <Card 
-                    key={opportunity.id}
-                    className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-sm"
-                  >
-                    <CardContent className="p-4">
-                      <div className="text-center">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-                          <Check className="w-6 h-6 text-green-600" />
-                        </div>
-                        <h4 className="font-semibold text-green-800 mb-2">{opportunity.title}</h4>
-                        <p className="text-sm text-green-600 mb-3 line-clamp-2">
-                          {opportunity.description}
-                        </p>
-                        <div className="flex items-center justify-center gap-1">
-                          <span className="text-lg font-bold text-green-700">
-                            {formatNCTR(opportunity.nctr_reward || opportunity.available_nctr_reward || opportunity.lock_360_nctr_reward || 0)}
-                          </span>
-                          <span className="text-sm text-green-600">NCTR Earned</span>
-                        </div>
-                        <Badge className="mt-2 bg-green-600 text-white">
-                          ✅ Completed
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
               </div>
             </div>
           )}
