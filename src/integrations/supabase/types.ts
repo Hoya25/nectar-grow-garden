@@ -120,6 +120,33 @@ export type Database = {
           },
         ]
       }
+      api_rate_limits: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          request_count: number | null
+          user_id: string
+          window_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          request_count?: number | null
+          user_id: string
+          window_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          request_count?: number | null
+          user_id?: string
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           category: string | null
@@ -646,6 +673,45 @@ export type Database = {
         }
         Relationships: []
       }
+      security_audit_log: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_table: string
+          risk_level: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_table: string
+          risk_level?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_table?: string
+          risk_level?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -758,7 +824,15 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      security_summary: {
+        Row: {
+          active_users_today: number | null
+          critical_events_today: number | null
+          high_risk_events_today: number | null
+          last_activity: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_sample_brands: {
@@ -813,6 +887,14 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      check_user_is_admin_secure: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
+      cleanup_old_audit_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       commit_all_nctr_to_360lock: {
         Args: { p_user_id: string }
         Returns: Json
@@ -829,7 +911,19 @@ export type Database = {
         Args: { x: number }
         Returns: number
       }
+      detect_suspicious_activity: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          last_activity: string
+          suspicious_actions: number
+          user_id: string
+        }[]
+      }
       get_admin_financial_access: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      get_admin_financial_access_secure: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
@@ -906,8 +1000,21 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      log_sensitive_access: {
+        Args: {
+          p_action_type: string
+          p_resource_id?: string
+          p_resource_table: string
+          p_risk_level?: string
+        }
+        Returns: undefined
+      }
       make_user_admin_by_email: {
         Args: { admin_role?: string; user_email: string }
+        Returns: string
+      }
+      mask_sensitive_data: {
+        Args: { input_text: string; mask_type?: string }
         Returns: string
       }
       move_pending_to_available: {
