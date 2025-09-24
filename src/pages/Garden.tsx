@@ -823,7 +823,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       <CardContent className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2 mb-2">
                           <UserCheck className="w-5 h-5 text-purple-600" />
-                          <span className="text-sm font-medium text-purple-600">My Referrals</span>
+                          <span className="text-sm font-medium text-purple-600">My Invites</span>
                         </div>
                         <p className="text-xl font-bold text-purple-600 mb-1">
                           {referralStats.successful}

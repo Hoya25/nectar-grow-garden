@@ -40,6 +40,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
   const fetchUserReferrals = async () => {
     if (!isOpen || !user) return;
     
+    console.log('Fetching referrals for user:', user.id);
     setLoading(true);
     try {
       // Generate user's referral code (first 8 chars of user ID)
@@ -53,6 +54,8 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
         .eq('referrer_user_id', user.id)
         .order('created_at', { ascending: false });
 
+      console.log('Referrals query result:', { referralsData, referralsError });
+
       if (referralsError) throw referralsError;
 
       if (referralsData && referralsData.length > 0) {
@@ -63,6 +66,8 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
           .from('profiles')
           .select('user_id, full_name, username, email')
           .in('user_id', referredUserIds);
+
+        console.log('Profiles query result:', { profilesData, profilesError });
 
         if (profilesError) throw profilesError;
 
@@ -92,7 +97,15 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
           pending,
           totalRewards: completed * 1000 // 1000 NCTR per successful referral
         });
+
+        console.log('Final stats:', {
+          total: enrichedReferrals.length,
+          completed,
+          pending,
+          totalRewards: completed * 1000
+        });
       } else {
+        console.log('No referrals found, setting empty state');
         setReferrals([]);
         setStats({ total: 0, completed: 0, pending: 0, totalRewards: 0 });
       }
@@ -127,7 +140,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
 
   useEffect(() => {
     fetchUserReferrals();
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -138,7 +151,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
-            My Referrals ({stats.total})
+            My Invites ({stats.total})
           </DialogTitle>
         </DialogHeader>
 
@@ -152,7 +165,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
             {/* Referral Code Section */}
             <Card className="bg-primary/5 border-primary/20">
               <CardHeader>
-                <CardTitle className="text-sm">Your Referral Code</CardTitle>
+                <CardTitle className="text-sm">Your Invite Code</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -179,7 +192,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
               <Card>
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-foreground">{stats.total}</div>
-                  <div className="text-sm text-muted-foreground">Total Referrals</div>
+                  <div className="text-sm text-muted-foreground">Total Invites</div>
                 </CardContent>
               </Card>
               <Card>
@@ -204,12 +217,12 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
 
             {/* Referrals List */}
             <div className="space-y-4">
-              <h3 className="font-semibold">Referral History</h3>
+              <h3 className="font-semibold">Invite History</h3>
               {referrals.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No referrals yet.</p>
-                  <p className="text-sm">Share your referral code with friends to get started!</p>
+                  <p>No invites yet.</p>
+                  <p className="text-sm">Share your invite code with friends to get started!</p>
                 </div>
               ) : (
                 <div className="space-y-3">
