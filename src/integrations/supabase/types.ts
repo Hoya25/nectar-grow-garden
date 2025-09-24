@@ -319,6 +319,30 @@ export type Database = {
         }
         Relationships: []
       }
+      nctr_price_cache: {
+        Row: {
+          created_at: string
+          id: string
+          price_usd: number
+          source: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          price_usd: number
+          source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          price_usd?: number
+          source?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nctr_transactions: {
         Row: {
           auto_lock_type: string | null

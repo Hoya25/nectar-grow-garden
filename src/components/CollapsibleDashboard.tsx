@@ -68,7 +68,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isConnected } = useWallet();
-  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue } = useNCTRPrice();
+  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, formatUSD } = useNCTRPrice();
 
   const handleCommitTo360LOCK = async () => {
     if (!user || !portfolio?.available_nctr || portfolio.available_nctr <= 0) {

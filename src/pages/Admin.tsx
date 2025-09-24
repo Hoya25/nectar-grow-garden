@@ -31,6 +31,7 @@ import WebhookTester from '@/components/WebhookTester';
 import BannerEditor from '@/components/admin/BannerEditor';
 import ReferralManagement from '@/components/admin/ReferralManagement';
 import InvitesModal from '@/components/admin/InvitesModal';
+import NCTRPriceManager from '@/components/admin/NCTRPriceManager';
 import WithdrawalManagement from '@/components/admin/WithdrawalManagement';
 
 interface AdminStats {
@@ -251,10 +252,14 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="withdrawals" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6 bg-section-highlight">
+          <TabsList className="grid w-full grid-cols-7 bg-section-highlight">
             <TabsTrigger value="withdrawals" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <TrendingUp className="w-4 h-4" />
+              <Activity className="w-4 h-4" />
               Withdrawals
+            </TabsTrigger>
+            <TabsTrigger value="price" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <TrendingUp className="w-4 h-4" />
+              NCTR Price
             </TabsTrigger>
             <TabsTrigger value="opportunities" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Gift className="w-4 h-4" />
@@ -280,6 +285,10 @@ const Admin = () => {
 
           <TabsContent value="withdrawals">
             <WithdrawalManagement />
+          </TabsContent>
+
+          <TabsContent value="price">
+            <NCTRPriceManager />
           </TabsContent>
 
           <TabsContent value="opportunities">

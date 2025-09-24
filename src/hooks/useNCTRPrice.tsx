@@ -18,6 +18,13 @@ interface PriceData {
   cached_at: string;
 }
 
+interface RealTimePriceData {
+  price: number;
+  last_updated: string;
+  source: string;
+  error?: string;
+}
+
 export const useNCTRPrice = () => {
   const [priceData, setPriceData] = useState<PriceData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,6 +35,34 @@ export const useNCTRPrice = () => {
       setLoading(true);
       setError(null);
 
+      // First try the new real-time price feed
+      const { data: realtimeData, error: realtimeError } = await supabase.functions.invoke('nctr-price-feed', {
+        body: { action: 'get_price' }
+      });
+
+      if (!realtimeError && realtimeData) {
+        const rtData = realtimeData as RealTimePriceData;
+        
+        // Convert to the expected format
+        const formattedData: PriceData = {
+          success: true,
+          contract_address: '0x973104fAa7F2B11787557e85953ECA6B4e262328',
+          chain_id: 8453, // Base network
+          price: {
+            price_usd: rtData.price,
+            price_change_24h: 0, // TODO: Calculate from historical data
+            last_updated: rtData.last_updated
+          },
+          sources: [{ name: 'DEX', type: rtData.source }],
+          cached_at: rtData.last_updated
+        };
+        
+        setPriceData(formattedData);
+        console.log(`📊 Real-time NCTR Price: $${rtData.price} (source: ${rtData.source})`);
+        return;
+      }
+
+      // Fallback to the existing pricing function
       const { data, error } = await supabase.functions.invoke('nctr-pricing', {
         body: { action: 'current' }
       });
@@ -35,9 +70,9 @@ export const useNCTRPrice = () => {
       if (error) throw error;
 
       setPriceData(data);
-    } catch (error) {
-      console.error('Error fetching NCTR price:', error);
-      setError(error instanceof Error ? error.message : 'Failed to fetch price');
+    } catch (fetchError) {
+      console.error('Error fetching NCTR price:', fetchError);
+      setError(fetchError instanceof Error ? fetchError.message : 'Failed to fetch price');
       
       // Fallback to mock data
       setPriceData({
@@ -53,6 +88,36 @@ export const useNCTRPrice = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const forceUpdatePrice = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('nctr-price-feed', {
+        body: { action: 'update_price' }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        const formattedData: PriceData = {
+          success: true,
+          contract_address: '0x973104fAa7F2B11787557e85953ECA6B4e262328',
+          chain_id: 8453,
+          price: {
+            price_usd: data.price,
+            price_change_24h: priceData?.price?.price_change_24h || 0,
+            last_updated: data.updated_at
+          },
+          sources: [{ name: 'DEX', type: 'onchain' }],
+          cached_at: data.updated_at
+        };
+        
+        setPriceData(formattedData);
+        console.log(`🔄 NCTR Price force updated: $${data.price}`);
+      }
+    } catch (updateError) {
+      console.error('Error force updating NCTR price:', updateError);
     }
   };
 
@@ -73,6 +138,16 @@ export const useNCTRPrice = () => {
   const calculatePortfolioValue = (nctrAmount: number): number => {
     if (!priceData?.price?.price_usd || nctrAmount === 0) return 0;
     return nctrAmount * priceData.price.price_usd;
+  };
+
+  const formatUSD = (nctrAmount: number): string => {
+    const usdValue = calculatePortfolioValue(nctrAmount);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: usdValue > 100 ? 2 : 6
+    }).format(usdValue);
   };
 
   const formatPrice = (price: number): string => {
@@ -99,12 +174,44 @@ export const useNCTRPrice = () => {
   useEffect(() => {
     fetchPrice();
 
-    // Set up periodic price updates (every 30 seconds)
+    // Set up periodic price updates (every 5 minutes for real-time data)
     const interval = setInterval(() => {
       fetchPrice();
-    }, 30000);
+    }, 5 * 60 * 1000);
 
-    return () => clearInterval(interval);
+    // Set up real-time updates from database changes
+    const subscription = supabase
+      .channel('nctr_price_updates')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'nctr_price_cache' },
+        (payload) => {
+          console.log('🔔 Price update received:', payload);
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const newData = payload.new as any;
+            
+            const formattedData: PriceData = {
+              success: true,
+              contract_address: '0x973104fAa7F2B11787557e85953ECA6B4e262328',
+              chain_id: 8453,
+              price: {
+                price_usd: newData.price_usd,
+                price_change_24h: priceData?.price?.price_change_24h || 0,
+                last_updated: newData.updated_at
+              },
+              sources: [{ name: 'DEX', type: newData.source || 'realtime' }],
+              cached_at: newData.updated_at
+            };
+            
+            setPriceData(formattedData);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      clearInterval(interval);
+      subscription.unsubscribe();
+    };
   }, []);
 
   return {
@@ -112,8 +219,10 @@ export const useNCTRPrice = () => {
     loading,
     error,
     fetchPrice,
+    forceUpdatePrice,
     fetchPriceHistory,
     calculatePortfolioValue,
+    formatUSD,
     formatPrice,
     formatChange,
     getChangeColor,

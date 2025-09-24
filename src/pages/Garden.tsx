@@ -76,7 +76,7 @@ const Garden = () => {
   const { user, signOut } = useAuth();
   const { address: connectedWallet } = useWallet();
   const { isAdmin } = useAdmin();
-  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress } = useNCTRPrice();
+  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress, formatUSD } = useNCTRPrice();
   const { getSetting, loading: settingsLoading } = useSiteSettings(['earning_opportunities_banner_title', 'earning_opportunities_banner_subtitle']);
   const navigate = useNavigate();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
@@ -845,6 +845,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       <p className="text-xl font-bold text-blue-600 mb-1">
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
+                      <p className="text-xs text-muted-foreground">{formatUSD(portfolio?.available_nctr || 0)}</p>
                       <p className="text-xs text-muted-foreground">Ready to commit</p>
                     </CardContent>
                   </Card>
@@ -858,6 +859,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       <p className="text-xl font-bold text-orange-600 mb-1">
                         {formatNCTR(portfolio?.lock_90_nctr || 0)}
                       </p>
+                      <p className="text-xs text-muted-foreground">{formatUSD(portfolio?.lock_90_nctr || 0)}</p>
                       <p className="text-xs text-orange-600/80">Short commitment</p>
                     </CardContent>
                   </Card>
@@ -871,6 +873,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       <p className="text-xl font-bold text-primary mb-1">
                         {formatNCTR(portfolio?.lock_360_nctr || 0)}
                       </p>
+                      <p className="text-xs text-muted-foreground">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
                       <p className="text-xs text-primary/80">Alliance Benefits</p>
                     </CardContent>
                   </Card>
@@ -884,6 +887,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       <p className="text-xl font-bold text-green-600 mb-1">
                         {formatNCTR(portfolio?.total_earned || 0)}
                       </p>
+                      <p className="text-xs text-muted-foreground">{formatUSD(portfolio?.total_earned || 0)}</p>
                       <p className="text-xs text-green-600/80">Lifetime NCTR</p>
                     </CardContent>
                   </Card>

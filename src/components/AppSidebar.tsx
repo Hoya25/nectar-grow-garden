@@ -59,7 +59,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue } = useNCTRPrice();
+  const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, formatUSD } = useNCTRPrice();
 
   const handleCommitTo360LOCK = async () => {
     if (!user || !portfolio?.available_nctr || portfolio.available_nctr <= 0) {
