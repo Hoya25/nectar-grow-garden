@@ -783,6 +783,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: boolean
       }
+      is_daily_checkin_available: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       make_user_admin_by_email: {
         Args: { admin_role?: string; user_email: string }
         Returns: string
@@ -790,6 +794,10 @@ export type Database = {
       move_pending_to_available: {
         Args: { p_amount: number; p_user_id: string }
         Returns: undefined
+      }
+      process_daily_checkin: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       process_referral_reward: {
         Args: { p_referral_id: string }

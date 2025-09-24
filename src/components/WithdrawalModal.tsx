@@ -26,13 +26,11 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
   const { provider } = useWallet();
 
   const calculateFees = (withdrawalAmount: number) => {
-    const gasFee = 0.5; // Fixed gas fee only
-    const netAmount = withdrawalAmount - gasFee;
-    
+    // No fees - user gets full amount
     setFees({
-      withdrawalFee: 0, // No withdrawal fee
-      gasFee,
-      netAmount: Math.max(0, netAmount)
+      withdrawalFee: 0,
+      gasFee: 0,
+      netAmount: withdrawalAmount
     });
   };
 
@@ -93,7 +91,7 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
     if (fees.netAmount <= 0) {
       toast({
         title: "Amount Too Small", 
-        description: "The withdrawal amount is too small after fees",
+        description: "Please enter a valid withdrawal amount",
         variant: "destructive"
       });
       return;
@@ -162,6 +160,13 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
               <strong>Base Network Required:</strong> Withdrawals are processed on Base network. Ensure your wallet is connected to Base.
             </AlertDescription>
           </Alert>
+          
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Fee-Free Withdrawals:</strong> No fees charged! You receive the full amount you withdraw.
+            </AlertDescription>
+          </Alert>
 
           <div className="space-y-2">
             <Label htmlFor="amount">Withdrawal Amount (NCTR)</Label>
@@ -216,19 +221,12 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
           </div>
 
           {parseFloat(amount) > 0 && (
-            <div className="bg-muted p-3 rounded-lg space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Withdrawal Amount:</span>
-                <span>{parseFloat(amount).toFixed(2)} NCTR</span>
+            <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+              <div className="flex justify-between items-center">
+                <span className="text-green-800 font-medium">You'll Receive:</span>
+                <span className="text-green-800 font-bold text-lg">{parseFloat(amount).toFixed(2)} NCTR</span>
               </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Gas Fee:</span>
-                <span>-{fees.gasFee.toFixed(2)} NCTR</span>
-              </div>
-              <div className="border-t pt-2 flex justify-between font-medium">
-                <span>You'll Receive:</span>
-                <span>{fees.netAmount.toFixed(2)} NCTR</span>
-              </div>
+              <p className="text-green-600 text-sm mt-1">✅ Fee-free withdrawal</p>
             </div>
           )}
 
@@ -236,7 +234,7 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                The withdrawal amount is too small after gas fees. Minimum withdrawal is 1 NCTR.
+                Please enter a valid withdrawal amount.
               </AlertDescription>
             </Alert>
           )}
@@ -247,7 +245,7 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
             </Button>
             <Button 
               onClick={handleWithdrawal} 
-              disabled={isProcessing || fees.netAmount <= 0 || !amount}
+              disabled={isProcessing || parseFloat(amount) <= 0 || !amount}
               className="flex-1"
             >
               {isProcessing ? (

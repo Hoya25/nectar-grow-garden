@@ -60,6 +60,7 @@ interface EarningOpportunity {
   video_url?: string;
   video_title?: string;
   video_description?: string;
+  cta_text?: string;
   // New reward structure fields
   available_nctr_reward?: number;
   lock_90_nctr_reward?: number;
@@ -315,6 +316,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       case 'bonus':
         handleBonusOpportunity(opportunity);
         break;
+      case 'daily_checkin':
+        handleDailyCheckinOpportunity(opportunity);
+        break;
       case 'social_follow':
         handleSocialFollowOpportunity(opportunity);
         break;
@@ -325,6 +329,52 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       default:
         handleGenericOpportunity(opportunity);
         break;
+    }
+  };
+
+  const handleDailyCheckinOpportunity = async (opportunity: EarningOpportunity) => {
+    try {
+      // Check if daily checkin is available
+      const { data: isAvailable } = await supabase.rpc('is_daily_checkin_available', {
+        p_user_id: user?.id
+      });
+
+      if (!isAvailable) {
+        toast({
+          title: "Already Claimed Today",
+          description: "You've already claimed your daily bonus today. Come back tomorrow!",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Process the daily checkin
+      const { data: result, error } = await supabase.rpc('process_daily_checkin', {
+        p_user_id: user?.id
+      });
+
+      if (error) throw error;
+
+      const checkinResult = result as { success: boolean; reward_amount?: number; message?: string; error?: string };
+
+      if (checkinResult.success) {
+        toast({
+          title: "Daily Bonus Claimed! 🎉",
+          description: `You earned ${checkinResult.reward_amount?.toFixed(2)} NCTR! ${checkinResult.message}`,
+        });
+        
+        // Refresh user data to show updated balance
+        fetchUserData();
+      } else {
+        throw new Error(checkinResult.error || 'Failed to claim daily bonus');
+      }
+    } catch (error: any) {
+      console.error('Daily checkin error:', error);
+      toast({
+        title: "Checkin Failed",
+        description: error.message || "Failed to claim daily bonus. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -886,6 +936,43 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             <p className="text-base sm:text-lg section-text max-w-3xl mx-auto">
               {getSetting('earning_opportunities_banner_subtitle') || 'Simple activities, real rewards – start earning today'}
             </p>
+          </div>
+
+          {/* Daily Check-in Section - Premium Design */}
+          <div className="mb-8">
+            {opportunities.filter(op => op.opportunity_type === 'daily_checkin').map(opportunity => (
+              <Card key={opportunity.id} className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 border-green-200 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
+                <CardContent className="p-6 sm:p-8">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                      <Gift className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-700 mb-1">{opportunity.title}</h3>
+                      <p className="text-sm text-green-600">{opportunity.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="text-center py-4 mb-4">
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <span className="text-3xl font-bold text-green-600">
+                        {formatNCTR(opportunity.available_nctr_reward || 50)} NCTR
+                      </span>
+                    </div>
+                    <p className="text-sm text-green-600 mb-4">Daily Available Bonus</p>
+                    
+                    <RewardDisplay opportunity={opportunity} size="md" />
+                  </div>
+
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6 group-hover:scale-105 transition-transform"
+                    size="lg"
+                  >
+                    {opportunity.cta_text || '✅ Claim Daily Bonus'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           {/* Invite Section - Premium Design */}
