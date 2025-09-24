@@ -1,0 +1,266 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Users, Calendar, Award, Loader2, Copy, Share2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
+import { toast } from '@/hooks/use-toast';
+
+interface ReferralData {
+  id: string;
+  referred_user_id: string;
+  created_at: string;
+  rewarded_at: string | null;
+  referral_code: string;
+  referred_name: string;
+  status: string;
+  reward_credited: boolean;
+}
+
+interface UserReferralsModalProps {
+  children: React.ReactNode;
+}
+
+const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
+  const { user } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [referrals, setReferrals] = useState<ReferralData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState<string>('');
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
+    pending: 0,
+    totalRewards: 0
+  });
+
+  const fetchUserReferrals = async () => {
+    if (!isOpen || !user) return;
+    
+    setLoading(true);
+    try {
+      // Generate user's referral code (first 8 chars of user ID)
+      const userCode = user.id.substring(0, 8).toUpperCase();
+      setReferralCode(userCode);
+
+      // Get user's referrals
+      const { data: referralsData, error: referralsError } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referrer_user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (referralsError) throw referralsError;
+
+      if (referralsData && referralsData.length > 0) {
+        // Get referred users' names
+        const referredUserIds = referralsData.map(r => r.referred_user_id);
+        
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, username, email')
+          .in('user_id', referredUserIds);
+
+        if (profilesError) throw profilesError;
+
+        // Create profile lookup map
+        const profileMap = new Map(
+          profilesData?.map(p => [
+            p.user_id, 
+            p.full_name || p.username || p.email?.split('@')[0] || 'Unknown User'
+          ]) || []
+        );
+
+        // Enrich referrals with names
+        const enrichedReferrals = referralsData.map(referral => ({
+          ...referral,
+          referred_name: profileMap.get(referral.referred_user_id) || 'Unknown User',
+        }));
+
+        setReferrals(enrichedReferrals);
+
+        // Calculate stats
+        const completed = enrichedReferrals.filter(r => r.status === 'completed' && r.reward_credited).length;
+        const pending = enrichedReferrals.filter(r => r.status !== 'completed' || !r.reward_credited).length;
+        
+        setStats({
+          total: enrichedReferrals.length,
+          completed,
+          pending,
+          totalRewards: completed * 1000 // 1000 NCTR per successful referral
+        });
+      } else {
+        setReferrals([]);
+        setStats({ total: 0, completed: 0, pending: 0, totalRewards: 0 });
+      }
+    } catch (error) {
+      console.error('Error fetching user referrals:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load referral data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyReferralCode = () => {
+    navigator.clipboard.writeText(referralCode);
+    toast({
+      title: "Copied!",
+      description: "Your referral code has been copied to clipboard.",
+    });
+  };
+
+  const shareReferralLink = () => {
+    const referralUrl = `${window.location.origin}/auth?ref=${referralCode}`;
+    navigator.clipboard.writeText(referralUrl);
+    toast({
+      title: "Link Copied!",
+      description: "Your referral link has been copied to clipboard.",
+    });
+  };
+
+  useEffect(() => {
+    fetchUserReferrals();
+  }, [isOpen]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            My Referrals ({stats.total})
+          </DialogTitle>
+        </DialogHeader>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin mr-2" />
+            <span>Loading your referrals...</span>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Referral Code Section */}
+            <Card className="bg-primary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-sm">Your Referral Code</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl font-mono font-bold text-primary bg-primary/10 px-3 py-1 rounded">
+                    {referralCode}
+                  </div>
+                  <Button variant="outline" size="sm" onClick={copyReferralCode}>
+                    <Copy className="w-4 h-4 mr-1" />
+                    Copy Code
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={shareReferralLink}>
+                    <Share2 className="w-4 h-4 mr-1" />
+                    Copy Link
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Share this code with friends to earn 1000 NCTR for each successful signup!
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-foreground">{stats.total}</div>
+                  <div className="text-sm text-muted-foreground">Total Referrals</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+                  <div className="text-sm text-muted-foreground">Successful</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+                  <div className="text-sm text-muted-foreground">Pending</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-primary">{stats.totalRewards.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">NCTR Earned</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Referrals List */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Referral History</h3>
+              {referrals.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No referrals yet.</p>
+                  <p className="text-sm">Share your referral code with friends to get started!</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {referrals.map((referral) => (
+                    <Card key={referral.id} className="bg-card/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Users className="w-5 h-5 text-primary" />
+                            <div>
+                              <div className="font-medium">{referral.referred_name}</div>
+                              <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                Joined {format(new Date(referral.created_at), 'MMM dd, yyyy')}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {referral.status === 'completed' && referral.reward_credited ? (
+                              <>
+                                <Badge variant="secondary" className="bg-green-100 text-green-700">
+                                  Rewarded
+                                </Badge>
+                                <div className="text-sm font-medium text-green-600">
+                                  +1000 NCTR
+                                </div>
+                              </>
+                            ) : (
+                              <Badge variant="outline" className="text-yellow-700">
+                                Pending
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        {referral.rewarded_at && (
+                          <div className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
+                            <Award className="w-3 h-3" />
+                            Reward credited on {format(new Date(referral.rewarded_at), 'MMM dd, yyyy')}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default UserReferralsModal;

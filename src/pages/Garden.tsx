@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
@@ -67,6 +67,7 @@ interface EarningOpportunity {
 }
 
 import ProfileModal from '@/components/ProfileModal';
+import UserReferralsModal from '@/components/UserReferralsModal';
 
 const Garden = () => {
   const { user, signOut } = useAuth();
@@ -83,6 +84,7 @@ const Garden = () => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [referralCode, setReferralCode] = useState('');
+  const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
 
   useEffect(() => {
     if (!user) {
@@ -94,6 +96,7 @@ const Garden = () => {
     
     fetchUserData();
     generateReferralCode();
+    fetchReferralStats();
   }, [user, navigate]);
 
   const generateReferralCode = () => {
@@ -101,6 +104,33 @@ const Garden = () => {
       // Generate a simple referral code based on user ID
       const code = user.id.slice(0, 8).toUpperCase();
       setReferralCode(code);
+    }
+  };
+
+  const fetchReferralStats = async () => {
+    if (!user) return;
+    
+    try {
+      // Get total referrals count
+      const { count: totalReferrals } = await supabase
+        .from('referrals')
+        .select('*', { count: 'exact', head: true })
+        .eq('referrer_user_id', user.id);
+
+      // Get successful referrals count
+      const { count: successfulReferrals } = await supabase
+        .from('referrals')
+        .select('*', { count: 'exact', head: true })
+        .eq('referrer_user_id', user.id)
+        .eq('status', 'completed')
+        .eq('reward_credited', true);
+
+      setReferralStats({
+        total: totalReferrals || 0,
+        successful: successfulReferrals || 0
+      });
+    } catch (error) {
+      console.error('Error fetching referral stats:', error);
     }
   };
 
@@ -735,7 +765,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             
             {portfolioExpanded && (
               <CardContent className="p-6 pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
                   <Card className="bg-white shadow-sm">
                     <CardContent className="p-4 text-center">
                       <div className="flex items-center justify-center gap-2 mb-2">
@@ -787,6 +817,28 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       <p className="text-xs text-green-600/80">Lifetime NCTR</p>
                     </CardContent>
                   </Card>
+
+                  <UserReferralsModal>
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 cursor-pointer hover:shadow-lg transition-shadow">
+                      <CardContent className="p-4 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <UserCheck className="w-5 h-5 text-purple-600" />
+                          <span className="text-sm font-medium text-purple-600">My Referrals</span>
+                        </div>
+                        <p className="text-xl font-bold text-purple-600 mb-1">
+                          {referralStats.successful}
+                        </p>
+                        <p className="text-xs text-purple-600/80">
+                          {referralStats.total > referralStats.successful && (
+                            <span className="text-xs text-muted-foreground">
+                              ({referralStats.total - referralStats.successful} pending)
+                            </span>
+                          )}
+                          {referralStats.total === 0 ? "Click to invite" : "Click for details"}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </UserReferralsModal>
                 </div>
 
                 <div className="flex justify-center">
