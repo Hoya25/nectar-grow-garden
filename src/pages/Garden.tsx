@@ -1049,11 +1049,11 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                     <div className="text-center py-4 mb-4">
                       {/* Total Available Bonus */}
                       <div className="flex items-center justify-center gap-2 mb-3">
-                        <span className="text-2xl font-bold text-primary">
+                        <span className="text-3xl font-bold text-green-600">
                           {(() => {
                             const total = (opportunity.available_nctr_reward || 0) + 
-                                         (opportunity.lock_90_nctr_reward || 0) + 
-                                         (opportunity.lock_360_nctr_reward || 0);
+                                        (opportunity.lock_90_nctr_reward || 0) + 
+                                        (opportunity.lock_360_nctr_reward || 0);
                             return formatNCTR(total || 50);
                           })()} NCTR
                         </span>
@@ -1123,7 +1123,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                         })()} NCTR
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4">Per $1 Spent</p>
+                    <p className="text-sm text-muted-foreground mb-4">Total Earn Opportunity</p>
                     
                     {/* Bounty Breakdown */}
                     <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
@@ -1232,18 +1232,17 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
                          <div className="text-center mb-4 sm:mb-6">
                            {/* Total NCTR Earn Opportunity */}
-                            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-                              {(() => {
-                                const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                                const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
-                                return formatNCTR(totalReward);
-                              })()} NCTR
-                            </div>
+                           <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
+                             {(() => {
+                               const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                               const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
+                               return formatNCTR(totalReward);
+                             })()} NCTR
                            </div>
-                           <div className="text-xs sm:text-sm text-muted-foreground mb-4">Per $1 Spent</div>
+                           <div className="text-xs sm:text-sm text-muted-foreground mb-4">Total Earn Opportunity</div>
                            
                            {/* Bounty Breakdown */}
-                           <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
+                           <RewardDisplay opportunity={opportunity} size="md" showPerDollar={true} />
                          </div>
 
                         <Button 
@@ -1340,8 +1339,7 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                               return formatNCTR(totalReward);
                             })()} NCTR
                           </div>
-                          </div>
-                          <div className="text-xs text-muted-foreground mb-3">Per $1 Spent</div>
+                          <div className="text-xs text-muted-foreground mb-3">Total Earn Opportunity</div>
                           
                           {/* Bounty Breakdown */}
                           <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} />
