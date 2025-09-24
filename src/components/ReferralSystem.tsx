@@ -21,7 +21,6 @@ interface UserStatus {
 }
 
 const ReferralSystem = () => {
-  console.log('ReferralSystem component rendering - updated version');
   const { user } = useAuth();
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState<ReferralStats>({
@@ -35,10 +34,7 @@ const ReferralSystem = () => {
   });
   const [copied, setCopied] = useState(false);
 
-  console.log('ReferralSystem: Current user status:', userStatus, 'User ID:', user?.id);
-
   useEffect(() => {
-    console.log('ReferralSystem: useEffect triggered with user:', !!user);
     if (user) {
       generateReferralCode();
       fetchUserStatus();
@@ -47,7 +43,6 @@ const ReferralSystem = () => {
 
   // Separate effect for fetching stats when multiplier changes
   useEffect(() => {
-    console.log('ReferralSystem: Stats useEffect triggered, multiplier:', userStatus.reward_multiplier);
     if (user && userStatus.reward_multiplier) {
       fetchReferralStats();
     }
@@ -61,7 +56,6 @@ const ReferralSystem = () => {
   };
 
   const fetchUserStatus = async () => {
-    console.log('ReferralSystem: fetchUserStatus called for user:', user?.id);
     if (!user) return;
 
     try {
@@ -72,8 +66,6 @@ const ReferralSystem = () => {
         .eq('user_id', user.id)
         .single();
 
-      console.log('ReferralSystem: Portfolio data:', portfolio, 'Error:', portfolioError);
-
       if (portfolioError) throw portfolioError;
 
       // Then get the status level details
@@ -83,8 +75,6 @@ const ReferralSystem = () => {
         .eq('status_name', portfolio?.opportunity_status || 'starter')
         .single();
 
-      console.log('ReferralSystem: Status level data:', statusLevel, 'Error:', statusError);
-
       if (statusError) throw statusError;
 
       const newStatus = {
@@ -92,17 +82,14 @@ const ReferralSystem = () => {
         reward_multiplier: statusLevel?.reward_multiplier || 1.0
       };
 
-      console.log('ReferralSystem: User status updated:', newStatus);
       setUserStatus(newStatus);
     } catch (error) {
-      console.error('ReferralSystem: Error fetching user status:', error);
+      console.error('Error fetching user status:', error);
       // Default to starter status
-      const defaultStatus = {
+      setUserStatus({
         opportunity_status: 'starter',
         reward_multiplier: 1.0
-      };
-      console.log('ReferralSystem: Using default status:', defaultStatus);
-      setUserStatus(defaultStatus);
+      });
     }
   };
 
