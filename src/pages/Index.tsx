@@ -56,6 +56,7 @@ const Index = () => {
         title="Grow The Community"
         description="The Garden is built to grow. The more we grow the community together, the more NCTR we collect together. And the more NCTR we have, the more partners we attract with incredible benefits for members."
         buttonText="Invite a Friend →"
+        buttonHref="/auth"
         icon=""
       />
       
