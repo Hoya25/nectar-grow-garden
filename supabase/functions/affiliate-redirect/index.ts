@@ -19,9 +19,25 @@ serve(async (req) => {
 
     const url = new URL(req.url);
     const linkId = url.searchParams.get('id');
-    const action = url.searchParams.get('action') || 'redirect';
+    let action = url.searchParams.get('action') || 'redirect';
 
-    if (!linkId) {
+    // For POST requests, check if action is in the body
+    if (req.method === 'POST') {
+      try {
+        const body = await req.json();
+        action = body.action || action;
+        
+        // If it's a create action, handle it directly
+        if (action === 'create') {
+          return await createTrackedLink(req, body, supabase);
+        }
+      } catch (e) {
+        // If body parsing fails, continue with URL-based action
+        console.log('Could not parse request body, using URL parameters');
+      }
+    }
+
+    if (!linkId && action !== 'create') {
       return new Response('Missing link ID', {
         status: 400,
         headers: corsHeaders
@@ -29,8 +45,6 @@ serve(async (req) => {
     }
 
     switch (action) {
-      case 'create':
-        return await createTrackedLink(req, supabase);
       case 'redirect':
         return await handleRedirect(linkId, req, supabase);
       case 'stats':
@@ -54,8 +68,7 @@ serve(async (req) => {
   }
 });
 
-async function createTrackedLink(req: Request, supabase: any): Promise<Response> {
-  const body = await req.json();
+async function createTrackedLink(req: Request, body: any, supabase: any): Promise<Response> {
   const { userId, originalUrl, platformName, description } = body;
 
   if (!originalUrl || !platformName) {
