@@ -966,7 +966,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="affiliate_link">
-                      Affiliate Link {formData.opportunity_type !== 'bonus' ? '*' : '(Optional for Bonus Opportunities)'}
+                      Affiliate Link {(() => {
+                        const isOptional = formData.opportunity_type === 'bonus' || 
+                                         formData.title.toLowerCase().includes('daily') || 
+                                         formData.title.toLowerCase().includes('checkin');
+                        return isOptional ? '(Optional)' : '*';
+                      })()}
                     </Label>
                     <Input
                       id="affiliate_link"
@@ -974,13 +979,22 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       value={formData.affiliate_link}
                       onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
                       placeholder="https://partner-tracking-url.com/?user_id={{USER_ID}}"
-                      required={formData.opportunity_type !== 'bonus'}
+                      required={(() => {
+                        const isOptional = formData.opportunity_type === 'bonus' || 
+                                         formData.title.toLowerCase().includes('daily') || 
+                                         formData.title.toLowerCase().includes('checkin');
+                        return !isOptional;
+                      })()}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {formData.opportunity_type === 'bonus' 
-                        ? '💡 Bonus opportunities typically don\'t require external links - they\'re internal rewards like daily check-ins or profile completion.'
-                        : '✅ Auto-populated from selected brand with user tracking. {USER_ID} and {TRACKING_ID} will be replaced dynamically.'
-                      }
+                      {(() => {
+                        const isOptional = formData.opportunity_type === 'bonus' || 
+                                         formData.title.toLowerCase().includes('daily') || 
+                                         formData.title.toLowerCase().includes('checkin');
+                        return isOptional
+                          ? '💡 Internal rewards like daily check-ins and bonus opportunities typically don\'t require external links.'
+                          : '✅ Auto-populated from selected brand with user tracking. {USER_ID} and {TRACKING_ID} will be replaced dynamically.';
+                      })()}
                     </p>
                   </div>
                   
