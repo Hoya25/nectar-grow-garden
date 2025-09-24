@@ -58,21 +58,21 @@ async function createTrackedLink(req: Request, supabase: any): Promise<Response>
   const body = await req.json();
   const { userId, originalUrl, platformName, description } = body;
 
-  if (!userId || !originalUrl || !platformName) {
+  if (!originalUrl || !platformName) {
     return new Response(
-      JSON.stringify({ error: 'Missing required fields: userId, originalUrl, platformName' }),
+      JSON.stringify({ error: 'Missing required fields: originalUrl, platformName' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 
-  console.log('🔗 Creating tracked affiliate link:', { userId, originalUrl, platformName });
+  console.log('🔗 Creating tracked affiliate link:', { originalUrl, platformName });
 
   try {
-    // Insert the new affiliate link
+    // Insert the new affiliate link with admin as creator
     const { data: link, error: insertError } = await supabase
       .from('independent_affiliate_links')
       .insert({
-        user_id: userId,
+        user_id: userId || 'admin', // Admin creates links for everyone
         original_affiliate_url: originalUrl,
         platform_name: platformName,
         description: description || `${platformName} affiliate link`

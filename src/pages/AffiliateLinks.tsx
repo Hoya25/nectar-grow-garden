@@ -100,44 +100,45 @@ const AffiliateLinks = () => {
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="independent" className="flex items-center gap-2">
                   <Link className="w-4 h-4" />
-                  Independent Links
-                  <Badge variant="secondary" className="ml-1 text-xs">Recommended</Badge>
+                  Curated Links
+                  <Badge variant="secondary" className="ml-1 text-xs">Available</Badge>
                 </TabsTrigger>
                 <TabsTrigger value="partners" className="flex items-center gap-2">
                   <Store className="w-4 h-4" />
                   Partner Brands
+                  <Badge variant="outline" className="ml-1 text-xs">Limited</Badge>
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="independent" className="mt-6">
-                <div className="space-y-4">
-                  <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                    <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                      🚀 Independent Affiliate Links (Recommended)
-                    </h3>
-                    <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
-                      Perfect for existing affiliate programs like Ledger, Amazon Associates, or any other platform. 
-                      We wrap your links with user tracking automatically.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Works with ANY affiliate program</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Automatic click tracking</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>User identification in URLs</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Manual conversion reporting</span>
-                      </div>
-                    </div>
+            <div className="space-y-4">
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  🔗 Curated Affiliate Links
+                </h3>
+                <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+                  The Garden team has curated these affiliate partnerships. Each link includes automatic user tracking 
+                  so you can earn NCTR rewards when people make purchases through your referrals.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Curated by Garden admins</span>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Automatic click tracking</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>User identification in URLs</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Earn NCTR on conversions</span>
+                  </div>
+                </div>
+              </div>
                   <IndependentAffiliateLinks />
                 </div>
               </TabsContent>

@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { ExternalLink, Link, Copy, Loader2, Plus, BarChart3, Eye } from 'lucide-react';
+import { useAdmin } from '@/hooks/useAdmin';
+import { ExternalLink, Link, Copy, Loader2, Plus, BarChart3, Eye, Lock } from 'lucide-react';
 
 interface IndependentAffiliateLink {
   id: string;
@@ -24,6 +25,7 @@ interface IndependentAffiliateLink {
 
 const IndependentAffiliateLinks = () => {
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const [links, setLinks] = useState<IndependentAffiliateLink[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -44,7 +46,7 @@ const IndependentAffiliateLinks = () => {
       const { data, error } = await supabase
         .from('independent_affiliate_links')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -53,7 +55,7 @@ const IndependentAffiliateLinks = () => {
       console.error('Error loading affiliate links:', error);
       toast({
         title: "Error",
-        description: "Failed to load your affiliate links",
+        description: "Failed to load affiliate links",
         variant: "destructive",
       });
     }
@@ -68,7 +70,7 @@ const IndependentAffiliateLinks = () => {
       const { data, error } = await supabase.functions.invoke('affiliate-redirect', {
         body: {
           action: 'create',
-          userId: user.id,
+          userId: 'admin', // Admin creates links for all users
           originalUrl: formData.originalUrl,
           platformName: formData.platformName,
           description: formData.description || `${formData.platformName} affiliate link`
@@ -149,20 +151,21 @@ const IndependentAffiliateLinks = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Link className="w-5 h-5" />
-            Independent Affiliate Links
+            Available Affiliate Links
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Add any affiliate link and we'll wrap it with user tracking. Works with Ledger, Amazon Associates, and any affiliate program.
+            Browse affiliate links curated by The Garden team. Click tracking and user identification is automatic.
           </p>
         </CardHeader>
         <CardContent>
-          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full sm:w-auto">
-                <Plus className="w-4 h-4 mr-2" />
-                Add New Affiliate Link
-              </Button>
-            </DialogTrigger>
+          {isAdmin && (
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full sm:w-auto mb-4">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Affiliate Link (Admin)
+                </Button>
+              </DialogTrigger>
             
             <DialogContent className="max-w-md">
               <DialogHeader>
@@ -231,6 +234,7 @@ const IndependentAffiliateLinks = () => {
               </form>
             </DialogContent>
           </Dialog>
+          )}
         </CardContent>
       </Card>
 
@@ -317,15 +321,19 @@ const IndependentAffiliateLinks = () => {
         <Card>
           <CardContent className="p-6 text-center">
             <div className="space-y-3">
-              <Link className="w-12 h-12 mx-auto text-muted-foreground" />
-              <h3 className="text-lg font-semibold">No Affiliate Links Yet</h3>
+              <div className="w-12 h-12 mx-auto rounded-lg bg-muted flex items-center justify-center">
+                <Lock className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold">No Affiliate Links Available</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Add your existing affiliate links from any platform. We'll wrap them with user tracking so you can earn NCTR rewards.
+                The Garden team hasn't added any affiliate links yet. Check back soon for curated affiliate opportunities that automatically track your referrals and reward you with NCTR.
               </p>
-              <Button onClick={() => setModalOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Your First Link
-              </Button>
+              {isAdmin && (
+                <Button onClick={() => setModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add First Link (Admin)
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -339,11 +347,11 @@ const IndependentAffiliateLinks = () => {
         <CardContent className="space-y-2 text-sm">
           <div className="flex gap-2">
             <span className="font-semibold text-primary">1.</span>
-            <span>Paste any affiliate link (Ledger, Amazon, etc.)</span>
+            <span>Garden admins curate quality affiliate partners</span>
           </div>
           <div className="flex gap-2">
             <span className="font-semibold text-primary">2.</span>
-            <span>We create a tracked version that adds user parameters</span>
+            <span>Each link includes automatic user tracking parameters</span>
           </div>
           <div className="flex gap-2">
             <span className="font-semibold text-primary">3.</span>
@@ -351,7 +359,7 @@ const IndependentAffiliateLinks = () => {
           </div>
           <div className="flex gap-2">
             <span className="font-semibold text-primary">4.</span>
-            <span>Report conversions manually to earn NCTR rewards</span>
+            <span>Report conversions to earn NCTR rewards</span>
           </div>
         </CardContent>
       </Card>

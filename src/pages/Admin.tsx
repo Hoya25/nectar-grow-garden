@@ -19,7 +19,8 @@ import {
   Shield,
   Sparkles,
   Webhook,
-  UserCheck
+  UserCheck,
+  Link
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
@@ -33,6 +34,7 @@ import ReferralManagement from '@/components/admin/ReferralManagement';
 import InvitesModal from '@/components/admin/InvitesModal';
 import NCTRPriceManager from '@/components/admin/NCTRPriceManager';
 import WithdrawalManagement from '@/components/admin/WithdrawalManagement';
+import AffiliateLinksManagement from '@/components/admin/AffiliateLinksManagement';
 
 interface AdminStats {
   total_users: number;
@@ -252,7 +254,7 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="withdrawals" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7 bg-section-highlight">
+          <TabsList className="grid w-full grid-cols-8 bg-section-highlight">
             <TabsTrigger value="withdrawals" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Activity className="w-4 h-4" />
               Withdrawals
@@ -264,6 +266,10 @@ const Admin = () => {
             <TabsTrigger value="opportunities" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Gift className="w-4 h-4" />
               Opportunities
+            </TabsTrigger>
+            <TabsTrigger value="affiliates" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Link className="w-4 h-4" />
+              Affiliates
             </TabsTrigger>
             <TabsTrigger value="referrals" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Users className="w-4 h-4" />
@@ -293,6 +299,10 @@ const Admin = () => {
 
           <TabsContent value="opportunities">
             <OpportunityManagement onStatsUpdate={fetchAdminStats} />
+          </TabsContent>
+
+          <TabsContent value="affiliates">
+            <AffiliateLinksManagement />
           </TabsContent>
 
           <TabsContent value="referrals">
