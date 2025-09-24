@@ -82,6 +82,44 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_link_clicks: {
+        Row: {
+          clicked_at: string
+          id: string
+          ip_address: string | null
+          link_id: string
+          referrer: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          clicked_at?: string
+          id?: string
+          ip_address?: string | null
+          link_id: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          clicked_at?: string
+          id?: string
+          ip_address?: string | null
+          link_id?: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_link_clicks_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "independent_affiliate_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           category: string | null
@@ -217,6 +255,48 @@ export type Database = {
           video_description?: string | null
           video_title?: string | null
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      independent_affiliate_links: {
+        Row: {
+          click_count: number | null
+          conversion_count: number | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          original_affiliate_url: string
+          platform_name: string
+          total_commissions: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          click_count?: number | null
+          conversion_count?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          original_affiliate_url: string
+          platform_name: string
+          total_commissions?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          click_count?: number | null
+          conversion_count?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          original_affiliate_url?: string
+          platform_name?: string
+          total_commissions?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
