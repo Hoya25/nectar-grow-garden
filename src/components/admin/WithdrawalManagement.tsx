@@ -275,9 +275,9 @@ const WithdrawalManagement = () => {
                     <TableCell>
                       <div className="space-y-1">
                         <div className="font-medium">{withdrawal.nctr_amount.toFixed(2)} NCTR</div>
-                        <div className="text-xs text-muted-foreground">
-                          Net: {withdrawal.net_amount_nctr.toFixed(2)} NCTR
-                          <br />Gas: FREE
+                        <div className="text-xs text-green-600">
+                          ✅ Fee-free withdrawal
+                          <br />User receives: {withdrawal.nctr_amount.toFixed(2)} NCTR
                         </div>
                       </div>
                     </TableCell>
