@@ -57,6 +57,8 @@ serve(async (req) => {
 
 async function getCurrentNCTRPrice(supabaseClient: any) {
   try {
+    console.log('🔍 Getting current NCTR price...');
+    
     // First try to get cached price from database
     const { data: cachedPrice, error } = await supabaseClient
       .from('nctr_price_cache')
@@ -70,8 +72,11 @@ async function getCurrentNCTRPrice(supabaseClient: any) {
       const now = new Date()
       const ageMinutes = (now.getTime() - lastUpdate.getTime()) / (1000 * 60)
 
-      // If price is less than 5 minutes old, return cached version
-      if (ageMinutes < 5) {
+      console.log(`📅 Cached price age: ${ageMinutes.toFixed(1)} minutes`);
+
+      // If price is less than 10 minutes old, return cached version
+      if (ageMinutes < 10) {
+        console.log(`✅ Returning cached NCTR price: $${cachedPrice.price_usd}`);
         return new Response(
           JSON.stringify({
             price: cachedPrice.price_usd,
@@ -83,68 +88,90 @@ async function getCurrentNCTRPrice(supabaseClient: any) {
       }
     }
 
-    // Fetch fresh price from on-chain
+    console.log('🔄 Fetching fresh price from sources...');
+    
+    // Fetch fresh price from multiple sources
     const freshPrice = await fetchOnChainPrice()
     
     // Update cache
     await supabaseClient
       .from('nctr_price_cache')
       .upsert({
+        id: cachedPrice?.id || undefined,
         price_usd: freshPrice,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        source: 'api_fetch'
       })
+
+    console.log(`✅ Updated NCTR price: $${freshPrice}`);
 
     return new Response(
       JSON.stringify({
         price: freshPrice,
         last_updated: new Date().toISOString(),
-        source: 'onchain'
+        source: 'fresh'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
-    console.error('Error getting NCTR price:', error)
+    console.error('❌ Error getting NCTR price:', error)
     
     // Fallback to last known price if available
-    const { data: fallbackPrice } = await supabaseClient
-      .from('nctr_price_cache')
-      .select('*')
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .single()
+    try {
+      const { data: fallbackPrice } = await supabaseClient
+        .from('nctr_price_cache')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single()
 
-    if (fallbackPrice) {
-      return new Response(
-        JSON.stringify({
-          price: fallbackPrice.price_usd,
-          last_updated: fallbackPrice.updated_at,
-          source: 'fallback',
-          error: 'Using cached price due to fetch error'
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      if (fallbackPrice) {
+        console.log(`🔄 Using fallback price: $${fallbackPrice.price_usd}`);
+        return new Response(
+          JSON.stringify({
+            price: fallbackPrice.price_usd,
+            last_updated: fallbackPrice.updated_at,
+            source: 'fallback',
+            error: 'Using cached price due to fetch error'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    } catch (fallbackError) {
+      console.error('❌ Fallback also failed:', fallbackError);
     }
 
+    // Ultimate fallback - use the user-mentioned price
+    const emergencyPrice = 0.088;
+    console.log(`🚨 Using emergency fallback price: $${emergencyPrice}`);
+    
     return new Response(
-      JSON.stringify({ error: 'Unable to fetch NCTR price' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ 
+        price: emergencyPrice,
+        last_updated: new Date().toISOString(),
+        source: 'emergency_fallback',
+        error: 'All price sources failed, using emergency price'
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   }
 }
 
 async function updateNCTRPrice(supabaseClient: any) {
   try {
+    console.log('🔄 Manually updating NCTR price...');
     const freshPrice = await fetchOnChainPrice()
     
     await supabaseClient
       .from('nctr_price_cache')
       .upsert({
         price_usd: freshPrice,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        source: 'manual_update'
       })
 
-    console.log(`🔄 NCTR price updated: $${freshPrice}`)
+    console.log(`✅ NCTR price manually updated: $${freshPrice}`)
 
     return new Response(
       JSON.stringify({
@@ -156,9 +183,37 @@ async function updateNCTRPrice(supabaseClient: any) {
     )
 
   } catch (error) {
-    console.error('Error updating NCTR price:', error)
+    console.error('❌ Error updating NCTR price:', error)
+    
+    // Even if update fails, try to return current cached price
+    try {
+      const { data: currentPrice } = await supabaseClient
+        .from('nctr_price_cache')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (currentPrice) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: error.message,
+            current_price: currentPrice.price_usd,
+            last_updated: currentPrice.updated_at
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        )
+      }
+    } catch (fallbackError) {
+      console.error('❌ Could not get fallback price:', fallbackError);
+    }
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: false,
+        error: error.message || 'Unknown error during price update'
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
