@@ -240,11 +240,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
           if (profileCompletionData && typeof profileCompletionData === 'object' && 'bonus_awarded' in profileCompletionData) {
             const completion = profileCompletionData as { bonus_awarded: boolean };
             if (completion.bonus_awarded) {
-              // Add the profile completion opportunity ID if bonus was awarded
-              const profileOpportunityId = '8847db62-4a02-4d04-b1f6-e213835c6481';
-              if (!completedIds.includes(profileOpportunityId)) {
-                completedIds.push(profileOpportunityId);
-              }
+              // Find all profile completion opportunities and mark them as completed
+              // We'll do this after opportunities are loaded to get accurate IDs
+              console.log('Profile completion bonus was awarded - will mark profile opportunities as completed');
             }
           }
         } catch (error) {
@@ -284,6 +282,39 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         });
         
         setOpportunities(sortedOpportunities);
+        
+        // After opportunities are loaded, check for profile completion
+        try {
+          const { data: profileCompletionData } = await supabase.rpc('calculate_profile_completion', {
+            p_user_id: user.id
+          });
+          
+          if (profileCompletionData && typeof profileCompletionData === 'object' && 'bonus_awarded' in profileCompletionData) {
+            const completion = profileCompletionData as { bonus_awarded: boolean };
+            if (completion.bonus_awarded) {
+              // Find profile-related opportunities and mark as completed
+              const profileOpportunities = sortedOpportunities.filter(op => 
+                op.title.toLowerCase().includes('profile') || 
+                op.title.toLowerCase().includes('complete') ||
+                op.opportunity_type === 'bonus' && op.description?.toLowerCase().includes('profile')
+              );
+              
+              // Get current completed IDs and add profile opportunity IDs
+              setCompletedOpportunityIds(prevCompleted => {
+                const newCompleted = [...prevCompleted];
+                profileOpportunities.forEach(op => {
+                  if (!newCompleted.includes(op.id)) {
+                    newCompleted.push(op.id);
+                    console.log('Marking profile opportunity as completed:', op.title);
+                  }
+                });
+                return newCompleted;
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error checking profile completion after opportunities loaded:', error);
+        }
       }
 
       // Check daily checkin availability
@@ -376,6 +407,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       const checkinResult = result as { success: boolean; reward_amount?: number; message?: string; error?: string };
 
       if (checkinResult.success) {
+        // Immediately update UI state
+        setDailyCheckinAvailable(false);
+        
         toast({
           title: "Daily Bonus Claimed! 🎉",
           description: `You earned ${checkinResult.reward_amount?.toFixed(2)} NCTR! ${checkinResult.message}`,
