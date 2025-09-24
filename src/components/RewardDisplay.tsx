@@ -3,21 +3,17 @@ import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface RewardDisplayProps {
   opportunity: {
-    nctr_reward?: number;
-    reward_per_dollar?: number;
     available_nctr_reward?: number;
     lock_90_nctr_reward?: number;
     lock_360_nctr_reward?: number;
     reward_distribution_type?: string;
   };
   size?: 'sm' | 'md' | 'lg';
-  showPerDollar?: boolean;
 }
 
 export const RewardDisplay = ({ 
   opportunity, 
-  size = 'md', 
-  showPerDollar = true 
+  size = 'md'
 }: RewardDisplayProps) => {
   const formatNCTR = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -26,13 +22,9 @@ export const RewardDisplay = ({
     }).format(Math.floor(amount));
   };
 
-  const isLegacyReward = opportunity.reward_distribution_type === 'legacy' || 
-                        (!opportunity.reward_distribution_type && 
-                         (opportunity.nctr_reward > 0 || opportunity.reward_per_dollar > 0));
-
-  const hasNewRewards = (opportunity.available_nctr_reward || 0) > 0 || 
-                       (opportunity.lock_90_nctr_reward || 0) > 0 || 
-                       (opportunity.lock_360_nctr_reward || 0) > 0;
+  const hasRewards = (opportunity.available_nctr_reward || 0) > 0 || 
+                    (opportunity.lock_90_nctr_reward || 0) > 0 || 
+                    (opportunity.lock_360_nctr_reward || 0) > 0;
 
   // Size configurations
   const sizeConfigs = {
@@ -66,37 +58,7 @@ export const RewardDisplay = ({
 
   return (
     <div className={config.container}>
-      {/* Legacy Reward Display */}
-      {isLegacyReward && (
-        <>
-          {showPerDollar && opportunity.reward_per_dollar > 0 && (
-            <div className="text-center">
-              <div className={config.flex + ' justify-center'}>
-                <span className={`${config.amountText} text-primary`}>
-                  {formatNCTR(opportunity.reward_per_dollar)}
-                </span>
-                <img src={nctrLogo} alt="NCTR" className={config.logo} />
-              </div>
-              <div className={`${config.perDollarText} text-muted-foreground`}>per $1 spent</div>
-            </div>
-          )}
-          
-          {opportunity.nctr_reward > 0 && (
-            <div className="bg-primary/10 rounded-lg p-3 text-center border border-primary/20">
-              <div className={config.flex + ' justify-center mb-1'}>
-                <span className={`${config.amountText} text-primary`}>
-                  +{formatNCTR(opportunity.nctr_reward)}
-                </span>
-                <img src={nctrLogo} alt="NCTR" className={config.logo} />
-              </div>
-              <div className={`${config.perDollarText} text-primary`}>Welcome Bonus</div>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* New Reward Structure Display */}
-      {hasNewRewards && (
+      {hasRewards && (
         <div className="space-y-2">
           <div className={`${config.perDollarText} font-medium text-muted-foreground uppercase tracking-wide text-center`}>
             Reward Breakdown
@@ -121,18 +83,12 @@ export const RewardDisplay = ({
               </Badge>
             )}
           </div>
-          
-          {showPerDollar && opportunity.reward_per_dollar > 0 && (
-            <div className="text-center">
-              <div className={config.flex + ' justify-center'}>
-                <span className={`${config.amountText} text-green-600`}>
-                  +{formatNCTR(opportunity.reward_per_dollar)}
-                </span>
-                <img src={nctrLogo} alt="NCTR" className={config.logo} />
-              </div>
-              <div className={`${config.perDollarText} text-green-600`}>Available per $1 spent</div>
-            </div>
-          )}
+        </div>
+      )}
+      
+      {!hasRewards && (
+        <div className="text-center text-muted-foreground text-sm">
+          No rewards configured
         </div>
       )}
     </div>

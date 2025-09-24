@@ -603,23 +603,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         value={formData.reward_distribution_type}
                         onValueChange={(value) => {
                           setFormData({...formData, reward_distribution_type: value});
-                          // Reset reward fields when changing type
-                          if (value === 'legacy') {
-                            setFormData(prev => ({
-                              ...prev,
-                              available_nctr_reward: 0,
-                              lock_90_nctr_reward: 0,
-                              lock_360_nctr_reward: 0,
-                              nctr_reward: 50, // Default for legacy
-                              reward_distribution_type: value
-                            }));
-                          } else {
-                            setFormData(prev => ({
-                              ...prev,
-                              nctr_reward: 0,
-                              reward_distribution_type: value
-                            }));
-                          }
                         }}
                       >
                         <SelectTrigger className="w-full">
@@ -630,7 +613,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                           <SelectItem value="lock_90">🟠 90LOCK Only</SelectItem>
                           <SelectItem value="lock_360">🔵 360LOCK Only</SelectItem>
                           <SelectItem value="combined">🎯 Multi-Tier Distribution</SelectItem>
-                          <SelectItem value="legacy">🔄 Legacy (Available Balance)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
