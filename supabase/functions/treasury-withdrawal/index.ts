@@ -84,11 +84,11 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
       throw new Error('Treasury wallet private key not configured')
     }
 
-    // Set up Ethereum provider and wallet
-    const provider = new ethers.JsonRpcProvider('https://mainnet.infura.io/v3/YOUR_INFURA_KEY') // Replace with actual RPC URL
+    // Set up Ethereum provider and wallet - Use Base network
+    const provider = new ethers.JsonRpcProvider('https://mainnet.base.org') // Base network
     const wallet = new ethers.Wallet(privateKey, provider)
 
-    // NCTR Token Contract Address (replace with actual contract address)
+    // NCTR Token Contract Address on Base network
     const NCTR_CONTRACT_ADDRESS = '0x973104fAa7F2B11787557e85953ECA6B4e262328'
     
     // ERC-20 ABI for transfer function

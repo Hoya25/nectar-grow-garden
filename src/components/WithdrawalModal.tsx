@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Wallet, AlertTriangle, Info } from 'lucide-react';
+import { Loader2, Wallet, AlertTriangle, Info, Network } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useWallet } from '@/hooks/useWallet';
 
 interface WithdrawalModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
   const [isProcessing, setIsProcessing] = useState(false);
   const [fees, setFees] = useState({ withdrawalFee: 0, gasFee: 0.5, netAmount: 0 });
   const { toast } = useToast();
+  const { provider } = useWallet();
 
   const calculateFees = (withdrawalAmount: number) => {
     const gasFee = 0.5; // Fixed gas fee only
@@ -58,6 +60,23 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
         variant: "destructive"
       });
       return;
+    }
+
+    // Check if user is on Base network
+    if (provider && !useCustomWallet) {
+      try {
+        const network = await provider.getNetwork();
+        if (network.chainId !== 8453n) { // Base mainnet chain ID
+          toast({
+            title: "Wrong Network",
+            description: "Please switch to Base network in your wallet to proceed with withdrawal",
+            variant: "destructive"
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('Network check error:', error);
+      }
     }
 
     const withdrawalAmount = parseFloat(amount);
@@ -134,6 +153,13 @@ export const WithdrawalModal = ({ isOpen, onClose, availableNCTR, walletAddress 
             <Info className="h-4 w-4" />
             <AlertDescription>
               Available Balance: <strong>{availableNCTR.toFixed(2)} NCTR</strong>
+            </AlertDescription>
+          </Alert>
+
+          <Alert>
+            <Network className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Base Network Required:</strong> Withdrawals are processed on Base network. Ensure your wallet is connected to Base.
             </AlertDescription>
           </Alert>
 
