@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useMailchimp } from './useMailchimp';
 
 interface AuthContextType {
   user: User | null;
@@ -25,6 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { subscribeUser, sendWelcomeEmail } = useMailchimp();
 
   useEffect(() => {
     // Set up auth state listener
@@ -73,6 +75,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         data: Object.keys(userData).length > 0 ? userData : undefined,
       }
     });
+    
+    // If signup was successful, add user to Mailchimp
+    if (!error && fullName) {
+      // Parse full name into first and last names
+      const nameParts = fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
+      // Subscribe user to Mailchimp in the background
+      // This won't block the signup process if it fails
+      setTimeout(async () => {
+        try {
+          await subscribeUser({
+            email,
+            firstName,
+            lastName,
+            status: 'subscribed',
+            tags: ['new-signup', 'garden-member'],
+            mergeFields: {
+              SIGNUP_DATE: new Date().toISOString().split('T')[0],
+              REFERRAL: referralCode || '',
+            }
+          });
+          
+          // Also send a branded welcome email
+          await sendWelcomeEmail({
+            email,
+            firstName,
+            lastName
+          });
+        } catch (mailchimpError) {
+          console.error('Mailchimp integration failed (non-blocking):', mailchimpError);
+        }
+      }, 1000); // Delay to ensure user signup completes first
+    }
     
     return { error };
   };
