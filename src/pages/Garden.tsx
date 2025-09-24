@@ -21,6 +21,7 @@ import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
+import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -43,7 +44,7 @@ interface LockCommitment {
   lock_date: string;
   unlock_date: string;
   status: string;
-  lock_category?: string;
+  lock_category: string;
   can_upgrade?: boolean;
 }
 
@@ -893,6 +894,15 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
                       </p>
                     </CardContent>
                   </Card>
+                </div>
+
+                {/* Easy Button for 360LOCK Commitment */}
+                <div className="mb-6">
+                  <BatchLockUpgrade 
+                    locks={locks}
+                    onUpgradeComplete={fetchUserData}
+                    availableNCTR={portfolio?.available_nctr || 0}
+                  />
                 </div>
 
                 <div className="flex justify-center gap-4 flex-wrap">
