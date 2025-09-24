@@ -562,6 +562,37 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
     }
 
     try {
+      // Check if this is a Loyalize-based URL (contains template placeholders)
+      const isLoyalizeUrl = opportunity.affiliate_link.includes('%7B%7B') || opportunity.affiliate_link.includes('{{');
+      
+      if (isLoyalizeUrl) {
+        // Handle Loyalize-based opportunity - replace placeholders and open directly
+        console.log('Handling Loyalize opportunity:', opportunity.title);
+        
+        // Generate simple tracking ID for Loyalize URLs
+        const trackingId = `tgn_${user?.id?.slice(-8)}_${opportunity.id?.slice(-8)}_${Date.now().toString(36)}`;
+        
+        // Replace template variables in the URL
+        let finalUrl = opportunity.affiliate_link
+          .replace(/%7B%7BUSER_ID%7D%7D/g, user?.id || 'anonymous')
+          .replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous')
+          .replace(/%7B%7BTRACKING_ID%7D%7D/g, trackingId)
+          .replace(/\{\{TRACKING_ID\}\}/g, trackingId);
+        
+        // Open the URL directly
+        window.open(finalUrl, '_blank');
+        
+        toast({
+          title: "Redirecting to Partner...",
+          description: `Opening ${opportunity.partner_name || 'partner'} - Your purchases will be tracked for NCTR rewards!`,
+        });
+        
+        return;
+      }
+
+      // For non-Loyalize URLs, use the independent affiliate tracking system
+      console.log('Handling independent affiliate opportunity:', opportunity.title);
+      
       // Create a user-tracked affiliate URL through our redirect system
       const response = await supabase.functions.invoke('affiliate-redirect', {
         body: {
@@ -586,11 +617,23 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       });
       
     } catch (error) {
-      console.error('Error creating tracked link:', error);
+      console.error('Error handling shopping opportunity:', error);
       // Fallback to direct link if tracking fails
-      window.open(opportunity.affiliate_link, '_blank');
+      let fallbackUrl = opportunity.affiliate_link;
+      
+      // If it's a template URL, replace placeholders for fallback
+      if (fallbackUrl.includes('%7B%7B') || fallbackUrl.includes('{{')) {
+        const trackingId = `fallback_${Date.now()}`;
+        fallbackUrl = fallbackUrl
+          .replace(/%7B%7BUSER_ID%7D%7D/g, user?.id || 'anonymous')
+          .replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous')
+          .replace(/%7B%7BTRACKING_ID%7D%7D/g, trackingId)
+          .replace(/\{\{TRACKING_ID\}\}/g, trackingId);
+      }
+      
+      window.open(fallbackUrl, '_blank');
       toast({
-        title: "Redirecting...",
+        title: "Redirecting...", 
         description: `Opening ${opportunity.partner_name || 'partner'} - NCTR tracking may be limited.`,
         variant: "destructive",
       });
