@@ -29,15 +29,22 @@ export const RewardDisplay = ({
   // Debug logging
   useEffect(() => {
     if (opportunity.opportunity_type === 'invite') {
-      console.log('RewardDisplay - Invite Opportunity Debug:', {
+      console.log('RewardDisplay - Full Invite Opportunity Data:', {
         userStatus,
         userMultiplier,
         colorClass: userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary',
-        isInvite: opportunity.opportunity_type === 'invite',
-        rewardPerDollar: opportunity.reward_per_dollar
+        opportunity: opportunity,
+        availableReward: opportunity.available_nctr_reward,
+        lock90Reward: opportunity.lock_90_nctr_reward,
+        lock360Reward: opportunity.lock_360_nctr_reward,
+        nctrReward: opportunity.nctr_reward,
+        rewardPerDollar: opportunity.reward_per_dollar,
+        hasNewRewards: (opportunity.available_nctr_reward || 0) > 0 || 
+                      (opportunity.lock_90_nctr_reward || 0) > 0 || 
+                      (opportunity.lock_360_nctr_reward || 0) > 0
       });
     }
-  }, [userStatus, userMultiplier, opportunity.opportunity_type, opportunity.reward_per_dollar]);
+  }, [userStatus, userMultiplier, opportunity]);
   const formatNCTR = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
