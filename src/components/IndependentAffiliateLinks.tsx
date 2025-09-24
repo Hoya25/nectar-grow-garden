@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { useAdmin } from '@/hooks/useAdmin';
-import { ExternalLink, Link, Copy, Loader2, Plus, BarChart3, Eye, Lock } from 'lucide-react';
+import { ExternalLink, Link, Copy, BarChart3, Eye, Lock } from 'lucide-react';
 
 interface IndependentAffiliateLink {
   id: string;
@@ -25,15 +22,7 @@ interface IndependentAffiliateLink {
 
 const IndependentAffiliateLinks = () => {
   const { user } = useAuth();
-  const { isAdmin } = useAdmin();
   const [links, setLinks] = useState<IndependentAffiliateLink[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    originalUrl: '',
-    platformName: '',
-    description: ''
-  });
 
   useEffect(() => {
     if (user) {
@@ -61,49 +50,6 @@ const IndependentAffiliateLinks = () => {
     }
   };
 
-  const createTrackedLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('affiliate-redirect', {
-        body: {
-          action: 'create',
-          userId: 'admin', // Admin creates links for all users
-          originalUrl: formData.originalUrl,
-          platformName: formData.platformName,
-          description: formData.description || `${formData.platformName} affiliate link`
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast({
-          title: "Affiliate Link Created",
-          description: `Your tracked link for ${formData.platformName} is ready!`,
-        });
-        
-        setFormData({ originalUrl: '', platformName: '', description: '' });
-        setModalOpen(false);
-        loadLinks();
-      } else {
-        throw new Error(data.error);
-      }
-
-    } catch (error) {
-      console.error('Error creating affiliate link:', error);
-      toast({
-        title: "Creation Failed",
-        description: error.message || "Failed to create affiliate link",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getTrackedUrl = (linkId: string) => {
     const supabaseUrl = 'https://rndivcsonsojgelzewkb.supabase.co';
     return `${supabaseUrl}/functions/v1/affiliate-redirect?id=${linkId}&action=redirect`;
@@ -125,20 +71,11 @@ const IndependentAffiliateLinks = () => {
     }
   };
 
-  const validateUrl = (url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   if (!user) {
     return (
       <Card>
         <CardContent className="p-6 text-center">
-          <p className="text-muted-foreground">Please sign in to create tracked affiliate links</p>
+          <p className="text-muted-foreground">Please sign in to view available affiliate links</p>
         </CardContent>
       </Card>
     );
@@ -157,85 +94,6 @@ const IndependentAffiliateLinks = () => {
             Browse affiliate links curated by The Garden team. Click tracking and user identification is automatic.
           </p>
         </CardHeader>
-        <CardContent>
-          {isAdmin && (
-            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-              <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto mb-4">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add New Affiliate Link (Admin)
-                </Button>
-              </DialogTrigger>
-            
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Add Independent Affiliate Link</DialogTitle>
-              </DialogHeader>
-              
-              <form onSubmit={createTrackedLink} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="platformName">Platform Name</Label>
-                  <Input
-                    id="platformName"
-                    value={formData.platformName}
-                    onChange={(e) => setFormData({...formData, platformName: e.target.value})}
-                    placeholder="e.g., Ledger, Amazon, Nike"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="originalUrl">Your Affiliate Link</Label>
-                  <Input
-                    id="originalUrl"
-                    type="url"
-                    value={formData.originalUrl}
-                    onChange={(e) => setFormData({...formData, originalUrl: e.target.value})}
-                    placeholder="https://shop.ledger.com/?r=4c47a8c09777"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Paste your existing affiliate link from any platform
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description (Optional)</Label>
-                  <Input
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Hardware wallet deals"
-                  />
-                </div>
-                
-                <div className="flex gap-2 pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setModalOpen(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={loading || !validateUrl(formData.originalUrl)}
-                    className="flex-1"
-                  >
-                    {loading ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Plus className="w-4 h-4 mr-2" />
-                    )}
-                    Create Link
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-          )}
-        </CardContent>
       </Card>
 
       {/* Links List */}
@@ -328,12 +186,6 @@ const IndependentAffiliateLinks = () => {
               <p className="text-muted-foreground max-w-md mx-auto">
                 The Garden team hasn't added any affiliate links yet. Check back soon for curated affiliate opportunities that automatically track your referrals and reward you with NCTR.
               </p>
-              {isAdmin && (
-                <Button onClick={() => setModalOpen(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add First Link (Admin)
-                </Button>
-              )}
             </div>
           </CardContent>
         </Card>

@@ -1404,61 +1404,44 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
             </div>
           )}
 
-          {/* Affiliate Links Section - Hidden */}
-          {/* Affiliate Links Section */}
-          <Card className="bg-gradient-to-br from-section-highlight to-white border border-section-border shadow-medium">
-            <CardHeader>
-              <CardTitle className="text-xl section-heading flex items-center gap-2">
-                <Link className="w-5 h-5" />
-                Affiliate Links & Earning
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Generate tracked affiliate links from any platform and earn NCTR rewards
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <ExternalLink className="w-5 h-5 text-primary" />
+          {/* Affiliate Links Section - Admin Only */}
+          {isAdmin && (
+            <Card className="bg-gradient-to-br from-section-highlight to-white border border-section-border shadow-medium">
+              <CardHeader>
+                <CardTitle className="text-xl section-heading flex items-center gap-2">
+                  <Link className="w-5 h-5" />
+                  Affiliate Links Management (Admin)
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  Create and manage tracked affiliate links for all users
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <ExternalLink className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Admin: Create Affiliate Links</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Add curated affiliate links that all users can access with tracking
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold">Create Affiliate Links</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Add any affiliate link (Ledger, Amazon, etc.) with user tracking
-                      </p>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={() => navigate('/affiliate-links')}
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    Get Started
-                  </Button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-muted-foreground">Works with ANY affiliate program</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-muted-foreground">Automatic click tracking</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-muted-foreground">User identification in URLs</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-muted-foreground">Earn NCTR on conversions</span>
+                    <Button 
+                      onClick={() => navigate('/admin')}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      Admin Panel
+                    </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
+
         </div>
 
       </main>
