@@ -90,6 +90,7 @@ const Garden = () => {
   const [copied, setCopied] = useState(false);
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
+  const [dailyCheckinAvailable, setDailyCheckinAvailable] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -283,6 +284,9 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
         
         setOpportunities(sortedOpportunities);
       }
+
+      // Check daily checkin availability
+      await checkDailyCheckinAvailability();
     } catch (error) {
       console.error('Error fetching user data:', error);
       toast({
@@ -292,6 +296,18 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkDailyCheckinAvailability = async () => {
+    try {
+      const { data: isAvailable } = await supabase.rpc('is_daily_checkin_available', {
+        p_user_id: user?.id
+      });
+      setDailyCheckinAvailable(isAvailable);
+    } catch (error) {
+      console.error('Error checking daily checkin availability:', error);
+      setDailyCheckinAvailable(false);
     }
   };
 
@@ -950,67 +966,100 @@ We both earn 1000 NCTR in 360LOCK when you sign up!`;
 
           {/* Daily Check-in Section - Premium Design */}
           <div className="mb-8">
-            {opportunities.filter(op => op.opportunity_type === 'daily_checkin').map(opportunity => (
-              <Card key={opportunity.id} className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 border-green-200 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
-                <CardContent className="p-6 sm:p-8">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-                      <Gift className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-green-700 mb-1">{opportunity.title}</h3>
-                      <p className="text-sm text-green-600">{opportunity.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="text-center py-4 mb-4">
-                    {/* Total Available Bonus */}
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <span className="text-3xl font-bold text-green-600">
-                        {(() => {
-                          const total = (opportunity.available_nctr_reward || 0) + 
-                                      (opportunity.lock_90_nctr_reward || 0) + 
-                                      (opportunity.lock_360_nctr_reward || 0);
-                          return formatNCTR(total || 50);
-                        })()} NCTR
-                      </span>
-                    </div>
-                    <p className="text-sm text-green-600 mb-4">Total Available Bonus</p>
-                    
-                    {/* Reward Breakdown */}
-                    <div className="bg-white/50 rounded-lg p-3 mb-4">
-                      <p className="text-xs font-semibold text-green-700 mb-2">Daily Reward Breakdown:</p>
-                      <div className="flex flex-wrap justify-center gap-2 text-xs">
-                        {(opportunity.available_nctr_reward || 0) > 0 && (
-                          <span className="bg-green-200 text-green-800 px-2 py-1 rounded-full">
-                            {formatNCTR(opportunity.available_nctr_reward || 0)} Active
+            {opportunities.filter(op => op.opportunity_type === 'daily_checkin').map(opportunity => {
+              // Show different UI based on availability
+              if (!dailyCheckinAvailable) {
+                // Minimized completed state
+                return (
+                  <Card key={opportunity.id} className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <Gift className="w-4 h-4 text-green-600" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-700">{opportunity.title}</h3>
+                            <p className="text-xs text-gray-500">Already claimed today</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
+                            ✓ Completed
                           </span>
-                        )}
-                        {(opportunity.lock_90_nctr_reward || 0) > 0 && (
-                          <span className="bg-orange-200 text-orange-800 px-2 py-1 rounded-full">
-                            {formatNCTR(opportunity.lock_90_nctr_reward || 0)} 90LOCK
+                          <span className="text-xs text-gray-500">
+                            Next: Tomorrow
                           </span>
-                        )}
-                        {(opportunity.lock_360_nctr_reward || 0) > 0 && (
-                          <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded-full">
-                            {formatNCTR(opportunity.lock_360_nctr_reward || 0)} 360LOCK
-                          </span>
-                        )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+              
+              // Full active state
+              return (
+                <Card key={opportunity.id} className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 border-green-200 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                        <Gift className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-green-700 mb-1">{opportunity.title}</h3>
+                        <p className="text-sm text-green-600">{opportunity.description}</p>
                       </div>
                     </div>
-                    
-                    <RewardDisplay opportunity={opportunity} size="md" />
-                  </div>
 
-                  <Button 
-                    className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6 group-hover:scale-105 transition-transform"
-                    size="lg"
-                  >
-                    {opportunity.cta_text || '✅ Claim Daily Bonus'}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="text-center py-4 mb-4">
+                      {/* Total Available Bonus */}
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <span className="text-3xl font-bold text-green-600">
+                          {(() => {
+                            const total = (opportunity.available_nctr_reward || 0) + 
+                                        (opportunity.lock_90_nctr_reward || 0) + 
+                                        (opportunity.lock_360_nctr_reward || 0);
+                            return formatNCTR(total || 50);
+                          })()} NCTR
+                        </span>
+                      </div>
+                      <p className="text-sm text-green-600 mb-4">Total Available Bonus</p>
+                      
+                      {/* Reward Breakdown */}
+                      <div className="bg-white/50 rounded-lg p-3 mb-4">
+                        <p className="text-xs font-semibold text-green-700 mb-2">Daily Reward Breakdown:</p>
+                        <div className="flex flex-wrap justify-center gap-2 text-xs">
+                          {(opportunity.available_nctr_reward || 0) > 0 && (
+                            <span className="bg-green-200 text-green-800 px-2 py-1 rounded-full">
+                              {formatNCTR(opportunity.available_nctr_reward || 0)} Active
+                            </span>
+                          )}
+                          {(opportunity.lock_90_nctr_reward || 0) > 0 && (
+                            <span className="bg-orange-200 text-orange-800 px-2 py-1 rounded-full">
+                              {formatNCTR(opportunity.lock_90_nctr_reward || 0)} 90LOCK
+                            </span>
+                          )}
+                          {(opportunity.lock_360_nctr_reward || 0) > 0 && (
+                            <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded-full">
+                              {formatNCTR(opportunity.lock_360_nctr_reward || 0)} 360LOCK
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <RewardDisplay opportunity={opportunity} size="md" />
+                    </div>
+
+                    <Button 
+                      className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6 group-hover:scale-105 transition-transform"
+                      size="lg"
+                    >
+                      {opportunity.cta_text || '✅ Claim Daily Bonus'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Invite Section - Premium Design */}
