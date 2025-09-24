@@ -12,6 +12,7 @@ import Garden from "./pages/Garden";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import Referrals from "./pages/Referrals";
+import AffiliateLinks from "./pages/AffiliateLinks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/referrals" element={<Referrals />} />
+              <Route path="/affiliate-links" element={<AffiliateLinks />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
