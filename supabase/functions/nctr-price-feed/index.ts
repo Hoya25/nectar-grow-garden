@@ -222,28 +222,33 @@ async function updateNCTRPrice(supabaseClient: any) {
 async function fetchOnChainPrice(): Promise<number> {
   console.log('🔍 Fetching NCTR price from multiple sources...');
   
-  // Try multiple approaches to get accurate price
-  const approaches = [
-    () => fetchFromDEXScreener(),
-    () => fetchFromDEXTools(), 
-    () => fetchFromUniswapPool(),
-    () => fetchFallbackPrice()
-  ];
-
-  for (const approach of approaches) {
-    try {
-      const price = await approach();
-      if (price && price > 0) {
-        console.log(`✅ Successfully fetched price: $${price}`);
-        return price;
-      }
-    } catch (error) {
-      console.log(`⚠️ Price fetch attempt failed:`, error.message);
-      continue;
+  // Try DEXScreener first (most reliable API)
+  try {
+    const price = await fetchFromDEXScreener();
+    if (price > 0) {
+      console.log(`✅ Successfully fetched price: $${price}`);
+      return price;
     }
+  } catch (error) {
+    console.log(`⚠️ DEXScreener failed:`, error.message);
   }
 
-  throw new Error('All price fetch methods failed');
+  // Try CoinGecko as backup API
+  try {
+    const price = await fetchFromCoinGecko();
+    if (price > 0) {
+      console.log(`✅ Successfully fetched price: $${price}`);
+      return price;
+    }
+  } catch (error) {
+    console.log(`⚠️ CoinGecko failed:`, error.message);
+  }
+
+  // Skip Uniswap V3 on-chain calls for now due to RPC issues
+  console.log('⚠️ Skipping Uniswap V3 due to RPC provider issues');
+
+  // No reliable API sources worked
+  throw new Error('All reliable price API sources failed');
 }
 
 async function fetchFromDEXScreener(): Promise<number> {
@@ -278,11 +283,36 @@ async function fetchFromDEXScreener(): Promise<number> {
   throw new Error('No valid price data from DEXScreener');
 }
 
-async function fetchFromDEXTools(): Promise<number> {
-  console.log('🔧 Trying DEXTools approach...');
+async function fetchFromCoinGecko(): Promise<number> {
+  console.log('🪙 Trying CoinGecko API...');
   
-  // DEXTools doesn't have a public API, but we can try the pool directly
-  throw new Error('DEXTools method not available');
+  // Note: CoinGecko might not have NCTR directly, but we can try
+  const response = await fetch(
+    'https://api.coingecko.com/api/v3/simple/token_price/base?contract_addresses=0x973104fAa7F2B11787557e85953ECA6B4e262328&vs_currencies=usd',
+    { 
+      headers: { 
+        'User-Agent': 'NCTR-PriceFeed/1.0',
+        'Accept': 'application/json'
+      } 
+    }
+  );
+  
+  if (!response.ok) {
+    throw new Error(`CoinGecko API error: ${response.status}`);
+  }
+  
+  const data = await response.json() as any;
+  const tokenAddress = '0x973104fAa7F2B11787557e85953ECA6B4e262328'.toLowerCase();
+  
+  if (data[tokenAddress] && data[tokenAddress].usd) {
+    const price = parseFloat(data[tokenAddress].usd);
+    if (price > 0) {
+      console.log(`💰 CoinGecko price: $${price}`);
+      return price;
+    }
+  }
+  
+  throw new Error('No valid price data from CoinGecko');
 }
 
 async function fetchFromUniswapPool(): Promise<number> {
