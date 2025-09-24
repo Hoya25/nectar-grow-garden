@@ -1,5 +1,8 @@
 project_id = "rndivcsonsojgelzewkb"
 
+[functions.affiliate-redirect]
+verify_jwt = false
+
 [functions.loyalize-brands]
 verify_jwt = true
 
