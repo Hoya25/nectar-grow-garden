@@ -39,6 +39,7 @@ import SecurityMonitor from '@/components/admin/SecurityMonitor';
 import EmergencyActions from '@/components/admin/EmergencyActions';
 import SecurityStatus from '@/components/admin/SecurityStatus';
 import ReferralTestComponent from '@/components/admin/ReferralTestComponent';
+import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
 
 interface AdminStats {
   total_users: number;
@@ -358,6 +359,9 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
+            {/* Bulk Email Sender */}
+            <BulkEmailSender />
+            
             <BannerEditor />
             
             {/* Security Overview */}
