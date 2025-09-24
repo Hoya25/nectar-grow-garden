@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 listId: 'ac31586d64', // Your Mailchimp Audience ID
                 contact: { email, firstName, lastName },
                 emailTemplate: {
-                  templateId: 123, // Replace with actual template ID
+                  templateId: 12752381, // Your actual Mailchimp template ID
                   subject: `Welcome to The Garden, ${firstName}! 🌱`,
                   customData: {
                     from_name: 'The Garden Team',

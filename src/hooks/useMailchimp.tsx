@@ -23,7 +23,7 @@ export const useMailchimp = (): MailchimpHookReturn => {
   
   // Default list ID - you'll need to get this from your Mailchimp account
   const DEFAULT_LIST_ID = 'ac31586d64'; // Your actual Mailchimp Audience ID
-  const DEFAULT_WELCOME_TEMPLATE_ID = 123; // Replace with your welcome template ID
+  const DEFAULT_WELCOME_TEMPLATE_ID = 12752381; // Your actual Mailchimp welcome template ID
 
   const callMailchimpFunction = useCallback(async (
     action: string,
