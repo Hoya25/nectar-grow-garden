@@ -22,7 +22,7 @@ export const useMailchimp = (): MailchimpHookReturn => {
   const { toast } = useToast();
   
   // Default list ID - you'll need to get this from your Mailchimp account
-  const DEFAULT_LIST_ID = 'your-mailchimp-list-id'; // Replace with your actual list ID
+  const DEFAULT_LIST_ID = 'REPLACE_WITH_YOUR_AUDIENCE_ID'; // Replace with your actual list ID
   const DEFAULT_WELCOME_TEMPLATE_ID = 123; // Replace with your welcome template ID
 
   const callMailchimpFunction = useCallback(async (
