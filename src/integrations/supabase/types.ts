@@ -176,6 +176,7 @@ export type Database = {
           cta_text: string | null
           default_lock_type: string | null
           description: string | null
+          display_order: number | null
           featured: boolean
           id: string
           is_active: boolean
@@ -205,6 +206,7 @@ export type Database = {
           cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
+          display_order?: number | null
           featured?: boolean
           id?: string
           is_active?: boolean
@@ -234,6 +236,7 @@ export type Database = {
           cta_text?: string | null
           default_lock_type?: string | null
           description?: string | null
+          display_order?: number | null
           featured?: boolean
           id?: string
           is_active?: boolean

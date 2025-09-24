@@ -26,7 +26,10 @@ import {
   Video,
   Upload,
   X,
-  Image
+  Image,
+  ChevronUp,
+  ChevronDown,
+  ArrowUpDown
 } from 'lucide-react';
 
 interface EarningOpportunity {
@@ -44,6 +47,7 @@ interface EarningOpportunity {
   video_description?: string;
   is_active: boolean;
   created_at: string;
+  display_order: number;
   // New reward structure fields
   available_nctr_reward?: number;
   lock_90_nctr_reward?: number;
@@ -95,6 +99,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     video_title: '',
     video_description: '',
     is_active: true,
+    display_order: 0,
     // New reward structure fields
     available_nctr_reward: 0,
     lock_90_nctr_reward: 0,
@@ -181,6 +186,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   });
 
   const resetForm = () => {
+    // Get next display order
+    const maxOrder = Math.max(...opportunities.map(o => o.display_order || 0), 0);
+    
     setFormData({
       title: '',
       description: '',
@@ -194,6 +202,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_title: '',
       video_description: '',
       is_active: true,
+      display_order: maxOrder + 1,
       // New reward structure fields
       available_nctr_reward: 0,
       lock_90_nctr_reward: 0,
@@ -221,6 +230,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_title: opportunity.video_title || '',
       video_description: opportunity.video_description || '',
       is_active: opportunity.is_active,
+      display_order: opportunity.display_order || 0,
       // New reward structure fields
       available_nctr_reward: opportunity.available_nctr_reward || 0,
       lock_90_nctr_reward: opportunity.lock_90_nctr_reward || 0,
@@ -492,6 +502,99 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
   };
 
+  const moveOpportunityUp = async (opportunity: EarningOpportunity) => {
+    if (opportunity.display_order <= 1) return; // Already at top
+
+    try {
+      // Find the opportunity above this one
+      const aboveOpportunity = opportunities.find(o => 
+        o.display_order === (opportunity.display_order - 1)
+      );
+
+      if (!aboveOpportunity) return;
+
+      // Swap display orders
+      const { error: error1 } = await supabase
+        .from('earning_opportunities')
+        .update({ display_order: opportunity.display_order })
+        .eq('id', aboveOpportunity.id);
+
+      const { error: error2 } = await supabase
+        .from('earning_opportunities')
+        .update({ display_order: opportunity.display_order - 1 })
+        .eq('id', opportunity.id);
+
+      if (error1 || error2) throw error1 || error2;
+
+      await logActivity('reordered', 'opportunity', opportunity.id, { 
+        title: opportunity.title,
+        action: 'moved_up',
+        new_order: opportunity.display_order - 1
+      });
+
+      toast({
+        title: "Order Updated",
+        description: `${opportunity.title} moved up in display order.`,
+      });
+
+      fetchOpportunities();
+    } catch (error) {
+      console.error('Error moving opportunity up:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reorder opportunity.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const moveOpportunityDown = async (opportunity: EarningOpportunity) => {
+    const maxOrder = Math.max(...opportunities.map(o => o.display_order || 0));
+    if (opportunity.display_order >= maxOrder) return; // Already at bottom
+
+    try {
+      // Find the opportunity below this one
+      const belowOpportunity = opportunities.find(o => 
+        o.display_order === (opportunity.display_order + 1)
+      );
+
+      if (!belowOpportunity) return;
+
+      // Swap display orders
+      const { error: error1 } = await supabase
+        .from('earning_opportunities')
+        .update({ display_order: opportunity.display_order })
+        .eq('id', belowOpportunity.id);
+
+      const { error: error2 } = await supabase
+        .from('earning_opportunities')
+        .update({ display_order: opportunity.display_order + 1 })
+        .eq('id', opportunity.id);
+
+      if (error1 || error2) throw error1 || error2;
+
+      await logActivity('reordered', 'opportunity', opportunity.id, { 
+        title: opportunity.title,
+        action: 'moved_down',
+        new_order: opportunity.display_order + 1
+      });
+
+      toast({
+        title: "Order Updated",
+        description: `${opportunity.title} moved down in display order.`,
+      });
+
+      fetchOpportunities();
+    } catch (error) {
+      console.error('Error moving opportunity down:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reorder opportunity.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getOpportunityIcon = (type: string) => {
     switch (type) {
       case 'invite': return Users;
@@ -581,7 +684,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="title">Opportunity Title *</Label>
                     <Input
@@ -609,6 +712,21 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <SelectItem value="bonus">Special Bonus</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="display_order">Display Order</Label>
+                    <Input
+                      id="display_order"
+                      type="number"
+                      min="1"
+                      value={formData.display_order}
+                      onChange={(e) => setFormData({...formData, display_order: parseInt(e.target.value) || 1})}
+                      placeholder="1"
+                    />
+                    <div className="text-xs text-muted-foreground">
+                      Lower numbers appear first
+                    </div>
                   </div>
                 </div>
 
@@ -644,7 +762,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             partner_logo_url: brand.logo_url || '',
                             affiliate_link: trackingLink,
                             title: `Shop with ${brand.name}`,
-                            description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`
+                            description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`,
+                            display_order: formData.display_order // Preserve existing display order
                           });
                         });
                       } else {
@@ -1238,9 +1357,41 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <p className="text-sm text-muted-foreground">{opportunity.partner_name || 'No Partner'}</p>
                       </div>
                     </div>
-                    <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
-                      {opportunity.is_active ? 'Active' : 'Inactive'}
-                    </Badge>
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge variant={opportunity.is_active ? "default" : "secondary"} className="text-xs">
+                        {opportunity.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                      
+                      {/* Display Order Controls */}
+                      <div className="flex items-center gap-1 bg-gray-50 rounded-md p-1">
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-muted-foreground font-mono">#{opportunity.display_order}</span>
+                          <ArrowUpDown className="w-3 h-3 text-muted-foreground" />
+                        </div>
+                        <div className="flex flex-col">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => moveOpportunityUp(opportunity)}
+                            disabled={opportunity.display_order <= 1}
+                            className="h-4 w-4 p-0 hover:bg-gray-100"
+                            title="Move up in display order"
+                          >
+                            <ChevronUp className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => moveOpportunityDown(opportunity)}
+                            disabled={opportunity.display_order >= Math.max(...opportunities.map(o => o.display_order || 0))}
+                            className="h-4 w-4 p-0 hover:bg-gray-100"
+                            title="Move down in display order"
+                          >
+                            <ChevronDown className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="space-y-3 mb-4">
