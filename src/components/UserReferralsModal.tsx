@@ -16,6 +16,8 @@ interface ReferralData {
   rewarded_at: string | null;
   referral_code: string;
   referred_name: string;
+  referred_email?: string;
+  join_date?: string;
   status: string;
   reward_credited: boolean;
 }
@@ -37,75 +39,97 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
     totalRewards: 0
   });
 
-  const fetchUserReferrals = async () => {
-    if (!isOpen || !user) return;
-    
-    console.log('Fetching referrals for user:', user.id);
-    setLoading(true);
-    try {
-      // Generate user's referral code (first 8 chars of user ID)
+  // Initialize referral code immediately when user is available
+  useEffect(() => {
+    if (user) {
       const userCode = user.id.substring(0, 8).toUpperCase();
       setReferralCode(userCode);
+    }
+  }, [user]);
 
-      // Get user's referrals
+  const fetchUserReferrals = async () => {
+    if (!user) {
+      console.log('No user available for fetching referrals');
+      return;
+    }
+    
+    console.log('Fetching referrals for user:', user.id, 'Modal open:', isOpen);
+    setLoading(true);
+    
+    try {
+      // Get user's referrals - fetch all referrals data
       const { data: referralsData, error: referralsError } = await supabase
         .from('referrals')
-        .select('*')
+        .select(`
+          id,
+          referrer_user_id,
+          referred_user_id,
+          created_at,
+          rewarded_at,
+          referral_code,
+          status,
+          reward_credited
+        `)
         .eq('referrer_user_id', user.id)
         .order('created_at', { ascending: false });
 
       console.log('Referrals query result:', { referralsData, referralsError });
 
-      if (referralsError) throw referralsError;
+      if (referralsError) {
+        console.error('Referrals query error:', referralsError);
+        throw referralsError;
+      }
 
       if (referralsData && referralsData.length > 0) {
-        // Get referred users' names
+        // Get referred users' names and profile data
         const referredUserIds = referralsData.map(r => r.referred_user_id);
         
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('user_id, full_name, username, email')
+          .select('user_id, full_name, username, email, created_at')
           .in('user_id', referredUserIds);
 
         console.log('Profiles query result:', { profilesData, profilesError });
 
-        if (profilesError) throw profilesError;
-
-        // Create profile lookup map
+        // Create profile lookup map (handle missing profiles gracefully)
         const profileMap = new Map(
           profilesData?.map(p => [
             p.user_id, 
-            p.full_name || p.username || p.email?.split('@')[0] || 'Unknown User'
+            {
+              name: p.full_name || p.username || p.email?.split('@')[0] || 'Unknown User',
+              email: p.email || '',
+              joinDate: p.created_at || ''
+            }
           ]) || []
         );
 
-        // Enrich referrals with names
+        // Enrich referrals with profile data
         const enrichedReferrals = referralsData.map(referral => ({
           ...referral,
-          referred_name: profileMap.get(referral.referred_user_id) || 'Unknown User',
+          referred_name: profileMap.get(referral.referred_user_id)?.name || 'Unknown User',
+          referred_email: profileMap.get(referral.referred_user_id)?.email || '',
+          join_date: profileMap.get(referral.referred_user_id)?.joinDate || referral.created_at,
         }));
 
+        console.log('Enriched referrals:', enrichedReferrals);
         setReferrals(enrichedReferrals);
 
         // Calculate stats
         const completed = enrichedReferrals.filter(r => r.status === 'completed' && r.reward_credited).length;
         const pending = enrichedReferrals.filter(r => r.status !== 'completed' || !r.reward_credited).length;
         
-        setStats({
+        const newStats = {
           total: enrichedReferrals.length,
           completed,
           pending,
           totalRewards: completed * 1000 // 1000 NCTR per successful referral
-        });
-
-        console.log('Final stats:', {
-          total: enrichedReferrals.length,
-          completed,
-          pending,
-          totalRewards: completed * 1000
-        });
+        };
+        
+        setStats(newStats);
+        console.log('Updated stats:', newStats);
+        
       } else {
-        console.log('No referrals found, setting empty state');
+        console.log('No referrals found for user');
         setReferrals([]);
         setStats({ total: 0, completed: 0, pending: 0, totalRewards: 0 });
       }
@@ -113,7 +137,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
       console.error('Error fetching user referrals:', error);
       toast({
         title: "Error",
-        description: "Failed to load referral data. Please try again.",
+        description: "Failed to load invite data. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -138,12 +162,19 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
     });
   };
 
+  // Fetch referrals when modal opens
   useEffect(() => {
-    fetchUserReferrals();
+    if (isOpen && user) {
+      console.log('Modal opened, triggering fetchUserReferrals');
+      fetchUserReferrals();
+    }
   }, [isOpen, user]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      console.log('Modal open state changing to:', open);
+      setIsOpen(open);
+    }}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
@@ -234,9 +265,12 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
                             <Users className="w-5 h-5 text-primary" />
                             <div>
                               <div className="font-medium">{referral.referred_name}</div>
+                              {referral.referred_email && (
+                                <div className="text-xs text-muted-foreground">{referral.referred_email}</div>
+                              )}
                               <div className="text-sm text-muted-foreground flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
-                                Joined {format(new Date(referral.created_at), 'MMM dd, yyyy')}
+                                Joined {format(new Date(referral.join_date || referral.created_at), 'MMM dd, yyyy')}
                               </div>
                             </div>
                           </div>
