@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp, ExternalLink, History } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import WalletConnection from '@/components/WalletConnection';
 import { WingsStatusBar } from '@/components/WingsStatusBar';
@@ -46,12 +47,26 @@ interface StatusLevel {
   benefits: string[];
 }
 
+interface WithdrawalRequest {
+  id: string;
+  nctr_amount: number;
+  net_amount_nctr: number;
+  gas_fee_nctr: number;
+  wallet_address: string;
+  status: string;
+  transaction_hash: string | null;
+  failure_reason: string | null;
+  created_at: string;
+  processed_at: string | null;
+}
+
 const Profile = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<any[]>([]);
+  const [withdrawalHistory, setWithdrawalHistory] = useState<WithdrawalRequest[]>([]);
   const [statusLevels, setStatusLevels] = useState<StatusLevel[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -134,6 +149,19 @@ const Profile = () => {
 
       if (statusLevelsError) {
         console.error('Status levels error:', statusLevelsError);
+      }
+
+      // Fetch withdrawal history
+      const { data: withdrawalData, error: withdrawalError } = await supabase
+        .from('withdrawal_requests')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (withdrawalError) {
+        console.error('Withdrawal history error:', withdrawalError);
+      } else {
+        setWithdrawalHistory(withdrawalData || []);
       }
 
       // Check admin status
@@ -295,6 +323,20 @@ const Profile = () => {
       ...prev,
       [field]: !prev[field]
     }));
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'completed': return 'default';
+      case 'pending': return 'secondary';
+      case 'processing': return 'outline';
+      case 'failed': return 'destructive';
+      default: return 'secondary';
+    }
+  };
+
+  const openTransactionInExplorer = (txHash: string) => {
+    window.open(`https://basescan.org/tx/${txHash}`, '_blank');
   };
 
   const getInitials = (name: string) => {
@@ -659,6 +701,92 @@ const Profile = () => {
                     {changingPassword ? "Changing Password..." : "Change Password"}
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Withdrawal History */}
+            <Card className="bg-card/80 backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5 text-foreground" />
+                  Withdrawal History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {withdrawalHistory.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No withdrawal requests yet</p>
+                    <p className="text-sm">Your withdrawal history will appear here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Transaction</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {withdrawalHistory.map((withdrawal) => (
+                          <TableRow key={withdrawal.id}>
+                            <TableCell>
+                              <div className="space-y-1">
+                                <div className="font-medium">{withdrawal.nctr_amount.toFixed(2)} NCTR</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Net: {withdrawal.net_amount_nctr.toFixed(2)} NCTR
+                                  {withdrawal.gas_fee_nctr > 0 && (
+                                    <span> (Gas: {withdrawal.gas_fee_nctr.toFixed(2)} NCTR)</span>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={getStatusBadgeVariant(withdrawal.status)}>
+                                {withdrawal.status.toUpperCase()}
+                              </Badge>
+                              {withdrawal.failure_reason && (
+                                <div className="text-xs text-destructive mt-1">
+                                  {withdrawal.failure_reason}
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="space-y-1">
+                                <div className="text-sm">{formatDate(withdrawal.created_at)}</div>
+                                {withdrawal.processed_at && (
+                                  <div className="text-xs text-muted-foreground">
+                                    Processed: {formatDate(withdrawal.processed_at)}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {withdrawal.transaction_hash ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openTransactionInExplorer(withdrawal.transaction_hash!)}
+                                  className="h-auto p-1 text-xs hover:text-primary"
+                                >
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  View on BaseScan
+                                </Button>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">
+                                  {withdrawal.status === 'pending' ? 'Waiting...' : 'No transaction'}
+                                </span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
