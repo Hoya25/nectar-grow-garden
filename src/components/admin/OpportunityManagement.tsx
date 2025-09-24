@@ -363,15 +363,25 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="affiliate_link">Affiliate Link *</Label>
+                    <Label htmlFor="affiliate_link">
+                      Affiliate Link {formData.opportunity_type !== 'daily_checkin' && '*'}
+                    </Label>
                     <Input
                       id="affiliate_link"
                       type="url"
                       value={formData.affiliate_link}
                       onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
-                      placeholder="https://partner.com/affiliate-link"
-                      required
+                      placeholder={formData.opportunity_type === 'daily_checkin' ? 
+                        "Optional: Link to terms or info page" : 
+                        "https://partner.com/affiliate-link"
+                      }
+                      required={formData.opportunity_type !== 'daily_checkin'}
                     />
+                    {formData.opportunity_type === 'daily_checkin' && (
+                      <p className="text-xs text-muted-foreground">
+                        Affiliate link is optional for daily check-in bonuses
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -724,13 +734,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center justify-between pt-2 border-t">
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEdit(opportunity)}
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 hover:bg-muted"
+                      title="Edit opportunity"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -738,7 +749,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleOpportunityStatus(opportunity.id!, opportunity.is_active)}
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 hover:bg-muted"
+                      title={opportunity.is_active ? 'Deactivate' : 'Activate'}
                     >
                       <Switch checked={opportunity.is_active} />
                     </Button>
@@ -746,18 +758,22 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(opportunity.id!)}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      title="Delete opportunity"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(generateTrackingLink(opportunity.affiliate_link), '_blank')}
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                  </Button>
+                  {opportunity.affiliate_link && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(generateTrackingLink(opportunity.affiliate_link), '_blank')}
+                      title="Open affiliate link"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
