@@ -30,7 +30,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state change:', event, session?.user?.email);
+        // Security: Remove sensitive user data from console logs in production
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth state change:', event, session?.user?.id ? 'User logged in' : 'User logged out');
+        }
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -39,7 +42,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session:', session?.user?.email);
+      // Security: Remove sensitive user data from console logs in production
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Initial session:', session?.user?.id ? 'User session found' : 'No session');
+      }
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);

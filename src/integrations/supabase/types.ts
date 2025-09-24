@@ -601,6 +601,33 @@ export type Database = {
           },
         ]
       }
+      price_access_log: {
+        Row: {
+          access_count: number | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_id: string | null
+          window_start: string | null
+        }
+        Insert: {
+          access_count?: number | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          access_count?: number | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -883,6 +910,10 @@ export type Database = {
         Args: { required_level: string }
         Returns: boolean
       }
+      check_price_access_rate_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       check_user_is_admin: {
         Args: { check_user_id: string }
         Returns: boolean
@@ -1007,6 +1038,10 @@ export type Database = {
       is_daily_checkin_available: {
         Args: { p_user_id: string }
         Returns: boolean
+      }
+      log_business_data_access: {
+        Args: { p_action?: string; p_table_name: string }
+        Returns: undefined
       }
       log_sensitive_access: {
         Args: {

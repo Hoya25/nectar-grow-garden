@@ -35,6 +35,9 @@ import InvitesModal from '@/components/admin/InvitesModal';
 import NCTRPriceManager from '@/components/admin/NCTRPriceManager';
 import WithdrawalManagement from '@/components/admin/WithdrawalManagement';
 import AffiliateLinksManagement from '@/components/admin/AffiliateLinksManagement';
+import SecurityMonitor from '@/components/admin/SecurityMonitor';
+import EmergencyActions from '@/components/admin/EmergencyActions';
+import SecurityStatus from '@/components/admin/SecurityStatus';
 
 interface AdminStats {
   total_users: number;
@@ -172,6 +175,11 @@ const Admin = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Security Monitor - Always visible at top */}
+        <div className="mb-8">
+          <SecurityMonitor />
+        </div>
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
           <Card className="bg-card/80 backdrop-blur-sm shadow-medium">
@@ -349,6 +357,13 @@ const Admin = () => {
 
           <TabsContent value="settings" className="space-y-6">
             <BannerEditor />
+            
+            {/* Security Overview */}
+            <SecurityStatus />
+            
+            {/* Emergency Security Actions - Only for super admins */}
+            <EmergencyActions />
+            
             <Card className="bg-section-highlight border border-section-border">
               <CardHeader>
                 <CardTitle className="text-foreground">System Management</CardTitle>
