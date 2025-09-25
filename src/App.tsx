@@ -27,8 +27,16 @@ const App = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const isPreview = urlParams.get('preview') === 'coming-soon';
     
+    console.log('Debug - Referrer:', referrer);
+    console.log('Debug - URL Search:', window.location.search);
+    console.log('Debug - Preview param:', urlParams.get('preview'));
+    console.log('Debug - Is Preview:', isPreview);
+    
     if (referrer.includes('nctr.live') || isPreview) {
+      console.log('Debug - Should show Coming Soon page');
       setShowComingSoon(true);
+    } else {
+      console.log('Debug - Should show normal app');
     }
   }, []);
 
