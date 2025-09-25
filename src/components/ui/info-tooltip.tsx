@@ -19,6 +19,15 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
   className,
   size = 14 
 }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -30,15 +39,21 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
               "text-muted-foreground hover:text-foreground",
               "transition-colors duration-200",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              "cursor-help",
+              "cursor-help z-10 relative",
               className
             )}
             aria-label="More information"
+            onClick={handleClick}
+            onTouchStart={handleTouchStart}
           >
             <Info size={size} />
           </button>
         </TooltipTrigger>
-        <TooltipContent className="max-w-xs p-3 text-sm leading-relaxed bg-white text-black border border-gray-200 shadow-lg">
+        <TooltipContent 
+          className="max-w-xs p-3 text-sm leading-relaxed bg-popover text-popover-foreground border shadow-md z-50"
+          side="top"
+          sideOffset={5}
+        >
           <p>{content}</p>
         </TooltipContent>
       </Tooltip>
