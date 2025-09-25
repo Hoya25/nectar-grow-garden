@@ -288,12 +288,25 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           const priorityA = getPriority(a.opportunity_type);
           const priorityB = getPriority(b.opportunity_type);
           
-          // If same priority, sort by created_at (newest first)
-          if (priorityA === priorityB) {
-            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          // If different priority groups, sort by priority
+          if (priorityA !== priorityB) {
+            return priorityA - priorityB;
           }
           
-          return priorityA - priorityB;
+          // If same priority group, apply specific sorting rules
+          if (priorityA === 1) {
+            // For Live opportunities (shopping), sort by display_order
+            const orderA = a.display_order || 999; // Put items without display_order at the end
+            const orderB = b.display_order || 999;
+            if (orderA !== orderB) {
+              return orderA - orderB; // Ascending order: 1, 2, 3...
+            }
+            // If same display_order, fallback to created_at (newest first)
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          } else {
+            // For Complete opportunities (bonus, invite), sort by created_at (newest first)
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          }
         });
         
         setOpportunities(sortedOpportunities);
