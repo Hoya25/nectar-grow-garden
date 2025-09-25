@@ -148,7 +148,7 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
               </Dialog>
 
               {/* Buy NCTR or Upgrade Action */}
-              {!isDiamondStatus && (
+              {!isDiamondStatus ? (
                 <LevelUpModal
                   currentStatus={currentStatus}
                   current360NCTR={current360NCTR}
@@ -177,6 +177,16 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                     <span className="sm:hidden">Up</span>
                   </Button>
                 </LevelUpModal>
+              ) : (
+                <Button 
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  onClick={() => window.open('https://token.nctr.live', '_blank')}
+                >
+                  <TrendingUp className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">Buy NCTR</span>
+                  <span className="sm:hidden">Buy</span>
+                </Button>
               )}
             </div>
           </div>
@@ -192,7 +202,7 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
             </div>
             
             {/* Mobile Level Up Button */}
-            {!isDiamondStatus && (
+            {!isDiamondStatus ? (
               <LevelUpModal
                 currentStatus={currentStatus}
                 current360NCTR={current360NCTR}
@@ -213,6 +223,15 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                   Level Up to {nextStatus.status?.toUpperCase()}
                 </Button>
               </LevelUpModal>
+            ) : (
+              <Button 
+                size="sm"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={() => window.open('https://token.nctr.live', '_blank')}
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Buy NCTR from token.nctr.live
+              </Button>
             )}
           </div>
         </CardContent>
