@@ -1028,6 +1028,14 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: Json
       }
+      get_business_data_access_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          access_count: number
+          last_access: string
+          table_name: string
+        }[]
+      }
       get_public_profile: {
         Args: { profile_user_id: string }
         Returns: {
