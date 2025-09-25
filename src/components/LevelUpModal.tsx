@@ -16,6 +16,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
+import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface LevelUpModalProps {
   currentStatus: string;
@@ -165,6 +166,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                 <span className="text-sm font-semibold">
                   {formatNCTR(neededNCTR)} more NCTR needed in 360LOCK
                 </span>
+                <Lock360InfoTooltip size={14} />
               </div>
             </CardContent>
           </Card>

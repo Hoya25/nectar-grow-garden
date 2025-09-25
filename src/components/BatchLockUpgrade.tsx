@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { ArrowUp, Zap, TrendingUp, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface BatchLockUpgradeProps {
   locks: Array<{
@@ -129,7 +130,8 @@ const BatchLockUpgrade = ({ locks, onUpgradeComplete, availableNCTR = 0 }: Batch
         <div className="bg-primary/5 rounded-lg p-3 space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium text-primary">
             <TrendingUp className="h-4 w-4" />
-            360LOCK Benefits
+            <span>360LOCK Benefits</span>
+            <Lock360InfoTooltip size={14} />
           </div>
           <ul className="text-xs text-muted-foreground space-y-1 ml-2">
             <li>• Maximum 360-day commitment period</li>

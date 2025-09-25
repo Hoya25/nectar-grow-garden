@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { Lock, TrendingUp, Calendar, Award, Loader2 } from 'lucide-react';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
+import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface LockCommitmentModalProps {
   availableNCTR: number;
@@ -185,7 +186,8 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                   <div className="flex items-center justify-between">
                     <CardTitle className={`flex items-center ${option.textColor}`}>
                       <div className={`w-4 h-4 rounded-full ${option.color} mr-3 shadow-sm`} />
-                      {option.title}
+                      <span>{option.title}</span>
+                      {option.type === '360LOCK' && <Lock360InfoTooltip size={14} className="ml-2" />}
                     </CardTitle>
                     <Badge className={`${option.color} text-white border-0 shadow-sm`}>
                       {option.duration}D

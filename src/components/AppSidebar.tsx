@@ -32,6 +32,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
@@ -195,6 +196,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
                           <span className="text-sm font-bold text-primary">360LOCK NCTR</span>
+                          <Lock360InfoTooltip size={14} />
                         </div>
                         <p className="text-lg font-bold text-primary mb-1">
                           {formatNCTR(portfolio?.lock_360_nctr || 0)} NCTR

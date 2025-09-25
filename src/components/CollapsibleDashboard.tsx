@@ -25,6 +25,7 @@ import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
@@ -361,7 +362,10 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                     <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Can Upgrade</span>
                   </div>
                   <div className="text-base font-bold text-blue-800">{formatNCTR(portfolio.lock_90_nctr)} NCTR</div>
-                  <div className="text-xs text-blue-600 mt-1">Upgrade to 360LOCK for max benefits</div>
+                  <div className="flex items-center gap-1 text-xs text-blue-600 mt-1">
+                    <span>Upgrade to 360LOCK for max benefits</span>
+                    <Lock360InfoTooltip size={12} />
+                  </div>
                 </div>
               )}
               
