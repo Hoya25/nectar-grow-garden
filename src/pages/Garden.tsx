@@ -899,11 +899,6 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
             {/* Compact Status Display in Header */}
             <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3 border border-primary/20">
               <div className="flex items-center gap-2">
-                <img 
-                  src={nctrLogo} 
-                  alt="NCTR" 
-                  className="h-9 w-auto opacity-70"
-                />
                 <div>
                   <p className="text-xs text-muted-foreground">Total NCTR</p>
                   <p className="text-sm font-semibold text-section-accent">
