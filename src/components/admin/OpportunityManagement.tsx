@@ -691,7 +691,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
             </SelectContent>
           </Select>
           
-          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <Dialog open={modalOpen} onOpenChange={(open) => {
+            // Prevent closing dialog during form submission
+            if (!loading) {
+              setModalOpen(open);
+            }
+          }}>
             <DialogTrigger asChild>
               <Button 
                 onClick={resetForm}
@@ -1332,7 +1337,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => setModalOpen(false)}
+                    onClick={() => {
+                      if (!loading) {
+                        setModalOpen(false);
+                      }
+                    }}
+                    disabled={loading}
                   >
                     Cancel
                   </Button>
@@ -1340,6 +1350,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     type="submit" 
                     disabled={loading}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
+                    onClick={(e) => {
+                      console.log('🔘 Submit button clicked!');
+                      // Let the form handle the submission
+                    }}
                   >
                     {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     {editingOpportunity ? 'Update' : 'Create'} Opportunity
