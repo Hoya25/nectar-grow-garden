@@ -19,23 +19,62 @@ import ComingSoon from "./pages/ComingSoon";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Check URL parameters immediately
-  const urlParams = new URLSearchParams(window.location.search);
-  const isPreview = urlParams.get('preview') === 'coming-soon';
-  const referrer = document.referrer.toLowerCase();
-  const fromNCTR = referrer.includes('nctr.live');
-  
-  console.log('=== COMING SOON DEBUG ===');
-  console.log('Current URL:', window.location.href);
-  console.log('Search params:', window.location.search);
-  console.log('Preview param:', urlParams.get('preview'));
-  console.log('Is preview:', isPreview);
-  console.log('Referrer:', referrer);
-  console.log('From NCTR:', fromNCTR);
-  console.log('Should show Coming Soon:', isPreview || fromNCTR);
-  
-  // Show Coming Soon page immediately if conditions are met
-  if (isPreview || fromNCTR) {
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
+
+  useEffect(() => {
+    // More comprehensive URL and referrer checking
+    const currentUrl = window.location.href;
+    const searchParams = window.location.search;
+    const urlParams = new URLSearchParams(searchParams);
+    const previewParam = urlParams.get('preview');
+    const isPreview = previewParam === 'coming-soon';
+    const referrer = document.referrer.toLowerCase();
+    const fromNCTR = referrer.includes('nctr.live');
+    
+    const debugOutput = `
+=== COMING SOON DEBUG (useEffect) ===
+Current URL: ${currentUrl}
+Search params: ${searchParams}
+All URL params: ${Array.from(urlParams.entries())}
+Preview param value: "${previewParam}"
+Is preview exactly 'coming-soon': ${isPreview}
+Document referrer: "${referrer}"
+From NCTR: ${fromNCTR}
+Should show Coming Soon: ${isPreview || fromNCTR}
+User agent: ${navigator.userAgent}
+================================
+    `;
+    
+    console.log(debugOutput);
+    setDebugInfo(debugOutput);
+    
+    // Set state based on conditions
+    if (isPreview || fromNCTR) {
+      console.log('✅ Setting showComingSoon to true');
+      setShowComingSoon(true);
+    } else {
+      console.log('❌ Not showing Coming Soon page');
+      setShowComingSoon(false);
+    }
+  }, []);
+
+  // Show debug info on page for easier debugging
+  if (window.location.search.includes('debug=true')) {
+    return (
+      <div style={{ padding: '20px', fontFamily: 'monospace', whiteSpace: 'pre-line' }}>
+        <h2>Debug Information</h2>
+        {debugInfo}
+        <button onClick={() => setShowComingSoon(!showComingSoon)}>
+          Toggle Coming Soon ({showComingSoon ? 'ON' : 'OFF'})
+        </button>
+        {showComingSoon && <ComingSoon />}
+      </div>
+    );
+  }
+
+  // Show Coming Soon page if conditions are met
+  if (showComingSoon) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
