@@ -73,6 +73,98 @@ serve(async (req) => {
         }
       }
 
+      case 'get_comprehensive_brands': {
+        console.log('Fetching comprehensive brand data with enhanced search support')
+        
+        const { search, category, min_commission, max_commission, sort_by = 'name', sort_order = 'asc' } = requestBody
+        
+        let query = supabase
+          .from('brands')
+          .select(`
+            id,
+            loyalize_id,
+            name,
+            description,
+            logo_url,
+            commission_rate,
+            nctr_per_dollar,
+            category,
+            website_url,
+            is_active,
+            featured,
+            created_at,
+            updated_at
+          `)
+          .eq('is_active', true)
+        
+        // Apply search filter if provided
+        if (search) {
+          const searchTerm = `%${search.toLowerCase()}%`
+          query = query.or(`name.ilike.${searchTerm},description.ilike.${searchTerm},category.ilike.${searchTerm}`)
+        }
+        
+        // Apply category filter if provided
+        if (category && category !== 'all') {
+          query = query.eq('category', category)
+        }
+        
+        // Apply commission rate filters if provided
+        if (min_commission !== undefined) {
+          query = query.gte('commission_rate', min_commission / 100)
+        }
+        
+        if (max_commission !== undefined) {
+          query = query.lte('commission_rate', max_commission / 100)
+        }
+        
+        // Apply sorting
+        const sortColumn = sort_by === 'commission' ? 'commission_rate' : sort_by
+        query = query.order(sortColumn, { ascending: sort_order === 'asc' })
+        
+        // Also sort by featured status and name for consistency
+        if (sort_by !== 'featured') {
+          query = query.order('featured', { ascending: false })
+        }
+        if (sort_by !== 'name') {
+          query = query.order('name', { ascending: true })
+        }
+        
+        const { data: brands, error: brandsError } = await query
+        
+        if (brandsError) {
+          console.error('Error fetching comprehensive brands:', brandsError)
+          throw brandsError
+        }
+        
+        // Get additional statistics
+        const stats = {
+          total_brands: brands?.length || 0,
+          categories: [...new Set(brands?.map(b => b.category) || [])].sort(),
+          avg_commission: brands?.length ? 
+            (brands.reduce((sum, b) => sum + (b.commission_rate * 100), 0) / brands.length).toFixed(2) : '0.00',
+          max_commission: brands?.length ? 
+            Math.max(...brands.map(b => b.commission_rate * 100)).toFixed(2) : '0.00',
+          featured_count: brands?.filter(b => b.featured).length || 0
+        }
+        
+        console.log(`Retrieved ${brands?.length || 0} brands with enhanced search`)
+        
+        return new Response(
+          JSON.stringify({
+            success: true,
+            brands: brands || [],
+            stats,
+            search_params: { search, category, min_commission, max_commission, sort_by, sort_order }
+          }),
+          {
+            headers: {
+              ...corsHeaders,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+      }
+
       case 'get_brand_offerings': {
         console.log('Fetching brand offerings from database')
         

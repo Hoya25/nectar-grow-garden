@@ -13,7 +13,10 @@ import {
   Star,
   Building2,
   TrendingUp,
-  Filter
+  Filter,
+  RefreshCw,
+  SlidersHorizontal,
+  ArrowUpDown
 } from 'lucide-react';
 import {
   Select,
@@ -22,6 +25,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Slider } from '@/components/ui/slider';
 
 interface Brand {
   id: string;
@@ -42,25 +52,57 @@ interface Brand {
 const LoyalizeBrandManager = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [commissionRange, setCommissionRange] = useState<[number, number]>([0, 10]);
+  const [sortBy, setSortBy] = useState<'name' | 'commission' | 'category'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [showFilters, setShowFilters] = useState(false);
   const [creatingOpportunity, setCreatingOpportunity] = useState<string | null>(null);
 
   useEffect(() => {
     loadBrands();
   }, []);
 
-  const loadBrands = async () => {
+  const loadBrands = async (useComprehensiveSearch = false) => {
     try {
-      const { data, error } = await supabase
-        .from('brands')
-        .select('*')
-        .eq('is_active', true)
-        .order('featured', { ascending: false })
-        .order('commission_rate', { ascending: false });
+      let data, error;
+      
+      if (useComprehensiveSearch) {
+        // Use the new comprehensive search endpoint for advanced filtering
+        const searchParams = {
+          action: 'get_comprehensive_brands',
+          search: searchTerm || undefined,
+          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          min_commission: commissionRange[0],
+          max_commission: commissionRange[1],
+          sort_by: sortBy,
+          sort_order: sortOrder
+        };
+        
+        const response = await supabase.functions.invoke('loyalize-integration', {
+          body: searchParams
+        });
+        
+        if (response.error) throw response.error;
+        
+        data = response.data?.brands || [];
+        error = null;
+      } else {
+        // Use the standard database query for simple cases
+        const result = await supabase
+          .from('brands')
+          .select('*')
+          .eq('is_active', true)
+          .order('featured', { ascending: false })
+          .order('commission_rate', { ascending: false });
+        
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) throw error;
-
       setBrands(data || []);
     } catch (error) {
       console.error('Error loading brands:', error);
@@ -71,6 +113,36 @@ const LoyalizeBrandManager = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const syncBrands = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('loyalize-integration', {
+        body: { action: 'sync_brands' }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: `Synced ${data.brands_count || 0} brands from Loyalize API`,
+        });
+        await loadBrands(); // Reload the brands list
+      } else {
+        throw new Error(data.error || 'Failed to sync brands');
+      }
+    } catch (error) {
+      console.error('Error syncing brands:', error);
+      toast({
+        title: "Error",
+        description: `Failed to sync brands: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -109,18 +181,60 @@ const LoyalizeBrandManager = () => {
     }
   };
 
-  const filteredBrands = brands.filter(brand => {
-    const matchesSearch = brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         brand.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || brand.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredAndSortedBrands = brands
+    .filter(brand => {
+      // Enhanced search - search in name, description, and category
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = !searchTerm || 
+        brand.name.toLowerCase().includes(searchLower) ||
+        brand.description?.toLowerCase().includes(searchLower) ||
+        brand.category.toLowerCase().includes(searchLower);
+      
+      // Category filter
+      const matchesCategory = selectedCategory === 'all' || brand.category === selectedCategory;
+      
+      // Commission rate filter
+      const commissionPercent = brand.commission_rate * 100;
+      const matchesCommission = commissionPercent >= commissionRange[0] && commissionPercent <= commissionRange[1];
+      
+      return matchesSearch && matchesCategory && matchesCommission;
+    })
+    .sort((a, b) => {
+      let aVal: string | number, bVal: string | number;
+      
+      switch (sortBy) {
+        case 'commission':
+          aVal = a.commission_rate;
+          bVal = b.commission_rate;
+          break;
+        case 'category':
+          aVal = a.category;
+          bVal = b.category;
+          break;
+        default: // name
+          aVal = a.name;
+          bVal = b.name;
+          break;
+      }
+      
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        const result = aVal.localeCompare(bVal);
+        return sortOrder === 'asc' ? result : -result;
+      } else {
+        const result = (aVal as number) - (bVal as number);
+        return sortOrder === 'asc' ? result : -result;
+      }
+    });
 
   const categories = [...new Set(brands.map(brand => brand.category))].sort();
   
   const averageCommission = brands.length > 0 
     ? (brands.reduce((sum, brand) => sum + (brand.commission_rate * 100), 0) / brands.length).toFixed(2)
     : '0.00';
+
+  const maxCommission = brands.length > 0
+    ? Math.max(...brands.map(brand => brand.commission_rate * 100))
+    : 10;
 
   if (loading) {
     return (
@@ -187,40 +301,130 @@ const LoyalizeBrandManager = () => {
       {/* Search and Filter Controls */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="w-5 h-5" />
-            Loyalize Brand Commission Manager
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Loyalize Brand Commission Manager
+            </div>
+            <Button 
+              onClick={syncBrands}
+              disabled={syncing}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+              {syncing ? 'Syncing...' : 'Sync Brands'}
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search brands or categories..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          <div className="space-y-4">
+            {/* Primary search and controls */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search brands, descriptions, or categories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  <SlidersHorizontal className="w-4 h-4 mr-2" />
+                  Filters
+                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <ArrowUpDown className="w-4 h-4 mr-2" />
+                      Sort
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => {setSortBy('name'); setSortOrder('asc')}}>
+                      Name (A-Z)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {setSortBy('name'); setSortOrder('desc')}}>
+                      Name (Z-A)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {setSortBy('commission'); setSortOrder('desc')}}>
+                      Highest Commission
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {setSortBy('commission'); setSortOrder('asc')}}>
+                      Lowest Commission
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {setSortBy('category'); setSortOrder('asc')}}>
+                      Category (A-Z)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+            {/* Advanced filters */}
+            {showFilters && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Category</label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Commission Rate: {commissionRange[0]}% - {commissionRange[1]}%
+                  </label>
+                  <Slider
+                    value={commissionRange}
+                    onValueChange={(value) => setCommissionRange(value as [number, number])}
+                    max={Math.ceil(maxCommission)}
+                    min={0}
+                    step={0.1}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Results summary */}
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>
+                Showing {filteredAndSortedBrands.length} of {brands.length} brands
+              </span>
+              {searchTerm && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSearchTerm('')}
+                >
+                  Clear search
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Brands Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredBrands.map((brand) => (
+            {filteredAndSortedBrands.map((brand) => (
               <Card key={brand.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4 mb-4">
@@ -309,7 +513,7 @@ const LoyalizeBrandManager = () => {
             ))}
           </div>
 
-          {filteredBrands.length === 0 && (
+          {filteredAndSortedBrands.length === 0 && (
             <div className="text-center py-12">
               <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No brands found</h3>
