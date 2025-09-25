@@ -1027,7 +1027,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                       <p className="text-xl font-bold text-blue-600 mb-1">
                         {formatNCTR(portfolio?.available_nctr || 0)}
                       </p>
-                      <p className="text-xs text-muted-foreground">{formatUSD(portfolio?.available_nctr || 0)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Intl.NumberFormat('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        }).format(calculatePortfolioValue(portfolio?.available_nctr || 0))}
+                      </p>
                       <p className="text-xs text-muted-foreground">Ready to commit</p>
                     </CardContent>
                   </Card>
