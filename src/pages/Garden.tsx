@@ -109,6 +109,32 @@ const Garden = () => {
     fetchReferralStats();
   }, [user, navigate, refreshKey]); // Add refreshKey to dependencies
 
+  // Real-time updates for earning opportunities
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('earning-opportunities-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'earning_opportunities'
+        },
+        (payload) => {
+          console.log('Earning opportunities updated:', payload);
+          // Refetch opportunities when any change occurs
+          fetchOpportunities();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const generateReferralCode = () => {
     if (user) {
       // Generate a simple referral code based on user ID
@@ -188,6 +214,46 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
   const shareViaWhatsApp = () => {
     const message = `🌱 Join The Garden and start earning NCTR tokens! Use my referral link: ${getReferralLink()}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+  };
+
+  const fetchOpportunities = async () => {
+    try {
+      const { data: opportunitiesData, error: opportunitiesError } = await supabase
+        .from('earning_opportunities')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (opportunitiesError) {
+        console.error('Error fetching opportunities:', opportunitiesError);
+      } else {
+        // Sort opportunities to prioritize shopping (with display_order) over bonus/invite
+        const sortedOpportunities = (opportunitiesData || []).sort((a, b) => {
+          // First, separate by type: shopping opportunities vs bonus/invite
+          const aIsShopping = a.opportunity_type === 'shopping';
+          const bIsShopping = b.opportunity_type === 'shopping';
+          
+          if (aIsShopping && !bIsShopping) return -1; // Shopping first
+          if (!aIsShopping && bIsShopping) return 1;  // Then bonus/invite
+          
+          // Within shopping opportunities, sort by display_order (ascending - lower numbers first)
+          if (aIsShopping && bIsShopping) {
+            const aOrder = a.display_order ?? 999;
+            const bOrder = b.display_order ?? 999;
+            if (aOrder !== bOrder) return aOrder - bOrder;
+            // Fall back to created_at if display_order is the same
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          }
+          
+          // Within bonus/invite opportunities, sort by created_at (newest first)
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+        
+        setOpportunities(sortedOpportunities);
+      }
+    } catch (error) {
+      console.error('Error fetching opportunities:', error);
+    }
   };
 
   const fetchUserData = async () => {
@@ -270,81 +336,22 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       }
 
       // Fetch earning opportunities
-      const { data: opportunitiesData, error: opportunitiesError } = await supabase
-        .from('earning_opportunities')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+      await fetchOpportunities();
 
-      if (opportunitiesError) {
-        console.error('Opportunities error:', opportunitiesError);
-      } else {
-        // Sort opportunities: Live (shopping) first, then Complete (bonus, invite)
-        const sortedOpportunities = (opportunitiesData || []).sort((a, b) => {
-          // Define priority: shopping (Live) = 1, bonus/invite (Complete) = 2
-          const getPriority = (type: string) => {
-            if (type === 'shopping') return 1; // Live opportunities first
-            return 2; // Complete opportunities (bonus, invite) second
-          };
-          
-          const priorityA = getPriority(a.opportunity_type);
-          const priorityB = getPriority(b.opportunity_type);
-          
-          // If different priority groups, sort by priority
-          if (priorityA !== priorityB) {
-            return priorityA - priorityB;
-          }
-          
-          // If same priority group, apply specific sorting rules
-          if (priorityA === 1) {
-            // For Live opportunities (shopping), sort by display_order
-            const orderA = a.display_order || 999; // Put items without display_order at the end
-            const orderB = b.display_order || 999;
-            if (orderA !== orderB) {
-              return orderA - orderB; // Ascending order: 1, 2, 3...
-            }
-            // If same display_order, fallback to created_at (newest first)
-            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-          } else {
-            // For Complete opportunities (bonus, invite), sort by created_at (newest first)
-            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-          }
+      // After opportunities are loaded, check for profile completion
+      try {
+        const { data: profileCompletionData } = await supabase.rpc('calculate_profile_completion', {
+          p_user_id: user.id
         });
         
-        setOpportunities(sortedOpportunities);
-        
-        // After opportunities are loaded, check for profile completion
-        try {
-          const { data: profileCompletionData } = await supabase.rpc('calculate_profile_completion', {
-            p_user_id: user.id
-          });
-          
-          if (profileCompletionData && typeof profileCompletionData === 'object' && 'bonus_awarded' in profileCompletionData) {
-            const completion = profileCompletionData as { bonus_awarded: boolean };
-            if (completion.bonus_awarded) {
-              // Find profile-related opportunities and mark as completed
-              const profileOpportunities = sortedOpportunities.filter(op => 
-                op.title.toLowerCase().includes('profile') || 
-                op.title.toLowerCase().includes('complete') ||
-                op.opportunity_type === 'bonus' && op.description?.toLowerCase().includes('profile')
-              );
-              
-              // Get current completed IDs and add profile opportunity IDs
-              setCompletedOpportunityIds(prevCompleted => {
-                const newCompleted = [...prevCompleted];
-                profileOpportunities.forEach(op => {
-                  if (!newCompleted.includes(op.id)) {
-                    newCompleted.push(op.id);
-                    console.log('Marking profile opportunity as completed:', op.title);
-                  }
-                });
-                return newCompleted;
-              });
-            }
+        if (profileCompletionData && typeof profileCompletionData === 'object' && 'bonus_awarded' in profileCompletionData) {
+          const completion = profileCompletionData as { bonus_awarded: boolean };
+          if (completion.bonus_awarded) {
+            console.log('Profile completion bonus was awarded - will mark profile opportunities as completed');
           }
-        } catch (error) {
-          console.error('Error checking profile completion after opportunities loaded:', error);
         }
+      } catch (error) {
+        console.error('Error checking profile completion after opportunities loaded:', error);
       }
 
       // Check daily checkin availability
