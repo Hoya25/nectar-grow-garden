@@ -26,18 +26,6 @@ export const RewardDisplay = ({
   userStatus = 'starter'
 }: RewardDisplayProps) => {
   
-  // Debug logging
-  useEffect(() => {
-    if (opportunity.opportunity_type === 'invite') {
-      console.log('RewardDisplay - Invite Opportunity Debug:', {
-        userStatus,
-        userMultiplier,
-        colorClass: userMultiplier > 1 ? getStatusTextColor(userStatus) : 'text-primary',
-        isInvite: opportunity.opportunity_type === 'invite',
-        rewardPerDollar: opportunity.reward_per_dollar
-      });
-    }
-  }, [userStatus, userMultiplier, opportunity.opportunity_type, opportunity.reward_per_dollar]);
   const formatNCTR = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,

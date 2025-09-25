@@ -50,11 +50,8 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
   // Simplified data fetching function
   const fetchUserReferrals = async () => {
     if (!user?.id) {
-      console.log('No user ID available');
       return;
     }
-    
-    console.log('Starting to fetch referrals for user:', user.id);
     setLoading(true);
     
     try {
@@ -65,15 +62,12 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
         .eq('referrer_user_id', user.id)
         .order('created_at', { ascending: false });
 
-      console.log('Raw referrals data:', referralsData);
-
       if (referralsError) {
         console.error('Error fetching referrals:', referralsError);
         throw referralsError;
       }
 
       if (!referralsData || referralsData.length === 0) {
-        console.log('No referrals found');
         setReferrals([]);
         setStats({ total: 0, completed: 0, pending: 0, totalRewards: 0 });
         return;
@@ -81,14 +75,11 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
 
       // Get profile data for referred users
       const userIds = referralsData.map(r => r.referred_user_id);
-      console.log('Fetching profiles for user IDs:', userIds);
       
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .in('user_id', userIds);
-
-      console.log('Profiles data result:', profilesData, 'Error:', profilesError);
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
@@ -106,7 +97,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
         };
       });
 
-      console.log('Final enriched referrals:', enrichedReferrals);
+      
       setReferrals(enrichedReferrals);
 
       // Calculate stats
@@ -153,12 +144,10 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
 
   // Handle modal opening and data fetching
   const handleModalOpenChange = (open: boolean) => {
-    console.log('Modal state changing to:', open);
     setIsOpen(open);
     
     // Fetch data immediately when modal opens
     if (open && user?.id) {
-      console.log('Modal opened, fetching referrals...');
       fetchUserReferrals();
     }
   };
