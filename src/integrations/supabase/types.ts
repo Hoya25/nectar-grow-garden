@@ -1026,6 +1026,16 @@ export type Database = {
           username: string
         }[]
       }
+      get_safe_referral_profile: {
+        Args: { target_user_id: string }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_security_dashboard_data: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -1072,6 +1082,10 @@ export type Database = {
           status_description: string
           user_id: string
         }[]
+      }
+      has_referral_relationship: {
+        Args: { user1_id: string; user2_id: string }
+        Returns: boolean
       }
       increment: {
         Args: { x: number }

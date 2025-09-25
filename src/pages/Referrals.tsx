@@ -71,18 +71,28 @@ const Referrals = () => {
         return;
       }
 
+      // Get secure profile data for referred users using the safe function
       const userIds = referralsData.map(r => r.referred_user_id);
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('user_id', userIds);
+      const profilePromises = userIds.map(async (userId) => {
+        const { data, error } = await supabase
+          .rpc('get_safe_referral_profile', { target_user_id: userId });
+        
+        if (error) {
+          console.error('Error fetching safe profile for user:', userId, error);
+          return null;
+        }
+        return data?.[0] || null;
+      });
 
-      const enrichedReferrals = referralsData.map(referral => {
-        const profile = profilesData?.find(p => p.user_id === referral.referred_user_id);
+      const profilesData = await Promise.all(profilePromises);
+
+      // Combine referral and profile data (no sensitive information exposed)
+      const enrichedReferrals = referralsData.map((referral, index) => {
+        const profile = profilesData[index];
         return {
           ...referral,
-          referred_name: profile?.full_name || profile?.username || profile?.email?.split('@')[0] || 'Unknown User',
-          referred_email: profile?.email || '',
+          referred_name: profile?.full_name || profile?.username || 'Member',
+          referred_email: '', // No longer expose email addresses for security
           join_date: profile?.created_at || referral.created_at,
         };
       });

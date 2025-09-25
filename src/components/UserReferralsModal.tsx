@@ -73,26 +73,28 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
         return;
       }
 
-      // Get profile data for referred users
+      // Get secure profile data for referred users using the safe function
       const userIds = referralsData.map(r => r.referred_user_id);
-      
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('user_id', userIds);
+      const profilePromises = userIds.map(async (userId) => {
+        const { data, error } = await supabase
+          .rpc('get_safe_referral_profile', { target_user_id: userId });
+        
+        if (error) {
+          console.error('Error fetching safe profile for user:', userId, error);
+          return null;
+        }
+        return data?.[0] || null;
+      });
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        // Don't throw here, just continue with empty profile data
-      }
+      const profilesData = await Promise.all(profilePromises);
 
-      // Combine referral and profile data
-      const enrichedReferrals = referralsData.map(referral => {
-        const profile = profilesData?.find(p => p.user_id === referral.referred_user_id);
+      // Combine referral and profile data (no sensitive information exposed)
+      const enrichedReferrals = referralsData.map((referral, index) => {
+        const profile = profilesData[index];
         return {
           ...referral,
-          referred_name: profile?.full_name || profile?.username || profile?.email?.split('@')[0] || 'Unknown User',
-          referred_email: profile?.email || '',
+          referred_name: profile?.full_name || profile?.username || 'Member',
+          referred_email: '', // No longer expose email addresses for security
           join_date: profile?.created_at || referral.created_at,
         };
       });
@@ -243,16 +245,13 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <Users className="w-5 h-5 text-primary" />
-                            <div>
-                              <div className="font-medium">{referral.referred_name}</div>
-                              {referral.referred_email && (
-                                <div className="text-xs text-muted-foreground">{referral.referred_email}</div>
-                              )}
-                              <div className="text-sm text-muted-foreground flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                Joined {format(new Date(referral.join_date || referral.created_at), 'MMM dd, yyyy')}
-                              </div>
-                            </div>
+                             <div>
+                               <div className="font-medium">{referral.referred_name}</div>
+                               <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                 <Calendar className="w-3 h-3" />
+                                 Joined {format(new Date(referral.join_date || referral.created_at), 'MMM dd, yyyy')}
+                               </div>
+                             </div>
                           </div>
                           <div className="flex items-center gap-2">
                             {referral.status === 'completed' && referral.reward_credited ? (
