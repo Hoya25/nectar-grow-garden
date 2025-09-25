@@ -392,12 +392,16 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       };
 
       if (editingOpportunity) {
+        console.log('Updating opportunity:', editingOpportunity.id, submitData);
         const { error } = await supabase
           .from('earning_opportunities')
           .update(submitData)
           .eq('id', editingOpportunity.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
         await logActivity('updated', 'opportunity', editingOpportunity.id, { 
           title: submitData.title,
