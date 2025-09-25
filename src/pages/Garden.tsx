@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BrandLogo } from '@/components/ui/brand-logo';
-import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
@@ -94,6 +94,7 @@ const Garden = () => {
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
   const [dailyCheckinAvailable, setDailyCheckinAvailable] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0); // Add refresh trigger
 
   useEffect(() => {
     if (!user) {
@@ -106,7 +107,7 @@ const Garden = () => {
     fetchUserData();
     generateReferralCode();
     fetchReferralStats();
-  }, [user, navigate]);
+  }, [user, navigate, refreshKey]); // Add refreshKey to dependencies
 
   const generateReferralCode = () => {
     if (user) {
@@ -370,6 +371,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       console.error('Error checking daily checkin availability:', error);
       setDailyCheckinAvailable(false);
     }
+  };
+
+  const refreshOpportunities = () => {
+    setRefreshKey(prev => prev + 1);
+    toast({
+      title: "Refreshing Data",
+      description: "Updated opportunity rewards are being loaded...",
+    });
   };
 
   const handleSignOut = async () => {
@@ -899,6 +908,16 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     <span className="hidden sm:inline">Admin</span>
                   </Button>
                 )}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={refreshOpportunities}
+                  className="flex items-center gap-1 sm:gap-2 border-primary/50 section-text hover:bg-primary/10 hover:text-primary whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
+                  title="Refresh opportunity rewards"
+                >
+                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Refresh</span>
+                </Button>
                 <Button 
                   variant="outline" 
                   onClick={handleSignOut}
