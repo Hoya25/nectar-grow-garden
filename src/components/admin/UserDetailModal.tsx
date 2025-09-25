@@ -386,7 +386,7 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-green-600">
-                        {userPortfolio.available_nctr.toFixed(2)}
+                        {(userPortfolio.available_nctr || 0).toFixed(2)}
                       </div>
                       <p className="text-sm text-muted-foreground">Ready for withdrawal</p>
                     </CardContent>
@@ -401,11 +401,11 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-orange-600">
-                        {(userPortfolio.lock_90_nctr + userPortfolio.lock_360_nctr).toFixed(2)}
+                        {((userPortfolio.lock_90_nctr || 0) + (userPortfolio.lock_360_nctr || 0)).toFixed(2)}
                       </div>
                       <div className="text-sm text-muted-foreground space-y-1">
-                        <div>90LOCK: {userPortfolio.lock_90_nctr.toFixed(2)}</div>
-                        <div>360LOCK: {userPortfolio.lock_360_nctr.toFixed(2)}</div>
+                        <div>90LOCK: {(userPortfolio.lock_90_nctr || 0).toFixed(2)}</div>
+                        <div>360LOCK: {(userPortfolio.lock_360_nctr || 0).toFixed(2)}</div>
                       </div>
                     </CardContent>
                   </Card>
@@ -419,7 +419,7 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-3xl font-bold text-primary">
-                        {userPortfolio.total_earned.toFixed(2)}
+                        {(userPortfolio.total_earned || 0).toFixed(2)}
                       </div>
                       <p className="text-sm text-muted-foreground">Lifetime earnings</p>
                     </CardContent>
