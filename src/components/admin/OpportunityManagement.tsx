@@ -413,10 +413,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         console.log('🔄 Updating opportunity:', editingOpportunity.id, submitData);
         
         try {
-          const { error } = await supabase
+          console.log('🏁 About to call supabase.update...');
+          const { data, error } = await supabase
             .from('earning_opportunities')
             .update(submitData)
-            .eq('id', editingOpportunity.id);
+            .eq('id', editingOpportunity.id)
+            .select();
+
+          console.log('💾 Supabase update response:', { data, error });
 
           if (error) {
             console.error('❌ Update error:', error);
