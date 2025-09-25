@@ -428,23 +428,21 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         console.log('🔄 Updating opportunity:', editingOpportunity.id, submitData);
         
         try {
-          console.log('🏁 About to call supabase.update...');
-          const { data, error } = await supabase
-            .from('earning_opportunities')
-            .update(submitData)
-            .eq('id', editingOpportunity.id)
-            .select();
+          console.log('🏁 About to call secure function...');
+          const { data, error } = await supabase.rpc('update_opportunity_secure', {
+            opportunity_id: editingOpportunity.id,
+            opportunity_data: submitData
+          });
 
-          console.log('💾 Supabase update response:', { data, error });
+          console.log('💾 Function response:', { data, error });
 
           if (error) {
-            console.error('❌ Update error:', error);
+            console.error('❌ Function error:', error);
             throw error;
           }
 
-          // Check if any rows were actually updated
           if (!data || data.length === 0) {
-            console.error('❌ No rows were updated - this indicates RLS policy issue or missing permissions');
+            console.error('❌ No rows were updated by the function');
             throw new Error(`Failed to update opportunity. This may be due to insufficient permissions or the record not existing.`);
           }
           

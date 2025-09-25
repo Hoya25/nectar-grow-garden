@@ -1305,6 +1305,28 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      update_opportunity_secure: {
+        Args: { opportunity_data: Json; opportunity_id: string }
+        Returns: {
+          affiliate_link: string
+          available_nctr_reward: number
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          is_active: boolean
+          lock_360_nctr_reward: number
+          lock_90_nctr_reward: number
+          nctr_reward: number
+          opportunity_type: string
+          partner_logo_url: string
+          partner_name: string
+          reward_distribution_type: string
+          reward_per_dollar: number
+          title: string
+          updated_at: string
+        }[]
+      }
       update_user_status: {
         Args: { user_id: string }
         Returns: Json
