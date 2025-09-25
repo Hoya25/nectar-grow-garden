@@ -1169,6 +1169,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      is_referral_power_user: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       log_business_data_access: {
         Args: { p_action?: string; p_table_name: string }
         Returns: undefined
@@ -1227,7 +1231,13 @@ export type Database = {
         Returns: Json
       }
       validate_referral_request: {
-        Args: { p_referred_user_id: string; p_referrer_code: string }
+        Args:
+          | { p_referee_id: string; p_referrer_id: string }
+          | { p_referred_user_id: string; p_referrer_code: string }
+        Returns: Json
+      }
+      validate_referral_request_enhanced: {
+        Args: { p_referee_id: string; p_referrer_id: string }
         Returns: Json
       }
     }
