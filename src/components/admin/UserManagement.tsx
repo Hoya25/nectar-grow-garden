@@ -7,13 +7,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
+import UserDetailModal from './UserDetailModal';
 import { 
   Users, 
   Search, 
   Shield,
   TrendingUp,
   Calendar,
-  Mail
+  Mail,
+  Eye,
+  MoreHorizontal
 } from 'lucide-react';
 
 interface UserProfile {
@@ -45,6 +48,8 @@ const UserManagement = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -184,6 +189,16 @@ const UserManagement = () => {
     }
   };
 
+  const openUserDetail = (user: UserData) => {
+    setSelectedUser(user);
+    setIsDetailModalOpen(true);
+  };
+
+  const closeUserDetail = () => {
+    setSelectedUser(null);
+    setIsDetailModalOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -310,6 +325,15 @@ const UserManagement = () => {
 
                   {/* Admin Actions */}
                   <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => openUserDetail(user)}
+                      className="flex items-center gap-1"
+                    >
+                      <Eye className="w-4 h-4" />
+                      View Details
+                    </Button>
                     {user.is_admin ? (
                       <Button 
                         variant="outline" 
@@ -335,6 +359,15 @@ const UserManagement = () => {
             </Card>
           ))}
         </div>
+      )}
+
+      {/* User Detail Modal */}
+      {selectedUser && (
+        <UserDetailModal
+          user={selectedUser}
+          isOpen={isDetailModalOpen}
+          onClose={closeUserDetail}
+        />
       )}
     </div>
   );

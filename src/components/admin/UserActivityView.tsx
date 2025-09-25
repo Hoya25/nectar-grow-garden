@@ -1,0 +1,339 @@
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { 
+  Activity, 
+  TrendingUp, 
+  TrendingDown, 
+  Lock, 
+  Unlock,
+  Gift,
+  Users,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight
+} from 'lucide-react';
+import { format } from 'date-fns';
+
+interface Transaction {
+  id: string;
+  transaction_type: string;
+  nctr_amount: number;
+  description: string;
+  earning_source: string;
+  status: string;
+  created_at: string;
+  partner_name?: string;
+}
+
+interface NCTRLock {
+  id: string;
+  lock_type: string;
+  lock_category: string;
+  nctr_amount: number;
+  lock_date: string;
+  unlock_date: string;
+  status: string;
+  commitment_days: number;
+}
+
+interface Referral {
+  id: string;
+  referred_user_id: string;
+  referral_code: string;
+  status: string;
+  reward_credited: boolean;
+  created_at: string;
+  rewarded_at?: string;
+}
+
+interface UserActivityViewProps {
+  userId: string;
+}
+
+const UserActivityView = ({ userId }: UserActivityViewProps) => {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [locks, setLocks] = useState<NCTRLock[]>([]);
+  const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'transactions' | 'locks' | 'referrals'>('transactions');
+
+  useEffect(() => {
+    if (userId) {
+      fetchUserActivity();
+    }
+  }, [userId]);
+
+  const fetchUserActivity = async () => {
+    setLoading(true);
+    try {
+      // Fetch transactions
+      const { data: transactionData, error: transactionError } = await supabase
+        .from('nctr_transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (!transactionError && transactionData) {
+        setTransactions(transactionData);
+      }
+
+      // Fetch locks
+      const { data: lockData, error: lockError } = await supabase
+        .from('nctr_locks')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (!lockError && lockData) {
+        setLocks(lockData);
+      }
+
+      // Fetch referrals
+      const { data: referralData, error: referralError } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referrer_user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (!referralError && referralData) {
+        setReferrals(referralData);
+      }
+
+    } catch (error) {
+      console.error('Error fetching user activity:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTransactionIcon = (type: string, amount: number) => {
+    if (amount > 0) {
+      return <ArrowUpRight className="w-4 h-4 text-green-500" />;
+    } else {
+      return <ArrowDownRight className="w-4 h-4 text-red-500" />;
+    }
+  };
+
+  const getTransactionTypeColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'earned': return 'bg-green-100 text-green-700';
+      case 'withdrawal': return 'bg-red-100 text-red-700';
+      case 'lock_upgrade': return 'bg-blue-100 text-blue-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getLockStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active': return 'bg-green-100 text-green-700';
+      case 'upgraded': return 'bg-blue-100 text-blue-700';
+      case 'unlocked': return 'bg-gray-100 text-gray-700';
+      default: return 'bg-yellow-100 text-yellow-700';
+    }
+  };
+
+  const getReferralStatusColor = (status: string, rewarded: boolean) => {
+    if (status === 'completed' && rewarded) {
+      return 'bg-green-100 text-green-700';
+    } else if (status === 'completed') {
+      return 'bg-blue-100 text-blue-700';
+    }
+    return 'bg-yellow-100 text-yellow-700';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Activity Tabs */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant={activeTab === 'transactions' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('transactions')}
+          className="flex items-center gap-2"
+        >
+          <Activity className="w-4 h-4" />
+          Transactions ({transactions.length})
+        </Button>
+        <Button
+          variant={activeTab === 'locks' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('locks')}
+          className="flex items-center gap-2"
+        >
+          <Lock className="w-4 h-4" />
+          Locks ({locks.length})
+        </Button>
+        <Button
+          variant={activeTab === 'referrals' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('referrals')}
+          className="flex items-center gap-2"
+        >
+          <Users className="w-4 h-4" />
+          Referrals ({referrals.length})
+        </Button>
+      </div>
+
+      {/* Transactions Tab */}
+      {activeTab === 'transactions' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="w-4 h-4" />
+              Recent Transactions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {transactions.length === 0 ? (
+              <div className="text-center py-8">
+                <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No transactions found</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {transactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      {getTransactionIcon(transaction.transaction_type, transaction.nctr_amount)}
+                      <div>
+                        <div className="font-medium">{transaction.description || transaction.transaction_type}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {format(new Date(transaction.created_at), 'MMM dd, yyyy HH:mm')}
+                        </div>
+                        {transaction.partner_name && (
+                          <div className="text-xs text-muted-foreground">
+                            Partner: {transaction.partner_name}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`font-bold ${transaction.nctr_amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {transaction.nctr_amount >= 0 ? '+' : ''}{transaction.nctr_amount.toFixed(2)} NCTR
+                      </div>
+                      <Badge className={getTransactionTypeColor(transaction.transaction_type)}>
+                        {transaction.transaction_type}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Locks Tab */}
+      {activeTab === 'locks' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              NCTR Locks
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {locks.length === 0 ? (
+              <div className="text-center py-8">
+                <Lock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No locks found</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {locks.map((lock) => (
+                  <div key={lock.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Lock className="w-5 h-5 text-orange-500" />
+                      <div>
+                        <div className="font-medium">{lock.lock_type}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Locked: {format(new Date(lock.lock_date), 'MMM dd, yyyy')}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Unlocks: {format(new Date(lock.unlock_date), 'MMM dd, yyyy')}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {lock.commitment_days} days commitment
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-orange-600">
+                        {lock.nctr_amount.toFixed(2)} NCTR
+                      </div>
+                      <Badge className={getLockStatusColor(lock.status)}>
+                        {lock.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Referrals Tab */}
+      {activeTab === 'referrals' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Referral History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {referrals.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No referrals found</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {referrals.map((referral) => (
+                  <div key={referral.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Users className="w-5 h-5 text-blue-500" />
+                      <div>
+                        <div className="font-medium">Referral Code: {referral.referral_code}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Created: {format(new Date(referral.created_at), 'MMM dd, yyyy')}
+                        </div>
+                        {referral.rewarded_at && (
+                          <div className="text-sm text-muted-foreground">
+                            Rewarded: {format(new Date(referral.rewarded_at), 'MMM dd, yyyy')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge className={getReferralStatusColor(referral.status, referral.reward_credited)}>
+                        {referral.status} {referral.reward_credited ? '(Rewarded)' : ''}
+                      </Badge>
+                      {referral.reward_credited && (
+                        <div className="text-sm text-green-600 mt-1">
+                          +1000 NCTR
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+export default UserActivityView;
