@@ -902,13 +902,22 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                 <img 
                   src={nctrLogo} 
                   alt="NCTR" 
-                  className="h-6 w-auto opacity-70"
+                  className="h-18 w-auto opacity-70"
                 />
                 <div>
                   <p className="text-xs text-muted-foreground">Total NCTR</p>
                   <p className="text-sm font-semibold text-section-accent">
                     {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
                   </p>
+                  {/* Live NCTR Price Feed */}
+                  <div className="mt-1">
+                    <p className="text-xs text-muted-foreground">
+                      ${formatPrice(currentPrice)} 
+                      <span className={`ml-1 ${getChangeColor(priceChange24h)}`}>
+                        {formatChange(priceChange24h)}
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
