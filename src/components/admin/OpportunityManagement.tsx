@@ -378,8 +378,19 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     e.preventDefault();
     console.log('🚀 Form submitted! Starting handleSubmit...');
     console.log('📝 Form data:', formData);
-    console.log('✏️ Editing opportunity:', editingOpportunity?.id);
+    console.log('✏️ Editing opportunity:', editingOpportunity);
     console.log('🖼️ Logo file present:', !!logoFile);
+    
+    if (!editingOpportunity) {
+      console.error('❌ No editingOpportunity found - cannot update');
+      toast({
+        title: "Error",
+        description: "No opportunity selected for editing",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
     
     setLoading(true);
 
