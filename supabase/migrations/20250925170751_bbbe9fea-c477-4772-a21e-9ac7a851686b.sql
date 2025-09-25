@@ -1,0 +1,36 @@
+-- Create NOBull earning opportunity with tracking link
+INSERT INTO public.earning_opportunities (
+  title,
+  description,
+  opportunity_type,
+  partner_name,
+  partner_logo_url,
+  affiliate_link,
+  reward_per_dollar,
+  available_nctr_reward,
+  lock_90_nctr_reward,
+  reward_distribution_type,
+  default_lock_type,
+  min_status,
+  featured,
+  is_active,
+  cta_text,
+  display_order
+) VALUES (
+  'NOBull Training Gear - Performance Footwear & Apparel',
+  'Earn NCTR on NOBull''s premium training shoes, running shoes, gym bags, and workout gear. Built for athletes and fitness enthusiasts who demand durable, functional designs for high-performance training and active lifestyles.',
+  'shopping',
+  'Nobull',
+  'https://api.loyalize.com/resources/stores/30095/logo',
+  'https://www.nobullproject.com/?utm_source=nctr&utm_medium=affiliate&utm_campaign=training_gear',
+  100.0000,
+  0,
+  5.6,
+  'lock_90',
+  '90LOCK',
+  'starter',
+  true,
+  true,
+  'Shop NOBull Training Gear',
+  1
+);
