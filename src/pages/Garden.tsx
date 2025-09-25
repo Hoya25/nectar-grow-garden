@@ -1051,6 +1051,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <Gift className="w-5 h-5 text-primary" />
                         <span className="text-sm font-medium text-primary">360LOCK</span>
+                        <Lock360InfoTooltip size={14} />
                       </div>
                       <p className="text-xl font-bold text-primary mb-1">
                         {formatNCTR(portfolio?.lock_360_nctr || 0)}
