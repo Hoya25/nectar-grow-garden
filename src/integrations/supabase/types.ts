@@ -851,15 +851,7 @@ export type Database = {
       }
     }
     Views: {
-      security_summary: {
-        Row: {
-          active_users_today: number | null
-          critical_events_today: number | null
-          high_risk_events_today: number | null
-          last_activity: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       add_sample_brands: {
@@ -1076,6 +1068,15 @@ export type Database = {
       get_security_dashboard_data: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_security_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active_users_today: number
+          critical_events_today: number
+          high_risk_events_today: number
+          last_activity: string
+        }[]
       }
       get_sensitive_profile_data: {
         Args: { target_user_id: string }
