@@ -476,7 +476,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       }
 
       console.log('🔄 Refreshing opportunities list...');
-      fetchOpportunities();
+      await fetchOpportunities();
       onStatsUpdate();
       setModalOpen(false);
       resetForm();
