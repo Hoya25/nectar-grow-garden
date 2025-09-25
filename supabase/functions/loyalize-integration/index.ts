@@ -314,7 +314,7 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     let allStores: any[] = [];
     let page = 0;
     let hasMorePages = true;
-    const maxPageSize = 1000;
+    const maxPageSize = 5000;
     
     // Fetch all stores with pagination using ONLY the correct auth method
     while (hasMorePages) {
@@ -790,7 +790,7 @@ async function fetchStoreLogos(apiKey: string): Promise<Record<string, string>> 
   try {
     let page = 0;
     let hasMorePages = true;
-    const pageSize = 1000; // Maximum per API docs
+    const pageSize = 5000; // Increased limit for comprehensive brand data
     
     while (hasMorePages) {
       const endpoint = `https://api.loyalize.com/v2/sku-details?page=${page}&size=${pageSize}`;
