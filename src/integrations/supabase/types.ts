@@ -902,6 +902,10 @@ export type Database = {
         Args: { required_level: string }
         Returns: boolean
       }
+      check_business_data_rate_limit: {
+        Args: { p_table_name: string }
+        Returns: boolean
+      }
       check_price_access_rate_limit: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -926,6 +930,10 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: Json
       }
+      create_secure_referral: {
+        Args: { p_referral_code: string; p_referred_user_id: string }
+        Returns: Json
+      }
       create_withdrawal_request: {
         Args: { p_nctr_amount: number; p_wallet_address: string }
         Returns: Json
@@ -942,9 +950,22 @@ export type Database = {
           user_id: string
         }[]
       }
+      detect_suspicious_patterns: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          last_activity: string
+          risk_score: number
+          suspicious_activities: string[]
+          user_id: string
+        }[]
+      }
       emergency_revoke_admin_access: {
         Args: { p_user_email: string }
         Returns: Json
+      }
+      enhanced_price_access_control: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       get_admin_financial_access: {
         Args: Record<PropertyKey, never>
@@ -1170,6 +1191,10 @@ export type Database = {
         Args: { p_referral_id: string }
         Returns: Json
       }
+      ultra_secure_admin_check: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       update_user_status: {
         Args: { user_id: string }
         Returns: Json
@@ -1180,6 +1205,10 @@ export type Database = {
       }
       upgrade_lock_to_360: {
         Args: { p_lock_id: string }
+        Returns: Json
+      }
+      validate_referral_integrity: {
+        Args: { p_referral_code: string; p_referred_user_id: string }
         Returns: Json
       }
     }
