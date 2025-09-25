@@ -25,6 +25,8 @@ import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -879,7 +881,62 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-page">
+    <SidebarProvider>
+      <div className="min-h-screen bg-gradient-page flex w-full">
+        <AppSidebar 
+          portfolio={portfolio} 
+          onLockCreated={() => fetchUserData()} 
+        />
+        
+        <main className="flex-1 overflow-auto">
+          {/* Header with Sidebar Trigger */}
+          <div className="sticky top-0 z-40 bg-gradient-page/80 backdrop-blur-sm border-b border-white/10">
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-4">
+                <SidebarTrigger />
+                <div className="flex items-center gap-3">
+                  <img src={nctrLogo} alt="NCTR" className="h-8 w-8" />
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-yellow-400 bg-clip-text text-transparent">
+                    The Garden
+                  </h1>
+                </div>
+              </div>
+              
+              {/* Header Actions */}
+              <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <Button
+                    onClick={() => navigate('/admin')}
+                    variant="outline"
+                    size="sm"
+                    className="hidden sm:flex"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                )}
+                <Button
+                  onClick={() => navigate('/profile')}
+                  variant="outline"
+                  size="sm"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Profile
+                </Button>
+                <Button
+                  onClick={handleSignOut}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Power className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="container mx-auto px-4 py-6">
       {/* Header with Wings Status */}
       <header className="section-highlight backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-3 sm:py-4">
@@ -1697,7 +1754,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         availableNCTR={portfolio?.available_nctr || 0}
         walletAddress={connectedWallet}
       />
-    </div>
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 
