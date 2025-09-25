@@ -140,7 +140,7 @@ export const RewardDisplay = ({
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
                 <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
                   {formatNCTR((opportunity.available_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))}
-                </span> Available
+                </span>{' '}Available
               </Badge>
             )}
             {(opportunity.lock_90_nctr_reward || 0) > 0 && (
@@ -148,7 +148,7 @@ export const RewardDisplay = ({
                 <div className="w-2 h-2 bg-orange-500 rounded-full mr-1"></div>
                 <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
                   {formatNCTR((opportunity.lock_90_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))}
-                </span> 90LOCK
+                </span>{' '}90LOCK
               </Badge>
             )}
             {(opportunity.lock_360_nctr_reward || 0) > 0 && (
@@ -156,7 +156,7 @@ export const RewardDisplay = ({
                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
                 <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
                   {formatNCTR((opportunity.lock_360_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))}
-                </span> 360LOCK
+                </span>{' '}360LOCK
               </Badge>
             )}
           </div>
