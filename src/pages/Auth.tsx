@@ -17,6 +17,7 @@ const Auth = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('signin');
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [manualReferralCode, setManualReferralCode] = useState('');
   
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
@@ -64,7 +65,8 @@ const Auth = () => {
     setLoading(true);
     setError(null);
 
-    const { error } = await signUp(email, password, fullName, referralCode);
+    const finalReferralCode = referralCode || (manualReferralCode.trim() || null);
+    const { error } = await signUp(email, password, fullName, finalReferralCode);
     
     if (error) {
       setError(error.message);
@@ -132,7 +134,7 @@ const Auth = () => {
             </TabsContent>
             
             <TabsContent value="signup" className="space-y-4">
-              {referralCode && (
+              {(referralCode || manualReferralCode.trim()) && (
                 <Alert className="border-green-200 bg-green-50">
                   <AlertDescription className="text-green-800">
                     🎉 You're signing up with a referral code! You and your referrer will both earn 1000 NCTR when you complete signup.
@@ -176,6 +178,19 @@ const Auth = () => {
                     minLength={6}
                   />
                 </div>
+                
+                {!referralCode && (
+                  <div className="space-y-2">
+                    <Label htmlFor="referral-code">Referral Code (Optional)</Label>
+                    <Input
+                      id="referral-code"
+                      type="text"
+                      placeholder="Enter referral code"
+                      value={manualReferralCode}
+                      onChange={(e) => setManualReferralCode(e.target.value)}
+                    />
+                  </div>
+                )}
                 
                 <Button 
                   type="submit" 
