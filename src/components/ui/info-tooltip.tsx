@@ -74,3 +74,17 @@ export const Lock360InfoTooltip: React.FC<{ className?: string; size?: number }>
     />
   );
 };
+
+// Specific 90LOCK info tooltip with predefined content
+export const Lock90InfoTooltip: React.FC<{ className?: string; size?: number }> = ({ 
+  className, 
+  size = 14 
+}) => {
+  return (
+    <InfoTooltip
+      content="90LOCK is your default anti‑abuse safeguard. Rewards vest over 90 days to keep the game fair and the token resilient. Commit to 360LOCK to level up your Wings status."
+      className={className}
+      size={size}
+    />
+  );
+};
