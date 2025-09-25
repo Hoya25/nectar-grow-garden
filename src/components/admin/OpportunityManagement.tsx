@@ -130,8 +130,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     console.log(`=== END DEBUG ===`);
   }, [brands]);
 
-  const fetchOpportunities = async () => {
+  const fetchOpportunities = async (skipLoading = false) => {
     try {
+      if (!skipLoading) {
+        setLoading(true);
+      }
       const { data, error } = await supabase
         .from('earning_opportunities')
         .select('*')
@@ -140,6 +143,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
       if (error) throw error;
       setOpportunities(data || []);
+      console.log('📊 Opportunities refreshed:', data?.length || 0, 'items');
     } catch (error) {
       console.error('Error fetching opportunities:', error);
       toast({
@@ -148,7 +152,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      if (!skipLoading) {
+        setLoading(false);
+      }
     }
   };
 
@@ -476,7 +482,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       }
 
       console.log('🔄 Refreshing opportunities list...');
-      await fetchOpportunities();
+      await fetchOpportunities(true); // Skip loading state management
       onStatsUpdate();
       setModalOpen(false);
       resetForm();
