@@ -22,9 +22,12 @@ const App = () => {
   const [showComingSoon, setShowComingSoon] = useState(false);
 
   useEffect(() => {
-    // Check if the user came from www.NCTR.Live
+    // Check if the user came from www.NCTR.Live or has the preview parameter
     const referrer = document.referrer.toLowerCase();
-    if (referrer.includes('nctr.live')) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPreview = urlParams.get('preview') === 'coming-soon';
+    
+    if (referrer.includes('nctr.live') || isPreview) {
       setShowComingSoon(true);
     }
   }, []);
