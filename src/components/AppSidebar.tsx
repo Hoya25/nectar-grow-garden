@@ -32,7 +32,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useWallet } from '@/hooks/useWallet';
 import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
+import NCTRLiveSync from './NCTRLiveSync';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface Portfolio {
@@ -138,12 +140,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
                 <p className="text-sm text-muted-foreground">
                   Sync your portfolio with token.nctr.live to update your Wings status and balance
                 </p>
-                <Button 
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                  size="sm"
-                >
-                  🔄 Sync Portfolio
-                </Button>
+                <NCTRLiveSync onSyncComplete={() => window.location.reload()} />
               </div>
             )}
           </SidebarGroupContent>
