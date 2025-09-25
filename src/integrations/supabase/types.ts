@@ -1037,6 +1037,18 @@ export type Database = {
           username: string
         }[]
       }
+      get_admin_safe_profile_data: {
+        Args: { target_user_id: string }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_admin_safe_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1086,6 +1098,20 @@ export type Database = {
           access_count: number
           last_access: string
           table_name: string
+        }[]
+      }
+      get_masked_profile_for_admin: {
+        Args: { target_user_id: string }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          email_masked: string
+          full_name: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+          wallet_masked: string
         }[]
       }
       get_password_security_status: {
@@ -1150,6 +1176,15 @@ export type Database = {
         }[]
       }
       get_sensitive_profile_data: {
+        Args: { target_user_id: string }
+        Returns: {
+          email: string
+          user_id: string
+          wallet_address: string
+          wallet_connected_at: string
+        }[]
+      }
+      get_sensitive_profile_data_secure: {
         Args: { target_user_id: string }
         Returns: {
           email: string
