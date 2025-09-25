@@ -1,5 +1,4 @@
 import { Badge } from '@/components/ui/badge';
-import { Lock90InfoTooltip } from '@/components/ui/info-tooltip';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface RewardDisplayProps {
@@ -132,12 +131,11 @@ export const RewardDisplay = ({
                </Badge>
             )}
 {(opportunity.lock_90_nctr_reward || 0) > 0 && (
-               <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100 flex items-center gap-1">
+               <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-1"></div>
                  <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
                    {formatNCTR((opportunity.lock_90_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} 90LOCK
                  </span>
-                 <Lock90InfoTooltip size={12} />
                </Badge>
             )}
             {(opportunity.lock_360_nctr_reward || 0) > 0 && (

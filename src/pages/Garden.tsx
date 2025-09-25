@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BrandLogo } from '@/components/ui/brand-logo';
-import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
+import { Lock360InfoTooltip, Lock90InfoTooltip } from '@/components/ui/info-tooltip';
 import { Coins, TrendingUp, Gift, Users, LogOut, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
@@ -1037,6 +1037,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <Gift className="w-5 h-5 text-orange-600" />
                         <span className="text-sm font-medium text-orange-600">90LOCK</span>
+                        <Lock90InfoTooltip size={14} />
                       </div>
                       <p className="text-xl font-bold text-orange-600 mb-1">
                         {formatNCTR(portfolio?.lock_90_nctr || 0)}
