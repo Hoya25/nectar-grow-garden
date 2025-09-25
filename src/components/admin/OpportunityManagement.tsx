@@ -441,7 +441,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
             console.error('❌ Update error:', error);
             throw error;
           }
-          console.log('✅ Update successful!');
+
+          // Check if any rows were actually updated
+          if (!data || data.length === 0) {
+            console.error('❌ No rows were updated - this indicates RLS policy issue or missing permissions');
+            throw new Error(`Failed to update opportunity. This may be due to insufficient permissions or the record not existing.`);
+          }
+          
+          console.log('✅ Update successful! Updated rows:', data.length);
         } catch (dbError) {
           console.error('💥 Database update failed:', dbError);
           throw dbError;
