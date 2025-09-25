@@ -50,7 +50,7 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
           </button>
         </TooltipTrigger>
         <TooltipContent 
-          className="max-w-xs p-3 text-sm leading-relaxed bg-popover text-popover-foreground border shadow-md z-50"
+          className="max-w-xs p-3 text-sm leading-relaxed bg-white text-black border shadow-md z-50"
           side="top"
           sideOffset={5}
         >

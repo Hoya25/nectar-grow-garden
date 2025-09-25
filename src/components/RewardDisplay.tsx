@@ -1,6 +1,4 @@
 import { Badge } from '@/components/ui/badge';
-import { useEffect } from 'react';
-import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 
 interface RewardDisplayProps {
@@ -141,13 +139,12 @@ export const RewardDisplay = ({
                </Badge>
             )}
             {(opportunity.lock_360_nctr_reward || 0) > 0 && (
-               <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 flex items-center gap-1">
-                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                 <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
-                   {formatNCTR((opportunity.lock_360_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} 360LOCK
-                 </span>
-                 <Lock360InfoTooltip size={12} />
-               </Badge>
+                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
+                  <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
+                    {formatNCTR((opportunity.lock_360_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} 360LOCK
+                  </span>
+                </Badge>
             )}
           </div>
           
