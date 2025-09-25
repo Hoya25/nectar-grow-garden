@@ -373,10 +373,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     console.log('🚀 Form submitted! Starting handleSubmit...');
     console.log('📝 Form data:', formData);
     console.log('✏️ Editing opportunity:', editingOpportunity?.id);
+    console.log('🖼️ Logo file present:', !!logoFile);
     
     setLoading(true);
 
     try {
+      console.log('🔧 Starting processing...');
       let logoUrl = formData.partner_logo_url;
       
       // Upload logo file if selected
@@ -387,9 +389,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
           logoUrl = uploadedUrl;
           console.log('✅ Logo uploaded:', logoUrl);
         } else {
-          console.log('❌ Logo upload failed');
+          console.log('❌ Logo upload failed - stopping submission');
           return;
         }
+      } else {
+        console.log('🔗 Using existing logo URL:', logoUrl);
       }
 
       const submitData = {
@@ -397,24 +401,37 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         partner_logo_url: logoUrl
       };
       console.log('📦 Final submit data:', submitData);
+      console.log('🎯 About to process database operation...');
 
       if (editingOpportunity) {
         console.log('🔄 Updating opportunity:', editingOpportunity.id, submitData);
-        const { error } = await supabase
-          .from('earning_opportunities')
-          .update(submitData)
-          .eq('id', editingOpportunity.id);
+        
+        try {
+          const { error } = await supabase
+            .from('earning_opportunities')
+            .update(submitData)
+            .eq('id', editingOpportunity.id);
 
-        if (error) {
-          console.error('❌ Update error:', error);
-          throw error;
+          if (error) {
+            console.error('❌ Update error:', error);
+            throw error;
+          }
+          console.log('✅ Update successful!');
+        } catch (dbError) {
+          console.error('💥 Database update failed:', dbError);
+          throw dbError;
         }
-        console.log('✅ Update successful!');
 
-        await logActivity('updated', 'opportunity', editingOpportunity.id, { 
-          title: submitData.title,
-          changes: submitData 
-        });
+        try {
+          await logActivity('updated', 'opportunity', editingOpportunity.id, { 
+            title: submitData.title,
+            changes: submitData 
+          });
+          console.log('📊 Activity logged successfully');
+        } catch (logError) {
+          console.error('⚠️ Activity logging failed (non-critical):', logError);
+          // Don't throw - logging failure shouldn't stop the update
+        }
 
         toast({
           title: "Opportunity Updated",
@@ -422,21 +439,35 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         });
       } else {
         console.log('➕ Creating new opportunity...');
-        const { data, error } = await supabase
-          .from('earning_opportunities')
-          .insert(submitData)
-          .select()
-          .single();
+        
+        let data;
+        try {
+          const result = await supabase
+            .from('earning_opportunities')
+            .insert(submitData)
+            .select()
+            .single();
 
-        if (error) {
-          console.error('❌ Create error:', error);
-          throw error;
+          if (result.error) {
+            console.error('❌ Create error:', result.error);
+            throw result.error;
+          }
+          data = result.data;
+          console.log('✅ Create successful:', data);
+        } catch (dbError) {
+          console.error('💥 Database create failed:', dbError);
+          throw dbError;
         }
-        console.log('✅ Create successful:', data);
 
-        await logActivity('created', 'opportunity', data.id, { 
-          title: submitData.title 
-        });
+        try {
+          await logActivity('created', 'opportunity', data.id, { 
+            title: submitData.title 
+          });
+          console.log('📊 Activity logged successfully');
+        } catch (logError) {
+          console.error('⚠️ Activity logging failed (non-critical):', logError);
+          // Don't throw - logging failure shouldn't stop the creation
+        }
 
         toast({
           title: "Opportunity Created",
@@ -452,12 +483,19 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       console.log('✅ Form submission complete!');
     } catch (error) {
       console.error('💥 Error saving opportunity:', error);
+      console.error('💥 Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
       toast({
         title: "Error",
-        description: "Failed to save opportunity.",
+        description: `Failed to save opportunity: ${error.message || 'Unknown error'}`,
         variant: "destructive",
       });
     } finally {
+      console.log('🏁 Finally block - setting loading to false');
       setLoading(false);
     }
   };
