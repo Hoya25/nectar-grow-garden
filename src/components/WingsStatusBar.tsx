@@ -98,7 +98,40 @@ export const WingsStatusBar: React.FC<WingsStatusBarProps> = ({
         {/* Background pattern */}
         <div className="absolute inset-0 bg-white/10 bg-[radial-gradient(circle_at_1px_1px,_white_1px,_transparent_0)] bg-[length:20px_20px] opacity-20" />
         
-        <div className="relative z-10 flex items-center justify-between mb-3">
+        {/* Mobile Layout */}
+        <div className="relative z-10 space-y-3 sm:hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <StatusIcon className="w-5 h-5 text-white" />
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 font-bold uppercase tracking-wide text-xs">
+                {currentStatus} Wings
+              </Badge>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-white/80 text-xs">Multiplier:</span>
+              <span className="text-white font-bold text-sm">{currentLevel.reward_multiplier}x</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <img 
+                src={nctrLogo} 
+                alt="NCTR" 
+                className="h-6 w-auto opacity-80"
+              />
+              <div>
+                <div className="text-white font-bold text-base">
+                  {formatNCTR(current360NCTR)}
+                </div>
+                <div className="text-white/70 text-xs">360LOCK Balance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="relative z-10 hidden sm:flex items-center justify-between mb-3">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <StatusIcon className="w-6 h-6 text-white" />
@@ -147,13 +180,32 @@ export const WingsStatusBar: React.FC<WingsStatusBarProps> = ({
           </div>
           
           {nextLevel && (
-            <div className="flex items-center justify-between text-xs text-white/70">
-              <span>Current: {formatNCTR(current360NCTR)} NCTR</span>
-              <span className="flex items-center space-x-1">
-                <span>Need:</span>
-                <span className="text-white font-medium">{formatNCTR(remaining)} more</span>
-                <span>({formatNCTR(nextRequired)} total)</span>
-              </span>
+            <div className="space-y-1">
+              {/* Mobile Progress Info */}
+              <div className="sm:hidden space-y-1 text-xs text-white/70">
+                <div className="flex justify-between">
+                  <span>Current:</span>
+                  <span className="text-white">{formatNCTR(current360NCTR)} NCTR</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Need:</span>
+                  <span className="text-white font-medium">{formatNCTR(remaining)} more</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Next Level:</span>
+                  <span className="text-white">{formatNCTR(nextRequired)} total</span>
+                </div>
+              </div>
+              
+              {/* Desktop Progress Info */}
+              <div className="hidden sm:flex items-center justify-between text-xs text-white/70">
+                <span>Current: {formatNCTR(current360NCTR)} NCTR</span>
+                <span className="flex items-center space-x-1">
+                  <span>Need:</span>
+                  <span className="text-white font-medium">{formatNCTR(remaining)} more</span>
+                  <span>({formatNCTR(nextRequired)} total)</span>
+                </span>
+              </div>
             </div>
           )}
           
@@ -167,11 +219,24 @@ export const WingsStatusBar: React.FC<WingsStatusBarProps> = ({
         {/* Benefits Preview */}
         <div className="mt-3 pt-3 border-t border-white/20">
           <div className="text-white/80 text-xs">
-            <span className="font-medium">Active Benefits:</span>
-            <span className="ml-2">{currentLevel.benefits?.slice(0, 2).join(', ')}</span>
-            {currentLevel.benefits && currentLevel.benefits.length > 2 && (
-              <span className="text-white/60"> +{currentLevel.benefits.length - 2} more</span>
-            )}
+            <div className="font-medium mb-1">Active Benefits:</div>
+            {/* Mobile Benefits - Stack vertically */}
+            <div className="sm:hidden space-y-1">
+              {currentLevel.benefits?.slice(0, 3).map((benefit, index) => (
+                <div key={index} className="text-white/70">• {benefit}</div>
+              ))}
+              {currentLevel.benefits && currentLevel.benefits.length > 3 && (
+                <div className="text-white/60">• +{currentLevel.benefits.length - 3} more benefits</div>
+              )}
+            </div>
+            
+            {/* Desktop Benefits - Inline */}
+            <div className="hidden sm:block">
+              <span className="ml-2">{currentLevel.benefits?.slice(0, 2).join(', ')}</span>
+              {currentLevel.benefits && currentLevel.benefits.length > 2 && (
+                <span className="text-white/60"> +{currentLevel.benefits.length - 2} more</span>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

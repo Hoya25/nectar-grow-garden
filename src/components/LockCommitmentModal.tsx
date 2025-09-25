@@ -170,7 +170,7 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
           </Alert>
 
           {/* Lock Type Selection */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             {lockOptions.map((option) => (
               <Card 
                 key={option.type}
@@ -193,27 +193,32 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                   </div>
                   <CardDescription className={option.textColor}>{option.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-sm">
                       <div className={`flex items-center ${option.textColor}`}>
-                        <Calendar className="w-4 h-4 mr-2" />
-                        {option.duration} days
+                        <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span>{option.duration} days</span>
                       </div>
                       <div className={`flex items-center ${option.textColor}`}>
-                        <Award className="w-4 h-4 mr-2" />
-                        Min. {option.minAmount.toLocaleString()} NCTR
+                        <Award className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span>Min. {option.minAmount.toLocaleString()} NCTR</span>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <p className={`text-sm font-semibold ${option.textColor}`}>Alliance Benefits:</p>
                       <ul className={`text-xs space-y-1 ${option.textColor}/80`}>
-                        {option.benefits.map((benefit, idx) => (
+                        {option.benefits.slice(0, 3).map((benefit, idx) => (
                           <li key={idx} className="flex items-start">
-                            <span className="mr-2">•</span>
-                            <span>{benefit}</span>
+                            <span className="mr-2 flex-shrink-0">•</span>
+                            <span className="leading-tight">{benefit}</span>
                           </li>
                         ))}
+                        {option.benefits.length > 3 && (
+                          <li className={`text-xs ${option.textColor}/60 ml-4`}>
+                            +{option.benefits.length - 3} more benefits
+                          </li>
+                        )}
                       </ul>
                     </div>
                   </div>
@@ -268,30 +273,30 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
               {isValidAmount && (
                 <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
                   <CardContent className="p-4">
-                    <h4 className="font-semibold mb-2">Lock Summary</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <h4 className="font-semibold mb-3">Lock Summary</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Amount:</span>
+                        <span className="text-muted-foreground block">Amount:</span>
                         <p className="font-medium">{numericAmount.toLocaleString()} NCTR</p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Duration:</span>
+                        <span className="text-muted-foreground block">Duration:</span>
                         <p className="font-medium">{selectedOption.duration} days</p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Unlock Date:</span>
-                        <p className="font-medium">
+                        <span className="text-muted-foreground block">Unlock Date:</span>
+                        <p className="font-medium text-sm">
                           {new Date(Date.now() + selectedOption.duration * 24 * 60 * 60 * 1000).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Commitment:</span>
+                        <span className="text-muted-foreground block">Commitment:</span>
                         <p className="font-medium text-foreground">{selectedOption.type} Alliance</p>
                       </div>
                     </div>
                     {selectedType === '360LOCK' && (
                       <div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                        <p className="text-sm text-primary font-medium">
+                        <p className="text-sm text-primary font-medium leading-relaxed">
                           💎 360LOCK qualifies for Wings tiers with earning multipliers up to 2.0x!
                         </p>
                       </div>
@@ -301,23 +306,28 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button 
                   variant="outline" 
                   onClick={() => setOpen(false)}
-                  className="flex-1"
+                  className="w-full sm:flex-1 order-2 sm:order-1"
                 >
                   Cancel
                 </Button>
-                  <Button 
-                    onClick={handleCreateLock}
-                    disabled={!isValidAmount || loading}
-                    variant={selectedType === '360LOCK' ? '360lock' : 'default'}
-                    className="flex-1 shadow-medium hover:shadow-large transition-all duration-300"
-                  >
-                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                <Button 
+                  onClick={handleCreateLock}
+                  disabled={!isValidAmount || loading}
+                  variant={selectedType === '360LOCK' ? '360lock' : 'default'}
+                  className="w-full sm:flex-1 shadow-medium hover:shadow-large transition-all duration-300 order-1 sm:order-2"
+                >
+                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  <span className="hidden sm:inline">
                     {selectedType === '360LOCK' ? 'Join Elite Alliance' : 'Join Standard Alliance'}
-                  </Button>
+                  </span>
+                  <span className="sm:hidden">
+                    {selectedType === '360LOCK' ? 'Join Elite' : 'Join Standard'}
+                  </span>
+                </Button>
               </div>
             </div>
           )}
