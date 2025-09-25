@@ -198,7 +198,7 @@ async function updateNCTRPrice(supabaseClient: any) {
         return new Response(
           JSON.stringify({ 
             success: false,
-            error: error.message,
+            error: error instanceof Error ? error.message : 'Unknown error occurred',
             current_price: currentPrice.price_usd,
             last_updated: currentPrice.updated_at
           }),
@@ -212,7 +212,7 @@ async function updateNCTRPrice(supabaseClient: any) {
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message || 'Unknown error during price update'
+        error: (error instanceof Error ? error.message : 'Unknown error') || 'Unknown error during price update'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
@@ -230,7 +230,7 @@ async function fetchOnChainPrice(): Promise<number> {
       return price;
     }
   } catch (error) {
-    console.log(`⚠️ DEXScreener failed:`, error.message);
+    console.log(`⚠️ DEXScreener failed:`, error instanceof Error ? error.message : 'Unknown error');
   }
 
   // Try CoinGecko as backup API
@@ -241,7 +241,7 @@ async function fetchOnChainPrice(): Promise<number> {
       return price;
     }
   } catch (error) {
-    console.log(`⚠️ CoinGecko failed:`, error.message);
+    console.log(`⚠️ CoinGecko failed:`, error instanceof Error ? error.message : 'Unknown error');
   }
 
   // Skip Uniswap V3 on-chain calls for now due to RPC issues
@@ -352,9 +352,9 @@ async function fetchFromUniswapPool(): Promise<number> {
     
     console.log(`Pool tokens: ${token0Symbol} (${token0Decimals} decimals) / ${token1Symbol} (${token1Decimals} decimals)`);
     
-    // Calculate price from sqrtPriceX96
+    // Calculate price from sqrtPriceX96 (convert to BigInt for division)
     const Q96 = 2n ** 96n;
-    const price = (sqrtPriceX96 * sqrtPriceX96) / (Q96 * Q96);
+    const price = (BigInt(sqrtPriceX96) * BigInt(sqrtPriceX96)) / (Q96 * Q96);
     
     // Adjust for decimals
     const decimalsAdjustment = 10n ** BigInt(token0Decimals - token1Decimals);

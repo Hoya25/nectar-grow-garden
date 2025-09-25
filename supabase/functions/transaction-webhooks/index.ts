@@ -99,7 +99,7 @@ serve(async (req) => {
     
     return new Response(JSON.stringify({
       success: false,
-      error: error.message || 'Webhook processing failed'
+      error: (error instanceof Error ? error.message : 'Unknown error') || 'Webhook processing failed'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -341,7 +341,7 @@ async function handleTransactionStatusUpdate(data: any, supabase: any) {
     console.error('❌ Error processing transaction status update:', error)
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -352,7 +352,7 @@ async function handleTransactionStatusUpdate(data: any, supabase: any) {
     console.error('❌ Error processing Loyalize webhook:', error)
     return new Response(JSON.stringify({
       success: false,
-      error: error.message || 'Failed to process Loyalize webhook',
+      error: (error instanceof Error ? error.message : 'Unknown error') || 'Failed to process Loyalize webhook',
       payload_received: payload
     }), {
       status: 500,
@@ -516,7 +516,7 @@ async function handleLoyalizePurchase(data: any, supabase: any) {
     console.error('❌ Error processing Loyalize purchase:', error)
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -607,7 +607,7 @@ async function handleNewTransaction(webhook: TransactionWebhook, supabase: any) 
       processedTransactions.push({
         id: transactionId,
         status: 'error',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
       })
     }
   }
@@ -686,7 +686,7 @@ async function handleTransactionComplete(webhook: TransactionWebhook, supabase: 
       completedTransactions.push({
         id: transactionId,
         status: 'error',
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
       })
     }
   }

@@ -50,8 +50,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in loyalize-affiliate function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -125,9 +126,9 @@ async function generateAffiliateLink(
       if (response.ok) {
         const data = await response.json();
         affiliateData = {
-          link: data.affiliate_url || data.tracking_url,
+          original_url: productUrl,
+          affiliate_url: data.affiliate_url || data.tracking_url,
           tracking_id: trackingId,
-          brand_id: brandId,
           expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
         };
         console.log('✅ Generated real Loyalize affiliate link');
@@ -161,7 +162,7 @@ async function generateAffiliateLink(
 
     return new Response(JSON.stringify({
       success: true,
-      affiliate_link: affiliateData.link,
+      affiliate_link: affiliateData.affiliate_url,
       tracking_id: affiliateData.tracking_id,
       user_profile: {
         user_id: userId,
@@ -184,9 +185,10 @@ async function generateAffiliateLink(
 
   } catch (error) {
     console.error('❌ Error generating affiliate link:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: errorMessage
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -284,10 +286,11 @@ async function trackPurchase(data: any, supabase: any): Promise<Response> {
 
   } catch (error) {
     console.error('❌ Error tracking purchase:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: errorMessage
       }),
       { 
         status: 500, 
@@ -331,7 +334,7 @@ function generateMockAffiliateLink(brand: any, productUrl: string, trackingId: s
   
   return {
     original_url: productUrl,
-    link: affiliateUrl, // Use 'link' to match the expected structure
+    affiliate_url: affiliateUrl,
     tracking_id: trackingId,
     expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
   };

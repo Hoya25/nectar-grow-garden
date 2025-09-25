@@ -67,7 +67,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message || 'Unknown error',
+        error: (error instanceof Error ? error.message : 'Unknown error') || 'Unknown error',
         timestamp: new Date().toISOString()
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }

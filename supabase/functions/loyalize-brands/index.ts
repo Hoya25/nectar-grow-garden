@@ -60,8 +60,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in loyalize-brands function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -192,7 +193,7 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
       brands: mockBrands.slice(offset, offset + limit),
       total: mockBrands.length,
       note: 'Using enhanced mock data with gift card support - API error',
-      error: error.message
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -304,9 +305,10 @@ async function importBrand(req: Request, apiKey: string, supabase: any): Promise
     
   } catch (error) {
     console.error('❌ Import brand error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: errorMessage
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -46,8 +46,20 @@ serve(async (req) => {
 
     switch (action) {
       case 'redirect':
+        if (!linkId) {
+          return new Response('Missing link ID for redirect', {
+            status: 400,
+            headers: corsHeaders
+          });
+        }
         return await handleRedirect(linkId, req, supabase);
       case 'stats':
+        if (!linkId) {
+          return new Response('Missing link ID for stats', {
+            status: 400,
+            headers: corsHeaders
+          });
+        }
         return await getLinkStats(linkId, supabase);
       default:
         return new Response('Invalid action', {
@@ -58,8 +70,9 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in affiliate-redirect function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -113,9 +126,10 @@ async function createTrackedLink(req: Request, body: any, supabase: any): Promis
 
   } catch (error) {
     console.error('❌ Error creating tracked link:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: errorMessage
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -228,9 +242,10 @@ async function getLinkStats(linkId: string, supabase: any): Promise<Response> {
 
   } catch (error) {
     console.error('❌ Error getting link stats:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: errorMessage
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

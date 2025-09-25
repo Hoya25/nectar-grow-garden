@@ -156,7 +156,7 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
       .from('withdrawal_requests')
       .update({
         status: 'failed',
-        failure_reason: error.message
+        failure_reason: error instanceof Error ? error.message : 'Unknown error occurred'
       })
       .eq('id', requestId)
 
@@ -166,8 +166,9 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
       p_amount: withdrawal.nctr_amount
     })
 
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
