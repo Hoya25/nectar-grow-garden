@@ -370,6 +370,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🚀 Form submitted! Starting handleSubmit...');
+    console.log('📝 Form data:', formData);
+    console.log('✏️ Editing opportunity:', editingOpportunity?.id);
+    
     setLoading(true);
 
     try {
@@ -377,11 +381,13 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       
       // Upload logo file if selected
       if (logoFile) {
+        console.log('📸 Uploading logo file...');
         const uploadedUrl = await uploadLogoFile();
         if (uploadedUrl) {
           logoUrl = uploadedUrl;
+          console.log('✅ Logo uploaded:', logoUrl);
         } else {
-          // Upload failed, don't proceed
+          console.log('❌ Logo upload failed');
           return;
         }
       }
@@ -390,18 +396,20 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         ...formData,
         partner_logo_url: logoUrl
       };
+      console.log('📦 Final submit data:', submitData);
 
       if (editingOpportunity) {
-        console.log('Updating opportunity:', editingOpportunity.id, submitData);
+        console.log('🔄 Updating opportunity:', editingOpportunity.id, submitData);
         const { error } = await supabase
           .from('earning_opportunities')
           .update(submitData)
           .eq('id', editingOpportunity.id);
 
         if (error) {
-          console.error('Update error:', error);
+          console.error('❌ Update error:', error);
           throw error;
         }
+        console.log('✅ Update successful!');
 
         await logActivity('updated', 'opportunity', editingOpportunity.id, { 
           title: submitData.title,
@@ -413,13 +421,18 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
           description: `${submitData.title} has been updated successfully.`,
         });
       } else {
+        console.log('➕ Creating new opportunity...');
         const { data, error } = await supabase
           .from('earning_opportunities')
           .insert(submitData)
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Create error:', error);
+          throw error;
+        }
+        console.log('✅ Create successful:', data);
 
         await logActivity('created', 'opportunity', data.id, { 
           title: submitData.title 
@@ -431,12 +444,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         });
       }
 
+      console.log('🔄 Refreshing opportunities list...');
       fetchOpportunities();
       onStatsUpdate();
       setModalOpen(false);
       resetForm();
+      console.log('✅ Form submission complete!');
     } catch (error) {
-      console.error('Error saving opportunity:', error);
+      console.error('💥 Error saving opportunity:', error);
       toast({
         title: "Error",
         description: "Failed to save opportunity.",
