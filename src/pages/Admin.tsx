@@ -42,6 +42,7 @@ import ReferralTestComponent from '@/components/admin/ReferralTestComponent';
 import LoyalizeBrandManager from '@/components/admin/LoyalizeBrandManager';
 import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement';
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
+import NoBullOpportunitySetup from '@/components/admin/NoBullOpportunitySetup';
 
 interface AdminStats {
   total_users: number;
@@ -324,6 +325,16 @@ const Admin = () => {
 
           <TabsContent value="loyalize">
             <div className="space-y-6">
+              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
+                <CardHeader>
+                  <CardTitle className="text-blue-900">🏃 NOBull Opportunity Setup</CardTitle>
+                  <p className="text-blue-700">Quick setup for NOBull training gear with API data pull</p>
+                </CardHeader>
+                <CardContent>
+                  <NoBullOpportunitySetup />
+                </CardContent>
+              </Card>
+              
               <LoyalizeBrandManager />
               
               <LoyalizeApiTester />
