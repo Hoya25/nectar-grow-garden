@@ -1082,6 +1082,17 @@ export type Database = {
           username: string
         }[]
       }
+      get_security_alerts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          alert_type: string
+          count: number
+          first_seen: string
+          last_seen: string
+          message: string
+          severity: string
+        }[]
+      }
       get_security_compliance_status: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -1191,6 +1202,10 @@ export type Database = {
         Args: { p_referral_id: string }
         Returns: Json
       }
+      secure_business_access_check: {
+        Args: { p_table_name: string; p_user_id: string }
+        Returns: boolean
+      }
       ultra_secure_admin_check: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -1209,6 +1224,10 @@ export type Database = {
       }
       validate_referral_integrity: {
         Args: { p_referral_code: string; p_referred_user_id: string }
+        Returns: Json
+      }
+      validate_referral_request: {
+        Args: { p_referred_user_id: string; p_referrer_code: string }
         Returns: Json
       }
     }
