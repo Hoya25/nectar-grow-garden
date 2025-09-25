@@ -18,6 +18,7 @@ import { WithdrawalModal } from '@/components/WithdrawalModal';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useAdmin } from '@/hooks/useAdmin';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
+import { DailyCheckinCountdown } from '@/components/DailyCheckinCountdown';
 import { MemberStatusBanner } from '@/components/MemberStatusBanner';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
@@ -1145,9 +1146,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                           <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
                             ✓ Completed
                           </span>
-                          <span className="text-xs text-gray-500">
-                            Next: Tomorrow
-                          </span>
+                          <DailyCheckinCountdown 
+                            className="text-gray-500"
+                            onComplete={() => checkDailyCheckinAvailability()}
+                          />
                         </div>
                       </div>
                     </CardContent>
