@@ -40,6 +40,7 @@ import EmergencyActions from '@/components/admin/EmergencyActions';
 import SecurityStatus from '@/components/admin/SecurityStatus';
 import ReferralTestComponent from '@/components/admin/ReferralTestComponent';
 import LoyalizeBrandManager from '@/components/admin/LoyalizeBrandManager';
+import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement';
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
 
 interface AdminStats {
@@ -369,6 +370,22 @@ const Admin = () => {
             
             {/* Security Overview */}
             <SecurityStatus />
+            
+            {/* Treasury Admin Management - Only for super admins */}
+            <Card className="bg-section-highlight border border-section-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Shield className="w-4 h-4" />
+                  Treasury Admin Management
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  Manage who has access to financial data and withdrawal operations
+                </p>
+              </CardHeader>
+              <CardContent>
+                <TreasuryAdminManagement />
+              </CardContent>
+            </Card>
             
             {/* Emergency Security Actions - Only for super admins */}
             <EmergencyActions />

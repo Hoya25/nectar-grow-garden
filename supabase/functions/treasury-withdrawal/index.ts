@@ -55,7 +55,7 @@ serve(async (req) => {
 async function processWithdrawal(supabaseClient: any, requestId: string) {
   console.log(`🏦 Processing withdrawal request: ${requestId}`)
 
-  // Get withdrawal request details
+  // Get withdrawal request details - security is now enforced by RLS policies
   const { data: withdrawal, error: withdrawalError } = await supabaseClient
     .from('withdrawal_requests')
     .select('*')
@@ -175,11 +175,14 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
 }
 
 async function getPendingWithdrawals(supabaseClient: any) {
+  // Security is now enforced by RLS policies - only treasury admins can see this data
+  console.log('🔐 Fetching pending withdrawals (access controlled by RLS)')
+  
   const { data, error } = await supabaseClient
     .from('withdrawal_requests')
     .select(`
       *,
-      profiles!inner(username, full_name, email)
+      profiles!inner(username, full_name)
     `)
     .eq('status', 'pending')
     .order('created_at', { ascending: true })

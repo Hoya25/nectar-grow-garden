@@ -766,6 +766,45 @@ export type Database = {
         }
         Relationships: []
       }
+      treasury_admin_roles: {
+        Row: {
+          access_reason: string | null
+          expires_at: string | null
+          granted_at: string
+          granted_by: string
+          id: string
+          is_active: boolean
+          last_access_at: string | null
+          role_type: string
+          session_token: string | null
+          user_id: string
+        }
+        Insert: {
+          access_reason?: string | null
+          expires_at?: string | null
+          granted_at?: string
+          granted_by: string
+          id?: string
+          is_active?: boolean
+          last_access_at?: string | null
+          role_type: string
+          session_token?: string | null
+          user_id: string
+        }
+        Update: {
+          access_reason?: string | null
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string
+          id?: string
+          is_active?: boolean
+          last_access_at?: string | null
+          role_type?: string
+          session_token?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       treasury_config: {
         Row: {
           created_at: string
@@ -1153,6 +1192,15 @@ export type Database = {
           user_id: string
         }[]
       }
+      grant_treasury_admin_access: {
+        Args: {
+          access_reason: string
+          expires_in_hours?: number
+          role_type: string
+          target_user_id: string
+        }
+        Returns: Json
+      }
       has_referral_relationship: {
         Args: { user1_id: string; user2_id: string }
         Returns: boolean
@@ -1171,6 +1219,10 @@ export type Database = {
       }
       is_referral_power_user: {
         Args: { p_user_id: string }
+        Returns: boolean
+      }
+      is_treasury_admin: {
+        Args: { check_user_id?: string }
         Returns: boolean
       }
       log_business_data_access: {
@@ -1206,6 +1258,10 @@ export type Database = {
         Args: { p_referral_id: string }
         Returns: Json
       }
+      revoke_treasury_access: {
+        Args: { revocation_reason: string; target_user_id: string }
+        Returns: Json
+      }
       secure_business_access_check: {
         Args: { p_table_name: string; p_user_id: string }
         Returns: boolean
@@ -1224,6 +1280,10 @@ export type Database = {
       }
       upgrade_lock_to_360: {
         Args: { p_lock_id: string }
+        Returns: Json
+      }
+      validate_financial_access: {
+        Args: { operation_type?: string; required_role?: string }
         Returns: Json
       }
       validate_referral_integrity: {
