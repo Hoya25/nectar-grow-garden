@@ -73,6 +73,32 @@ User agent: ${navigator.userAgent}
     );
   }
 
+  // Add test button for easy Coming Soon testing (temporary)
+  if (window.location.search.includes('test=true')) {
+    return (
+      <div style={{ padding: '20px' }}>
+        <h2>Coming Soon Test</h2>
+        <p>Click the button below to test the Coming Soon page:</p>
+        <button 
+          onClick={() => setShowComingSoon(!showComingSoon)}
+          style={{ 
+            padding: '10px 20px', 
+            fontSize: '16px', 
+            backgroundColor: '#007bff', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '4px', 
+            cursor: 'pointer',
+            marginBottom: '20px'
+          }}
+        >
+          {showComingSoon ? 'Hide Coming Soon' : 'Show Coming Soon'}
+        </button>
+        {showComingSoon && <ComingSoon />}
+      </div>
+    );
+  }
+
   // Show Coming Soon page if conditions are met
   if (showComingSoon) {
     return (
