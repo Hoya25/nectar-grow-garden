@@ -38,7 +38,7 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
             <Info size={size} />
           </button>
         </TooltipTrigger>
-        <TooltipContent className="max-w-xs p-3 text-sm leading-relaxed">
+        <TooltipContent className="max-w-xs p-3 text-sm leading-relaxed bg-white text-black border border-gray-200 shadow-lg">
           <p>{content}</p>
         </TooltipContent>
       </Tooltip>
@@ -53,7 +53,7 @@ export const Lock360InfoTooltip: React.FC<{ className?: string; size?: number }>
 }) => {
   return (
     <InfoTooltip
-      content="360LOCK is a 360‑day commitment of your NCTR that fortifies the Alliance. In return, your Wings status increases, unlocking higher multipliers and access."
+      content="360LOCK is a 360‑day commitment of your NCTR that fortifies the Alliance, making NCTR more valuable for everyone. In return, your Wings status increases, unlocking higher multipliers and access."
       className={className}
       size={size}
     />
