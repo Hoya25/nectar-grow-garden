@@ -136,28 +136,28 @@ export const RewardDisplay = ({
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             {(opportunity.available_nctr_reward || 0) > 0 && (
-              <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
-                  {formatNCTR((opportunity.available_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))}
-                </span>{' '}Available
-              </Badge>
+               <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                 <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                 <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
+                   {formatNCTR((opportunity.available_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} Available
+                 </span>
+               </Badge>
             )}
             {(opportunity.lock_90_nctr_reward || 0) > 0 && (
-              <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mr-1"></div>
-                <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
-                  {formatNCTR((opportunity.lock_90_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))}
-                </span>{' '}90LOCK
-              </Badge>
+               <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
+                 <div className="w-2 h-2 bg-orange-500 rounded-full mr-1"></div>
+                 <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
+                   {formatNCTR((opportunity.lock_90_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} 90LOCK
+                 </span>
+               </Badge>
             )}
             {(opportunity.lock_360_nctr_reward || 0) > 0 && (
-              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
-                  {formatNCTR((opportunity.lock_360_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))}
-                </span>{' '}360LOCK
-              </Badge>
+               <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
+                 <span className={isInviteOpportunity && userMultiplier > 1 ? getStatusTextColor(userStatus) : ''}>
+                   {formatNCTR((opportunity.lock_360_nctr_reward || 0) * (isInviteOpportunity ? userMultiplier : 1))} 360LOCK
+                 </span>
+               </Badge>
             )}
           </div>
           
