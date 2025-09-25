@@ -376,10 +376,15 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🚀 Form submitted! Starting handleSubmit...');
-    console.log('📝 Form data:', formData);
-    console.log('✏️ Editing opportunity:', editingOpportunity);
-    console.log('🖼️ Logo file present:', !!logoFile);
+    
+    try {
+      console.log('🚀 Form submitted! Starting handleSubmit...');
+      console.log('📝 Form data keys:', Object.keys(formData));
+      console.log('✏️ Editing opportunity ID:', editingOpportunity?.id);
+      console.log('🖼️ Logo file present:', !!logoFile);
+    } catch (logError) {
+      console.error('❌ Error in logging:', logError);
+    }
     
     if (!editingOpportunity) {
       console.error('❌ No editingOpportunity found - cannot update');
@@ -388,7 +393,6 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         description: "No opportunity selected for editing",
         variant: "destructive",
       });
-      setLoading(false);
       return;
     }
     
