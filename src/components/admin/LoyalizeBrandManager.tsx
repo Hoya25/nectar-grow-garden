@@ -16,7 +16,9 @@ import {
   Filter,
   RefreshCw,
   SlidersHorizontal,
-  ArrowUpDown
+  ArrowUpDown,
+  Edit,
+  Loader2
 } from 'lucide-react';
 import {
   Select,
@@ -32,6 +34,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Slider } from '@/components/ui/slider';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 interface Brand {
   id: string;
@@ -60,6 +64,9 @@ const LoyalizeBrandManager = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showFilters, setShowFilters] = useState(false);
   const [creatingOpportunity, setCreatingOpportunity] = useState<string | null>(null);
+  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [nctrRate, setNctrRate] = useState('');
+  const [updatingNCTR, setUpdatingNCTR] = useState(false);
 
   useEffect(() => {
     loadBrands();
@@ -70,7 +77,6 @@ const LoyalizeBrandManager = () => {
       let data, error;
       
       if (useComprehensiveSearch) {
-        // Use the new comprehensive search endpoint for advanced filtering
         const searchParams = {
           action: 'get_comprehensive_brands',
           search: searchTerm || undefined,
@@ -90,7 +96,6 @@ const LoyalizeBrandManager = () => {
         data = response.data?.brands || [];
         error = null;
       } else {
-        // Use the standard database query for simple cases
         const result = await supabase
           .from('brands')
           .select('*')
@@ -130,7 +135,7 @@ const LoyalizeBrandManager = () => {
           title: "Success",
           description: `Synced ${data.brands_count || 0} brands from Loyalize API`,
         });
-        await loadBrands(); // Reload the brands list
+        await loadBrands();
       } else {
         throw new Error(data.error || 'Failed to sync brands');
       }
@@ -160,7 +165,7 @@ const LoyalizeBrandManager = () => {
           title: "Success",
           description: `Synced ${data.brands_synced || 0} NOBull brands. ${data.new_brands || 0} new brands added.`,
         });
-        await loadBrands(); // Reload the brands list
+        await loadBrands();
       } else {
         throw new Error(data.error || 'Failed to sync NOBull data');
       }
@@ -173,6 +178,53 @@ const LoyalizeBrandManager = () => {
       });
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const editBrandNCTR = (brand: Brand) => {
+    setEditingBrand(brand);
+    setNctrRate(brand.nctr_per_dollar ? brand.nctr_per_dollar.toString() : '');
+  };
+
+  const updateBrandNCTR = async () => {
+    if (!editingBrand || !nctrRate) return;
+
+    setUpdatingNCTR(true);
+    try {
+      const nctrValue = parseFloat(nctrRate);
+      if (isNaN(nctrValue) || nctrValue < 0) {
+        toast({
+          title: "Invalid NCTR Rate",
+          description: "Please enter a valid number greater than or equal to 0",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('brands')
+        .update({ nctr_per_dollar: nctrValue })
+        .eq('id', editingBrand.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "NCTR Rate Updated",
+        description: `${editingBrand.name} NCTR rate updated to ${nctrValue} per dollar`,
+      });
+
+      await loadBrands();
+      setEditingBrand(null);
+      setNctrRate('');
+    } catch (error) {
+      console.error('Error updating NCTR rate:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update NCTR rate",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingNCTR(false);
     }
   };
 
@@ -213,17 +265,14 @@ const LoyalizeBrandManager = () => {
 
   const filteredAndSortedBrands = brands
     .filter(brand => {
-      // Enhanced search - search in name, description, and category
       const searchLower = searchTerm.toLowerCase();
       const matchesSearch = !searchTerm || 
         brand.name.toLowerCase().includes(searchLower) ||
         brand.description?.toLowerCase().includes(searchLower) ||
         brand.category.toLowerCase().includes(searchLower);
       
-      // Category filter
       const matchesCategory = selectedCategory === 'all' || brand.category === selectedCategory;
       
-      // Commission rate filter
       const commissionPercent = brand.commission_rate * 100;
       const matchesCommission = commissionPercent >= commissionRange[0] && commissionPercent <= commissionRange[1];
       
@@ -241,7 +290,7 @@ const LoyalizeBrandManager = () => {
           aVal = a.category;
           bVal = b.category;
           break;
-        default: // name
+        default:
           aVal = a.name;
           bVal = b.name;
           break;
@@ -465,7 +514,7 @@ const LoyalizeBrandManager = () => {
           </div>
 
           {/* Brands Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-6">
             {filteredAndSortedBrands.map((brand) => (
               <Card key={brand.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
@@ -518,7 +567,7 @@ const LoyalizeBrandManager = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">NCTR per $:</span>
                       <span className="font-semibold">
-                        {brand.nctr_per_dollar.toFixed(0)}
+                        {brand.nctr_per_dollar ? brand.nctr_per_dollar.toFixed(3) : 'Not Set'}
                       </span>
                     </div>
 
@@ -529,26 +578,48 @@ const LoyalizeBrandManager = () => {
                     )}
 
                     <div className="flex gap-2 pt-2">
-                      <Button
+                      <Button 
+                        onClick={() => editBrandNCTR(brand)}
+                        variant="outline"
                         size="sm"
-                        onClick={() => createOpportunity(brand)}
-                        disabled={creatingOpportunity === brand.id}
                         className="flex-1"
                       >
-                        <Plus className="w-3 h-3 mr-1" />
-                        {creatingOpportunity === brand.id ? 'Creating...' : 'Create Opportunity'}
+                        <Edit className="w-4 h-4 mr-2" />
+                        Set NCTR
                       </Button>
-                      
-                      {brand.website_url && (
+                      <Button 
+                        onClick={() => createOpportunity(brand)}
+                        disabled={creatingOpportunity === brand.id}
+                        size="sm"
+                        className="flex-1 bg-gradient-hero hover:opacity-90"
+                      >
+                        {creatingOpportunity === brand.id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Creating...
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Create
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    {brand.website_url && (
+                      <div className="pt-2">
                         <Button
+                          variant="ghost"
                           size="sm"
-                          variant="outline"
+                          className="w-full text-xs"
                           onClick={() => window.open(brand.website_url, '_blank')}
                         >
-                          <ExternalLink className="w-3 h-3" />
+                          <ExternalLink className="w-3 h-3 mr-2" />
+                          Visit Site
                         </Button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -568,6 +639,54 @@ const LoyalizeBrandManager = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* NCTR Rate Edit Dialog */}
+      <Dialog open={!!editingBrand} onOpenChange={(open) => !open && setEditingBrand(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Set NCTR Rate for {editingBrand?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="nctr-rate">NCTR per Dollar Spent</Label>
+              <Input
+                id="nctr-rate"
+                type="number"
+                step="0.001"
+                min="0"
+                value={nctrRate}
+                onChange={(e) => setNctrRate(e.target.value)}
+                placeholder="e.g., 0.025 for 2.5 NCTR per $1"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                This is what users earn in NCTR for every dollar they spend with this brand
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setEditingBrand(null)}
+                disabled={updatingNCTR}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={updateBrandNCTR}
+                disabled={updatingNCTR || !nctrRate}
+              >
+                {updatingNCTR ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  'Update NCTR Rate'
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

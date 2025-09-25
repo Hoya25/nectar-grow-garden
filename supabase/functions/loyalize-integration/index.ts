@@ -289,7 +289,7 @@ serve(async (req) => {
             logo_url: 'https://cdn.nobullproject.com/assets/nobull-logo.png',
             website_url: 'https://www.nobullproject.com',
             commission_rate: 0.08, // 8% commission
-            nctr_per_dollar: 0.02, // 2 NCTR per dollar (25% of commission)
+            nctr_per_dollar: null, // Must be set manually by admin
             loyalize_id: 'nobull-sample-001',
             is_active: true,
             featured: true
@@ -357,7 +357,7 @@ serve(async (req) => {
             logo_url: 'https://cdn.nobullproject.com/assets/nobull-logo.png',
             website_url: 'https://www.nobullproject.com',
             commission_rate: 0.08,
-            nctr_per_dollar: 0.02,
+            nctr_per_dollar: null, // Must be set manually by admin
             loyalize_id: 'nobull-sample-001',
             is_active: true,
             featured: true
@@ -407,7 +407,7 @@ serve(async (req) => {
             logo_url: nobullBrand.imageUrl || 'https://cdn.nobullproject.com/assets/nobull-logo.png',
             website_url: nobullBrand.homePage || nobullBrand.url,
             commission_rate: (nobullBrand.commission?.value || 8) / 100,
-            nctr_per_dollar: ((nobullBrand.commission?.value || 8) / 100) * 0.25, // 25% of commission
+            nctr_per_dollar: null, // Must be set manually by admin
             loyalize_id: nobullBrand.id,
             is_active: true,
             featured: true
@@ -445,7 +445,7 @@ serve(async (req) => {
         console.error('Error syncing NOBull data:', error);
         return new Response(JSON.stringify({
           success: false,
-          error: error.message
+          error: (error as Error).message
         }), { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         });
