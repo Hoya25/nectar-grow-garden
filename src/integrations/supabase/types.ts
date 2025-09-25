@@ -988,6 +988,35 @@ export type Database = {
           wallet_connected_at: string
         }[]
       }
+      get_admin_user_activity: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
+      get_admin_user_list: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          available_nctr: number
+          avatar_url: string
+          created_at: string
+          full_name: string
+          id: string
+          is_admin: boolean
+          lock_360_nctr: number
+          lock_90_nctr: number
+          opportunity_status: string
+          pending_nctr: number
+          total_earned: number
+          updated_at: string
+          user_id: string
+          username: string
+          wallet_address: string
+          wallet_connected_at: string
+        }[]
+      }
+      get_admin_user_stats: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       get_public_profile: {
         Args: { profile_user_id: string }
         Returns: {

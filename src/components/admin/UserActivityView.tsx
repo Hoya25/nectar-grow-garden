@@ -16,6 +16,7 @@ import {
   ArrowDownRight
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from '@/hooks/use-toast';
 
 interface Transaction {
   id: string;
@@ -69,42 +70,34 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
   const fetchUserActivity = async () => {
     setLoading(true);
     try {
-      // Fetch transactions
-      const { data: transactionData, error: transactionError } = await supabase
-        .from('nctr_transactions')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(50);
+      // Use secure admin function to fetch all activity data
+      const { data: activityData, error: activityError } = await supabase
+        .rpc('get_admin_user_activity', { target_user_id: userId });
 
-      if (!transactionError && transactionData) {
-        setTransactions(transactionData);
+      if (activityError) {
+        throw activityError;
       }
 
-      // Fetch locks
-      const { data: lockData, error: lockError } = await supabase
-        .from('nctr_locks')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-
-      if (!lockError && lockData) {
-        setLocks(lockData);
-      }
-
-      // Fetch referrals
-      const { data: referralData, error: referralError } = await supabase
-        .from('referrals')
-        .select('*')
-        .eq('referrer_user_id', userId)
-        .order('created_at', { ascending: false });
-
-      if (!referralError && referralData) {
-        setReferrals(referralData);
+      if (activityData) {
+        // Parse the returned JSON data with proper typing
+        const parsedData = activityData as unknown as {
+          transactions: Transaction[];
+          locks: NCTRLock[];
+          referrals: Referral[];
+        };
+        
+        setTransactions(parsedData.transactions || []);
+        setLocks(parsedData.locks || []);
+        setReferrals(parsedData.referrals || []);
       }
 
     } catch (error) {
       console.error('Error fetching user activity:', error);
+      toast({
+        title: "Access Denied",
+        description: "Admin privileges required to view user activity.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

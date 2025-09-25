@@ -114,56 +114,39 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
         });
       }
 
-      // Fetch portfolio details
-      const { data: portfolio, error: portfolioError } = await supabase
-        .from('nctr_portfolio')
-        .select('*')
-        .eq('user_id', user.user_id)
-        .single();
-
-      if (!portfolioError && portfolio) {
-        setUserPortfolio(portfolio);
+      // Fetch portfolio details using secure method
+      if (user.portfolio) {
+        setUserPortfolio(user.portfolio);
       }
 
-      // Fetch user statistics
-      const [transactionsResult, referralsResult, locksResult] = await Promise.all([
-        supabase
-          .from('nctr_transactions')
-          .select('id, created_at')
-          .eq('user_id', user.user_id),
-        supabase
-          .from('referrals')
-          .select('id, status, reward_credited')
-          .eq('referrer_user_id', user.user_id),
-        supabase
-          .from('nctr_locks')
-          .select('id, status')
-          .eq('user_id', user.user_id)
-          .eq('status', 'active')
-      ]);
+      // Fetch user statistics using secure admin function
+      const { data: statsData, error: statsError } = await supabase
+        .rpc('get_admin_user_stats', { target_user_id: user.user_id });
 
-      const transactions = transactionsResult.data || [];
-      const referrals = referralsResult.data || [];
-      const locks = locksResult.data || [];
-
-      const successfulReferrals = referrals.filter(r => r.status === 'completed' && r.reward_credited).length;
-      const lastActivity = transactions.length > 0 
-        ? transactions.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
-        : undefined;
-
-      setUserStats({
-        total_transactions: transactions.length,
-        total_referrals: referrals.length,
-        successful_referrals: successfulReferrals,
-        active_locks: locks.length,
-        last_activity: lastActivity
-      });
+      if (!statsError && statsData) {
+        // Parse the returned JSON data with proper typing
+        const parsedStats = statsData as unknown as {
+          total_transactions: number;
+          total_referrals: number;
+          successful_referrals: number;
+          active_locks: number;
+          last_activity?: string;
+        };
+        
+        setUserStats({
+          total_transactions: parsedStats.total_transactions || 0,
+          total_referrals: parsedStats.total_referrals || 0,
+          successful_referrals: parsedStats.successful_referrals || 0,
+          active_locks: parsedStats.active_locks || 0,
+          last_activity: parsedStats.last_activity
+        });
+      }
 
     } catch (error) {
       console.error('Error fetching user details:', error);
       toast({
-        title: "Error",
-        description: "Failed to load user details.",
+        title: "Access Denied",
+        description: "Admin privileges required to view detailed user data.",
         variant: "destructive",
       });
     } finally {

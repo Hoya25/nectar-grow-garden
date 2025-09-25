@@ -57,46 +57,40 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // Fetch user profiles using secure admin function (no email access)
-      const { data: profiles, error: profilesError } = await supabase
-        .rpc('get_admin_safe_profiles');
+      // Use secure admin function instead of direct queries
+      const { data: usersData, error: usersError } = await supabase
+        .rpc('get_admin_user_list');
 
-      if (profilesError) throw profilesError;
-
-      // Fetch portfolios for all users
-      const { data: portfolios, error: portfoliosError } = await supabase
-        .from('nctr_portfolio')
-        .select('*');
-
-      if (portfoliosError) throw portfoliosError;
-
-      // Fetch admin users
-      const { data: adminUsers, error: adminError } = await supabase
-        .from('admin_users')
-        .select('user_id');
-
-      if (adminError && adminError.code !== 'PGRST116') {
-        console.error('Error fetching admin users:', adminError);
+      if (usersError) {
+        throw usersError;
       }
 
-      // Combine data
-      const enrichedUsers: UserData[] = profiles.map(profile => {
-        const portfolio = portfolios.find(p => p.user_id === profile.user_id);
-        const isAdmin = adminUsers?.some(admin => admin.user_id === profile.user_id);
-        
-        return {
-          ...profile,
-          portfolio,
-          is_admin: isAdmin
-        };
-      });
+      // Transform the data to match expected format
+      const enrichedUsers: UserData[] = (usersData || []).map(user => ({
+        id: user.id,
+        user_id: user.user_id,
+        username: user.username,
+        full_name: user.full_name,
+        avatar_url: user.avatar_url,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        wallet_address: user.wallet_address,
+        wallet_connected_at: user.wallet_connected_at,
+        portfolio: {
+          available_nctr: user.available_nctr,
+          pending_nctr: user.pending_nctr,
+          total_earned: user.total_earned,
+          opportunity_status: user.opportunity_status
+        },
+        is_admin: user.is_admin
+      }));
 
       setUsers(enrichedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
-        title: "Error",
-        description: "Failed to load users. This may be due to security restrictions.",
+        title: "Access Denied",
+        description: "Admin privileges required to view user data.",
         variant: "destructive",
       });
     } finally {
