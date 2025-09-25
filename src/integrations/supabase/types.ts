@@ -1257,7 +1257,7 @@ export type Database = {
         Returns: boolean
       }
       is_treasury_admin: {
-        Args: { check_user_id?: string }
+        Args: { check_user_id: string }
         Returns: boolean
       }
       log_business_data_access: {
@@ -1355,6 +1355,14 @@ export type Database = {
       }
       validate_referral_request_enhanced: {
         Args: { p_referee_id: string; p_referrer_id: string }
+        Returns: Json
+      }
+      validate_treasury_operation: {
+        Args: {
+          amount?: number
+          operation_type: string
+          user_id_param?: string
+        }
         Returns: Json
       }
     }

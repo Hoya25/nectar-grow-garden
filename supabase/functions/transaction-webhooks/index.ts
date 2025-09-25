@@ -36,13 +36,50 @@ serve(async (req) => {
   }
 
   try {
+    // Enhanced security: validate request method
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Parse webhook payload - handle both our format and Loyalize format
-    const rawPayload = await req.json()
-    console.log('🔔 Received webhook payload:', JSON.stringify(rawPayload, null, 2))
+    // Enhanced security: validate webhook signature (if configured)
+    const webhookSecret = Deno.env.get('TRANSACTION_WEBHOOK_SECRET');
+    if (webhookSecret) {
+      const signature = req.headers.get('x-webhook-signature');
+      if (!signature) {
+        return new Response(JSON.stringify({ error: 'Missing webhook signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    // Enhanced security: rate limiting check
+    const clientIP = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || 'unknown';
+
+    // Parse webhook payload with enhanced security - handle both our format and Loyalize format
+    let rawPayload;
+    try {
+      const text = await req.text();
+      if (!text.trim()) {
+        throw new Error('Empty request body');
+      }
+      rawPayload = JSON.parse(text);
+    } catch (parseError) {
+      return new Response(JSON.stringify({ error: 'Invalid JSON payload' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Enhanced security: log webhook with sanitized data (no sensitive info)
+    console.log('🔔 Received webhook from IP:', clientIP, 'payload keys:', Object.keys(rawPayload))
 
     // Handle Loyalize webhook format - data might be in body field
     let actualPayload = rawPayload

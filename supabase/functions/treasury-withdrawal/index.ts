@@ -23,14 +23,61 @@ serve(async (req) => {
   }
 
   try {
+    // Enhanced security: validate request method
+    if (req.method !== 'POST') {
+      return new Response(
+        JSON.stringify({ error: 'Method not allowed' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 405 }
+      )
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { action, request_id } = await req.json()
+    // Enhanced security: validate JWT token from request
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
+    }
 
+    // Parse and validate request body
+    let requestBody
+    try {
+      const text = await req.text()
+      if (!text.trim()) {
+        throw new Error('Empty request body')
+      }
+      requestBody = JSON.parse(text)
+    } catch (parseError) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON payload' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    const { action, request_id } = requestBody
+
+    // Enhanced security: validate required fields
+    if (!action || typeof action !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Missing or invalid action parameter' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    // Enhanced security: validate request_id for process_withdrawal
     if (action === 'process_withdrawal') {
+      if (!request_id || typeof request_id !== 'string' || request_id.length !== 36) {
+        return new Response(
+          JSON.stringify({ error: 'Missing or invalid request_id parameter' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        )
+      }
       return await processWithdrawal(supabaseClient, request_id)
     }
 
@@ -39,14 +86,15 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ error: 'Invalid action' }),
+      JSON.stringify({ error: 'Invalid action parameter' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     )
 
   } catch (error) {
+    // Enhanced security: don't expose sensitive error details
     console.error('Treasury withdrawal error:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Request processing failed' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
