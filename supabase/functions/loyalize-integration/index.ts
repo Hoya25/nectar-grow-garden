@@ -42,13 +42,12 @@ serve(async (req) => {
 
   let requestBody: any = null;
   
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  
   try {
     const loyalizeApiKey = Deno.env.get('LOYALIZE_API_KEY')
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
     requestBody = await req.json()
     const { action } = requestBody
@@ -201,7 +200,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message || 'Internal server error',
+        error: (error as Error).message || 'Internal server error',
         brands_count: 0,
         fallback_attempted: requestBody?.action === 'sync_brands'
       }),
@@ -316,7 +315,7 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         console.log(`✅ Total after adding gift cards: ${allStores.length}`);
       }
     } catch (giftCardError) {
-      console.log('ℹ️ Gift card endpoint not available or failed:', giftCardError.message);
+      console.log('ℹ️ Gift card endpoint not available or failed:', (giftCardError as Error).message);
     }
     
     if (allStores.length === 0) {
@@ -328,10 +327,25 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
     const logoData = await fetchStoreLogos(apiKey);
     console.log(`✅ Retrieved logo data for ${Object.keys(logoData).length} stores`);
     
-    // Check for Uber specifically and log if found
+    // Check for priority gift card brands specifically and add manually if not found
     const foundUberStores = allStores.filter(store => 
       store.name?.toLowerCase().includes('uber') ||
       store.description?.toLowerCase().includes('uber')
+    );
+    
+    const foundAirbnbStores = allStores.filter(store => 
+      store.name?.toLowerCase().includes('airbnb') ||
+      store.description?.toLowerCase().includes('airbnb')
+    );
+    
+    const foundAppleStores = allStores.filter(store => 
+      (store.name?.toLowerCase().includes('apple') && store.name?.toLowerCase().includes('gift')) ||
+      store.description?.toLowerCase().includes('apple gift')
+    );
+    
+    const foundAmazonStores = allStores.filter(store => 
+      (store.name?.toLowerCase().includes('amazon') && store.name?.toLowerCase().includes('gift')) ||
+      store.description?.toLowerCase().includes('amazon gift')
     );
     
     if (foundUberStores.length > 0) {
@@ -351,6 +365,77 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         homePage: 'https://www.mygiftcardsplus.com/buy/Uber-USADIG3RDB2BVAR'
       });
       console.log('✅ Added Uber Gift Cards manually to ensure availability');
+    }
+    
+    if (foundAirbnbStores.length > 0) {
+      console.log(`🎯 Found ${foundAirbnbStores.length} Airbnb-related stores:`, foundAirbnbStores.map(s => s.name));
+    } else {
+      console.log('⚠️ No Airbnb stores found in API results');
+      
+      // Add Airbnb Gift Cards manually if not found
+      allStores.push({
+        id: 'airbnb-gift-cards-manual-001',
+        name: 'Airbnb Gift Cards',
+        description: 'Purchase Airbnb gift cards and earn up to 2% cashback. Perfect for travel accommodations worldwide.',
+        imageUrl: logoData['airbnb'] || 'https://logo.clearbit.com/airbnb.com',
+        commission: { value: 2.0, format: '%' },
+        categories: ['Gift Cards', 'Travel'],
+        url: 'https://www.mygiftcardsplus.com/airbnb-gift-cards',
+        homePage: 'https://www.mygiftcardsplus.com/airbnb-gift-cards'
+      });
+      console.log('✅ Added Airbnb Gift Cards manually to ensure availability');
+    }
+    
+    // Verify Apple Gift Cards have correct commission rate (should be 2.5%)
+    if (foundAppleStores.length > 0) {
+      console.log(`🎯 Found ${foundAppleStores.length} Apple Gift Card stores:`, foundAppleStores.map(s => s.name));
+      foundAppleStores.forEach(store => {
+        if (store.commission?.value < 2.5) {
+          console.log(`📈 Updating Apple Gift Card commission from ${store.commission?.value}% to 2.5%`);
+          store.commission = { value: 2.5, format: '%' };
+        }
+      });
+    } else {
+      console.log('⚠️ No Apple Gift Card stores found in API results');
+      
+      // Add Apple Gift Cards manually with correct commission
+      allStores.push({
+        id: 'apple-gift-cards-manual-001',
+        name: 'Apple Gift Cards',
+        description: 'Apple Store gift cards for apps, music, movies, and Apple products. Earn up to 2.5% cashback.',
+        imageUrl: logoData['apple'] || 'https://logo.clearbit.com/apple.com',
+        commission: { value: 2.5, format: '%' },
+        categories: ['Gift Cards', 'Technology'],
+        url: 'https://www.mygiftcardsplus.com/apple-gift-cards',
+        homePage: 'https://www.mygiftcardsplus.com/apple-gift-cards'
+      });
+      console.log('✅ Added Apple Gift Cards manually with correct 2.5% commission');
+    }
+    
+    // Verify Amazon Gift Cards have correct commission rate (should be 3.5%)
+    if (foundAmazonStores.length > 0) {
+      console.log(`🎯 Found ${foundAmazonStores.length} Amazon Gift Card stores:`, foundAmazonStores.map(s => s.name));
+      foundAmazonStores.forEach(store => {
+        if (store.commission?.value < 3.5) {
+          console.log(`📈 Updating Amazon Gift Card commission from ${store.commission?.value}% to 3.5%`);
+          store.commission = { value: 3.5, format: '%' };
+        }
+      });
+    } else {
+      console.log('⚠️ No Amazon Gift Card stores found in API results');
+      
+      // Add Amazon Gift Cards manually with correct commission
+      allStores.push({
+        id: 'amazon-gift-cards-manual-001',
+        name: 'Amazon Gift Cards',
+        description: 'Amazon gift cards for the world\'s largest online marketplace. Earn up to 3.5% cashback.',
+        imageUrl: logoData['amazon'] || 'https://logo.clearbit.com/amazon.com',
+        commission: { value: 3.5, format: '%' },
+        categories: ['Gift Cards', 'Shopping'],
+        url: 'https://www.mygiftcardsplus.com/amazon-gift-cards',
+        homePage: 'https://www.mygiftcardsplus.com/amazon-gift-cards'
+      });
+      console.log('✅ Added Amazon Gift Cards manually with correct 3.5% commission');
     }
     
     console.log(`📈 Total stores retrieved: ${allStores.length}`);
@@ -375,7 +460,11 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
         category: store.categories?.[0] || 'General',
         website_url: store.url || store.homePage || null,
         is_active: true,
-        featured: store.name?.toLowerCase().includes('uber') || store.name?.toLowerCase().includes('amazon') || store.name?.toLowerCase().includes('starbucks'),
+        featured: store.name?.toLowerCase().includes('uber') || 
+                 store.name?.toLowerCase().includes('airbnb') ||
+                 store.name?.toLowerCase().includes('amazon') || 
+                 store.name?.toLowerCase().includes('apple') ||
+                 store.name?.toLowerCase().includes('starbucks'),
       };
     });
     
@@ -413,6 +502,9 @@ async function syncFromLoyalizeAPI(apiKey: string, supabase: any): Promise<Respo
       brands_synced: syncedCount,
       total_pages_fetched: page,
       uber_gift_cards_included: foundUberStores.length > 0 || true, // Always true since we add manually if not found
+      airbnb_gift_cards_included: foundAirbnbStores.length > 0 || true, // Always true since we add manually if not found
+      apple_gift_cards_included: foundAppleStores.length > 0 || true, // Always true since we add manually if not found
+      amazon_gift_cards_included: foundAmazonStores.length > 0 || true, // Always true since we add manually if not found
       is_sample_data: false,
       is_fallback_data: false
     }), {
@@ -471,7 +563,7 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       name: 'Amazon Gift Cards',
       description: 'Digital and physical gift cards for the world\'s largest online retailer. Perfect for any occasion.',
       logo_url: 'https://logo.clearbit.com/amazon.com',
-      commission_rate: 0.04, // 4%
+      commission_rate: 0.035, // 3.5% - Updated commission rate
       nctr_per_dollar: 100.0,
       category: 'Gift Cards',
       website_url: 'https://amazon.com/gift-cards',
@@ -507,10 +599,22 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
       name: 'Apple Store Gift Cards',
       description: 'Gift cards for Apple products, apps, music, movies, and more from the App Store and iTunes.',
       logo_url: 'https://logo.clearbit.com/apple.com',
-      commission_rate: 0.035, // 3.5%
+      commission_rate: 0.025, // 2.5% - Updated commission rate
       nctr_per_dollar: 100.0,
       category: 'Gift Cards',
       website_url: 'https://apple.com/gift-cards',
+      is_active: true,
+      featured: true
+    },
+    {
+      loyalize_id: 'airbnb-gc-001',
+      name: 'Airbnb Gift Cards',
+      description: 'Gift cards for unique travel accommodations and experiences worldwide through Airbnb.',
+      logo_url: 'https://logo.clearbit.com/airbnb.com',
+      commission_rate: 0.02, // 2.0% - Airbnb gift card commission
+      nctr_per_dollar: 100.0,
+      category: 'Gift Cards',
+      website_url: 'https://airbnb.com/gift-cards',
       is_active: true,
       featured: true
     },
@@ -562,6 +666,9 @@ async function syncSampleBrands(supabase: any, isFallback = false) {
     brands_count: enhancedBrands.length,
     brands_synced: enhancedBrands.length,
     uber_gift_cards_included: true,
+    airbnb_gift_cards_included: true,
+    apple_gift_cards_included: true,
+    amazon_gift_cards_included: true,
     is_sample_data: !isFallback,
     is_fallback_data: isFallback,
     brand_types: [...new Set(enhancedBrands.map(b => b.category))]
