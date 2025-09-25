@@ -890,33 +890,7 @@ export type Database = {
       }
     }
     Views: {
-      withdrawal_requests_admin_view: {
-        Row: {
-          admin_notes: string | null
-          created_at: string | null
-          email_masked: string | null
-          failure_reason_masked: string | null
-          full_name: string | null
-          gas_fee_nctr: number | null
-          id: string | null
-          nctr_amount: number | null
-          net_amount_nctr: number | null
-          processed_at: string | null
-          status: string | null
-          user_id: string | null
-          username: string | null
-          wallet_address_masked: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_withdrawal_requests_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       add_sample_brands: {
@@ -1117,6 +1091,42 @@ export type Database = {
       get_admin_user_stats: {
         Args: { target_user_id: string }
         Returns: Json
+      }
+      get_admin_withdrawal_by_id: {
+        Args: { withdrawal_id: string }
+        Returns: {
+          admin_notes: string
+          created_at: string
+          email_masked: string
+          full_name: string
+          id: string
+          nctr_amount: number
+          net_amount_nctr: number
+          processed_at: string
+          status: string
+          user_id: string
+          username: string
+          wallet_address_masked: string
+        }[]
+      }
+      get_admin_withdrawal_data: {
+        Args: { limit_count?: number; offset_count?: number }
+        Returns: {
+          admin_notes: string
+          created_at: string
+          email_masked: string
+          failure_reason_masked: string
+          full_name: string
+          gas_fee_nctr: number
+          id: string
+          nctr_amount: number
+          net_amount_nctr: number
+          processed_at: string
+          status: string
+          user_id: string
+          username: string
+          wallet_address_masked: string
+        }[]
       }
       get_business_data_access_summary: {
         Args: Record<PropertyKey, never>

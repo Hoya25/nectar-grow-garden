@@ -11,20 +11,19 @@ import { toast } from '@/hooks/use-toast';
 interface WithdrawalRequest {
   id: string;
   user_id: string;
-  wallet_address: string;
+  wallet_address_masked: string;  // Now masked for security
   nctr_amount: number;
   net_amount_nctr: number;
   gas_fee_nctr: number;
   status: string;
-  transaction_hash: string | null;
-  failure_reason: string | null;
+  transaction_hash?: string | null;
+  failure_reason_masked: string | null;  // Now masked for security
   created_at: string;
   processed_at: string | null;
-  profiles?: {
-    username: string | null;
-    full_name: string | null;
-    email: string | null;
-  } | null;
+  admin_notes: string | null;
+  username: string | null;
+  full_name: string | null;
+  email_masked: string | null;  // Now masked for security
 }
 
 const WithdrawalManagement = () => {
@@ -53,21 +52,42 @@ const WithdrawalManagement = () => {
 
   const fetchWithdrawals = async () => {
     try {
-      const { data, error } = await supabase
-        .from('withdrawal_requests')
-        .select(`
-          *,
-          profiles(username, full_name, email)
-        `)
-        .order('created_at', { ascending: false });
+      // Use secure function instead of direct table access
+      const { data, error } = await supabase.rpc('get_admin_withdrawal_data', {
+        limit_count: 500,  // Reasonable limit for admin interface
+        offset_count: 0
+      });
 
-      if (error) throw error;
-      setWithdrawals((data as any) || []);
+      if (error) {
+        // Handle session expiry specifically
+        if (error.message?.includes('Session expired')) {
+          toast({
+            title: "Session Expired",
+            description: "Please re-authenticate to access financial data",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
+      
+      setWithdrawals(data || []);
     } catch (error: any) {
       console.error('Error fetching withdrawals:', error);
+      
+      // Provide specific error messages for security issues
+      let errorMessage = "Failed to fetch withdrawal requests";
+      if (error.message?.includes('Access denied')) {
+        errorMessage = "Access denied: Admin privileges required";
+      } else if (error.message?.includes('Session expired')) {
+        errorMessage = "Session expired: Please re-authenticate";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error Loading Withdrawals",
-        description: error.message || "Failed to fetch withdrawal requests",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -154,8 +174,9 @@ const WithdrawalManagement = () => {
     });
   };
 
-  const formatAddress = (address: string) => {
-    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  // Address is already masked by the secure function, so just return it
+  const formatAddress = (maskedAddress: string) => {
+    return maskedAddress; // Already formatted as "0x1234...abcd"
   };
 
   const openTransactionInExplorer = (txHash: string) => {
@@ -212,7 +233,12 @@ const WithdrawalManagement = () => {
             <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-500">{withdrawals.length}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-2xl font-bold text-purple-500">{withdrawals.length}</div>
+              <div className="text-xs text-muted-foreground bg-yellow-100 dark:bg-yellow-900/20 px-2 py-1 rounded">
+                🔒 Secured Access
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -262,16 +288,16 @@ const WithdrawalManagement = () => {
               <TableBody>
                 {withdrawals.map((withdrawal) => (
                   <TableRow key={withdrawal.id}>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium">
-                          {withdrawal.profiles?.full_name || withdrawal.profiles?.username || 'Unknown User'}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {withdrawal.profiles?.email}
-                        </div>
-                      </div>
-                    </TableCell>
+                     <TableCell>
+                       <div className="space-y-1">
+                         <div className="font-medium">
+                           {withdrawal.full_name || withdrawal.username || 'Unknown User'}
+                         </div>
+                         <div className="text-xs text-muted-foreground">
+                           {withdrawal.email_masked}  {/* Now using masked email */}
+                         </div>
+                       </div>
+                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
                         <div className="font-medium">{withdrawal.nctr_amount.toFixed(2)} NCTR</div>
@@ -281,20 +307,20 @@ const WithdrawalManagement = () => {
                         </div>
                       </div>
                     </TableCell>
+                     <TableCell>
+                       <div className="font-mono text-sm">
+                         {formatAddress(withdrawal.wallet_address_masked)}  {/* Now using masked address */}
+                       </div>
+                     </TableCell>
                     <TableCell>
-                      <div className="font-mono text-sm">
-                        {formatAddress(withdrawal.wallet_address)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        {getStatusBadge(withdrawal.status)}
-                        {withdrawal.failure_reason && (
-                          <div className="text-xs text-destructive">
-                            {withdrawal.failure_reason}
-                          </div>
-                        )}
-                      </div>
+                       <div className="space-y-1">
+                         {getStatusBadge(withdrawal.status)}
+                         {withdrawal.failure_reason_masked && (
+                           <div className="text-xs text-destructive">
+                             {withdrawal.failure_reason_masked}  {/* Now using masked failure reason */}
+                           </div>
+                         )}
+                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
