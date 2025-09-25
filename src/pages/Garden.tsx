@@ -898,11 +898,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
             
             {/* Compact Status Display in Header */}
             <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3 border border-primary/20">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <img 
                   src={nctrLogo} 
                   alt="NCTR" 
-                  className="h-18 w-auto opacity-90"
+                  className="h-6 w-auto opacity-70"
                 />
                 <div>
                   <p className="text-xs text-muted-foreground">Total NCTR</p>
@@ -914,14 +914,9 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
               {/* Live NCTR Price Feed */}
               <div className="border-l border-primary/20 pl-3">
                 <p className="text-xs text-muted-foreground">Live Price</p>
-                <div className="flex items-center gap-1">
-                  <p className="text-sm font-semibold text-section-accent">
-                    ${formatPrice(currentPrice)}
-                  </p>
-                  <span className={`text-xs ${getChangeColor(priceChange24h)}`}>
-                    {formatChange(priceChange24h)}
-                  </span>
-                </div>
+                <p className="text-sm font-semibold text-section-accent">
+                  ${formatPrice(currentPrice)}
+                </p>
               </div>
             </div>
           </div>
