@@ -962,6 +962,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      get_admin_profile_summary: {
+        Args: { target_user_ids: string[] }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          masked_email: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_admin_profiles_safe: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1024,6 +1035,16 @@ export type Database = {
           full_name: string
           id: string
           username: string
+        }[]
+      }
+      get_rate_limit_statistics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          blocked_requests_estimate: number
+          top_user_accesses: number
+          total_accesses_today: number
+          unique_ips_today: number
+          unique_users_today: number
         }[]
       }
       get_safe_referral_profile: {
