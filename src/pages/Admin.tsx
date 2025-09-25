@@ -39,6 +39,7 @@ import SecurityMonitor from '@/components/admin/SecurityMonitor';
 import EmergencyActions from '@/components/admin/EmergencyActions';
 import SecurityStatus from '@/components/admin/SecurityStatus';
 import ReferralTestComponent from '@/components/admin/ReferralTestComponent';
+import LoyalizeBrandManager from '@/components/admin/LoyalizeBrandManager';
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
 
 interface AdminStats {
@@ -322,6 +323,8 @@ const Admin = () => {
 
           <TabsContent value="loyalize">
             <div className="space-y-6">
+              <LoyalizeBrandManager />
+              
               <LoyalizeApiTester />
               
               <Card className="bg-section-highlight border border-section-border">
