@@ -890,7 +890,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      withdrawal_requests_admin_view: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          email_masked: string | null
+          failure_reason_masked: string | null
+          full_name: string | null
+          gas_fee_nctr: number | null
+          id: string | null
+          nctr_amount: number | null
+          net_amount_nctr: number | null
+          processed_at: string | null
+          status: string | null
+          user_id: string | null
+          username: string | null
+          wallet_address_masked: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_withdrawal_requests_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Functions: {
       add_sample_brands: {
@@ -1264,6 +1290,16 @@ export type Database = {
         Args: { p_action?: string; p_table_name: string }
         Returns: undefined
       }
+      log_financial_data_access: {
+        Args: {
+          access_reason?: string
+          access_type: string
+          accessed_fields?: string[]
+          record_id: string
+          table_name: string
+        }
+        Returns: undefined
+      }
       log_sensitive_access: {
         Args: {
           p_action_type: string
@@ -1280,6 +1316,15 @@ export type Database = {
       mask_sensitive_data: {
         Args: { input_text: string; mask_type?: string }
         Returns: string
+      }
+      monitor_withdrawal_access_patterns: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          access_count: number
+          last_access: string
+          risk_assessment: string
+          user_id: string
+        }[]
       }
       move_pending_to_available: {
         Args: { p_amount: number; p_user_id: string }
@@ -1362,6 +1407,14 @@ export type Database = {
           amount?: number
           operation_type: string
           user_id_param?: string
+        }
+        Returns: Json
+      }
+      validate_withdrawal_access: {
+        Args: {
+          access_type: string
+          record_id?: string
+          target_user_id: string
         }
         Returns: Json
       }
