@@ -273,6 +273,184 @@ serve(async (req) => {
         )
       }
 
+    // Fetch NOBull brand data and create/update
+    case 'sync_nobull_data':
+      try {
+        console.log('🟡 Starting NOBull data sync from Loyalize API');
+        
+        if (!loyalizeApiKey) {
+          console.warn('LOYALIZE_API_KEY not configured, using sample NOBull data');
+          
+          // Create sample NOBull data
+          const sampleNoBull = {
+            name: 'NOBULL',
+            description: 'Premium fitness apparel and footwear designed for training and life.',
+            category: 'Fitness & Sports',
+            logo_url: 'https://cdn.nobullproject.com/assets/nobull-logo.png',
+            website_url: 'https://www.nobullproject.com',
+            commission_rate: 0.08, // 8% commission
+            nctr_per_dollar: 0.02, // 2 NCTR per dollar (25% of commission)
+            loyalize_id: 'nobull-sample-001',
+            is_active: true,
+            featured: true
+          };
+
+          // Check if NOBull already exists
+          const { data: existingBrand } = await supabase
+            .from('brands')
+            .select('id')
+            .ilike('name', '%nobull%')
+            .single();
+
+          if (existingBrand) {
+            // Update existing
+            await supabase
+              .from('brands')
+              .update(sampleNoBull)
+              .eq('id', existingBrand.id);
+          } else {
+            // Insert new
+            await supabase
+              .from('brands')
+              .insert(sampleNoBull);
+          }
+
+          return new Response(JSON.stringify({
+            success: true,
+            brands_synced: 1,
+            new_brands: existingBrand ? 0 : 1,
+            message: 'NOBull brand synced (sample data)'
+          }), { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          });
+        }
+
+        // Fetch NOBull data from Loyalize API
+        const nobullResponse = await fetch('https://api.loyalize.com/v1/stores?page=0&size=100', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': loyalizeApiKey
+          }
+        });
+
+        if (!nobullResponse.ok) {
+          throw new Error(`Loyalize API error: ${nobullResponse.status}`);
+        }
+
+        const nobullData = await nobullResponse.json();
+        const allStores = nobullData.content || [];
+        
+        // Find NOBull brands
+        const nobullBrands = allStores.filter((store: any) => 
+          store.name?.toLowerCase().includes('nobull') ||
+          store.description?.toLowerCase().includes('nobull')
+        );
+
+        if (nobullBrands.length === 0) {
+          console.log('No NOBull brands found in API, using sample data');
+          // Fall back to sample data like above
+          const sampleNoBull = {
+            name: 'NOBULL',
+            description: 'Premium fitness apparel and footwear designed for training and life.',
+            category: 'Fitness & Sports',
+            logo_url: 'https://cdn.nobullproject.com/assets/nobull-logo.png',
+            website_url: 'https://www.nobullproject.com',
+            commission_rate: 0.08,
+            nctr_per_dollar: 0.02,
+            loyalize_id: 'nobull-sample-001',
+            is_active: true,
+            featured: true
+          };
+
+          const { data: existingBrand } = await supabase
+            .from('brands')
+            .select('id')
+            .ilike('name', '%nobull%')
+            .single();
+
+          if (existingBrand) {
+            await supabase
+              .from('brands')
+              .update(sampleNoBull)
+              .eq('id', existingBrand.id);
+          } else {
+            await supabase
+              .from('brands')
+              .insert(sampleNoBull);
+          }
+
+          return new Response(JSON.stringify({
+            success: true,
+            brands_synced: 1,
+            new_brands: existingBrand ? 0 : 1,
+            message: 'NOBull brand synced (fallback data)'
+          }), { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          });
+        }
+
+        // Process each NOBull brand from API
+        const processedBrands = [];
+        for (const nobullBrand of nobullBrands) {
+          // Check if brand already exists
+          const { data: existingBrand } = await supabase
+            .from('brands')
+            .select('id')
+            .eq('loyalize_id', nobullBrand.id)
+            .single();
+
+          const brandData = {
+            name: nobullBrand.name,
+            description: nobullBrand.description || 'Premium fitness apparel and footwear designed for training and life.',
+            category: nobullBrand.categories?.[0] || 'Fitness & Sports',
+            logo_url: nobullBrand.imageUrl || 'https://cdn.nobullproject.com/assets/nobull-logo.png',
+            website_url: nobullBrand.homePage || nobullBrand.url,
+            commission_rate: (nobullBrand.commission?.value || 8) / 100,
+            nctr_per_dollar: ((nobullBrand.commission?.value || 8) / 100) * 0.25, // 25% of commission
+            loyalize_id: nobullBrand.id,
+            is_active: true,
+            featured: true
+          };
+
+          if (existingBrand) {
+            // Update existing brand
+            await supabase
+              .from('brands')
+              .update(brandData)
+              .eq('id', existingBrand.id);
+          } else {
+            // Insert new brand
+            const { data: newBrand } = await supabase
+              .from('brands')
+              .insert(brandData)
+              .select()
+              .single();
+            
+            processedBrands.push(newBrand);
+          }
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          brands_synced: nobullBrands.length,
+          new_brands: processedBrands.length,
+          brands: processedBrands,
+          message: `Synced ${nobullBrands.length} NOBull brands from Loyalize API`
+        }), { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        });
+
+      } catch (error) {
+        console.error('Error syncing NOBull data:', error);
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.message
+        }), { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        });
+      }
+
       default:
         throw new Error(`Unknown action: ${action}`)
     }
