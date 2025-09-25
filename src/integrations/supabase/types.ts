@@ -1036,6 +1036,10 @@ export type Database = {
           table_name: string
         }[]
       }
+      get_password_security_status: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_public_profile: {
         Args: { profile_user_id: string }
         Returns: {
@@ -1064,6 +1068,10 @@ export type Database = {
           user_id: string
           username: string
         }[]
+      }
+      get_security_compliance_status: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       get_security_dashboard_data: {
         Args: Record<PropertyKey, never>
