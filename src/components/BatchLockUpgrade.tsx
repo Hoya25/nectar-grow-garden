@@ -95,7 +95,8 @@ const BatchLockUpgrade = ({ locks, onUpgradeComplete, availableNCTR = 0 }: Batch
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Zap className="h-4 w-4 text-primary" />
-          Commit All to 360LOCK
+          <span>Commit All to 360LOCK</span>
+          <Lock360InfoTooltip size={14} />
         </CardTitle>
       </CardHeader>
       
