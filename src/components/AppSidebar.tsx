@@ -12,7 +12,7 @@ import {
   BarChart3,
   User,
   Settings,
-  LogOut
+  Power
 } from 'lucide-react';
 import {
   Sidebar,
@@ -309,7 +309,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
                     onClick={handleSignOut}
                     className="flex items-center gap-2 w-full p-2 hover:bg-muted/50 rounded-md text-red-600"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <Power className="h-4 w-4" />
                     {open && <span>Sign Out</span>}
                   </button>
                 </SidebarMenuButton>
