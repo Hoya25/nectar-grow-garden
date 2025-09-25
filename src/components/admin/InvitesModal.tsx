@@ -43,32 +43,42 @@ const InvitesModal = ({ children }: InvitesModalProps) => {
       if (referralsError) throw referralsError;
 
       if (referralsData && referralsData.length > 0) {
-        // Get profile names for referrers and referees
-        const userIds = [
-          ...referralsData.map(r => r.referrer_user_id),
-          ...referralsData.map(r => r.referred_user_id)
-        ];
+        // Get safe profile names for referrers and referees using secure function
+        const referrerIds = [...new Set(referralsData.map(r => r.referrer_user_id))];
+        const referredIds = [...new Set(referralsData.map(r => r.referred_user_id))];
         
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('user_id, full_name, username, email')
-          .in('user_id', userIds);
+        // Fetch profiles using the secure function for admin use
+        const referrerPromises = referrerIds.map(async (userId) => {
+          const { data, error } = await supabase
+            .rpc('get_safe_referral_profile', { target_user_id: userId });
+          return { userId, profile: data?.[0] || null };
+        });
+        
+        const referredPromises = referredIds.map(async (userId) => {
+          const { data, error } = await supabase
+            .rpc('get_safe_referral_profile', { target_user_id: userId });
+          return { userId, profile: data?.[0] || null };
+        });
 
-        if (profilesError) throw profilesError;
+        const [referrerProfiles, referredProfiles] = await Promise.all([
+          Promise.all(referrerPromises),
+          Promise.all(referredPromises)
+        ]);
 
-        // Create profile lookup map
-        const profileMap = new Map(
-          profilesData?.map(p => [
-            p.user_id, 
-            p.full_name || p.username || p.email?.split('@')[0] || 'Unknown'
-          ]) || []
-        );
+        // Create profile lookup map with secure data only
+        const profileMap = new Map();
+        
+        [...referrerProfiles, ...referredProfiles].forEach(({ userId, profile }) => {
+          if (profile) {
+            profileMap.set(userId, profile.full_name || profile.username || 'Member');
+          }
+        });
 
-        // Combine referrals with names
+        // Combine referrals with names (no sensitive data exposed)
         const enrichedReferrals = referralsData.map(referral => ({
           ...referral,
-          referrer_name: profileMap.get(referral.referrer_user_id) || 'Unknown',
-          referred_name: profileMap.get(referral.referred_user_id) || 'Unknown',
+          referrer_name: profileMap.get(referral.referrer_user_id) || 'Member',
+          referred_name: profileMap.get(referral.referred_user_id) || 'Member',
         }));
 
         setReferrals(enrichedReferrals);
