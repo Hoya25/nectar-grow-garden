@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
+  RefreshCw, 
   Coins, 
   TrendingUp, 
   Gift, 
@@ -155,6 +156,18 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
           <SidebarGroupContent>
             {open && (
               <div className="p-3 space-y-3">
+                {/* NCTR Live Sync Button */}
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="flex items-center gap-2 mb-2">
+                    <RefreshCw className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium">NCTR Live Sync</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Sync your token.nctr.live portfolio to upgrade your Wings status
+                  </p>
+                  <NCTRLiveSync onSyncComplete={() => window.location.reload()} />
+                </div>
+                
                 <div className="text-xs text-muted-foreground flex items-center gap-2">
                   <span>⏰ Last synced: 9/23/2025, 3:07:48 PM</span>
                 </div>
