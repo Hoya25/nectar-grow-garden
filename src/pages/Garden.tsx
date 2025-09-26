@@ -95,6 +95,7 @@ const Garden = () => {
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
   const [dailyCheckinAvailable, setDailyCheckinAvailable] = useState(true);
+  const [lastCheckinTime, setLastCheckinTime] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0); // Add refresh trigger
 
   useEffect(() => {
@@ -375,9 +376,23 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         p_user_id: user?.id
       });
       setDailyCheckinAvailable(isAvailable);
+
+      // Get the user's last check-in time for the countdown
+      const { data: lastCheckin } = await supabase
+        .from('nctr_transactions')
+        .select('created_at')
+        .eq('user_id', user?.id)
+        .eq('earning_source', 'daily_checkin')
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      setLastCheckinTime(lastCheckin?.created_at || null);
     } catch (error) {
       console.error('Error checking daily checkin availability:', error);
       setDailyCheckinAvailable(false);
+      setLastCheckinTime(null);
     }
   };
 
@@ -455,6 +470,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       if (checkinResult.success) {
         // Immediately update UI state
         setDailyCheckinAvailable(false);
+        setLastCheckinTime(new Date().toISOString()); // Set current time as last check-in
         
         toast({
           title: "Daily Bonus Claimed! 🎉",
@@ -1185,6 +1201,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                           <DailyCheckinCountdown 
                             className="text-gray-500"
                             onComplete={() => checkDailyCheckinAvailability()}
+                            lastCheckinTime={lastCheckinTime}
                           />
                         </div>
                       </div>

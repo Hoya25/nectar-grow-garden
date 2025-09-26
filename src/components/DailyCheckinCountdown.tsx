@@ -4,21 +4,31 @@ import { Clock } from 'lucide-react';
 interface DailyCheckinCountdownProps {
   className?: string;
   onComplete?: () => void;
+  lastCheckinTime?: string | null; // ISO timestamp of user's last check-in
 }
 
-export const DailyCheckinCountdown = ({ className = "", onComplete }: DailyCheckinCountdownProps) => {
+export const DailyCheckinCountdown = ({ className = "", onComplete, lastCheckinTime }: DailyCheckinCountdownProps) => {
   const [timeLeft, setTimeLeft] = useState<{
     hours: number;
     minutes: number;
     seconds: number;
   }>({ hours: 0, minutes: 0, seconds: 0 });
 
-  const calculateTimeUntilMidnight = () => {
+  const calculateTimeUntilNextCheckin = () => {
     const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0); // Next midnight in local timezone
+    let targetTime: Date;
+
+    if (lastCheckinTime) {
+      // Calculate 24 hours from the user's last check-in time
+      const lastCheckin = new Date(lastCheckinTime);
+      targetTime = new Date(lastCheckin.getTime() + (24 * 60 * 60 * 1000));
+    } else {
+      // Fallback to midnight if no last check-in time available
+      targetTime = new Date(now);
+      targetTime.setHours(24, 0, 0, 0);
+    }
     
-    const diff = midnight.getTime() - now.getTime();
+    const diff = targetTime.getTime() - now.getTime();
     
     if (diff <= 0) {
       return { hours: 0, minutes: 0, seconds: 0 };
@@ -33,7 +43,7 @@ export const DailyCheckinCountdown = ({ className = "", onComplete }: DailyCheck
 
   useEffect(() => {
     const updateCountdown = () => {
-      const time = calculateTimeUntilMidnight();
+      const time = calculateTimeUntilNextCheckin();
       setTimeLeft(time);
       
       // If countdown reaches zero, call onComplete callback
@@ -49,7 +59,7 @@ export const DailyCheckinCountdown = ({ className = "", onComplete }: DailyCheck
     const interval = setInterval(updateCountdown, 1000);
     
     return () => clearInterval(interval);
-  }, [onComplete]);
+  }, [onComplete, lastCheckinTime]);
 
   const formatTime = (value: number) => value.toString().padStart(2, '0');
 
