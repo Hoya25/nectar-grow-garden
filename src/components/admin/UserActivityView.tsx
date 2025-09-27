@@ -70,12 +70,20 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
   const fetchUserActivity = async () => {
     setLoading(true);
     try {
+      console.log('🔍 Fetching activity for user:', userId);
+      
       // Use secure admin function to fetch all activity data
       const { data: activityData, error: activityError } = await supabase
         .rpc('get_admin_user_activity', { target_user_id: userId });
 
+      console.log('📊 Activity data response:', { activityData, activityError });
+
       if (activityError) {
-        throw activityError;
+        console.error('❌ RPC Error:', activityError);
+        // If admin function fails, try direct queries as fallback
+        console.log('🔄 Attempting fallback queries...');
+        await fetchActivityFallback();
+        return;
       }
 
       if (activityData) {
@@ -86,20 +94,68 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
           referrals: Referral[];
         };
         
+        console.log('✅ Parsed activity data:', parsedData);
         setTransactions(parsedData.transactions || []);
         setLocks(parsedData.locks || []);
         setReferrals(parsedData.referrals || []);
       }
 
     } catch (error) {
-      console.error('Error fetching user activity:', error);
-      toast({
-        title: "Access Denied",
-        description: "Admin privileges required to view user activity.",
-        variant: "destructive",
-      });
+      console.error('❌ Error fetching user activity:', error);
+      console.log('🔄 Attempting fallback queries...');
+      await fetchActivityFallback();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchActivityFallback = async () => {
+    try {
+      console.log('🔄 Using fallback method to fetch activity data...');
+      
+      // Fallback: fetch data directly using regular queries
+      const [transactionsQuery, locksQuery, referralsQuery] = await Promise.all([
+        supabase
+          .from('nctr_transactions')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(50),
+        supabase
+          .from('nctr_locks')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('referrals')
+          .select('*')
+          .eq('referrer_user_id', userId)
+          .order('created_at', { ascending: false })
+      ]);
+
+      console.log('📊 Fallback queries results:', {
+        transactions: transactionsQuery,
+        locks: locksQuery,
+        referrals: referralsQuery
+      });
+
+      if (transactionsQuery.error) console.error('Transactions error:', transactionsQuery.error);
+      if (locksQuery.error) console.error('Locks error:', locksQuery.error);
+      if (referralsQuery.error) console.error('Referrals error:', referralsQuery.error);
+
+      setTransactions(transactionsQuery.data || []);
+      setLocks(locksQuery.data || []);
+      setReferrals(referralsQuery.data || []);
+      
+      console.log('✅ Fallback data loaded successfully');
+      
+    } catch (fallbackError) {
+      console.error('❌ Fallback queries also failed:', fallbackError);
+      toast({
+        title: "Error Loading Data",
+        description: "Unable to load user activity data. Please try again or contact support.",
+        variant: "destructive",
+      });
     }
   };
 
