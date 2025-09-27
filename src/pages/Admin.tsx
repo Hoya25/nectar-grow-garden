@@ -39,6 +39,7 @@ import SecurityMonitor from '@/components/admin/SecurityMonitor';
 import EmergencyActions from '@/components/admin/EmergencyActions';
 import SecurityStatus from '@/components/admin/SecurityStatus';
 import ReferralTestComponent from '@/components/admin/ReferralTestComponent';
+import AffiliateWebhookTester from '@/components/admin/AffiliateWebhookTester';
 import LoyalizeBrandManager from '@/components/admin/LoyalizeBrandManager';
 import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement';
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
@@ -318,7 +319,8 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="referrals">
-            <ReferralTestComponent />
+          <ReferralTestComponent />
+          <AffiliateWebhookTester />
             <ReferralManagement />
           </TabsContent>
 
