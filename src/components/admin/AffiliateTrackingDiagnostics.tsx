@@ -58,21 +58,24 @@ export const AffiliateTrackingDiagnostics = () => {
         .select('id, name, is_active')
         .in('id', brandIds);
 
-      // Get user emails separately  
+      // Get user info separately - NO ACCESS TO SENSITIVE DATA
       const userIds = mappingsData?.map(m => m.user_id).filter(Boolean) || [];
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('user_id, email')
-        .in('user_id', userIds);
+      const userSummaries = await Promise.all(
+        userIds.map(async (userId) => {
+          const { data } = await supabase
+            .rpc('get_admin_safe_profile_summary', { target_user_id: userId });
+          return { userId, summary: data?.[0] || null };
+        })
+      );
 
       const formattedMappings = mappingsData?.map(mapping => {
         const brand = brandsData?.find(b => b.id === mapping.brand_id);
-        const profile = profilesData?.find(p => p.user_id === mapping.user_id);
+        const userSummary = userSummaries.find(u => u.userId === mapping.user_id);
         
         return {
           ...mapping,
           brand_name: brand?.name || 'Unknown Brand',
-          user_email: profile?.email || 'Unknown User'
+          user_email: userSummary?.summary?.username || 'User access restricted' // No email access
         };
       }) || [];
 

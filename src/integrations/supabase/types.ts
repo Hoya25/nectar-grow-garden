@@ -1076,6 +1076,17 @@ export type Database = {
           username: string
         }[]
       }
+      get_admin_safe_profile_summary: {
+        Args: { target_user_id: string }
+        Returns: {
+          created_at: string
+          has_wallet: boolean
+          profile_completion_score: number
+          updated_at: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_admin_safe_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {

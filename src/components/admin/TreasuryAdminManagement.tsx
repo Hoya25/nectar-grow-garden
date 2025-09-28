@@ -21,9 +21,13 @@ interface TreasuryAdminRole {
   is_active: boolean;
   access_reason: string;
   last_access_at: string | null;
-  profiles?: {
+  profile_summary?: {
+    user_id: string;
     username: string;
-    full_name: string;
+    created_at: string;
+    updated_at: string;
+    has_wallet: boolean;
+    profile_completion_score: number;
   } | null;
 }
 
@@ -46,16 +50,28 @@ export const TreasuryAdminManagement = () => {
 
   const fetchTreasuryRoles = async () => {
     try {
+      // Fetch treasury roles without sensitive profile data
       const { data, error } = await supabase
         .from('treasury_admin_roles')
-        .select(`
-          *,
-          profiles!treasury_admin_roles_user_id_fkey(username, full_name)
-        `)
+        .select('*')
         .order('granted_at', { ascending: false });
 
       if (error) throw error;
-      setTreasuryRoles((data as any[]) || []);
+      
+      // Get safe profile summaries for each role
+      const rolesWithSafeProfiles = await Promise.all(
+        (data || []).map(async (role) => {
+          const { data: profileSummary } = await supabase
+            .rpc('get_admin_safe_profile_summary', { target_user_id: role.user_id });
+          
+          return {
+            ...role,
+            profile_summary: profileSummary?.[0] || null
+          };
+        })
+      );
+      
+      setTreasuryRoles(rolesWithSafeProfiles);
     } catch (error) {
       console.error('Error fetching treasury roles:', error);
       toast({
@@ -70,13 +86,10 @@ export const TreasuryAdminManagement = () => {
 
   const fetchUserProfiles = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, username, full_name, email')
-        .order('full_name');
-
-      if (error) throw error;
-      setUserProfiles(data || []);
+      // Security update: No longer fetch sensitive profile data
+      // This function is disabled to prevent admin access to sensitive user data
+      setUserProfiles([]);
+      console.warn('Direct profile access disabled for security - admin cannot access user email addresses');
     } catch (error) {
       console.error('Error fetching user profiles:', error);
     }
@@ -211,18 +224,18 @@ export const TreasuryAdminManagement = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>User</Label>
-              <Select value={targetUserId} onValueChange={setTargetUserId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select user..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {userProfiles.map((profile) => (
-                    <SelectItem key={profile.user_id} value={profile.user_id}>
-                      {profile.full_name || profile.username} ({profile.email})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div>
+                <Label>User ID (Manual Entry)</Label>
+                <Input
+                  value={targetUserId}
+                  onChange={(e) => setTargetUserId(e.target.value)}
+                  placeholder="Enter user UUID manually"
+                  className="font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  User profile lookup disabled for security. Enter UUID directly.
+                </p>
+              </div>
             </div>
             
             <div>
@@ -297,7 +310,7 @@ export const TreasuryAdminManagement = () => {
                     
                     <div>
                       <div className="font-semibold">
-                        {role.profiles?.full_name || role.profiles?.username || 'Unknown User'}
+                        {role.profile_summary?.username || 'User profile restricted'}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Granted: {format(new Date(role.granted_at), 'MMM dd, yyyy HH:mm')}

@@ -79,38 +79,38 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
     
     setLoading(true);
     try {
-      // Fetch detailed profile using secure function
-      const { data: sensitiveProfile, error: profileError } = await supabase
-        .rpc('get_sensitive_profile_data', { target_user_id: user.user_id });
+      // Use secure profile summary instead of sensitive data
+      const { data: profileSummary, error: profileError } = await supabase
+        .rpc('get_admin_safe_profile_summary', { target_user_id: user.user_id });
 
       if (profileError) {
-        console.error('Error fetching sensitive profile:', profileError);
-        // Fallback to basic profile data
+        console.error('Error fetching profile summary:', profileError);
+        // Use only non-sensitive fallback data
         setUserProfile({
           id: user.id,
           user_id: user.user_id,
-          username: user.username,
-          full_name: user.full_name,
+          username: user.username ? user.username.substring(0, 3) + '***' : 'N/A',
+          full_name: 'Access restricted',
           avatar_url: user.avatar_url,
           email: 'Access restricted',
           created_at: user.created_at,
           updated_at: user.updated_at,
-          wallet_address: user.wallet_address,
+          wallet_address: 'Access restricted',
           wallet_connected_at: user.wallet_connected_at
         });
-      } else if (sensitiveProfile && sensitiveProfile.length > 0) {
-        const profile = sensitiveProfile[0];
+      } else if (profileSummary && profileSummary.length > 0) {
+        const summary = profileSummary[0];
         setUserProfile({
           id: user.id,
-          user_id: profile.user_id,
-          username: user.username,
-          full_name: user.full_name,
+          user_id: summary.user_id,
+          username: summary.username, // Already masked in the function
+          full_name: 'Profile data restricted',
           avatar_url: user.avatar_url,
-          email: profile.email || 'No email',
-          created_at: user.created_at,
-          updated_at: user.updated_at,
-          wallet_address: profile.wallet_address,
-          wallet_connected_at: profile.wallet_connected_at
+          email: 'Access restricted',
+          created_at: summary.created_at,
+          updated_at: summary.updated_at,
+          wallet_address: summary.has_wallet ? 'Connected (details restricted)' : 'Not connected',
+          wallet_connected_at: user.wallet_connected_at
         });
       }
 
