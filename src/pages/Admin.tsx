@@ -40,6 +40,7 @@ import EmergencyActions from '@/components/admin/EmergencyActions';
 import SecurityStatus from '@/components/admin/SecurityStatus';
 import ReferralTestComponent from '@/components/admin/ReferralTestComponent';
 import AffiliateWebhookTester from '@/components/admin/AffiliateWebhookTester';
+import AffiliateTrackingDiagnostics from '@/components/admin/AffiliateTrackingDiagnostics';
 import LoyalizeBrandManager from '@/components/admin/LoyalizeBrandManager';
 import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement';
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
@@ -426,8 +427,12 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-        </Tabs>
+      </TabsContent>
+      
+      <TabsContent value="affiliate-diagnostics" className="space-y-6">
+        <AffiliateTrackingDiagnostics />
+      </TabsContent>
+    </Tabs>
       </div>
     </div>
   );
