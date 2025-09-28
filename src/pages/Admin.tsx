@@ -20,7 +20,8 @@ import {
   Sparkles,
   Webhook,
   UserCheck,
-  Link
+  Link,
+  Database
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
@@ -44,6 +45,8 @@ import AffiliateTrackingDiagnostics from '@/components/admin/AffiliateTrackingDi
 import LoyalizeBrandManager from '@/components/admin/LoyalizeBrandManager';
 import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement';
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
+import SuperAdminTransactionHistory from '@/components/admin/SuperAdminTransactionHistory';
+import SuperAdminReferralTracking from '@/components/admin/SuperAdminReferralTracking';
 
 interface AdminStats {
   total_users: number;
@@ -268,7 +271,7 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="withdrawals" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-8 bg-section-highlight">
+          <TabsList className="grid w-full grid-cols-10 bg-section-highlight">
             <TabsTrigger value="withdrawals" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Activity className="w-4 h-4" />
               Withdrawals
@@ -296,6 +299,14 @@ const Admin = () => {
             <TabsTrigger value="webhooks" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Webhook className="w-4 h-4" />
               Webhooks
+            </TabsTrigger>
+            <TabsTrigger value="super-transactions" className="flex items-center gap-1 bg-red-100 text-red-700 data-[state=active]:bg-red-200 data-[state=active]:text-red-800">
+              <Database className="w-3 h-3" />
+              Super TX
+            </TabsTrigger>
+            <TabsTrigger value="super-referrals" className="flex items-center gap-1 bg-red-100 text-red-700 data-[state=active]:bg-red-200 data-[state=active]:text-red-800">
+              <Activity className="w-3 h-3" />
+              Super REF
             </TabsTrigger>
             <TabsTrigger value="settings" className="text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Settings className="w-4 h-4 mr-2" />
@@ -363,6 +374,14 @@ const Admin = () => {
                 <WebhookTester />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="super-transactions" className="space-y-6">
+            <SuperAdminTransactionHistory />
+          </TabsContent>
+          
+          <TabsContent value="super-referrals" className="space-y-6">
+            <SuperAdminReferralTracking />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">

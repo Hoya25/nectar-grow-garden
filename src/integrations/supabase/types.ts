@@ -1267,6 +1267,45 @@ export type Database = {
           wallet_connected_at: string
         }[]
       }
+      get_super_admin_referral_tracking: {
+        Args: { target_user_id?: string }
+        Returns: {
+          created_at: string
+          id: string
+          referee_email: string
+          referee_name: string
+          referral_code: string
+          referred_user_id: string
+          referrer_email: string
+          referrer_ip_address: string
+          referrer_name: string
+          referrer_user_agent: string
+          referrer_user_id: string
+          reward_credited: boolean
+          rewarded_at: string
+          status: string
+          total_referrals_by_user: number
+        }[]
+      }
+      get_super_admin_transaction_history: {
+        Args: { target_user_id?: string }
+        Returns: {
+          created_at: string
+          description: string
+          earning_source: string
+          external_transaction_id: string
+          id: string
+          nctr_amount: number
+          opportunity_id: string
+          partner_name: string
+          purchase_amount: number
+          status: string
+          transaction_type: string
+          user_email: string
+          user_id: string
+          user_name: string
+        }[]
+      }
       get_user_referrals_with_names: {
         Args: { p_user_id: string }
         Returns: {
