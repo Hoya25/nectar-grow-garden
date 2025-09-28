@@ -102,7 +102,7 @@ async function generateAffiliateLink(
     console.log(`🎁 Gift card detected: ${isGiftCard ? 'Yes' : 'No'} for ${brand.name}`);
 
     // Generate tracking ID for this specific user/brand/product combination
-    const trackingId = generateTrackingId(userId, brandId);
+    const trackingId = await generateTrackingId(userId, brandId, supabase);
 
     let affiliateData: AffiliateLink;
 
@@ -203,7 +203,7 @@ async function trackPurchase(data: any, supabase: any): Promise<Response> {
 
   try {
     // Parse tracking ID to extract user and brand information
-    const parsedIds = parseTrackingId(trackingId);
+    const parsedIds = await parseTrackingId(trackingId, supabase);
     const { userId, brandId } = parsedIds;
     
     if (!userId || !brandId) {
@@ -300,26 +300,66 @@ async function trackPurchase(data: any, supabase: any): Promise<Response> {
   }
 }
 
-function generateTrackingId(userId: string, brandId: string): string {
+async function generateTrackingId(userId: string, brandId: string, supabase: any): string {
   const timestamp = Date.now().toString(36);
-  const userHash = userId.slice(-8); // Take last 8 chars to avoid collisions
-  const brandHash = brandId.slice(-8);
-  return `tgn_${userHash}_${brandHash}_${timestamp}`;
+  const randomId = Math.random().toString(36).substring(2, 15);
+  const trackingId = `tgn_${randomId}_${timestamp}`;
+  
+  // Store the mapping in database for reliable lookups
+  const { error } = await supabase
+    .from('affiliate_link_mappings')
+    .upsert({
+      tracking_id: trackingId,
+      user_id: userId,
+      brand_id: brandId,
+      created_at: new Date().toISOString()
+    }, {
+      onConflict: 'tracking_id'
+    });
+    
+  if (error) {
+    console.error('Failed to store tracking mapping:', error);
+    // Fallback to simple format if mapping fails
+    return `${userId}-${brandId}-${timestamp}`;
+  }
+  
+  return trackingId;
 }
 
-function parseTrackingId(trackingId: string): { userId: string, brandId: string } {
-  // Enhanced parser with better error handling
+async function parseTrackingId(trackingId: string, supabase: any): Promise<{ userId: string, brandId: string }> {
+  console.log('🔍 Parsing tracking ID:', trackingId);
+  
   try {
-    const parts = trackingId.split('_');
-    if (parts.length < 4 || parts[0] !== 'tgn') {
-      throw new Error('Invalid tracking ID format');
+    // Try database lookup first
+    const { data, error } = await supabase
+      .from('affiliate_link_mappings')
+      .select('user_id, brand_id')
+      .eq('tracking_id', trackingId)
+      .single();
+      
+    if (!error && data) {
+      console.log('✅ Found tracking mapping:', data);
+      return {
+        userId: data.user_id,
+        brandId: data.brand_id
+      };
     }
-    return {
-      userId: parts[1] || '',
-      brandId: parts[2] || ''
-    };
+    
+    // Fallback to old format parsing if no mapping found
+    if (trackingId.includes('-')) {
+      const parts = trackingId.split('-');
+      if (parts.length >= 2) {
+        return {
+          userId: parts[0],
+          brandId: parts[1]
+        };
+      }
+    }
+    
+    throw new Error(`No mapping found for tracking ID: ${trackingId}`);
+    
   } catch (error) {
-    console.error('Error parsing tracking ID:', trackingId, error);
+    console.error('❌ Error parsing tracking ID:', trackingId, error);
     return {
       userId: '',
       brandId: ''
