@@ -79,19 +79,10 @@ serve(async (req) => {
     // Extract user ID from tracking ID if not provided directly
     let userId = payload.user_id;
     if (!userId && payload.tracking_id) {
-      const parsedTracking = parseTrackingId(payload.tracking_id);
+      const parsedTracking = await parseTrackingId(payload.tracking_id, supabase);
       if (parsedTracking.userId) {
-        // Full user ID from tracking
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .like('user_id', `%${parsedTracking.userId}%`)
-          .limit(1);
-        
-        if (profiles && profiles.length > 0) {
-          userId = profiles[0].user_id;
-          console.log('🔍 Found user ID from tracking:', userId);
-        }
+        userId = parsedTracking.userId;
+        console.log('🔍 Found user ID from tracking mapping:', userId);
       }
     }
 
@@ -216,32 +207,10 @@ serve(async (req) => {
 
     // Update affiliate link click stats if we have tracking info
     if (payload.tracking_id) {
-      const parsedTracking = parseTrackingId(payload.tracking_id);
-      if (parsedTracking.linkId) {
-        // Get current stats first
-        const { data: currentLink } = await supabase
-          .from('independent_affiliate_links')
-          .select('conversion_count, total_commissions')
-          .eq('id', parsedTracking.linkId)
-          .single();
-
-        if (currentLink) {
-          const { error: clickUpdateError } = await supabase
-            .from('independent_affiliate_links')
-            .update({
-              conversion_count: currentLink.conversion_count + 1,
-              total_commissions: currentLink.total_commissions + nctrReward,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', parsedTracking.linkId);
-
-          if (clickUpdateError) {
-            console.error('⚠️ Could not update affiliate link stats:', clickUpdateError);
-            // Don't fail the entire request for this
-          } else {
-            console.log('📈 Updated affiliate link conversion stats');
-          }
-        }
+      const parsedTracking = await parseTrackingId(payload.tracking_id, supabase);
+      if (parsedTracking.brandId) {
+        // Try to find brand-specific tracking info
+        console.log('📊 Found brand tracking info:', parsedTracking.brandId);
       }
     }
 
@@ -272,28 +241,54 @@ serve(async (req) => {
   }
 });
 
-// Helper function to parse tracking IDs and extract user/link info
-function parseTrackingId(trackingId: string): { userId: string, linkId?: string, brandId?: string } {
+// Helper function to parse tracking IDs using database lookup
+async function parseTrackingId(trackingId: string, supabase: any): Promise<{ userId: string, linkId?: string, brandId?: string }> {
   try {
-    console.log('🔍 Parsing tracking ID:', trackingId);
+    console.log('🔍 Parsing tracking ID for webhook:', trackingId);
     
-    // Handle our format: tgn_cd1a54f5_1b17d9eb_mg2hq0dp
-    if (trackingId.startsWith('tgn_')) {
-      const parts = trackingId.split('_');
+    // Try database lookup first for new format
+    const { data, error } = await supabase
+      .from('affiliate_link_mappings')
+      .select('user_id, brand_id')
+      .eq('tracking_id', trackingId)
+      .single();
+      
+    if (!error && data) {
+      console.log('✅ Found webhook tracking mapping:', data);
       return {
-        userId: parts[1] || '',
-        brandId: parts[2] || '',
-        linkId: parts.length > 3 ? parts[3] : undefined
+        userId: data.user_id,
+        brandId: data.brand_id
       };
     }
     
-    // Handle direct user ID format (UUID-like)
-    if (trackingId.includes('-') && trackingId.length > 30) {
-      return { userId: trackingId };
+    // Fallback parsers for older formats
+    if (trackingId.includes('_')) {
+      // Format: tgn_userHash_brandHash_timestamp or user_link_brand
+      const parts = trackingId.split('_');
+      if (parts.length >= 3) {
+        return {
+          userId: parts[1],
+          linkId: parts[2],
+          brandId: parts[3] || parts[2]
+        };
+      }
     }
     
-    console.log('⚠️ Unknown tracking ID format');
+    if (trackingId.includes('-')) {
+      // Format: userId-linkId-brandId
+      const parts = trackingId.split('-');
+      if (parts.length >= 2) {
+        return {
+          userId: parts[0],
+          linkId: parts[1],
+          brandId: parts[2] || undefined
+        };
+      }
+    }
+    
+    console.warn('⚠️ Could not parse tracking ID format:', trackingId);
     return { userId: '' };
+    
   } catch (error) {
     console.error('❌ Error parsing tracking ID:', error);
     return { userId: '' };

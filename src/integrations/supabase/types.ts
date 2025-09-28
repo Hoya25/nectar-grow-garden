@@ -120,6 +120,33 @@ export type Database = {
           },
         ]
       }
+      affiliate_link_mappings: {
+        Row: {
+          brand_id: string
+          created_at: string
+          id: string
+          tracking_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          id?: string
+          tracking_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          id?: string
+          tracking_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       api_rate_limits: {
         Row: {
           created_at: string | null

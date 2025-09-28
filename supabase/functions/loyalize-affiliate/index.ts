@@ -300,7 +300,7 @@ async function trackPurchase(data: any, supabase: any): Promise<Response> {
   }
 }
 
-async function generateTrackingId(userId: string, brandId: string, supabase: any): string {
+async function generateTrackingId(userId: string, brandId: string, supabase: any): Promise<string> {
   const timestamp = Date.now().toString(36);
   const randomId = Math.random().toString(36).substring(2, 15);
   const trackingId = `tgn_${randomId}_${timestamp}`;
