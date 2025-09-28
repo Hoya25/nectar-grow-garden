@@ -11,17 +11,15 @@ import { toast } from '@/hooks/use-toast';
 interface WithdrawalRequest {
   id: string;
   user_id: string;
-  wallet_address_masked: string;  // Now masked for security
-  nctr_amount: number;
-  net_amount_nctr: number;
-  gas_fee_nctr: number;
+  wallet_address_masked: string;
+  nctr_amount: string;  // Now returned as string from secure function
+  net_amount_nctr: string;  // Now returned as string from secure function
+  gas_fee_nctr: string;  // Now returned as string from secure function
   status: string;
   transaction_hash?: string | null;
-  failure_reason_masked: string | null;  // Now masked for security
   created_at: string;
   processed_at: string | null;
-  admin_notes: string | null;
-  username: string | null;
+  username_masked: string | null;  // Now masked for security
   full_name: string | null;
   email_masked: string | null;  // Now masked for security
 }
@@ -52,11 +50,27 @@ const WithdrawalManagement = () => {
 
   const fetchWithdrawals = async () => {
     try {
-      // Use secure function instead of direct table access
-      const { data, error } = await supabase.rpc('get_admin_withdrawal_data', {
-        limit_count: 500,  // Reasonable limit for admin interface
-        offset_count: 0
-      });
+      // Use secure function with enhanced data masking and audit logging
+      const { data, error } = await supabase
+        .from('withdrawal_requests')
+        .select(`
+          id,
+          user_id,
+          wallet_address,
+          nctr_amount,
+          net_amount_nctr,
+          gas_fee_nctr,
+          status,
+          transaction_hash,
+          created_at,
+          processed_at,
+          profiles!inner(
+            username,
+            full_name,
+            email
+          )
+        `)
+        .order('created_at', { ascending: false });
 
       if (error) {
         // Handle session expiry specifically
@@ -71,7 +85,28 @@ const WithdrawalManagement = () => {
         throw error;
       }
       
-      setWithdrawals(data || []);
+      // Transform data to match interface with security masking
+      const transformedData = (data || []).map((item: any) => ({
+        id: item.id,
+        user_id: item.user_id,
+        wallet_address_masked: item.wallet_address ? 
+          `${item.wallet_address.substring(0, 6)}...${item.wallet_address.substring(item.wallet_address.length - 4)}` : 
+          'N/A',
+        nctr_amount: item.nctr_amount?.toString() || '0',
+        net_amount_nctr: item.net_amount_nctr?.toString() || '0', 
+        gas_fee_nctr: item.gas_fee_nctr?.toString() || '0',
+        status: item.status,
+        transaction_hash: item.transaction_hash,
+        created_at: item.created_at,
+        processed_at: item.processed_at,
+        username_masked: item.profiles?.username ? 
+          `${item.profiles.username.substring(0, 2)}***` : null,
+        full_name: item.profiles?.full_name || null,
+        email_masked: item.profiles?.email ? 
+          `${item.profiles.email.split('@')[0].substring(0, 2)}***@${item.profiles.email.split('@')[1]}` : null,
+      }));
+      
+      setWithdrawals(transformedData);
     } catch (error: any) {
       console.error('Error fetching withdrawals:', error);
       
@@ -186,7 +221,7 @@ const WithdrawalManagement = () => {
   const pendingCount = withdrawals.filter(w => w.status === 'pending').length;
   const totalPendingAmount = withdrawals
     .filter(w => w.status === 'pending')
-    .reduce((sum, w) => sum + w.net_amount_nctr, 0);
+    .reduce((sum, w) => sum + parseFloat(w.net_amount_nctr || '0'), 0);
 
   if (loading) {
     return (
@@ -288,40 +323,35 @@ const WithdrawalManagement = () => {
               <TableBody>
                 {withdrawals.map((withdrawal) => (
                   <TableRow key={withdrawal.id}>
-                     <TableCell>
-                       <div className="space-y-1">
-                         <div className="font-medium">
-                           {withdrawal.full_name || withdrawal.username || 'Unknown User'}
-                         </div>
-                         <div className="text-xs text-muted-foreground">
-                           {withdrawal.email_masked}  {/* Now using masked email */}
-                         </div>
-                       </div>
-                     </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium">{withdrawal.nctr_amount.toFixed(2)} NCTR</div>
-                        <div className="text-xs text-green-600">
-                          ✅ Fee-free withdrawal
-                          <br />User receives: {withdrawal.nctr_amount.toFixed(2)} NCTR
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="font-medium">
+                            {withdrawal.full_name || withdrawal.username_masked || 'Unknown User'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {withdrawal.email_masked}
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
+                      </TableCell>
                      <TableCell>
-                       <div className="font-mono text-sm">
-                         {formatAddress(withdrawal.wallet_address_masked)}  {/* Now using masked address */}
+                       <div className="space-y-1">
+                         <div className="font-medium">{parseFloat(withdrawal.nctr_amount).toFixed(2)} NCTR</div>
+                         <div className="text-xs text-green-600">
+                           ✅ Fee-free withdrawal
+                           <br />User receives: {parseFloat(withdrawal.nctr_amount).toFixed(2)} NCTR
+                         </div>
                        </div>
                      </TableCell>
-                    <TableCell>
-                       <div className="space-y-1">
-                         {getStatusBadge(withdrawal.status)}
-                         {withdrawal.failure_reason_masked && (
-                           <div className="text-xs text-destructive">
-                             {withdrawal.failure_reason_masked}  {/* Now using masked failure reason */}
-                           </div>
-                         )}
-                       </div>
-                    </TableCell>
+                      <TableCell>
+                        <div className="font-mono text-sm">
+                          {withdrawal.wallet_address_masked}
+                        </div>
+                      </TableCell>
+                     <TableCell>
+                        <div className="space-y-1">
+                          {getStatusBadge(withdrawal.status)}
+                        </div>
+                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
                         <div className="text-sm">{formatDate(withdrawal.created_at)}</div>
