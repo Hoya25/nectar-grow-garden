@@ -676,20 +676,21 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       // Generate tracking ID
       const trackingId = `tgn_${user?.id?.slice(-8)}_${opportunity.id?.slice(-8)}_${Date.now().toString(36)}`;
       
+      console.log('🔗 ORIGINAL affiliate_link:', opportunity.affiliate_link);
+      console.log('🆔 Generated tracking ID:', trackingId);
+      
       // Prepare the final URL (handle template variables for Loyalize)
       let finalUrl = opportunity.affiliate_link;
       
-      // Decode URL if it's encoded to ensure proper character handling
-      try {
-        finalUrl = decodeURIComponent(finalUrl);
-      } catch (e) {
-        // URL is not encoded, use as-is
-      }
+      console.log('🔗 URL before replacements:', finalUrl);
       
       // Replace placeholders with actual values
       finalUrl = finalUrl
         .replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous')
         .replace(/\{\{TRACKING_ID\}\}/g, trackingId);
+      
+      console.log('🔗 URL after replacements:', finalUrl);
+      console.log('🔗 Final URL to open:', finalUrl);
       
       // CRITICAL: Record click in database for purchase attribution
       const { error: clickError } = await supabase
