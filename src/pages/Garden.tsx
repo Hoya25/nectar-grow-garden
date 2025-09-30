@@ -66,6 +66,7 @@ interface EarningOpportunity {
   video_title?: string;
   video_description?: string;
   cta_text?: string;
+  brand_id?: string; // Link to brands table for proper tracking
   // New reward structure fields
   available_nctr_reward?: number;
   lock_90_nctr_reward?: number;
@@ -705,12 +706,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       }
       
       // CRITICAL: Create tracking mapping for purchase attribution
+      // Use brand_id from opportunity to properly link to brands table
+      const brandIdToUse = opportunity.brand_id || opportunity.id;
       const { error: mappingError } = await supabase
         .from('affiliate_link_mappings')
         .insert({
           tracking_id: trackingId,
           user_id: user?.id,
-          brand_id: opportunity.id, // Link to opportunity
+          brand_id: brandIdToUse, // Use proper brand_id from opportunity
         });
       
       if (mappingError) {

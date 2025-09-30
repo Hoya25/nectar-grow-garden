@@ -226,6 +226,7 @@ export type Database = {
         Row: {
           affiliate_link: string | null
           available_nctr_reward: number | null
+          brand_id: string | null
           created_at: string
           cta_text: string | null
           default_lock_type: string | null
@@ -256,6 +257,7 @@ export type Database = {
         Insert: {
           affiliate_link?: string | null
           available_nctr_reward?: number | null
+          brand_id?: string | null
           created_at?: string
           cta_text?: string | null
           default_lock_type?: string | null
@@ -286,6 +288,7 @@ export type Database = {
         Update: {
           affiliate_link?: string | null
           available_nctr_reward?: number | null
+          brand_id?: string | null
           created_at?: string
           cta_text?: string | null
           default_lock_type?: string | null
@@ -313,7 +316,15 @@ export type Database = {
           video_title?: string | null
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "earning_opportunities_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       independent_affiliate_links: {
         Row: {
