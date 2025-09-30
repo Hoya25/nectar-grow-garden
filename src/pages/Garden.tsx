@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useWallet } from '@/hooks/useWallet';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
+import { useTransactionNotifications } from '@/hooks/useTransactionNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -97,6 +98,15 @@ const Garden = () => {
   const [dailyCheckinAvailable, setDailyCheckinAvailable] = useState(true);
   const [lastCheckinTime, setLastCheckinTime] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0); // Add refresh trigger
+
+  // Set up real-time transaction notifications
+  useTransactionNotifications({
+    userId: user?.id,
+    onTransactionReceived: () => {
+      // Refresh user data when new transaction arrives
+      fetchUserData();
+    }
+  });
 
   useEffect(() => {
     if (!user) {
@@ -679,9 +689,12 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         // Open the URL directly
         window.open(finalUrl, '_blank');
         
+        // Enhanced link click notification
+        const rewardRate = opportunity.reward_per_dollar || 50;
         toast({
-          title: "Redirecting to Partner...",
-          description: `Opening ${opportunity.partner_name || 'partner'} - Your purchases will be tracked for NCTR rewards!`,
+          title: `🔗 ${opportunity.partner_name || 'Partner'} Link Activated!`,
+          description: `Your purchases are now tracked! Earn ${rewardRate} NCTR per $1 spent.`,
+          duration: 5000,
         });
         
         return;
@@ -708,9 +721,12 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       // Open the tracked URL
       window.open(tracked_url, '_blank');
       
+      // Enhanced link click notification
+      const rewardRate = opportunity.reward_per_dollar || 50;
       toast({
-        title: "Redirecting with User Tracking...",
-        description: `Opening ${opportunity.partner_name || 'partner'} - Your purchases will be tracked for NCTR rewards!`,
+        title: `🔗 ${opportunity.partner_name || 'Partner'} Link Activated!`,
+        description: `Your purchases are now tracked! Earn ${rewardRate} NCTR per $1 spent. We'll notify you when your reward is confirmed.`,
+        duration: 5000,
       });
       
     } catch (error) {
