@@ -669,72 +669,79 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     }
 
     try {
-      // Check if this is a Loyalize-based URL (contains template placeholders)
-      const isLoyalizeUrl = opportunity.affiliate_link.includes('%7B%7B') || opportunity.affiliate_link.includes('{{');
+      // ALL shopping opportunities now go through proper tracking
+      console.log('🛍️ Tracking shopping opportunity click:', opportunity.title);
+      
+      // Generate tracking ID
+      const trackingId = `tgn_${user?.id?.slice(-8)}_${opportunity.id?.slice(-8)}_${Date.now().toString(36)}`;
+      
+      // Prepare the final URL (handle template variables for Loyalize)
+      let finalUrl = opportunity.affiliate_link;
+      const isLoyalizeUrl = finalUrl.includes('%7B%7B') || finalUrl.includes('{{');
       
       if (isLoyalizeUrl) {
-        // Handle Loyalize-based opportunity - replace placeholders and open directly
-        console.log('Handling Loyalize opportunity:', opportunity.title);
-        
-        // Generate simple tracking ID for Loyalize URLs
-        const trackingId = `tgn_${user?.id?.slice(-8)}_${opportunity.id?.slice(-8)}_${Date.now().toString(36)}`;
-        
-        // Replace template variables in the URL
-        let finalUrl = opportunity.affiliate_link
+        finalUrl = finalUrl
           .replace(/%7B%7BUSER_ID%7D%7D/g, user?.id || 'anonymous')
           .replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous')
           .replace(/%7B%7BTRACKING_ID%7D%7D/g, trackingId)
           .replace(/\{\{TRACKING_ID\}\}/g, trackingId);
-        
-        // Open the URL directly
-        window.open(finalUrl, '_blank');
-        
-        // Enhanced link click notification
-        const rewardRate = opportunity.reward_per_dollar || 50;
-        toast({
-          title: `🔗 ${opportunity.partner_name || 'Partner'} Link Activated!`,
-          description: `Your purchases are now tracked! Earn ${rewardRate} NCTR per $1 spent.`,
-          duration: 5000,
-        });
-        
-        return;
       }
-
-      // For non-Loyalize URLs, use the independent affiliate tracking system
-      console.log('Handling independent affiliate opportunity:', opportunity.title);
       
-      // Create a user-tracked affiliate URL through our redirect system
-      const response = await supabase.functions.invoke('affiliate-redirect', {
-        body: {
-          action: 'create',
-          userId: user?.id,
-          originalUrl: opportunity.affiliate_link,
-          platformName: opportunity.partner_name || 'Partner',
-          description: `${opportunity.title} - User: ${user?.id?.slice(0, 8)}`
-        }
-      });
-
-      if (response.error) throw response.error;
+      // CRITICAL: Record click in database for purchase attribution
+      const { error: clickError } = await supabase
+        .from('affiliate_link_clicks')
+        .insert({
+          user_id: user?.id,
+          link_id: opportunity.id, // Use opportunity ID as link reference
+          referrer: window.location.href,
+          user_agent: navigator.userAgent,
+          ip_address: null // Will be set by server if needed
+        });
       
-      const { tracked_url } = response.data;
+      if (clickError) {
+        console.error('❌ Failed to record click:', clickError);
+      } else {
+        console.log('✅ Click recorded successfully');
+      }
       
-      // Open the tracked URL
-      window.open(tracked_url, '_blank');
+      // CRITICAL: Create tracking mapping for purchase attribution
+      const { error: mappingError } = await supabase
+        .from('affiliate_link_mappings')
+        .insert({
+          tracking_id: trackingId,
+          user_id: user?.id,
+          brand_id: opportunity.id, // Link to opportunity
+        });
       
-      // Enhanced link click notification
+      if (mappingError) {
+        console.error('❌ Failed to create tracking mapping:', mappingError);
+      } else {
+        console.log('✅ Tracking mapping created:', trackingId);
+      }
+      
+      // Open the URL
+      window.open(finalUrl, '_blank');
+      
+      // Enhanced notification with tracking confirmation
       const rewardRate = opportunity.reward_per_dollar || 50;
       toast({
         title: `🔗 ${opportunity.partner_name || 'Partner'} Link Activated!`,
-        description: `Your purchases are now tracked! Earn ${rewardRate} NCTR per $1 spent. We'll notify you when your reward is confirmed.`,
-        duration: 5000,
+        description: `Click tracked! Your purchases are now linked to your account. Earn ${rewardRate} NCTR per $1 spent.`,
+        duration: 6000,
+      });
+      
+      console.log('🎯 Tracking complete:', {
+        user_id: user?.id,
+        tracking_id: trackingId,
+        opportunity: opportunity.title,
+        partner: opportunity.partner_name
       });
       
     } catch (error) {
-      console.error('Error handling shopping opportunity:', error);
-      // Fallback to direct link if tracking fails
-      let fallbackUrl = opportunity.affiliate_link;
+      console.error('❌ Error handling shopping opportunity:', error);
       
-      // If it's a template URL, replace placeholders for fallback
+      // Fallback: try to open URL anyway but warn user
+      let fallbackUrl = opportunity.affiliate_link;
       if (fallbackUrl.includes('%7B%7B') || fallbackUrl.includes('{{')) {
         const trackingId = `fallback_${Date.now()}`;
         fallbackUrl = fallbackUrl
@@ -746,8 +753,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       
       window.open(fallbackUrl, '_blank');
       toast({
-        title: "Redirecting...", 
-        description: `Opening ${opportunity.partner_name || 'partner'} - NCTR tracking may be limited.`,
+        title: "⚠️ Tracking Issue", 
+        description: `Link opened but tracking may be limited. Contact support if purchases don't appear.`,
         variant: "destructive",
       });
     }
