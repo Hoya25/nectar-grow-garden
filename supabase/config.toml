@@ -29,3 +29,9 @@ verify_jwt = true
 
 [functions.nctr-price-updater]
 verify_jwt = true
+
+[functions.loyalize-transaction-sync]
+verify_jwt = true
+
+[functions.manual-credit-purchase]
+verify_jwt = true
