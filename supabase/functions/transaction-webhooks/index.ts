@@ -88,8 +88,13 @@ serve(async (req) => {
       console.log('📦 Extracted from body field:', JSON.stringify(actualPayload, null, 2))
     }
 
+    // Log payload details for debugging
+    console.log('📊 Event type:', actualPayload.eventType || actualPayload.event_type || actualPayload.type || actualPayload.event)
+    console.log('📊 Event data:', JSON.stringify(actualPayload.data || actualPayload, null, 2))
+
     // Handle Loyalize webhook format
     if (actualPayload.event_type || actualPayload.eventType || actualPayload.type || actualPayload.event) {
+      console.log('🎯 Processing Loyalize webhook:', JSON.stringify(actualPayload, null, 2).substring(0, 500))
       return await handleLoyalizeWebhook(actualPayload, supabase)
     }
 

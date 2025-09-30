@@ -21,7 +21,8 @@ import {
   Webhook,
   UserCheck,
   Link,
-  Database
+  Database,
+  ShoppingCart
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
@@ -47,6 +48,7 @@ import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement'
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
 import SuperAdminTransactionHistory from '@/components/admin/SuperAdminTransactionHistory';
 import SuperAdminReferralTracking from '@/components/admin/SuperAdminReferralTracking';
+import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
 
 interface AdminStats {
   total_users: number;
@@ -270,34 +272,38 @@ const Admin = () => {
         </div>
 
         {/* Admin Tabs */}
-        <Tabs defaultValue="withdrawals" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-10 bg-section-highlight">
-            <TabsTrigger value="withdrawals" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Activity className="w-4 h-4" />
+        <Tabs defaultValue="purchases" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-11 bg-section-highlight text-xs">
+            <TabsTrigger value="purchases" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <ShoppingCart className="w-3 h-3" />
+              Purchases
+            </TabsTrigger>
+            <TabsTrigger value="withdrawals" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Activity className="w-3 h-3" />
               Withdrawals
             </TabsTrigger>
-            <TabsTrigger value="price" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <TrendingUp className="w-4 h-4" />
-              NCTR Price
+            <TabsTrigger value="price" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <TrendingUp className="w-3 h-3" />
+              Price
             </TabsTrigger>
-            <TabsTrigger value="opportunities" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Gift className="w-4 h-4" />
-              Opportunities
+            <TabsTrigger value="opportunities" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Gift className="w-3 h-3" />
+              Opps
             </TabsTrigger>
-            <TabsTrigger value="affiliates" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Link className="w-4 h-4" />
+            <TabsTrigger value="affiliates" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Link className="w-3 h-3" />
               Affiliates
             </TabsTrigger>
-            <TabsTrigger value="referrals" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Users className="w-4 h-4" />
+            <TabsTrigger value="referrals" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Users className="w-3 h-3" />
               Referrals
             </TabsTrigger>
-            <TabsTrigger value="loyalize" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Sparkles className="w-4 h-4" />
+            <TabsTrigger value="loyalize" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Sparkles className="w-3 h-3" />
               Brands
             </TabsTrigger>
-            <TabsTrigger value="webhooks" className="flex items-center gap-2 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Webhook className="w-4 h-4" />
+            <TabsTrigger value="webhooks" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Webhook className="w-3 h-3" />
               Webhooks
             </TabsTrigger>
             <TabsTrigger value="super-transactions" className="flex items-center gap-1 bg-red-100 text-red-700 data-[state=active]:bg-red-200 data-[state=active]:text-red-800">
@@ -309,10 +315,14 @@ const Admin = () => {
               Super REF
             </TabsTrigger>
             <TabsTrigger value="settings" className="text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Settings className="w-4 h-4 mr-2" />
+              <Settings className="w-3 h-3 mr-1" />
               Settings
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="purchases">
+            <PurchaseTracking />
+          </TabsContent>
 
           <TabsContent value="withdrawals">
             <WithdrawalManagement />
