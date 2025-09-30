@@ -22,9 +22,9 @@ export const AffiliateWebhookTester = () => {
     order_status: 'completed',
     total_amount: 100,
     currency: 'USD',
-    tracking_id: 'tgn_cd1a54f5_1b17d9eb_mg2hq0dp',
-    source: 'uber_gift_card',
-    customer_email: 'jeffrey.kurdilla@example.com',
+    tracking_id: 'tgn_cd1a54f5_1b17d9eb_mg33qd4g', // Correct Kurdilla tracking ID
+    source: 'Uber Gift Card',
+    customer_email: 'jjkurdilla@gmail.com',
     products: [{ name: 'Uber Gift Card', amount: 100, quantity: 1 }]
   });
   
@@ -125,16 +125,27 @@ export const AffiliateWebhookTester = () => {
   };
 
   const presetPayloads = {
-    kurdilla_uber: {
+    kurdilla_uber_purchase_1: {
       user_id: '4b90a032-2c5b-4835-9c73-d298cd1a54f5',
-      order_id: 'UBER_TEST_' + Date.now(),
+      order_id: 'MANUAL_CREDIT_UBER_1_' + Date.now(),
       order_status: 'completed',
       total_amount: 100,
       currency: 'USD',
-      tracking_id: 'tgn_cd1a54f5_1b17d9eb_mg2hq0dp',
-      source: 'uber_gift_card',
-      customer_email: 'jeffrey.kurdilla@example.com',
-      products: [{ name: 'Uber Gift Card $100', amount: 100, quantity: 1 }]
+      tracking_id: 'tgn_cd1a54f5_1b17d9eb_mg33qd4g',
+      source: 'Uber Gift Card',
+      customer_email: 'jjkurdilla@gmail.com',
+      products: [{ name: 'Uber Gift Card $100', amount: 100, quantity: 1, category: 'Gift Cards' }]
+    },
+    kurdilla_uber_purchase_2: {
+      user_id: '4b90a032-2c5b-4835-9c73-d298cd1a54f5',
+      order_id: 'MANUAL_CREDIT_UBER_2_' + Date.now(),
+      order_status: 'completed',
+      total_amount: 100,
+      currency: 'USD',
+      tracking_id: 'tgn_cd1a54f5_1b17d9eb_mg33qd4g',
+      source: 'Uber Gift Card',
+      customer_email: 'jjkurdilla@gmail.com',
+      products: [{ name: 'Uber Gift Card $100', amount: 100, quantity: 1, category: 'Gift Cards' }]
     },
     generic_giftcard: {
       user_id: '4b90a032-2c5b-4835-9c73-d298cd1a54f5',
@@ -163,46 +174,84 @@ export const AffiliateWebhookTester = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Quick Tests */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="p-4">
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Kurdilla's Uber Purchase
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+              <h4 className="font-bold text-lg mb-2 flex items-center gap-2 text-yellow-900">
+                <User className="w-5 h-5" />
+                🚨 Credit Kurdilla's Missing Uber Purchases
               </h4>
-              <p className="text-sm text-muted-foreground mb-3">
-                Test with Jeffrey Kurdilla's $100 Uber purchase
+              <p className="text-sm text-yellow-800 mb-4">
+                Jeffrey Kurdilla bought 2 × $100 Uber gift cards but wasn't credited. 
+                <strong> Should earn 20,000 NCTR total (10,000 per $100)</strong>
               </p>
-              <Button 
-                onClick={() => testAffiliateWebhook(false)}
-                disabled={loading}
-                className="w-full"
-                size="sm"
-              >
-                Test Kurdilla's Purchase
-              </Button>
-            </Card>
-            
-            <Card className="p-4">
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Generic Gift Card
-              </h4>
-              <p className="text-sm text-muted-foreground mb-3">
-                Test with a generic $50 gift card purchase
-              </p>
-              <Button 
-                onClick={() => {
-                  setTestData(presetPayloads.generic_giftcard);
-                  setTimeout(() => testAffiliateWebhook(false), 100);
-                }}
-                disabled={loading}
-                variant="outline"
-                className="w-full"
-                size="sm"
-              >
-                Test Generic Purchase
-              </Button>
-            </Card>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    setTestData(presetPayloads.kurdilla_uber_purchase_1);
+                    setTimeout(() => testAffiliateWebhook(false), 100);
+                  }}
+                  disabled={loading}
+                  className="flex-1"
+                  size="sm"
+                >
+                  Credit Purchase #1 ($100)
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setTestData(presetPayloads.kurdilla_uber_purchase_2);
+                    setTimeout(() => testAffiliateWebhook(false), 100);
+                  }}
+                  disabled={loading}
+                  className="flex-1"
+                  size="sm"
+                >
+                  Credit Purchase #2 ($100)
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="p-4">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Test New Kurdilla Purchase
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Test webhook with a new $100 Uber purchase
+                </p>
+                <Button 
+                  onClick={() => testAffiliateWebhook(false)}
+                  disabled={loading}
+                  variant="outline"
+                  className="w-full"
+                  size="sm"
+                >
+                  Test New Purchase
+                </Button>
+              </Card>
+              
+              <Card className="p-4">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Generic Gift Card
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Test with a generic $50 gift card purchase
+                </p>
+                <Button 
+                  onClick={() => {
+                    setTestData(presetPayloads.generic_giftcard);
+                    setTimeout(() => testAffiliateWebhook(false), 100);
+                  }}
+                  disabled={loading}
+                  variant="outline"
+                  className="w-full"
+                  size="sm"
+                >
+                  Test Generic Purchase
+                </Button>
+              </Card>
+            </div>
           </div>
 
           {/* Manual Test Data */}
