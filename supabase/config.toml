@@ -35,3 +35,6 @@ verify_jwt = true
 
 [functions.manual-credit-purchase]
 verify_jwt = true
+
+[functions.process-purchase]
+verify_jwt = false
