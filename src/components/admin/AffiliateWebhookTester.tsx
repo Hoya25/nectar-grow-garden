@@ -182,7 +182,7 @@ export const AffiliateWebhookTester = () => {
               </h4>
               <p className="text-sm text-yellow-800 mb-4">
                 Jeffrey Kurdilla bought 2 × $100 Uber gift cards but wasn't credited. 
-                <strong> Should earn 20,000 NCTR total (10,000 per $100)</strong>
+                <strong> Should earn 10,000 NCTR total (5,000 per $100 at 50 NCTR per $1)</strong>
               </p>
               <div className="flex gap-2">
                 <Button 
