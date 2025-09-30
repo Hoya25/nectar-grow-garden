@@ -672,25 +672,42 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     try {
       // ALL shopping opportunities now go through proper tracking
       console.log('🛍️ Tracking shopping opportunity click:', opportunity.title);
+      console.log('🔗 RAW affiliate_link from DB:', opportunity.affiliate_link);
+      console.log('🔗 Type of affiliate_link:', typeof opportunity.affiliate_link);
+      console.log('🔗 Length:', opportunity.affiliate_link?.length);
       
       // Generate tracking ID
       const trackingId = `tgn_${user?.id?.slice(-8)}_${opportunity.id?.slice(-8)}_${Date.now().toString(36)}`;
-      
-      console.log('🔗 ORIGINAL affiliate_link:', opportunity.affiliate_link);
       console.log('🆔 Generated tracking ID:', trackingId);
       
-      // Prepare the final URL (handle template variables for Loyalize)
+      // Start with the original URL
       let finalUrl = opportunity.affiliate_link;
+      console.log('🔗 Step 1 - Original URL:', finalUrl);
       
-      console.log('🔗 URL before replacements:', finalUrl);
+      // Check if URL contains template variables
+      const hasUserIdPlaceholder = finalUrl.includes('{{USER_ID}}');
+      const hasTrackingIdPlaceholder = finalUrl.includes('{{TRACKING_ID}}');
+      console.log('🔍 Has {{USER_ID}}:', hasUserIdPlaceholder);
+      console.log('🔍 Has {{TRACKING_ID}}:', hasTrackingIdPlaceholder);
       
-      // Replace placeholders with actual values
-      finalUrl = finalUrl
-        .replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous')
-        .replace(/\{\{TRACKING_ID\}\}/g, trackingId);
+      // Replace USER_ID if present
+      if (hasUserIdPlaceholder) {
+        finalUrl = finalUrl.replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous');
+        console.log('🔗 Step 2 - After USER_ID replacement:', finalUrl);
+      }
       
-      console.log('🔗 URL after replacements:', finalUrl);
-      console.log('🔗 Final URL to open:', finalUrl);
+      // Replace TRACKING_ID if present
+      if (hasTrackingIdPlaceholder) {
+        const beforeReplace = finalUrl;
+        finalUrl = finalUrl.replace(/\{\{TRACKING_ID\}\}/g, trackingId);
+        console.log('🔗 Step 3 - Before TRACKING_ID replacement:', beforeReplace);
+        console.log('🔗 Step 3 - After TRACKING_ID replacement:', finalUrl);
+        console.log('🔗 Character at position of ?:', finalUrl.charAt(finalUrl.indexOf('user_tracking_id') - 1));
+      }
+      
+      console.log('🔗 FINAL URL to open:', finalUrl);
+      console.log('🔗 URL includes https://:', finalUrl.includes('https://'));
+      console.log('🔗 URL includes ?:', finalUrl.includes('?'));
       
       // CRITICAL: Record click in database for purchase attribution
       const { error: clickError } = await supabase
@@ -727,7 +744,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       }
       
       // Open the URL
+      console.log('🚀 Opening URL in new window...');
       window.open(finalUrl, '_blank');
+      console.log('✅ Window.open called');
+      
       
       // Enhanced notification with tracking confirmation
       const rewardRate = opportunity.reward_per_dollar || 50;
