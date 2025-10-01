@@ -137,23 +137,16 @@ serve(async (req) => {
 
     // Generate affiliate link
     if (action === 'generate') {
-      console.log(`🔗 Generating affiliate link for advertiser: ${advertiserId}`);
+      console.log(`🔗 Generating affiliate link for campaign: ${advertiserId}`);
       
-      if (!advertiserId || !productUrl) {
+      if (!advertiserId) {
         return new Response(
-          JSON.stringify({ error: 'advertiserId and productUrl are required' }),
+          JSON.stringify({ error: 'advertiserId (campaignId) is required' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      // Impact.com uses a standard affiliate link structure
-      // The tracking link format: https://impact.com/campaign-promo/{accountSid}/{campaignId}/{advertiserId}
-      // Then redirects to the actual product URL
-      
-      // For now, we'll create a deep link that includes the destination URL
-      const trackingUrl = `https://api.impact.com/Mediapartners/${accountSid}/v3/Ads`;
-      
-      // Get campaign details first
+      // Get campaign details - advertiserId is actually the CampaignId from the search results
       const campaignResponse = await fetch(
         `https://api.impact.com/Mediapartners/${accountSid}/Campaigns/${advertiserId}`,
         { headers }
@@ -162,8 +155,13 @@ serve(async (req) => {
       if (!campaignResponse.ok) {
         const errorText = await campaignResponse.text();
         console.error('❌ Failed to get campaign details:', errorText);
+        console.error('❌ Response status:', campaignResponse.status);
         return new Response(
-          JSON.stringify({ error: 'Failed to get campaign details', details: errorText }),
+          JSON.stringify({ 
+            error: 'Failed to get campaign details', 
+            details: errorText,
+            status: campaignResponse.status 
+          }),
           { status: campaignResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -172,27 +170,19 @@ serve(async (req) => {
       
       console.log('📊 Full campaign data received:', JSON.stringify(campaignData, null, 2));
       
-      // Use Impact.com's native tracking URL if available
-      // This is the proper format: https://[brand].[tracking-domain].net/c/[account]/[sub]/[campaign]
-      const impactTrackingUrl = campaignData.TrackingLink || 
-                                campaignData.LandingPageUrl || 
-                                campaignData.WebsiteUrl || 
-                                campaignData.AdvertiserWebsiteUrl ||
-                                campaignData.CampaignUrl;
+      // Use Impact.com's native tracking URL - this is the actual affiliate link
+      const affiliateLink = campaignData.TrackingLink;
       
-      console.log('🌐 Impact.com tracking URL:', impactTrackingUrl);
-      console.log('📋 Available URL fields:', {
-        TrackingLink: campaignData.TrackingLink,
-        LandingPageUrl: campaignData.LandingPageUrl,
-        WebsiteUrl: campaignData.WebsiteUrl,
-        AdvertiserWebsiteUrl: campaignData.AdvertiserWebsiteUrl,
-        CampaignUrl: campaignData.CampaignUrl
-      });
-      
-      // Use Impact.com's provided tracking URL directly - it handles tracking and redirect
-      // If no tracking URL is provided, fall back to constructing one
-      const affiliateLink = impactTrackingUrl || 
-                           `https://go.impact.com/campaign-promo/${accountSid}/${advertiserId}`;
+      if (!affiliateLink) {
+        console.error('❌ No TrackingLink found in campaign data');
+        return new Response(
+          JSON.stringify({ 
+            error: 'No tracking link available for this campaign',
+            campaignData: campaignData
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       
       console.log(`✅ Using Impact.com tracking link: ${affiliateLink}`);
       
