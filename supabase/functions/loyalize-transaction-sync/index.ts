@@ -76,15 +76,18 @@ serve(async (req) => {
       
       try {
         // Fetch full transaction details from Loyalize v2 API
+        console.log(`   🔑 Using API key: ${loyalizeApiKey.substring(0, 10)}...`)
         const loyalizeResponse = await fetch(
           `https://api.loyalize.com/v2/transactions/${txnId}`,
           {
             headers: {
-              'Authorization': loyalizeApiKey, // No 'Bearer' prefix per Loyalize docs
+              'Authorization': loyalizeApiKey,
               'Content-Type': 'application/json'
             }
           }
         )
+        
+        console.log(`   📡 Response status: ${loyalizeResponse.status}`)
 
         if (!loyalizeResponse.ok) {
           console.error(`❌ Failed to fetch transaction ${txnId}: ${loyalizeResponse.status}`)
