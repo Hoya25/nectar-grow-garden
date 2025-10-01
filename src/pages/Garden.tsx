@@ -694,14 +694,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         const storeIdMatch = finalUrl.match(/stores\/(\d+)/);
         if (storeIdMatch) {
           const storeId = storeIdMatch[1];
-          // Build proper Loyalize API tracking URL that credits YOUR account
+          // Build proper Loyalize tracking URL per official docs
           const trackingUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
-          trackingUrl.searchParams.set('cid', 'nctr_platform'); // Your Loyalize customer ID
-          trackingUrl.searchParams.set('pid', 'nctr_platform'); // Platform identifier  
-          trackingUrl.searchParams.set('cp', user?.id || 'anonymous'); // Customer identifier
-          trackingUrl.searchParams.set('sid', trackingId); // SubID for detailed tracking
+          // cid is auto-filled by Loyalize - DO NOT set manually
+          trackingUrl.searchParams.set('pid', 'the_garden_nctr'); // Traffic source (must be approved in Loyalize)
+          trackingUrl.searchParams.set('cp', user?.id || 'anonymous'); // Shopper ID
+          trackingUrl.searchParams.set('sid', trackingId); // Sub-tracking ID
           finalUrl = trackingUrl.toString();
-          console.log('✅ Converted broken link.loyalize.com to proper API tracking URL');
+          console.log('✅ Converted to official Loyalize tracking URL:', finalUrl);
         }
       }
       

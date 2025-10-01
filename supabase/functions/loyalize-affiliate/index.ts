@@ -352,17 +352,20 @@ async function parseTrackingId(trackingId: string, supabase: any): Promise<{ use
 }
 
 /**
- * Generate Loyalize tracking URL that credits commissions to your account
- * Format: https://api.loyalize.com/v1/stores/{store_id}/tracking?cid={your_loyalize_id}&pid=nctr_platform&cp={user_id}&sid={tracking_id}
+ * Generate Loyalize tracking URL per official documentation
+ * cid: Auto-filled by Loyalize API (do not set manually)
+ * pid: Traffic source identifier (must map to approved source in Loyalize dashboard)
+ * cp: Shopper identifier (user_id)
+ * sid: Optional sub-tracking ID for campaigns/filtering
  */
 function generateLoyalizeTrackingUrl(storeId: string, userId: string, trackingId: string): string {
-  const YOUR_LOYALIZE_CID = Deno.env.get('LOYALIZE_CID') || 'nctr_platform';
+  const TRAFFIC_SOURCE_ID = Deno.env.get('LOYALIZE_PID') || 'the_garden_nctr';
   
   const trackingUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
-  trackingUrl.searchParams.set('cid', YOUR_LOYALIZE_CID); // Your Loyalize customer ID
-  trackingUrl.searchParams.set('pid', 'nctr_platform'); // Platform identifier
-  trackingUrl.searchParams.set('cp', userId); // Customer/user identifier
-  trackingUrl.searchParams.set('sid', trackingId); // SubID for detailed tracking
+  // cid is auto-filled by Loyalize when using API key - DO NOT set manually
+  trackingUrl.searchParams.set('pid', TRAFFIC_SOURCE_ID); // Traffic source (must be approved in Loyalize dashboard)
+  trackingUrl.searchParams.set('cp', userId); // Shopper ID (96-char limit)
+  trackingUrl.searchParams.set('sid', trackingId); // Sub-tracking ID (96-char limit, optional)
   
   return trackingUrl.toString();
 }
