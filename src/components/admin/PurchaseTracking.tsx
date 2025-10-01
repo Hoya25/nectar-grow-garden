@@ -206,7 +206,7 @@ export const PurchaseTracking = () => {
                 <Label htmlFor="user_id">User ID *</Label>
                 <Input
                   id="user_id"
-                  placeholder="User UUID"
+                  placeholder="Enter user UUID"
                   value={creditForm.user_id}
                   onChange={(e) => setCreditForm({...creditForm, user_id: e.target.value})}
                   required
@@ -217,7 +217,7 @@ export const PurchaseTracking = () => {
                 <Label htmlFor="partner_name">Partner Name *</Label>
                 <Input
                   id="partner_name"
-                  placeholder="e.g., NoBull"
+                  placeholder="Partner/Brand name"
                   value={creditForm.partner_name}
                   onChange={(e) => setCreditForm({...creditForm, partner_name: e.target.value})}
                   required
@@ -232,7 +232,7 @@ export const PurchaseTracking = () => {
                   id="purchase_amount"
                   type="number"
                   step="0.01"
-                  placeholder="160.00"
+                  placeholder="0.00"
                   value={creditForm.purchase_amount}
                   onChange={(e) => setCreditForm({...creditForm, purchase_amount: e.target.value})}
                   required
@@ -251,8 +251,8 @@ export const PurchaseTracking = () => {
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   {creditForm.purchase_amount && creditForm.nctr_per_dollar 
-                    ? `= ${(parseFloat(creditForm.purchase_amount) * parseFloat(creditForm.nctr_per_dollar)).toLocaleString()} NCTR`
-                    : 'NCTR reward rate'}
+                    ? `Total reward: ${(parseFloat(creditForm.purchase_amount) * parseFloat(creditForm.nctr_per_dollar)).toLocaleString()} NCTR`
+                    : 'NCTR reward calculation'}
                 </p>
               </div>
             </div>
