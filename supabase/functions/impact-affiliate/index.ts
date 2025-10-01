@@ -172,17 +172,15 @@ serve(async (req) => {
       
       console.log('📊 Full campaign data received:', JSON.stringify(campaignData, null, 2));
       
-      // Extract the actual brand website URL from campaign data
-      // Try multiple possible field names from Impact.com API
-      // Priority: Use tracking URL if available, otherwise landing page, then website
-      const brandWebsiteUrl = campaignData.TrackingLink || 
-                              campaignData.LandingPageUrl || 
-                              campaignData.WebsiteUrl || 
-                              campaignData.AdvertiserWebsiteUrl ||
-                              campaignData.CampaignUrl ||
-                              productUrl; // Fallback to provided URL
+      // Use Impact.com's native tracking URL if available
+      // This is the proper format: https://[brand].[tracking-domain].net/c/[account]/[sub]/[campaign]
+      const impactTrackingUrl = campaignData.TrackingLink || 
+                                campaignData.LandingPageUrl || 
+                                campaignData.WebsiteUrl || 
+                                campaignData.AdvertiserWebsiteUrl ||
+                                campaignData.CampaignUrl;
       
-      console.log('🌐 Extracted brand website URL:', brandWebsiteUrl);
+      console.log('🌐 Impact.com tracking URL:', impactTrackingUrl);
       console.log('📋 Available URL fields:', {
         TrackingLink: campaignData.TrackingLink,
         LandingPageUrl: campaignData.LandingPageUrl,
@@ -191,12 +189,12 @@ serve(async (req) => {
         CampaignUrl: campaignData.CampaignUrl
       });
       
-      // Create the affiliate tracking link that will redirect to the brand's website
-      // Impact.com format: https://go.impact.com/campaign-promo/{AccountSid}/{CampaignId}?url={destination}
-      const affiliateLink = `https://go.impact.com/campaign-promo/${accountSid}/${advertiserId}?url=${encodeURIComponent(brandWebsiteUrl)}`;
+      // Use Impact.com's provided tracking URL directly - it handles tracking and redirect
+      // If no tracking URL is provided, fall back to constructing one
+      const affiliateLink = impactTrackingUrl || 
+                           `https://go.impact.com/campaign-promo/${accountSid}/${advertiserId}`;
       
-      console.log(`✅ Generated affiliate link: ${affiliateLink}`);
-      console.log(`✅ Will redirect to: ${brandWebsiteUrl}`);
+      console.log(`✅ Using Impact.com tracking link: ${affiliateLink}`);
       
       return new Response(
         JSON.stringify({

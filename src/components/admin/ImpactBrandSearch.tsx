@@ -69,28 +69,13 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated, onBrandSelect }: ImpactBran
         websiteUrl: campaign.WebsiteUrl
       });
       
-      // Prompt user for the merchant's actual website URL
-      // Impact.com API returns tracking URLs, not merchant URLs
-      const merchantUrl = prompt(
-        `Enter the merchant website URL for ${campaign.AdvertiserName || campaign.Name}:\n\n(e.g., https://www.fanatics.com)`,
-        campaign.WebsiteUrl || 'https://www.'
-      );
-      
-      if (!merchantUrl || merchantUrl.trim() === '') {
-        toast({
-          title: "URL Required",
-          description: "You must provide the merchant website URL to generate the tracking link.",
-          variant: "destructive",
-        });
-        setGeneratingForCampaign(null);
-        return;
-      }
-      
+      // Generate the Impact.com tracking link
+      // The API will return Impact's native tracking URL format
       const { data, error } = await supabase.functions.invoke('impact-affiliate', {
         body: { 
           action: 'generate',
           advertiserId: campaign.Id,
-          productUrl: merchantUrl.trim()
+          productUrl: campaign.WebsiteUrl || ''
         }
       });
 
