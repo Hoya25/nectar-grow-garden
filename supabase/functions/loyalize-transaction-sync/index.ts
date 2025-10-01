@@ -38,41 +38,27 @@ serve(async (req) => {
     console.log(`   Headers:`, Object.fromEntries(req.headers.entries()))
 
     // Parse incoming webhook payload
-    const payload: LoyalizeWebhookPayload = await req.json()
+    const payload: any = await req.json()
     console.log('📦 Webhook payload:', JSON.stringify(payload, null, 2))
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const loyalizeApiKey = Deno.env.get('LOYALIZE_API_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Extract transaction data with multiple possible field names
-    const transactionId = payload.transaction_id || payload.id
-    const storeId = payload.store_id
-    const storeName = payload.store_name || payload.merchant_name
-    const amount = payload.amount || payload.purchase_amount || 0
-    const cashback = payload.cashback || payload.commission || 0
-    const status = payload.status
-    
-    // Try multiple possible tracking ID field names
-    const trackingId = payload.user_tracking_id || 
-                       payload.tracking_id || 
-                       payload.click_id || 
-                       payload.subid
+    // Loyalize sends notification webhooks with transaction IDs
+    // Format: { body: { eventType: "NEW_TRANSACTION", data: { transactions: [1, 2, 3] } } }
+    const eventType = payload.body?.eventType
+    const transactionIds = payload.body?.data?.transactions || []
 
-    console.log('\n📊 Parsed webhook data:')
-    console.log(`   Transaction ID: ${transactionId}`)
-    console.log(`   Store: ${storeName} (ID: ${storeId})`)
-    console.log(`   Amount: $${amount}`)
-    console.log(`   Cashback: $${cashback}`)
-    console.log(`   Status: ${status}`)
-    console.log(`   Tracking ID: ${trackingId || 'MISSING ⚠️'}`)
+    console.log(`\n📨 Event: ${eventType}`)
+    console.log(`   Transaction IDs: [${transactionIds.join(', ')}]`)
 
-    // Validate required fields
-    if (!transactionId) {
-      console.error('❌ Missing transaction ID in webhook payload')
+    if (!transactionIds || transactionIds.length === 0) {
+      console.error('❌ No transaction IDs in webhook payload')
       return new Response(
         JSON.stringify({ 
-          error: 'Missing transaction ID',
+          error: 'No transaction IDs found',
           received_payload: payload 
         }),
         { 
@@ -82,160 +68,189 @@ serve(async (req) => {
       )
     }
 
-    if (!trackingId) {
-      console.error('❌ Missing tracking ID - cannot match to user')
-      return new Response(
-        JSON.stringify({ 
-          error: 'Missing tracking ID field',
-          note: 'Check if Loyalize is configured to send tracking IDs',
-          received_payload: payload 
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    // Process each transaction ID
+    const results = []
+    for (const txnId of transactionIds) {
+      console.log(`\n🔍 Fetching transaction #${txnId} from Loyalize API...`)
+      
+      try {
+        // Fetch full transaction details from Loyalize API
+        const loyalizeResponse = await fetch(
+          `https://api.loyalize.io/v1/transactions/${txnId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${loyalizeApiKey}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+
+        if (!loyalizeResponse.ok) {
+          console.error(`❌ Failed to fetch transaction ${txnId}: ${loyalizeResponse.status}`)
+          results.push({ transaction_id: txnId, error: 'Failed to fetch from Loyalize API' })
+          continue
         }
-      )
-    }
 
-    // Find matching user via tracking ID
-    console.log(`\n🔍 Looking up tracking ID: ${trackingId}`)
-    
-    const { data: mapping, error: mappingError } = await supabase
-      .from('affiliate_link_mappings')
-      .select('user_id, brand_id')
-      .eq('tracking_id', trackingId)
-      .maybeSingle()
-    
-    if (mappingError) {
-      console.error('❌ Database lookup error:', mappingError)
-      throw mappingError
-    }
-    
-    if (!mapping) {
-      console.error(`❌ No user mapping found for tracking ID: ${trackingId}`)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Tracking ID not found',
-          tracking_id: trackingId,
-          note: 'User may not have clicked through your affiliate link'
-        }),
-        { 
-          status: 404, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        const transaction = await loyalizeResponse.json()
+        console.log(`✅ Transaction data:`, JSON.stringify(transaction, null, 2))
+
+        // Extract transaction details
+        const transactionId = transaction.id
+        const storeId = transaction.store_id
+        const storeName = transaction.store_name || transaction.merchant_name
+        const amount = transaction.amount || transaction.purchase_amount || 0
+        const cashback = transaction.cashback || transaction.commission || 0
+        const status = transaction.status
+        
+        // Extract tracking ID
+        const trackingId = transaction.user_tracking_id || 
+                          transaction.tracking_id || 
+                          transaction.click_id || 
+                          transaction.subid ||
+                          transaction.custom_data?.tracking_id
+
+        console.log(`\n💰 Transaction Details:`)
+        console.log(`   ID: ${transactionId}`)
+        console.log(`   Store: ${storeName} (ID: ${storeId})`)
+        console.log(`   Amount: $${amount}`)
+        console.log(`   Cashback: $${cashback}`)
+        console.log(`   Status: ${status}`)
+        console.log(`   Tracking ID: ${trackingId || 'MISSING ⚠️'}`)
+
+        if (!trackingId) {
+          console.error('❌ Missing tracking ID - cannot match to user')
+          results.push({ transaction_id: txnId, error: 'Missing tracking ID' })
+          continue
         }
-      )
+
+        // Find matching user via tracking ID
+        console.log(`   🔍 Looking up tracking ID: ${trackingId}`)
+        
+        const { data: mapping, error: mappingError } = await supabase
+          .from('affiliate_link_mappings')
+          .select('user_id, brand_id')
+          .eq('tracking_id', trackingId)
+          .maybeSingle()
+        
+        if (mappingError) {
+          console.error('   ❌ Database lookup error:', mappingError)
+          results.push({ transaction_id: txnId, error: 'Database error' })
+          continue
+        }
+        
+        if (!mapping) {
+          console.error(`   ❌ No user mapping found for tracking ID: ${trackingId}`)
+          results.push({ transaction_id: txnId, error: 'Tracking ID not found' })
+          continue
+        }
+
+        const userId = mapping.user_id
+        console.log(`   ✅ Found user: ${userId.slice(0, 8)}...`)
+
+        // Check if already credited
+        const externalTxnId = `LOYALIZE_${transactionId}`
+        const { data: existing } = await supabase
+          .from('nctr_transactions')
+          .select('id')
+          .eq('external_transaction_id', externalTxnId)
+          .maybeSingle()
+
+        if (existing) {
+          console.log('   ℹ️ Transaction already credited')
+          results.push({ transaction_id: txnId, status: 'already_processed' })
+          continue
+        }
+
+        // Get brand info for reward calculation
+        const { data: brand } = await supabase
+          .from('brands')
+          .select('name, nctr_per_dollar')
+          .eq('loyalize_id', storeId?.toString())
+          .maybeSingle()
+
+        const nctrPerDollar = brand?.nctr_per_dollar || 50
+        const nctrReward = amount * nctrPerDollar
+        
+        console.log(`   💰 Reward: ${nctrReward} NCTR (${nctrPerDollar} per dollar)`)
+
+        // Credit the user
+        const { data: currentPortfolio, error: fetchError } = await supabase
+          .from('nctr_portfolio')
+          .select('total_earned')
+          .eq('user_id', userId)
+          .maybeSingle()
+        
+        if (fetchError || !currentPortfolio) {
+          console.error('   ❌ Portfolio error:', fetchError)
+          results.push({ transaction_id: txnId, error: 'Portfolio error' })
+          continue
+        }
+        
+        const newTotalEarned = (currentPortfolio.total_earned || 0) + nctrReward
+        
+        // Update portfolio
+        const { error: portfolioError } = await supabase
+          .from('nctr_portfolio')
+          .update({
+            total_earned: newTotalEarned,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+
+        if (portfolioError) {
+          console.error('   ❌ Portfolio update error:', portfolioError)
+          results.push({ transaction_id: txnId, error: 'Update failed' })
+          continue
+        }
+
+        // Create auto-lock
+        await supabase
+          .from('nctr_locks')
+          .insert({
+            user_id: userId,
+            nctr_amount: nctrReward,
+            lock_type: '90LOCK',
+            lock_category: '90LOCK',
+            commitment_days: 90,
+            unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+            can_upgrade: true,
+            original_lock_type: '90LOCK'
+          })
+
+        // Record transaction
+        await supabase
+          .from('nctr_transactions')
+          .insert({
+            user_id: userId,
+            transaction_type: 'earned',
+            nctr_amount: nctrReward,
+            purchase_amount: amount,
+            partner_name: brand?.name || storeName,
+            description: `${brand?.name || storeName} purchase via Loyalize ($${amount})`,
+            earning_source: 'affiliate_purchase',
+            external_transaction_id: externalTxnId,
+            status: 'completed'
+          })
+
+        console.log(`   ✅ SUCCESS: Credited ${nctrReward} NCTR`)
+        results.push({ 
+          transaction_id: txnId, 
+          status: 'success',
+          nctr_credited: nctrReward,
+          user_id: userId.slice(0, 8) + '...'
+        })
+
+      } catch (error) {
+        console.error(`   ❌ Error processing transaction ${txnId}:`, error)
+        results.push({ transaction_id: txnId, error: error.message })
+      }
     }
-
-    const userId = mapping.user_id
-    console.log(`✅ Found user: ${userId.slice(0, 8)}...`)
-    console.log(`   Brand ID: ${mapping.brand_id?.slice(0, 8) || 'N/A'}...`)
-
-    // Check if already credited
-    const externalTxnId = `LOYALIZE_${transactionId}`
-    const { data: existing } = await supabase
-      .from('nctr_transactions')
-      .select('id')
-      .eq('external_transaction_id', externalTxnId)
-      .maybeSingle()
-
-    if (existing) {
-      console.log('ℹ️ Transaction already credited - returning success')
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          message: 'Transaction already processed',
-          transaction_id: transactionId
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Get brand info for reward calculation
-    const { data: brand } = await supabase
-      .from('brands')
-      .select('name, nctr_per_dollar')
-      .eq('loyalize_id', storeId?.toString())
-      .maybeSingle()
-
-    const nctrPerDollar = brand?.nctr_per_dollar || 50
-    const nctrReward = amount * nctrPerDollar
-    
-    console.log(`\n💰 Calculating reward:`)
-    console.log(`   Brand: ${brand?.name || storeName}`)
-    console.log(`   Rate: ${nctrPerDollar} NCTR per dollar`)
-    console.log(`   Reward: ${nctrReward} NCTR`)
-
-    // Credit the user - get current portfolio
-    const { data: currentPortfolio, error: fetchError } = await supabase
-      .from('nctr_portfolio')
-      .select('total_earned')
-      .eq('user_id', userId)
-      .maybeSingle()
-    
-    if (fetchError) {
-      console.error('❌ Error fetching portfolio:', fetchError)
-      throw fetchError
-    }
-    
-    if (!currentPortfolio) {
-      console.error('❌ Portfolio not found for user')
-      throw new Error('User portfolio not found')
-    }
-    
-    const newTotalEarned = (currentPortfolio.total_earned || 0) + nctrReward
-    
-    // Update portfolio
-    const { error: portfolioError } = await supabase
-      .from('nctr_portfolio')
-      .update({
-        total_earned: newTotalEarned,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', userId)
-
-    if (portfolioError) {
-      console.error('❌ Error updating portfolio:', portfolioError)
-      throw portfolioError
-    }
-
-    // Create auto-lock (shopping purchases go to 90LOCK)
-    await supabase
-      .from('nctr_locks')
-      .insert({
-        user_id: userId,
-        nctr_amount: nctrReward,
-        lock_type: '90LOCK',
-        lock_category: '90LOCK',
-        commitment_days: 90,
-        unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-        can_upgrade: true,
-        original_lock_type: '90LOCK'
-      })
-
-    // Record transaction
-    await supabase
-      .from('nctr_transactions')
-      .insert({
-        user_id: userId,
-        transaction_type: 'earned',
-        nctr_amount: nctrReward,
-        purchase_amount: amount,
-        partner_name: brand?.name || storeName,
-        description: `${brand?.name || storeName} purchase via Loyalize ($${amount})`,
-        earning_source: 'affiliate_purchase',
-        external_transaction_id: externalTxnId,
-        status: 'completed'
-      })
-
-    console.log(`\n✅ SUCCESS: Credited ${nctrReward} NCTR to user ${userId.slice(0, 8)}...`)
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Transaction processed successfully',
-        transaction_id: transactionId,
-        user_id: userId.slice(0, 8) + '...',
-        nctr_credited: nctrReward
+        message: 'Webhook processed',
+        results
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
