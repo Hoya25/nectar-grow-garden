@@ -51,6 +51,7 @@ serve(async (req) => {
     if (trackingId) loyalizeApiUrl.searchParams.set('sid', trackingId);
 
     console.log(`🔗 Calling Loyalize API: ${loyalizeApiUrl.toString()}`);
+    console.log(`   📋 Headers: Authorization=${loyalizeApiKey ? 'SET' : 'NOT SET'}`);
 
     const loyalizeResponse = await fetch(loyalizeApiUrl.toString(), {
       method: 'GET',
@@ -62,22 +63,43 @@ serve(async (req) => {
     });
 
     console.log(`📡 Loyalize API response status: ${loyalizeResponse.status}`);
+    console.log(`   📋 Response headers:`, Object.fromEntries(loyalizeResponse.headers.entries()));
+    
+    // Log response body for debugging (but don't consume the stream yet)
+    const responseClone = loyalizeResponse.clone();
+    try {
+      const responseText = await responseClone.text();
+      console.log(`   📄 Response body preview:`, responseText.substring(0, 500));
+    } catch (e) {
+      console.log(`   ⚠️ Could not read response body:`, e);
+    }
 
     // Loyalize should return a 302 redirect or a redirect URL in the response
     let redirectUrl: string | null = null;
 
     if (loyalizeResponse.status === 302 || loyalizeResponse.status === 301) {
       redirectUrl = loyalizeResponse.headers.get('Location');
-      console.log(`✅ Got redirect from Loyalize: ${redirectUrl}`);
+      console.log(`✅ Got 3xx redirect from Loyalize`);
+      console.log(`   🎯 Location header: ${redirectUrl}`);
     } else if (loyalizeResponse.status === 200) {
       // Try to parse JSON response for redirect URL
       try {
         const data = await loyalizeResponse.json();
-        redirectUrl = data.redirectUrl || data.url || data.trackingUrl;
-        console.log(`✅ Got tracking URL from Loyalize response: ${redirectUrl}`);
+        console.log(`   📦 Loyalize response data:`, JSON.stringify(data, null, 2));
+        redirectUrl = data.redirectUrl || data.url || data.trackingUrl || data.destinationUrl;
+        console.log(`✅ Extracted tracking URL: ${redirectUrl}`);
       } catch (e) {
-        console.error('❌ Failed to parse Loyalize response:', e);
+        console.error('❌ Failed to parse Loyalize JSON response:', e);
       }
+    } else if (loyalizeResponse.status === 401) {
+      console.error('❌ 401 Unauthorized from Loyalize API');
+      console.error('   💡 Check: API key permissions, traffic source approval (thegarden.nctr.live)');
+      return new Response('Loyalize API authentication failed', { 
+        status: 500,
+        headers: corsHeaders 
+      });
+    } else {
+      console.error(`❌ Unexpected status ${loyalizeResponse.status} from Loyalize`);
     }
 
     // Fallback: Try to get store details and build direct URL
@@ -104,8 +126,9 @@ serve(async (req) => {
 
     // Record the affiliate link click
     if (userId && trackingId) {
+      console.log(`📝 Recording click - User: ${userId}, Tracking: ${trackingId}`);
       try {
-        await supabase
+        const { data: mappingData, error: mappingError } = await supabase
           .from('affiliate_link_mappings')
           .upsert({
             user_id: userId,
@@ -114,15 +137,24 @@ serve(async (req) => {
             created_at: new Date().toISOString()
           }, {
             onConflict: 'tracking_id'
-          });
-        console.log(`✅ Recorded affiliate click for tracking ID: ${trackingId}`);
+          })
+          .select();
+        
+        if (mappingError) {
+          console.error('⚠️ Failed to record click mapping:', mappingError);
+        } else {
+          console.log(`✅ Recorded affiliate click:`, mappingData);
+        }
       } catch (error) {
-        console.error('⚠️ Failed to record click:', error);
+        console.error('⚠️ Exception recording click:', error);
         // Don't fail the redirect if tracking fails
       }
+    } else {
+      console.log(`⚠️ Skipping click recording - userId: ${userId}, trackingId: ${trackingId}`);
     }
 
     console.log(`🎯 Final redirect URL: ${redirectUrl}`);
+    console.log(`🚀 Redirecting user now...`);
 
     // Perform 302 redirect to the merchant
     return new Response(null, {
