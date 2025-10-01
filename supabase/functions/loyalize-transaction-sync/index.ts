@@ -6,25 +6,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface LoyalizeWebhookPayload {
-  // Adjust these fields based on actual Loyalize webhook structure
-  transaction_id?: string | number
-  id?: string | number
-  store_id?: number
-  store_name?: string
-  merchant_name?: string
-  amount?: number
-  purchase_amount?: number
-  cashback?: number
-  commission?: number
-  status?: string
-  user_tracking_id?: string
-  tracking_id?: string
-  click_id?: string
-  subid?: string
-  created_at?: string
-  updated_at?: string
-  event_type?: string
+interface LoyalizeTransaction {
+  // Based on official Loyalize v2 API documentation
+  id: number
+  sid: string | null // Our tracking ID (sub-ID)
+  shopperId: string // The 'cp' parameter we passed (user ID)
+  storeId: number
+  storeName: string
+  orderNumber: string
+  status: 'PENDING' | 'AVAILABLE' | 'PAYMENT_INITIATED' | 'PAID' | 'NON_COMMISSIONABLE'
+  currency: string
+  saleAmount: number // Purchase amount
+  shopperCommission: number // Cashback/commission amount
+  tier: string
+  purchaseDate: string
+  pendingDate: string
+  availabilityDate: string | null
+  paymentDate: string | null
+  adminComment: string | null
+  lastUpdate: string
+  isSkuDetailsBrand: boolean
 }
 
 serve(async (req) => {
@@ -74,12 +75,12 @@ serve(async (req) => {
       console.log(`\n🔍 Fetching transaction #${txnId} from Loyalize API...`)
       
       try {
-        // Fetch full transaction details from Loyalize API
+        // Fetch full transaction details from Loyalize v2 API
         const loyalizeResponse = await fetch(
-          `https://api.loyalize.io/v1/transactions/${txnId}`,
+          `https://api.loyalize.com/v2/transactions/${txnId}`,
           {
             headers: {
-              'Authorization': `Bearer ${loyalizeApiKey}`,
+              'Authorization': loyalizeApiKey, // No 'Bearer' prefix per Loyalize docs
               'Content-Type': 'application/json'
             }
           }
@@ -91,61 +92,67 @@ serve(async (req) => {
           continue
         }
 
-        const transaction = await loyalizeResponse.json()
+        const transaction: LoyalizeTransaction = await loyalizeResponse.json()
         console.log(`✅ Transaction data:`, JSON.stringify(transaction, null, 2))
 
-        // Extract transaction details
+        // Extract transaction details per Loyalize v2 API spec
         const transactionId = transaction.id
-        const storeId = transaction.store_id
-        const storeName = transaction.store_name || transaction.merchant_name
-        const amount = transaction.amount || transaction.purchase_amount || 0
-        const cashback = transaction.cashback || transaction.commission || 0
+        const storeId = transaction.storeId
+        const storeName = transaction.storeName
+        const amount = transaction.saleAmount || 0
+        const cashback = transaction.shopperCommission || 0
         const status = transaction.status
+        const shopperId = transaction.shopperId // The user_id we passed as 'cp'
         
-        // Extract tracking ID
-        const trackingId = transaction.user_tracking_id || 
-                          transaction.tracking_id || 
-                          transaction.click_id || 
-                          transaction.subid ||
-                          transaction.custom_data?.tracking_id
+        // Extract tracking ID from 'sid' field (this is what we passed)
+        const trackingId = transaction.sid
 
         console.log(`\n💰 Transaction Details:`)
         console.log(`   ID: ${transactionId}`)
         console.log(`   Store: ${storeName} (ID: ${storeId})`)
         console.log(`   Amount: $${amount}`)
-        console.log(`   Cashback: $${cashback}`)
+        console.log(`   Commission: $${cashback}`)
         console.log(`   Status: ${status}`)
-        console.log(`   Tracking ID: ${trackingId || 'MISSING ⚠️'}`)
+        console.log(`   Shopper ID (cp): ${shopperId}`)
+        console.log(`   Tracking ID (sid): ${trackingId || 'MISSING ⚠️'}`)
 
-        if (!trackingId) {
-          console.error('❌ Missing tracking ID - cannot match to user')
-          results.push({ transaction_id: txnId, error: 'Missing tracking ID' })
+        if (!trackingId && !shopperId) {
+          console.error('❌ Missing both tracking ID and shopper ID - cannot match to user')
+          results.push({ transaction_id: txnId, error: 'Missing tracking identifiers' })
           continue
         }
 
-        // Find matching user via tracking ID
-        console.log(`   🔍 Looking up tracking ID: ${trackingId}`)
+        // Try to find user by tracking ID first, fallback to shopper ID
+        console.log(`   🔍 Looking up user...`)
         
-        const { data: mapping, error: mappingError } = await supabase
-          .from('affiliate_link_mappings')
-          .select('user_id, brand_id')
-          .eq('tracking_id', trackingId)
-          .maybeSingle()
+        let userId: string | null = null
         
-        if (mappingError) {
-          console.error('   ❌ Database lookup error:', mappingError)
-          results.push({ transaction_id: txnId, error: 'Database error' })
-          continue
+        // Try tracking ID lookup first
+        if (trackingId) {
+          const { data: mapping } = await supabase
+            .from('affiliate_link_mappings')
+            .select('user_id, brand_id')
+            .eq('tracking_id', trackingId)
+            .maybeSingle()
+          
+          if (mapping) {
+            userId = mapping.user_id
+            console.log(`   ✅ Found user via tracking ID: ${userId.slice(0, 8)}...`)
+          }
         }
         
-        if (!mapping) {
-          console.error(`   ❌ No user mapping found for tracking ID: ${trackingId}`)
-          results.push({ transaction_id: txnId, error: 'Tracking ID not found' })
+        // Fallback to shopper ID (which is the user_id we passed as 'cp')
+        if (!userId && shopperId) {
+          console.log(`   🔍 Trying shopper ID fallback: ${shopperId}`)
+          userId = shopperId
+          console.log(`   ✅ Using shopper ID as user ID: ${userId.slice(0, 8)}...`)
+        }
+        
+        if (!userId) {
+          console.error(`   ❌ Could not determine user ID`)
+          results.push({ transaction_id: txnId, error: 'User not found' })
           continue
         }
-
-        const userId = mapping.user_id
-        console.log(`   ✅ Found user: ${userId.slice(0, 8)}...`)
 
         // Check if already credited
         const externalTxnId = `LOYALIZE_${transactionId}`
