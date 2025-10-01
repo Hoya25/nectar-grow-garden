@@ -12,11 +12,17 @@ serve(async (req) => {
   }
 
   try {
-    const body = await req.json();
-    const { action, advertiserId, productUrl, searchTerm } = body;
+    console.log('🚀 Impact.com affiliate function called');
     
     const accountSid = Deno.env.get('IMPACT_ACCOUNT_SID');
     const authToken = Deno.env.get('IMPACT_AUTH_TOKEN');
+    
+    console.log('🔑 Account SID exists:', !!accountSid);
+    console.log('🔑 Auth Token exists:', !!authToken);
+    
+    if (accountSid) {
+      console.log('📋 Account SID prefix:', accountSid.substring(0, 5));
+    }
     
     if (!accountSid || !authToken) {
       console.error('❌ Impact.com credentials not configured');
@@ -25,6 +31,11 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const body = await req.json();
+    const { action, advertiserId, productUrl, searchTerm } = body;
+    
+    console.log('📝 Request body:', { action, advertiserId, productUrl, searchTerm });
 
     // Create Basic Auth header
     const basicAuth = btoa(`${accountSid}:${authToken}`);
