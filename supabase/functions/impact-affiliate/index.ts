@@ -48,8 +48,21 @@ serve(async (req) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ Impact.com API error:', errorText);
+        
+        let errorMessage = 'Failed to search advertisers';
+        let helpText = '';
+        
+        if (response.status === 403) {
+          errorMessage = 'Access Denied: Your Impact.com API credentials do not have the required permissions.';
+          helpText = 'Please create a new "Scoped Token" in Impact.com with "Advertisers - Read" permissions enabled. Visit: https://app.impact.com/secure/agency/accountSettings/agency-wsapi-flow.ihtml';
+        }
+        
         return new Response(
-          JSON.stringify({ error: 'Failed to search advertisers', details: errorText }),
+          JSON.stringify({ 
+            error: errorMessage, 
+            details: errorText,
+            help: helpText
+          }),
           { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }

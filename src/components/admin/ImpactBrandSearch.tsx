@@ -59,6 +59,12 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated }: ImpactBrandSearchProps) =
         throw error;
       }
 
+      // Check if the response contains an error from the API
+      if (data.error) {
+        const errorMsg = data.help ? `${data.error}\n\n${data.help}` : data.error;
+        throw new Error(errorMsg);
+      }
+
       if (!data.campaigns) {
         throw new Error('No campaigns data returned');
       }
@@ -73,11 +79,25 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated }: ImpactBrandSearchProps) =
     } catch (error) {
       console.error('Error searching Impact.com:', error);
       
+      const errorMessage = error.message || "Failed to search Impact.com. Check your API credentials.";
+      const lines = errorMessage.split('\n');
+      
       toast({
         title: "Search Failed",
-        description: error.message || "Failed to search Impact.com. Check your API credentials.",
+        description: lines[0],
         variant: "destructive",
       });
+      
+      // If there's help text, show it in a separate toast
+      if (lines.length > 1) {
+        setTimeout(() => {
+          toast({
+            title: "How to Fix",
+            description: lines.slice(1).join('\n'),
+            variant: "default",
+          });
+        }, 500);
+      }
     } finally {
       setIsSearching(false);
     }
