@@ -38,9 +38,10 @@ serve(async (req) => {
 
     // Search for advertisers/brands
     if (action === 'search') {
-      console.log(`🔍 Searching Impact.com for: ${searchTerm}`);
+      console.log(`🔍 Searching Impact.com advertisers for: ${searchTerm}`);
       
-      const searchUrl = `https://api.impact.com/Mediapartners/${accountSid}/v3/Campaigns`;
+      // Use Agency API endpoint (for accounts starting with IR)
+      const searchUrl = `https://api.impact.com/Agencies/${accountSid}/Advertisers`;
       
       const response = await fetch(searchUrl, { headers });
       
@@ -54,15 +55,23 @@ serve(async (req) => {
       }
       
       const data = await response.json();
-      console.log(`✅ Found ${data.Campaigns?.length || 0} campaigns`);
+      console.log(`✅ Found ${data.Advertisers?.length || 0} advertisers`);
       
-      // Filter campaigns by search term if provided
-      let campaigns = data.Campaigns || [];
+      // Filter advertisers by search term if provided
+      let campaigns = data.Advertisers || [];
       if (searchTerm) {
         campaigns = campaigns.filter((c: any) => 
           c.Name?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
+      
+      // Map advertisers to campaign format for compatibility
+      campaigns = campaigns.map((adv: any) => ({
+        Id: adv.Id,
+        Name: adv.Name,
+        AdvertiserName: adv.Name,
+        Status: adv.Status
+      }));
       
       return new Response(
         JSON.stringify({ campaigns }),
@@ -88,9 +97,9 @@ serve(async (req) => {
       // For now, we'll create a deep link that includes the destination URL
       const trackingUrl = `https://api.impact.com/Mediapartners/${accountSid}/v3/Ads`;
       
-      // Get campaign details first
+      // Get advertiser details first
       const campaignResponse = await fetch(
-        `https://api.impact.com/Mediapartners/${accountSid}/v3/Campaigns/${advertiserId}`,
+        `https://api.impact.com/Agencies/${accountSid}/Advertisers/${advertiserId}`,
         { headers }
       );
       
