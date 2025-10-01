@@ -46,7 +46,7 @@ serve(async (req) => {
 
     // Call Loyalize API to get the actual tracking redirect URL
     const loyalizeApiUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
-    loyalizeApiUrl.searchParams.set('pid', 'thegarden');
+    loyalizeApiUrl.searchParams.set('pid', 'thegarden.nctr.live'); // Your approved traffic source
     if (userId) loyalizeApiUrl.searchParams.set('cp', userId);
     if (trackingId) loyalizeApiUrl.searchParams.set('sid', trackingId);
 
