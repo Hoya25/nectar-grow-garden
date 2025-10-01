@@ -42,14 +42,32 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated, onBrandSelect }: ImpactBran
   const [generatingForCampaign, setGeneratingForCampaign] = useState<string | null>(null);
 
   const handleCampaignSelect = async (campaign: ImpactCampaign) => {
+    console.log('🎯 handleCampaignSelect called with:', campaign);
+    
+    if (!campaign || !campaign.Id) {
+      console.error('❌ Invalid campaign object:', campaign);
+      toast({
+        title: "Error",
+        description: "Invalid campaign data. Please try searching again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!onBrandSelect) {
+      console.log('⚠️ No onBrandSelect callback provided');
       return;
     }
 
     setGeneratingForCampaign(campaign.Id);
     
     try {
-      console.log('Auto-generating affiliate link for campaign:', campaign.Id);
+      console.log('🔗 Auto-generating affiliate link for campaign ID:', campaign.Id);
+      console.log('📋 Campaign details:', {
+        name: campaign.Name,
+        advertiser: campaign.AdvertiserName,
+        websiteUrl: campaign.WebsiteUrl
+      });
       
       // Use the brand's website as the default product URL
       const defaultUrl = campaign.WebsiteUrl || 'https://www.example.com';
@@ -227,8 +245,7 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated, onBrandSelect }: ImpactBran
             return (
               <Card 
                 key={campaign.Id} 
-                className={`hover:shadow-glow transition-all cursor-pointer ${isGenerating ? 'ring-2 ring-primary' : ''}`}
-                onClick={() => !isGenerating && handleCampaignSelect(campaign)}
+                className={`hover:shadow-glow transition-all ${isGenerating ? 'ring-2 ring-primary' : ''}`}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3 mb-3">
@@ -285,8 +302,8 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated, onBrandSelect }: ImpactBran
                     variant={isGenerating ? "secondary" : "default"}
                     disabled={isGenerating}
                     className="w-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
+                      console.log('🖱️ Button clicked for campaign:', campaign);
                       handleCampaignSelect(campaign);
                     }}
                   >
