@@ -170,9 +170,19 @@ serve(async (req) => {
       
       const campaignData = await campaignResponse.json();
       
+      // Extract the actual brand website URL from campaign data
+      // Try multiple possible field names from Impact.com API
+      const brandWebsiteUrl = campaignData.LandingPageUrl || 
+                              campaignData.WebsiteUrl || 
+                              campaignData.AdvertiserWebsiteUrl ||
+                              campaignData.TrackingLink ||
+                              productUrl; // Fallback to provided URL
+      
+      console.log('🌐 Brand website URL from campaign data:', brandWebsiteUrl);
+      
       // Create the affiliate tracking link
-      // Impact.com format: https://go.impact.com/campaign-promo/{AccountSid}/{CampaignId}
-      const affiliateLink = `https://go.impact.com/campaign-promo/${accountSid}/${advertiserId}?url=${encodeURIComponent(productUrl)}`;
+      // Impact.com format: https://go.impact.com/campaign-promo/{AccountSid}/{CampaignId}?url={destination}
+      const affiliateLink = `https://go.impact.com/campaign-promo/${accountSid}/${advertiserId}?url=${encodeURIComponent(brandWebsiteUrl)}`;
       
       console.log(`✅ Generated affiliate link for campaign: ${campaignData.Name}`);
       
