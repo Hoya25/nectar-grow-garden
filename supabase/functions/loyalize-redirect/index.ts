@@ -24,30 +24,36 @@ serve(async (req) => {
       });
     }
 
-    console.log(`🔄 Redirecting to Loyalize store: ${storeId}`);
+    console.log(`🔄 Redirecting to store: ${storeId}`);
     console.log(`   User: ${userId}, Tracking: ${trackingId}`);
 
-    // Build the Loyalize redirect URL
-    // Format: link.loyalize.com/stores/{storeId}?params
-    const loyalizeUrl = new URL(`https://link.loyalize.com/stores/${storeId}`);
-    
-    // Add tracking parameters
-    if (userId) {
-      loyalizeUrl.searchParams.set('cid', userId); // Client ID
-    }
-    if (trackingId) {
-      loyalizeUrl.searchParams.set('sid', trackingId); // Sub ID
-    }
-    loyalizeUrl.searchParams.set('pid', 'thegarden.nctr.live'); // Publisher ID
+    // Map store IDs to direct merchant URLs
+    const storeUrls: Record<string, string> = {
+      '30095': 'https://nobullproject.com/?ref=nctr&uid={{USER_ID}}&tid={{TRACKING_ID}}',
+      '44820': 'https://gifts.uber.com/?ref=nctr&uid={{USER_ID}}&tid={{TRACKING_ID}}'
+    };
 
-    console.log(`✅ Redirect URL: ${loyalizeUrl.toString()}`);
+    const baseUrl = storeUrls[storeId];
+    if (!baseUrl) {
+      return new Response('Unknown store', { 
+        status: 404,
+        headers: corsHeaders 
+      });
+    }
+
+    // Replace placeholders with actual values
+    let finalUrl = baseUrl
+      .replace('{{USER_ID}}', userId || 'anonymous')
+      .replace('{{TRACKING_ID}}', trackingId || 'unknown');
+
+    console.log(`✅ Redirect URL: ${finalUrl}`);
 
     // Perform 302 redirect
     return new Response(null, {
       status: 302,
       headers: {
         ...corsHeaders,
-        'Location': loyalizeUrl.toString(),
+        'Location': finalUrl,
       },
     });
   } catch (error) {
