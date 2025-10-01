@@ -82,6 +82,11 @@ serve(async (req) => {
       const data = await response.json();
       console.log(`✅ Found ${data.Campaigns?.length || 0} campaigns`);
       
+      // Log first campaign raw data for debugging
+      if (data.Campaigns && data.Campaigns.length > 0) {
+        console.log('📊 Sample raw campaign data:', JSON.stringify(data.Campaigns[0], null, 2));
+      }
+      
       // Filter campaigns by search term if provided
       let campaigns = data.Campaigns || [];
       if (searchTerm) {
@@ -92,17 +97,26 @@ serve(async (req) => {
       }
       
       // Map campaigns with logo and commission info
-      campaigns = campaigns.map((camp: any) => ({
-        Id: camp.Id,
-        Name: camp.Name,
-        AdvertiserName: camp.AdvertiserName || camp.Name,
-        Status: camp.Status,
-        LogoUrl: camp.LogoUrl || null,
-        CommissionRate: camp.DefaultPayoutAmount || camp.DefaultPayout || null,
-        CommissionType: camp.DefaultPayoutType || 'percentage',
-        Description: camp.Description || '',
-        WebsiteUrl: camp.LandingPageUrl || camp.WebsiteUrl || null
-      }));
+      // Try multiple possible ID field names from Impact.com API
+      campaigns = campaigns.map((camp: any) => {
+        const campaignId = camp.Id || camp.CampaignId || camp.id || camp.CampaignIdFromAdvertiser || String(camp.CampaignIdFromNetworkId);
+        
+        if (!campaignId) {
+          console.warn('⚠️ Campaign missing ID:', camp);
+        }
+        
+        return {
+          Id: campaignId,
+          Name: camp.Name || camp.CampaignName,
+          AdvertiserName: camp.AdvertiserName || camp.Name,
+          Status: camp.State || camp.Status,
+          LogoUrl: camp.LogoUrl || camp.AdvertiserLogoUrl || null,
+          CommissionRate: camp.DefaultPayoutAmount || camp.DefaultPayout || null,
+          CommissionType: camp.DefaultPayoutType || 'percentage',
+          Description: camp.Description || camp.CampaignDescription || '',
+          WebsiteUrl: camp.LandingPageUrl || camp.WebsiteUrl || camp.AdvertiserWebsiteUrl || null
+        };
+      });
       
       // Deduplicate by AdvertiserName - keep only one campaign per brand
       const uniqueCampaigns = campaigns.reduce((acc: any[], campaign: any) => {
