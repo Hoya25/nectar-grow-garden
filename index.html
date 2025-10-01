@@ -20,19 +20,35 @@
     <!-- Tidio Chat Widget -->
     <script src="//code.tidio.co/rectztr7fq0lawem89ts8lnuzdimmd8k.js" async></script>
     
-    <!-- Minimize Tidio widget on admin pages -->
-    <style>
-      /* Make Tidio widget smaller and less intrusive on admin pages */
-      body[data-route="/admin"] #tidio-chat-iframe {
-        transform: scale(0.7) !important;
-        transform-origin: bottom right !important;
-        right: 10px !important;
-        bottom: 10px !important;
-      }
+    <!-- Hide Tidio "Chat with us" bubble, keep icon only -->
+    <script>
+      // Wait for Tidio to load and hide the chat bubble
+      document.addEventListener('tidioChat-ready', function() {
+        // Hide the welcome message/bubble
+        if (window.tidioChatApi) {
+          window.tidioChatApi.hide();
+          window.tidioChatApi.display(false);
+        }
+      });
       
-      /* Alternative: hide completely on admin page if preferred */
-      /* body[data-route="/admin"] #tidio-chat { display: none !important; } */
-    </style>
+      // Fallback: Use CSS to hide bubble elements
+      const style = document.createElement('style');
+      style.textContent = `
+        /* Hide Tidio chat bubble/popups while keeping the icon */
+        #tidio-chat > iframe {
+          max-height: 60px !important;
+          max-width: 60px !important;
+        }
+        
+        /* Hide welcome bubble and chat messages */
+        div[id^="tidio-chat-code"] div[class*="message"],
+        div[id^="tidio-chat-code"] div[class*="bubble"],
+        div[id^="tidio-chat-code"] div[class*="welcome"] {
+          display: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
   </head>
 
   <body>
