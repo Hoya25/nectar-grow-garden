@@ -158,15 +158,33 @@ serve(async (req) => {
         console.log(`   Reward: ${nctrReward} NCTR`)
 
         // Credit the user
+        // First, get current portfolio values
+        const { data: currentPortfolio, error: fetchError } = await supabase
+          .from('nctr_portfolio')
+          .select('total_earned')
+          .eq('user_id', userId)
+          .single()
+        
+        if (fetchError) {
+          console.error(`   ❌ Error fetching portfolio:`, fetchError)
+          throw fetchError
+        }
+        
+        const newTotalEarned = (currentPortfolio?.total_earned || 0) + nctrReward
+        
+        // Update portfolio with new total
         const { error: portfolioError } = await supabase
           .from('nctr_portfolio')
           .update({
-            total_earned: supabase.rpc('increment', { value: nctrReward }),
+            total_earned: newTotalEarned,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', userId)
 
-        if (portfolioError) throw portfolioError
+        if (portfolioError) {
+          console.error(`   ❌ Error updating portfolio:`, portfolioError)
+          throw portfolioError
+        }
 
         // Create auto-lock (shopping purchases go to 90LOCK)
         const { data: lock } = await supabase
