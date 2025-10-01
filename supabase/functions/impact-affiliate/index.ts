@@ -104,8 +104,19 @@ serve(async (req) => {
         WebsiteUrl: camp.LandingPageUrl || camp.WebsiteUrl || null
       }));
       
+      // Deduplicate by AdvertiserName - keep only one campaign per brand
+      const uniqueCampaigns = campaigns.reduce((acc: any[], campaign: any) => {
+        const existing = acc.find(c => c.AdvertiserName === campaign.AdvertiserName);
+        if (!existing) {
+          acc.push(campaign);
+        }
+        return acc;
+      }, []);
+      
+      console.log(`✅ Returning ${uniqueCampaigns.length} unique campaigns (${campaigns.length} total)`);
+      
       return new Response(
-        JSON.stringify({ campaigns }),
+        JSON.stringify({ campaigns: uniqueCampaigns }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
