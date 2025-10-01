@@ -27,24 +27,22 @@ serve(async (req) => {
     console.log(`🔄 Redirecting to Loyalize store: ${storeId}`);
     console.log(`   User: ${userId}, Tracking: ${trackingId}`);
 
-    // Build the Loyalize tracking URL that will credit YOUR Loyalize account
-    // Format: link.loyalize.com/stores/{storeId}?params
-    const loyalizeUrl = new URL(`https://link.loyalize.com/stores/${storeId}`);
+    // Build the Loyalize tracking URL per official API spec
+    // Format: api.loyalize.com/v1/stores/{storeId}/tracking?params
+    const loyalizeUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
     
     // Add tracking parameters per Loyalize API spec:
-    // - cp (customer parameter) = user_id so webhook can identify user
-    // - sid (sub-ID) = tracking_id for detailed tracking
-    // - pid (publisher ID) = your identifier (use your domain or Loyalize account ID)
+    // - pid (publisher/traffic source ID) = must be approved in Loyalize dashboard
+    // - cp (customer parameter) = user_id so webhook can identify user (96-char limit)
+    // - sid (sub-ID) = tracking_id for detailed tracking (96-char limit, optional)
+    loyalizeUrl.searchParams.set('pid', 'thegarden'); // Your traffic source ID (must match Loyalize dashboard)
+    
     if (userId) {
       loyalizeUrl.searchParams.set('cp', userId); // Customer parameter (user ID)
     }
     if (trackingId) {
       loyalizeUrl.searchParams.set('sid', trackingId); // Sub ID (tracking ID)
     }
-    
-    // IMPORTANT: Set your publisher ID here
-    // This should match your Loyalize account/publisher identifier
-    loyalizeUrl.searchParams.set('pid', 'thegarden'); // Your publisher ID
     
     console.log(`✅ Loyalize tracking URL: ${loyalizeUrl.toString()}`);
     console.log(`   📊 Tracking: cp=${userId}, sid=${trackingId}`);
