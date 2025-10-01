@@ -53,3 +53,6 @@ verify_jwt = true
 
 [functions.nctr-live-sync]
 verify_jwt = true
+
+[functions.loyalize-redirect]
+verify_jwt = false
