@@ -14,6 +14,11 @@ interface ImpactCampaign {
   Name: string;
   AdvertiserName?: string;
   Status?: string;
+  LogoUrl?: string;
+  CommissionRate?: number;
+  CommissionType?: string;
+  Description?: string;
+  WebsiteUrl?: string;
   DefaultCommission?: {
     Type?: string;
     Amount?: number;
@@ -165,16 +170,17 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated }: ImpactBrandSearchProps) =
     }
 
     try {
-      const commissionRate = selectedCampaign.DefaultCommission?.Amount || 5;
+      const commissionRate = selectedCampaign.CommissionRate || selectedCampaign.DefaultCommission?.Amount || 5;
       const nctrPerDollar = commissionRate * 20; // Convert commission % to NCTR per dollar
 
       const { data, error } = await supabase
         .from('earning_opportunities')
         .insert({
           title: `Shop ${selectedCampaign.Name || selectedCampaign.AdvertiserName}`,
-          description: `Earn NCTR tokens when you shop at ${selectedCampaign.Name || selectedCampaign.AdvertiserName} through Impact.com`,
+          description: selectedCampaign.Description || `Earn NCTR tokens when you shop at ${selectedCampaign.Name || selectedCampaign.AdvertiserName} through Impact.com. Commission: ${commissionRate}%`,
           opportunity_type: 'shopping',
           partner_name: selectedCampaign.AdvertiserName || selectedCampaign.Name,
+          partner_logo_url: selectedCampaign.LogoUrl || null,
           affiliate_link: generatedLink,
           reward_per_dollar: nctrPerDollar,
           is_active: true,
@@ -258,8 +264,18 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated }: ImpactBrandSearchProps) =
           {campaigns.map((campaign) => (
             <Card key={campaign.Id} className="hover:shadow-glow transition-shadow">
               <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
+                <div className="flex items-start gap-3 mb-3">
+                  {campaign.LogoUrl && (
+                    <img 
+                      src={campaign.LogoUrl} 
+                      alt={`${campaign.Name} logo`}
+                      className="w-12 h-12 object-contain rounded bg-muted p-1"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <div className="flex-1">
                     <h4 className="font-semibold text-sm mb-1">{campaign.Name}</h4>
                     {campaign.AdvertiserName && campaign.AdvertiserName !== campaign.Name && (
                       <p className="text-xs text-muted-foreground">{campaign.AdvertiserName}</p>
@@ -273,23 +289,23 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated }: ImpactBrandSearchProps) =
                 </div>
 
                 <div className="space-y-2 mb-4">
-                  {campaign.DefaultCommission && (
+                  {(campaign.CommissionRate || campaign.DefaultCommission) && (
                     <>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Commission Type:</span>
-                        <span className="font-medium">{campaign.DefaultCommission.Type || 'N/A'}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Commission Rate:</span>
-                        <span className="font-medium text-foreground">
-                          {campaign.DefaultCommission.Amount ? `${campaign.DefaultCommission.Amount}%` : 'Variable'}
+                        <span className="text-muted-foreground">Commission:</span>
+                        <span className="font-medium text-crypto-gold">
+                          {campaign.CommissionRate 
+                            ? `${campaign.CommissionRate}${campaign.CommissionType === 'percentage' ? '%' : ''}` 
+                            : campaign.DefaultCommission?.Amount 
+                              ? `${campaign.DefaultCommission.Amount}%` 
+                              : 'Variable'}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Est. NCTR per $1:</span>
                         <span className="font-medium text-crypto-gold">
-                          {campaign.DefaultCommission.Amount 
-                            ? (campaign.DefaultCommission.Amount * 20).toFixed(0) 
+                          {(campaign.CommissionRate || campaign.DefaultCommission?.Amount)
+                            ? ((campaign.CommissionRate || campaign.DefaultCommission?.Amount || 0) * 20).toFixed(0) 
                             : 'TBD'} NCTR
                         </span>
                       </div>

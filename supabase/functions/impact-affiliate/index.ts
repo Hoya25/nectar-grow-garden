@@ -52,7 +52,8 @@ serve(async (req) => {
       console.log(`🔍 Searching Impact.com campaigns for: ${searchTerm}`);
       
       // Use Mediapartners API endpoint (requires Campaigns scope)
-      const searchUrl = `https://api.impact.com/Mediapartners/${accountSid}/Campaigns`;
+      // Filter for US campaigns only
+      const searchUrl = `https://api.impact.com/Mediapartners/${accountSid}/Campaigns?Country=US&PageSize=100`;
       
       const response = await fetch(searchUrl, { headers });
       
@@ -90,12 +91,17 @@ serve(async (req) => {
         );
       }
       
-      // Campaigns already have the right format
+      // Map campaigns with logo and commission info
       campaigns = campaigns.map((camp: any) => ({
         Id: camp.Id,
         Name: camp.Name,
         AdvertiserName: camp.AdvertiserName || camp.Name,
-        Status: camp.Status
+        Status: camp.Status,
+        LogoUrl: camp.LogoUrl || null,
+        CommissionRate: camp.DefaultPayoutAmount || camp.DefaultPayout || null,
+        CommissionType: camp.DefaultPayoutType || 'percentage',
+        Description: camp.Description || '',
+        WebsiteUrl: camp.LandingPageUrl || camp.WebsiteUrl || null
       }));
       
       return new Response(

@@ -48,8 +48,8 @@ import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement'
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
 import SuperAdminTransactionHistory from '@/components/admin/SuperAdminTransactionHistory';
 import SuperAdminReferralTracking from '@/components/admin/SuperAdminReferralTracking';
-import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
 import ImpactBrandSearch from '@/components/admin/ImpactBrandSearch';
+import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
 
 interface AdminStats {
   total_users: number;
@@ -338,7 +338,10 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="affiliates">
-            <AffiliateLinksManagement />
+            <div className="space-y-6">
+              <ImpactBrandSearch onOpportunitiesUpdated={fetchAdminStats} />
+              <AffiliateLinksManagement />
+            </div>
           </TabsContent>
 
           <TabsContent value="referrals">
