@@ -38,3 +38,18 @@ verify_jwt = true
 
 [functions.process-purchase]
 verify_jwt = false
+
+[functions.impact-affiliate]
+verify_jwt = true
+
+[functions.mailchimp-integration]
+verify_jwt = true
+
+[functions.loyalize-integration]
+verify_jwt = true
+
+[functions.send-bulk-test-email]
+verify_jwt = true
+
+[functions.nctr-live-sync]
+verify_jwt = true
