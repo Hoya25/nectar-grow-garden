@@ -27,9 +27,16 @@ interface ImpactCampaign {
 
 interface ImpactBrandSearchProps {
   onOpportunitiesUpdated: () => void;
+  onBrandSelect?: (brandData: {
+    name: string;
+    logoUrl: string | null;
+    affiliateLink: string;
+    description: string;
+    commissionRate: number;
+  }) => void;
 }
 
-const ImpactBrandSearch = ({ onOpportunitiesUpdated }: ImpactBrandSearchProps) => {
+const ImpactBrandSearch = ({ onOpportunitiesUpdated, onBrandSelect }: ImpactBrandSearchProps) => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [campaigns, setCampaigns] = useState<ImpactCampaign[]>([]);
@@ -145,6 +152,18 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated }: ImpactBrandSearchProps) =
         title: "Link Generated",
         description: `Created tracking link for ${campaign.Name}`,
       });
+
+      // Auto-populate form if callback provided
+      if (onBrandSelect) {
+        const commissionRate = campaign.CommissionRate || campaign.DefaultCommission?.Amount || 5;
+        onBrandSelect({
+          name: campaign.AdvertiserName || campaign.Name || 'Unknown Brand',
+          logoUrl: campaign.LogoUrl || null,
+          affiliateLink: data.affiliateLink,
+          description: campaign.Description || `Earn NCTR tokens when you shop at ${campaign.Name || campaign.AdvertiserName}. Commission: ${commissionRate}%`,
+          commissionRate: commissionRate
+        });
+      }
 
     } catch (error) {
       console.error('Error generating link:', error);

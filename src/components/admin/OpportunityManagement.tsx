@@ -857,9 +857,31 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         await fetchOpportunities(true);
                         onStatsUpdate();
                       }}
+                      onBrandSelect={(brandData) => {
+                        // Auto-populate form with Impact.com brand data
+                        const nctrPerDollar = brandData.commissionRate * 20; // Convert commission % to NCTR per dollar
+                        
+                        setFormData({
+                          ...formData,
+                          partner_name: brandData.name,
+                          partner_logo_url: brandData.logoUrl || '',
+                          affiliate_link: brandData.affiliateLink,
+                          title: `Shop with ${brandData.name}`,
+                          description: brandData.description,
+                          reward_per_dollar: nctrPerDollar,
+                          opportunity_type: 'shopping'
+                        });
+                        
+                        setLogoPreview(brandData.logoUrl || '');
+                        
+                        toast({
+                          title: "Brand Loaded",
+                          description: `${brandData.name} details populated in form`,
+                        });
+                      }}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Search Impact.com's US affiliate network to find brands, generate tracking links, and create opportunities
+                      Search Impact.com's US affiliate network - when you generate a tracking link, it will automatically populate the opportunity form below
                     </p>
                   </div>
 
