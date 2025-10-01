@@ -390,7 +390,7 @@ function generateTrackingUrl(storeId: string, userId: string, loyalizeId: string
   const trackingUrl = new URL(baseUrl);
   
   trackingUrl.searchParams.set('cid', loyalizeId); // Your Loyalize ID
-  trackingUrl.searchParams.set('pid', 'nctr_platform'); // Traffic source identifier
+  trackingUrl.searchParams.set('pid', '3120835'); // Your Loyalize PID
   trackingUrl.searchParams.set('cp', userId); // Unique shopper identifier
   
   if (subId) {
