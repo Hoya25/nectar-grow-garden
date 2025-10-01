@@ -170,21 +170,33 @@ serve(async (req) => {
       
       const campaignData = await campaignResponse.json();
       
+      console.log('📊 Full campaign data received:', JSON.stringify(campaignData, null, 2));
+      
       // Extract the actual brand website URL from campaign data
       // Try multiple possible field names from Impact.com API
-      const brandWebsiteUrl = campaignData.LandingPageUrl || 
+      // Priority: Use tracking URL if available, otherwise landing page, then website
+      const brandWebsiteUrl = campaignData.TrackingLink || 
+                              campaignData.LandingPageUrl || 
                               campaignData.WebsiteUrl || 
                               campaignData.AdvertiserWebsiteUrl ||
-                              campaignData.TrackingLink ||
+                              campaignData.CampaignUrl ||
                               productUrl; // Fallback to provided URL
       
-      console.log('🌐 Brand website URL from campaign data:', brandWebsiteUrl);
+      console.log('🌐 Extracted brand website URL:', brandWebsiteUrl);
+      console.log('📋 Available URL fields:', {
+        TrackingLink: campaignData.TrackingLink,
+        LandingPageUrl: campaignData.LandingPageUrl,
+        WebsiteUrl: campaignData.WebsiteUrl,
+        AdvertiserWebsiteUrl: campaignData.AdvertiserWebsiteUrl,
+        CampaignUrl: campaignData.CampaignUrl
+      });
       
-      // Create the affiliate tracking link
+      // Create the affiliate tracking link that will redirect to the brand's website
       // Impact.com format: https://go.impact.com/campaign-promo/{AccountSid}/{CampaignId}?url={destination}
       const affiliateLink = `https://go.impact.com/campaign-promo/${accountSid}/${advertiserId}?url=${encodeURIComponent(brandWebsiteUrl)}`;
       
-      console.log(`✅ Generated affiliate link for campaign: ${campaignData.Name}`);
+      console.log(`✅ Generated affiliate link: ${affiliateLink}`);
+      console.log(`✅ Will redirect to: ${brandWebsiteUrl}`);
       
       return new Response(
         JSON.stringify({
