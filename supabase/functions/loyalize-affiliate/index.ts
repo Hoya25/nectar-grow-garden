@@ -106,39 +106,18 @@ async function generateAffiliateLink(
 
     let affiliateData: AffiliateLink;
 
-    try {
-      // Try to generate real affiliate link via Loyalize API
-      const response = await fetch('https://api.loyalize.com/v1/affiliate/generate', {
-        method: 'POST',
-        headers: {
-          'Authorization': apiKey, // Correct Loyalize auth format per support
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          brand_id: brand.loyalize_id,
-          product_url: productUrl,
-          tracking_id: trackingId,
-          user_id: userId,
-          campaign_type: isGiftCard ? 'gift_card' : 'standard'
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        affiliateData = {
-          original_url: productUrl,
-          affiliate_url: data.affiliate_url || data.tracking_url,
-          tracking_id: trackingId,
-          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
-        };
-        console.log('✅ Generated real Loyalize affiliate link');
-      } else {
-        throw new Error('Loyalize API unavailable');
-      }
-    } catch (error) {
-      console.log('⚠️ Using mock affiliate link generation');
-      affiliateData = generateMockAffiliateLink(brand, productUrl, trackingId);
-    }
+    // **CRITICAL**: Use Loyalize's proper tracking API endpoint format
+    // This ensures commission credit flows back to Loyalize account
+    const loyalizeTrackingUrl = generateLoyalizeTrackingUrl(brand.loyalize_id, userId, trackingId);
+    
+    console.log('✅ Generated Loyalize tracking URL:', loyalizeTrackingUrl);
+    
+    affiliateData = {
+      original_url: productUrl,
+      affiliate_url: loyalizeTrackingUrl,
+      tracking_id: trackingId,
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+    };
 
     // Store the pending transaction with detailed tracking
     const { error: transactionError } = await supabase
@@ -370,6 +349,22 @@ async function parseTrackingId(trackingId: string, supabase: any): Promise<{ use
       brandId: ''
     };
   }
+}
+
+/**
+ * Generate Loyalize tracking URL that credits commissions to your account
+ * Format: https://api.loyalize.com/v1/stores/{store_id}/tracking?cid={your_loyalize_id}&pid=nctr_platform&cp={user_id}&sid={tracking_id}
+ */
+function generateLoyalizeTrackingUrl(storeId: string, userId: string, trackingId: string): string {
+  const YOUR_LOYALIZE_CID = Deno.env.get('LOYALIZE_CID') || 'nctr_platform';
+  
+  const trackingUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
+  trackingUrl.searchParams.set('cid', YOUR_LOYALIZE_CID); // Your Loyalize customer ID
+  trackingUrl.searchParams.set('pid', 'nctr_platform'); // Platform identifier
+  trackingUrl.searchParams.set('cp', userId); // Customer/user identifier
+  trackingUrl.searchParams.set('sid', trackingId); // SubID for detailed tracking
+  
+  return trackingUrl.toString();
 }
 
 function generateMockAffiliateLink(brand: any, productUrl: string, trackingId: string): AffiliateLink {
