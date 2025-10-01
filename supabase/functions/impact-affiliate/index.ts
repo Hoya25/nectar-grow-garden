@@ -36,12 +36,12 @@ serve(async (req) => {
 
     console.log(`🔄 Impact.com API request - Action: ${action}`);
 
-    // Search for advertisers/brands
+    // Search for campaigns/brands
     if (action === 'search') {
-      console.log(`🔍 Searching Impact.com advertisers for: ${searchTerm}`);
+      console.log(`🔍 Searching Impact.com campaigns for: ${searchTerm}`);
       
-      // Use Agency API endpoint (for accounts starting with IR)
-      const searchUrl = `https://api.impact.com/Agencies/${accountSid}/Advertisers`;
+      // Use Mediapartners API endpoint (requires Campaigns scope)
+      const searchUrl = `https://api.impact.com/Mediapartners/${accountSid}/Campaigns`;
       
       const response = await fetch(searchUrl, { headers });
       
@@ -49,12 +49,12 @@ serve(async (req) => {
         const errorText = await response.text();
         console.error('❌ Impact.com API error:', errorText);
         
-        let errorMessage = 'Failed to search advertisers';
+        let errorMessage = 'Failed to search campaigns';
         let helpText = '';
         
         if (response.status === 403) {
           errorMessage = 'Access Denied: Your Impact.com API credentials do not have the required permissions.';
-          helpText = 'Please create a new "Scoped Token" in Impact.com with "Advertisers - Read" permissions enabled. Visit: https://app.impact.com/secure/agency/accountSettings/agency-wsapi-flow.ihtml';
+          helpText = 'Please ensure your token has "Campaigns - Read" permissions enabled. Visit: https://app.impact.com/secure/agency/accountSettings/agency-wsapi-flow.ihtml';
         }
         
         return new Response(
@@ -68,22 +68,23 @@ serve(async (req) => {
       }
       
       const data = await response.json();
-      console.log(`✅ Found ${data.Advertisers?.length || 0} advertisers`);
+      console.log(`✅ Found ${data.Campaigns?.length || 0} campaigns`);
       
-      // Filter advertisers by search term if provided
-      let campaigns = data.Advertisers || [];
+      // Filter campaigns by search term if provided
+      let campaigns = data.Campaigns || [];
       if (searchTerm) {
         campaigns = campaigns.filter((c: any) => 
-          c.Name?.toLowerCase().includes(searchTerm.toLowerCase())
+          c.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.AdvertiserName?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
       
-      // Map advertisers to campaign format for compatibility
-      campaigns = campaigns.map((adv: any) => ({
-        Id: adv.Id,
-        Name: adv.Name,
-        AdvertiserName: adv.Name,
-        Status: adv.Status
+      // Campaigns already have the right format
+      campaigns = campaigns.map((camp: any) => ({
+        Id: camp.Id,
+        Name: camp.Name,
+        AdvertiserName: camp.AdvertiserName || camp.Name,
+        Status: camp.Status
       }));
       
       return new Response(
@@ -110,9 +111,9 @@ serve(async (req) => {
       // For now, we'll create a deep link that includes the destination URL
       const trackingUrl = `https://api.impact.com/Mediapartners/${accountSid}/v3/Ads`;
       
-      // Get advertiser details first
+      // Get campaign details first
       const campaignResponse = await fetch(
-        `https://api.impact.com/Agencies/${accountSid}/Advertisers/${advertiserId}`,
+        `https://api.impact.com/Mediapartners/${accountSid}/Campaigns/${advertiserId}`,
         { headers }
       );
       
