@@ -50,6 +50,7 @@ import SuperAdminTransactionHistory from '@/components/admin/SuperAdminTransacti
 import SuperAdminReferralTracking from '@/components/admin/SuperAdminReferralTracking';
 import ImpactBrandSearch from '@/components/admin/ImpactBrandSearch';
 import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
+import LoyalizeWebhookConfig from '@/components/admin/LoyalizeWebhookConfig';
 
 interface AdminStats {
   total_users: number;
@@ -380,9 +381,13 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="webhooks" className="space-y-6">
+            {/* Loyalize Webhook Configuration */}
+            <LoyalizeWebhookConfig />
+            
+            {/* Purchase Webhooks (token.nctr.live) */}
             <Card className="bg-section-highlight border border-section-border">
               <CardHeader>
-                <CardTitle className="text-foreground">Purchase Webhooks</CardTitle>
+                <CardTitle className="text-foreground">Purchase Webhooks (token.nctr.live)</CardTitle>
                 <p className="text-muted-foreground">Test the purchase webhook endpoint for token.nctr.live integration</p>
               </CardHeader>
               <CardContent>
