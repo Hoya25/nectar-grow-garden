@@ -12,7 +12,8 @@ serve(async (req) => {
   }
 
   try {
-    const { action, advertiserId, productUrl } = await req.json();
+    const body = await req.json();
+    const { action, advertiserId, productUrl, searchTerm } = body;
     
     const accountSid = Deno.env.get('IMPACT_ACCOUNT_SID');
     const authToken = Deno.env.get('IMPACT_AUTH_TOKEN');
@@ -37,7 +38,6 @@ serve(async (req) => {
 
     // Search for advertisers/brands
     if (action === 'search') {
-      const { searchTerm } = await req.json();
       console.log(`🔍 Searching Impact.com for: ${searchTerm}`);
       
       const searchUrl = `https://api.impact.com/Mediapartners/${accountSid}/v3/Campaigns`;
