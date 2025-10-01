@@ -274,7 +274,7 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="purchases" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-11 bg-section-highlight text-xs">
+          <TabsList className="grid w-full grid-cols-10 bg-section-highlight text-xs">
             <TabsTrigger value="purchases" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <ShoppingCart className="w-3 h-3" />
               Purchases
@@ -291,17 +291,13 @@ const Admin = () => {
               <Gift className="w-3 h-3" />
               Opps
             </TabsTrigger>
-            <TabsTrigger value="affiliates" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Link className="w-3 h-3" />
-              Affiliates
+            <TabsTrigger value="brands" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <Building2 className="w-3 h-3" />
+              Brands
             </TabsTrigger>
             <TabsTrigger value="referrals" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Users className="w-3 h-3" />
               Referrals
-            </TabsTrigger>
-            <TabsTrigger value="loyalize" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
-              <Sparkles className="w-3 h-3" />
-              Brands
             </TabsTrigger>
             <TabsTrigger value="webhooks" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Webhook className="w-3 h-3" />
@@ -337,34 +333,23 @@ const Admin = () => {
             <OpportunityManagement onStatsUpdate={fetchAdminStats} />
           </TabsContent>
 
-          <TabsContent value="affiliates">
+          <TabsContent value="brands">
             <div className="space-y-6">
-              <ImpactBrandSearch onOpportunitiesUpdated={fetchAdminStats} />
-              <AffiliateLinksManagement />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="referrals">
-          <ReferralTestComponent />
-          <AffiliateWebhookTester />
-            <ReferralManagement />
-          </TabsContent>
-
-          <TabsContent value="loyalize">
-            <div className="space-y-6">
-              <LoyalizeBrandManager />
-              
-              <LoyalizeApiTester />
-              
               <Card className="bg-section-highlight border border-section-border">
                 <CardHeader>
-                  <CardTitle className="text-foreground">Impact.com Brand Search</CardTitle>
-                  <p className="text-muted-foreground">Search Impact.com's advertiser network and generate tracking links</p>
+                  <CardTitle className="text-foreground">Impact.com Affiliate Network</CardTitle>
+                  <p className="text-muted-foreground">Search Impact.com's US advertiser network and generate tracking links</p>
                 </CardHeader>
                 <CardContent>
                   <ImpactBrandSearch onOpportunitiesUpdated={fetchAdminStats} />
                 </CardContent>
               </Card>
+              
+              <AffiliateLinksManagement />
+              
+              <LoyalizeBrandManager />
+              
+              <LoyalizeApiTester />
               
               <Card className="bg-section-highlight border border-section-border">
                 <CardHeader>
@@ -386,6 +371,12 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="referrals">
+          <ReferralTestComponent />
+          <AffiliateWebhookTester />
+            <ReferralManagement />
           </TabsContent>
 
           <TabsContent value="webhooks" className="space-y-6">
