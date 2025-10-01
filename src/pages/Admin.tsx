@@ -49,6 +49,7 @@ import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
 import SuperAdminTransactionHistory from '@/components/admin/SuperAdminTransactionHistory';
 import SuperAdminReferralTracking from '@/components/admin/SuperAdminReferralTracking';
 import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
+import ImpactBrandSearch from '@/components/admin/ImpactBrandSearch';
 
 interface AdminStats {
   total_users: number;
@@ -354,7 +355,17 @@ const Admin = () => {
               
               <Card className="bg-section-highlight border border-section-border">
                 <CardHeader>
-                  <CardTitle className="text-foreground">Find & Add Brands</CardTitle>
+                  <CardTitle className="text-foreground">Impact.com Brand Search</CardTitle>
+                  <p className="text-muted-foreground">Search Impact.com's advertiser network and generate tracking links</p>
+                </CardHeader>
+                <CardContent>
+                  <ImpactBrandSearch onOpportunitiesUpdated={fetchAdminStats} />
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-section-highlight border border-section-border">
+                <CardHeader>
+                  <CardTitle className="text-foreground">Loyalize Brand Search</CardTitle>
                   <p className="text-muted-foreground">Search the Loyalize database to find new brands for your platform</p>
                 </CardHeader>
                 <CardContent>
