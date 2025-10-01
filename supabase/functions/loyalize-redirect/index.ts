@@ -24,36 +24,37 @@ serve(async (req) => {
       });
     }
 
-    console.log(`🔄 Redirecting to store: ${storeId}`);
+    console.log(`🔄 Redirecting to Loyalize store: ${storeId}`);
     console.log(`   User: ${userId}, Tracking: ${trackingId}`);
 
-    // Map store IDs to direct merchant URLs
-    const storeUrls: Record<string, string> = {
-      '30095': 'https://nobullproject.com/?ref=nctr&uid={{USER_ID}}&tid={{TRACKING_ID}}',
-      '44820': 'https://gifts.uber.com/?ref=nctr&uid={{USER_ID}}&tid={{TRACKING_ID}}'
-    };
-
-    const baseUrl = storeUrls[storeId];
-    if (!baseUrl) {
-      return new Response('Unknown store', { 
-        status: 404,
-        headers: corsHeaders 
-      });
+    // Build the Loyalize tracking URL that will credit YOUR Loyalize account
+    // Format: link.loyalize.com/stores/{storeId}?params
+    const loyalizeUrl = new URL(`https://link.loyalize.com/stores/${storeId}`);
+    
+    // Add tracking parameters per Loyalize API spec:
+    // - cp (customer parameter) = user_id so webhook can identify user
+    // - sid (sub-ID) = tracking_id for detailed tracking
+    // - pid (publisher ID) = your identifier (use your domain or Loyalize account ID)
+    if (userId) {
+      loyalizeUrl.searchParams.set('cp', userId); // Customer parameter (user ID)
     }
+    if (trackingId) {
+      loyalizeUrl.searchParams.set('sid', trackingId); // Sub ID (tracking ID)
+    }
+    
+    // IMPORTANT: Set your publisher ID here
+    // This should match your Loyalize account/publisher identifier
+    loyalizeUrl.searchParams.set('pid', 'thegarden'); // Your publisher ID
+    
+    console.log(`✅ Loyalize tracking URL: ${loyalizeUrl.toString()}`);
+    console.log(`   📊 Tracking: cp=${userId}, sid=${trackingId}`);
 
-    // Replace placeholders with actual values
-    let finalUrl = baseUrl
-      .replace('{{USER_ID}}', userId || 'anonymous')
-      .replace('{{TRACKING_ID}}', trackingId || 'unknown');
-
-    console.log(`✅ Redirect URL: ${finalUrl}`);
-
-    // Perform 302 redirect
+    // Perform 302 redirect through Loyalize tracking
     return new Response(null, {
       status: 302,
       headers: {
         ...corsHeaders,
-        'Location': finalUrl,
+        'Location': loyalizeUrl.toString(),
       },
     });
   } catch (error) {
