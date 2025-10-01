@@ -81,7 +81,7 @@ serve(async (req) => {
           `https://api.loyalize.com/v2/transactions/${txnId}`,
           {
             headers: {
-              'Authorization': loyalizeApiKey,
+              'Authorization': `Bearer ${loyalizeApiKey}`,
               'Content-Type': 'application/json'
             }
           }

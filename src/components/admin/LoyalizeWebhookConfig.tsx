@@ -71,8 +71,9 @@ export const LoyalizeWebhookConfig = () => {
           <AlertDescription className="space-y-2">
             <p className="font-semibold">Setup Instructions:</p>
             <ol className="list-decimal list-inside space-y-1 text-sm">
-              <li>Log into your Loyalize dashboard</li>
-              <li>Navigate to Settings → Webhooks</li>
+              <li>Get your API key from Loyalize dashboard → Settings → API Keys</li>
+              <li>Add the API key as <code className="bg-muted px-1 rounded">LOYALIZE_API_KEY</code> secret in Edge Functions settings</li>
+              <li>Navigate to Loyalize Settings → Webhooks</li>
               <li>Add a new webhook with the URL above</li>
               <li>Select event type: <code className="bg-muted px-1 rounded">NEW_TRANSACTION</code></li>
               <li>Ensure webhook is enabled and save</li>
