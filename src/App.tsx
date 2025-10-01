@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { WalletProvider } from "@/hooks/useWallet";
 import Index from "./pages/Index";
@@ -17,6 +17,17 @@ import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 
 const queryClient = new QueryClient();
+
+// Component to track route changes and update body attribute
+const RouteTracker = () => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    document.body.setAttribute('data-route', location.pathname);
+  }, [location.pathname]);
+  
+  return null;
+};
 
 const App = () => {
   const [showComingSoon, setShowComingSoon] = useState(false);
@@ -118,6 +129,7 @@ User agent: ${navigator.userAgent}
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <RouteTracker />
           <AuthProvider>
             <WalletProvider>
               <Routes>
