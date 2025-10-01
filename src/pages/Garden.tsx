@@ -689,20 +689,17 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         finalUrl = finalUrl.replace(/\{\{TRACKING_ID\}\}/g, trackingId);
       }
       
-      // **CRITICAL**: If URL uses broken link.loyalize.com redirect, convert to proper API tracking URL
+      // Build proper Loyalize redirect URL with tracking parameters
+      // Use link.loyalize.com redirect (it handles the API call internally)
       if (finalUrl.includes('link.loyalize.com/stores/')) {
-        const storeIdMatch = finalUrl.match(/stores\/(\d+)/);
-        if (storeIdMatch) {
-          const storeId = storeIdMatch[1];
-          // Build proper Loyalize tracking URL per official docs
-          const trackingUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
-          // cid is auto-filled by Loyalize - DO NOT set manually
-          trackingUrl.searchParams.set('pid', 'thegarden.nctr.live'); // Traffic source (approved in Loyalize)
-          trackingUrl.searchParams.set('cp', user?.id || 'anonymous'); // Shopper ID
-          trackingUrl.searchParams.set('sid', trackingId); // Sub-tracking ID
-          finalUrl = trackingUrl.toString();
-          console.log('✅ Converted to official Loyalize tracking URL:', finalUrl);
-        }
+        const url = new URL(finalUrl);
+        // Add our tracking parameters to the redirect URL
+        url.searchParams.set('user_tracking_id', trackingId); // Our tracking ID
+        url.searchParams.set('pid', 'thegarden.nctr.live'); // Traffic source
+        url.searchParams.set('cp', user?.id || 'anonymous'); // Shopper/user ID
+        url.searchParams.set('sid', trackingId); // Sub-ID (same as tracking ID)
+        finalUrl = url.toString();
+        console.log('✅ Enhanced Loyalize redirect URL:', finalUrl);
       }
       
       console.log('🔗 FINAL tracked URL:', finalUrl);
