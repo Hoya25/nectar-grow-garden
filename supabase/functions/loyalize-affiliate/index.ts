@@ -359,7 +359,7 @@ async function parseTrackingId(trackingId: string, supabase: any): Promise<{ use
  * sid: Optional sub-tracking ID for campaigns/filtering
  */
 function generateLoyalizeTrackingUrl(storeId: string, userId: string, trackingId: string): string {
-  const TRAFFIC_SOURCE_ID = Deno.env.get('LOYALIZE_PID') || 'the_garden_nctr';
+  const TRAFFIC_SOURCE_ID = Deno.env.get('LOYALIZE_PID') || 'thegarden.nctr.live';
   
   const trackingUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
   // cid is auto-filled by Loyalize when using API key - DO NOT set manually

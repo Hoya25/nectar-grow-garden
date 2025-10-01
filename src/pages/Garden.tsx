@@ -697,7 +697,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           // Build proper Loyalize tracking URL per official docs
           const trackingUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
           // cid is auto-filled by Loyalize - DO NOT set manually
-          trackingUrl.searchParams.set('pid', 'the_garden_nctr'); // Traffic source (must be approved in Loyalize)
+          trackingUrl.searchParams.set('pid', 'thegarden.nctr.live'); // Traffic source (approved in Loyalize)
           trackingUrl.searchParams.set('cp', user?.id || 'anonymous'); // Shopper ID
           trackingUrl.searchParams.set('sid', trackingId); // Sub-tracking ID
           finalUrl = trackingUrl.toString();
