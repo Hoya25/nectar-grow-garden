@@ -61,28 +61,46 @@ serve(async (req) => {
 
     for (const txn of transactions) {
       results.checked++
+      
+      console.log(`\n📦 Processing transaction ${txn.id}:`)
+      console.log(`   Amount: $${txn.amount}`)
+      console.log(`   Store: ${txn.store_name}`)
+      console.log(`   Tracking ID: ${txn.user_tracking_id || 'MISSING'}`)
 
       try {
         // Try to find matching user via tracking ID
         let userId: string | null = null
         
         if (txn.user_tracking_id) {
-          // Parse tracking ID format: tgn_{userId}_{brandId}_{timestamp}
-          const parts = txn.user_tracking_id.split('_')
-          if (parts.length >= 2) {
-            const userIdPart = parts[1]
+          console.log(`🔍 Looking up tracking ID: ${txn.user_tracking_id}`)
+          
+          // First attempt: Direct database lookup
+          const { data: mapping, error: mappingError } = await supabase
+            .from('affiliate_link_mappings')
+            .select('user_id, brand_id')
+            .eq('tracking_id', txn.user_tracking_id)
+            .maybeSingle()
+          
+          if (mappingError) {
+            console.error(`   ❌ Database lookup error:`, mappingError)
+          }
+          
+          if (mapping) {
+            userId = mapping.user_id
+            results.matched++
+            console.log(`   ✅ Found user via database: ${userId.slice(0, 8)}...`)
+            console.log(`   └─ Brand ID: ${mapping.brand_id?.slice(0, 8) || 'N/A'}...`)
+          } else {
+            console.log(`   ⚠️ No mapping found in database for: ${txn.user_tracking_id}`)
             
-            // Look up in tracking mappings
-            const { data: mapping } = await supabase
-              .from('affiliate_link_mappings')
-              .select('user_id')
-              .eq('tracking_id', txn.user_tracking_id)
-              .maybeSingle()
+            // Fallback: Try to parse tracking ID parts
+            const parts = txn.user_tracking_id.split('_')
+            console.log(`   └─ Tracking ID parts: ${parts.join(', ')}`)
             
-            if (mapping) {
-              userId = mapping.user_id
-              results.matched++
-            } else {
+            if (parts.length >= 2 && parts[0] === 'tgn') {
+              const userIdPart = parts[1]
+              console.log(`   └─ Attempting partial user ID match with: ${userIdPart}`)
+              
               // Try to find user by partial match
               const { data: users } = await supabase
                 .from('profiles')
@@ -93,16 +111,24 @@ serve(async (req) => {
               if (users && users.length > 0) {
                 userId = users[0].user_id
                 results.matched++
+                console.log(`   ✅ Found user via partial match: ${userId.slice(0, 8)}...`)
+              } else {
+                console.log(`   ❌ No user found via partial match`)
               }
             }
           }
+        } else {
+          console.log(`   ⚠️ Transaction missing user_tracking_id field`)
         }
 
         if (!userId) {
-          console.log(`⚠️ Could not match transaction ${txn.id} to user (tracking_id: ${txn.user_tracking_id})`)
+          console.log(`❌ SKIPPING: Could not match transaction ${txn.id} to any user`)
+          results.errors.push(`Transaction ${txn.id}: No user match found for tracking_id: ${txn.user_tracking_id}`)
           continue
         }
 
+        console.log(`✓ User matched: ${userId.slice(0, 8)}...`)
+        
         // Check if already credited
         const { data: existing } = await supabase
           .from('nctr_transactions')
@@ -111,10 +137,12 @@ serve(async (req) => {
           .maybeSingle()
 
         if (existing) {
-          console.log(`✓ Transaction ${txn.id} already credited`)
+          console.log(`   ℹ️ Already credited - skipping`)
           continue
         }
 
+        console.log(`   💰 Processing credit...`)
+        
         // Get brand info
         const { data: brand } = await supabase
           .from('brands')
@@ -124,6 +152,10 @@ serve(async (req) => {
 
         const nctrPerDollar = brand?.nctr_per_dollar || 50
         const nctrReward = txn.amount * nctrPerDollar
+        
+        console.log(`   Brand: ${brand?.name || txn.store_name}`)
+        console.log(`   Rate: ${nctrPerDollar} NCTR per dollar`)
+        console.log(`   Reward: ${nctrReward} NCTR`)
 
         // Credit the user
         const { error: portfolioError } = await supabase
@@ -168,10 +200,11 @@ serve(async (req) => {
           })
 
         results.credited++
-        console.log(`✅ Credited ${nctrReward} NCTR to user ${userId.slice(0, 8)} for transaction ${txn.id}`)
+        console.log(`✅ CREDITED: ${nctrReward} NCTR → user ${userId.slice(0, 8)}...\n`)
 
       } catch (error) {
-        console.error(`❌ Error processing transaction ${txn.id}:`, error)
+        console.error(`\n❌ ERROR processing transaction ${txn.id}:`, error)
+        console.error(`   Error details:`, error.message)
         results.errors.push(`Transaction ${txn.id}: ${error.message}`)
       }
     }

@@ -305,6 +305,9 @@ async function generateTrackingId(userId: string, brandId: string, supabase: any
   const randomId = Math.random().toString(36).substring(2, 15);
   const trackingId = `tgn_${randomId}_${timestamp}`;
   
+  console.log(`🔑 Generated tracking ID: ${trackingId}`);
+  console.log(`   └─ For user: ${userId.slice(0, 8)}... brand: ${brandId.slice(0, 8)}...`);
+  
   // Store the mapping in database for reliable lookups
   const { error } = await supabase
     .from('affiliate_link_mappings')
@@ -318,9 +321,11 @@ async function generateTrackingId(userId: string, brandId: string, supabase: any
     });
     
   if (error) {
-    console.error('Failed to store tracking mapping:', error);
+    console.error('❌ Error storing tracking ID mapping:', error);
     // Fallback to simple format if mapping fails
     return `${userId}-${brandId}-${timestamp}`;
+  } else {
+    console.log(`✅ Tracking ID mapping stored in database`);
   }
   
   return trackingId;
