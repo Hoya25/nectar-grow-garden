@@ -13,7 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
 import BrandSearchInterface from './BrandSearchInterface';
-import { 
+import ImpactBrandSearch from './ImpactBrandSearch';
+import {
   Plus, 
   Gift, 
   Edit, 
@@ -848,32 +849,59 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     Brand Partner Selection
                   </h4>
                   
-                  <BrandSearchInterface
-                    onBrandSelect={(brand) => {
-                      if (brand) {
-                        setSelectedBrand(brand);
-                        // Get brand details and generate tracking link
-                        fetchBrandDetails(brand.id).then((brandDetails) => {
-                          const trackingLink = generateUserTrackingLink(brandDetails?.website_url || '', brand.name);
-                          
-                          setFormData({
-                            ...formData,
-                            partner_name: brand.name,
-                            partner_logo_url: brand.logo_url || '',
-                            affiliate_link: trackingLink,
-                            title: `Shop with ${brand.name}`,
-                            description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`,
-                            display_order: formData.display_order // Preserve existing display order
+                  {/* Impact.com Brand Search */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Search Impact.com Network (US Brands)</Label>
+                    <ImpactBrandSearch 
+                      onOpportunitiesUpdated={async () => {
+                        await fetchOpportunities(true);
+                        onStatsUpdate();
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Search Impact.com's US affiliate network to find brands, generate tracking links, and create opportunities
+                    </p>
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-border"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-section-highlight px-2 text-muted-foreground">Or search local brands</span>
+                    </div>
+                  </div>
+                  
+                  {/* Local Brand Search */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Search Added Brands & Gift Cards</Label>
+                    <BrandSearchInterface
+                      onBrandSelect={(brand) => {
+                        if (brand) {
+                          setSelectedBrand(brand);
+                          // Get brand details and generate tracking link
+                          fetchBrandDetails(brand.id).then((brandDetails) => {
+                            const trackingLink = generateUserTrackingLink(brandDetails?.website_url || '', brand.name);
+                            
+                            setFormData({
+                              ...formData,
+                              partner_name: brand.name,
+                              partner_logo_url: brand.logo_url || '',
+                              affiliate_link: trackingLink,
+                              title: `Shop with ${brand.name}`,
+                              description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`,
+                              display_order: formData.display_order // Preserve existing display order
+                            });
                           });
-                        });
-                      } else {
-                        setSelectedBrand(null);
-                      }
-                    }}
-                    selectedBrand={selectedBrand}
-                    showFullDetails={true}
-                    placeholder="🔍 Search for partner brands and gift cards..."
-                  />
+                        } else {
+                          setSelectedBrand(null);
+                        }
+                      }}
+                      selectedBrand={selectedBrand}
+                      showFullDetails={true}
+                      placeholder="🔍 Search your added brands and gift cards..."
+                    />
+                  </div>
 
                   {/* Manual Brand Entry */}
                   <div className="space-y-4">
