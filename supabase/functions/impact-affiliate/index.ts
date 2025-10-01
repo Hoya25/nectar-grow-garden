@@ -201,11 +201,11 @@ serve(async (req) => {
           success: true,
           affiliateLink,
           campaign: {
-            id: campaignData.Id,
-            name: campaignData.Name,
+            id: campaignData.CampaignId || campaignData.Id,
+            name: campaignData.CampaignName || campaignData.Name,
             advertiser: campaignData.AdvertiserName,
             commissionType: campaignData.DefaultCommission?.Type,
-            commissionRate: campaignData.DefaultCommission?.Amount,
+            commissionRate: campaignData.DefaultCommission?.Amount || campaignData.DefaultPayoutAmount,
           }
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
