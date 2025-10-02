@@ -9,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { Search, Link, Database, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 export const TrackingDiagnostics = () => {
+  console.log('🔍 TrackingDiagnostics component mounted');
   const [checking, setChecking] = useState(false);
   const [trackingId, setTrackingId] = useState('');
   const [userId, setUserId] = useState('');
