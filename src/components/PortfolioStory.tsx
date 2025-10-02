@@ -53,6 +53,8 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
     switch (source) {
       case 'daily_checkin':
         return <CheckCircle className="w-5 h-5 text-primary" />;
+      case 'token_purchase':
+        return <ShoppingCart className="w-5 h-5 text-green-500" />;
       case 'affiliate_purchase':
       case 'shopping':
         return <ShoppingCart className="w-5 h-5 text-primary" />;

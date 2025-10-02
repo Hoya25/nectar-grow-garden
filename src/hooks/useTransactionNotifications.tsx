@@ -66,6 +66,23 @@ export const useTransactionNotifications = ({ userId, onTransactionReceived }: T
     let icon = PartyPopper;
 
     switch (source) {
+      case 'token_purchase':
+        title = '🎉 NCTR Purchase Successful!';
+        message = description || `Your ${formatNCTR(nctrAmount)} NCTR has been locked in 360LOCK!`;
+        icon = ShoppingBag;
+        
+        // Show extra celebratory message for large purchases
+        if (nctrAmount >= 1000) {
+          setTimeout(() => {
+            toast({
+              title: "🌟 Welcome to The Garden!",
+              description: `Your ${formatNCTR(nctrAmount)} NCTR is now working for you in 360LOCK!`,
+              duration: 5000,
+            });
+          }, 2000);
+        }
+        break;
+        
       case 'affiliate_purchase':
         title = '🛍️ Purchase Confirmed!';
         message = `You earned ${formatNCTR(nctrAmount)} NCTR from ${partnerName || 'your purchase'}!`;
