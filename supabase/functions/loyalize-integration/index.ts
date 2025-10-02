@@ -570,14 +570,15 @@ serve(async (req) => {
         }
 
         try {
-          // Fetch transactions from Loyalize
+          // Fetch transactions from Loyalize using the correct v2 endpoint
           const transactionsResponse = await fetch(
-            'https://api.loyalize.com/v2/publisher/transactions?page=0&size=100',
+            'https://api.loyalize.com/v2/transactions',
             {
               method: 'GET',
               headers: {
+                'Authorization': loyalizeApiKey,
                 'Content-Type': 'application/json',
-                'Authorization': loyalizeApiKey
+                'Accept': 'application/json'
               }
             }
           )
