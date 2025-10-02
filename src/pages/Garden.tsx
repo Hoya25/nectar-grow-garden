@@ -695,14 +695,28 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
   };
 
   const handleShoppingOpportunity = async (opportunity: EarningOpportunity) => {
+    // Debug: Check what data we have
+    console.log('🔍 Opportunity data:', {
+      id: opportunity.id,
+      title: opportunity.title,
+      brand_id: opportunity.brand_id,
+      brands: opportunity.brands,
+      has_brands_data: !!opportunity.brands
+    });
+    
     // Validate that we have both brand info and a valid loyalize_id
     if (!opportunity.brands?.id || !opportunity.brands?.loyalize_id) {
+      console.error('❌ Missing brand data:', {
+        has_brands: !!opportunity.brands,
+        brands_id: opportunity.brands?.id,
+        loyalize_id: opportunity.brands?.loyalize_id
+      });
+      
       toast({
         title: "Link Not Available",
         description: "This shopping opportunity is not properly configured. Please contact support.",
         variant: "destructive",
       });
-      console.error('❌ Shopping opportunity missing brand data:', opportunity);
       return;
     }
 
