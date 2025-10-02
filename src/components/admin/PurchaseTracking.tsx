@@ -166,7 +166,7 @@ export const PurchaseTracking = () => {
                   <div className="text-2xl font-bold text-green-500">{syncResult.results.credited}</div>
                 </div>
               </div>
-              {syncResult.results.errors.length > 0 && (
+              {syncResult.results.errors && syncResult.results.errors.length > 0 && (
                 <div className="mt-4">
                   <div className="font-semibold text-red-500">Errors:</div>
                   <ul className="list-disc list-inside text-sm text-muted-foreground">
