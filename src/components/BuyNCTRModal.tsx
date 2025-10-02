@@ -135,16 +135,26 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
       if (data?.url) {
         console.log('✅ Opening Stripe checkout in new tab:', data.url);
         // Open Stripe checkout in a new tab
-        window.open(data.url, '_blank');
+        const checkoutWindow = window.open(data.url, '_blank');
         
-        // Reset loading state and close modal
-        setLoading(false);
-        onOpenChange(false);
+        // Keep loading state while checkout is open
+        // Don't close modal - let user see the instructions
         
         toast({
           title: "Checkout Opened",
-          description: "Please complete your purchase in the new tab.",
+          description: "Complete your purchase in the new tab. This window will stay open.",
+          duration: 10000,
         });
+
+        // Check if window was blocked
+        if (!checkoutWindow) {
+          toast({
+            title: "Popup Blocked",
+            description: "Please allow popups for this site and try again.",
+            variant: "destructive",
+          });
+          setLoading(false);
+        }
       } else {
         console.error('❌ No checkout URL in response:', data);
         throw new Error('No checkout URL returned from Stripe');
@@ -335,8 +345,8 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                Processing...
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Checkout Opened - Complete in New Tab
               </>
             ) : (
               <>
@@ -347,6 +357,26 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
               </>
             )}
           </Button>
+
+          {loading && (
+            <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 text-center space-y-2">
+              <p className="text-sm font-medium">✅ Stripe checkout opened in new tab</p>
+              <p className="text-xs text-muted-foreground">
+                Complete your purchase there, then return here. Your NCTR will appear automatically.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setLoading(false);
+                  onOpenChange(false);
+                }}
+                className="mt-2"
+              >
+                Close This Window
+              </Button>
+            </div>
+          )}
 
           <p className="text-xs text-center text-muted-foreground">
             Secure checkout powered by Stripe • Automatically locks in 360LOCK
