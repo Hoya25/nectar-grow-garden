@@ -400,13 +400,26 @@ const Profile = () => {
               </Button>
               <h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
             </div>
-            <Button 
-              variant="outline"
-              onClick={() => signOut()}
-              className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-            >
-              Sign Out
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="default"
+                onClick={() => {
+                  toast({
+                    title: "Action Triggered!",
+                    description: "Your new button is working",
+                  });
+                }}
+              >
+                New Action
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => signOut()}
+                className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+              >
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </div>
