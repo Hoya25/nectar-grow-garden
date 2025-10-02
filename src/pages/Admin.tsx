@@ -50,6 +50,7 @@ import SuperAdminTransactionHistory from '@/components/admin/SuperAdminTransacti
 import SuperAdminReferralTracking from '@/components/admin/SuperAdminReferralTracking';
 import ImpactBrandSearch from '@/components/admin/ImpactBrandSearch';
 import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
+import { TrackingDiagnostics } from '@/components/admin/TrackingDiagnostics';
 import LoyalizeWebhookConfig from '@/components/admin/LoyalizeWebhookConfig';
 
 interface AdminStats {
@@ -318,7 +319,8 @@ const Admin = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="purchases">
+          <TabsContent value="purchases" className="space-y-6">
+            <TrackingDiagnostics />
             <PurchaseTracking />
           </TabsContent>
 
