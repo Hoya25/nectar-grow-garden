@@ -1395,7 +1395,7 @@ export type Database = {
         Returns: number
       }
       is_admin: {
-        Args: { user_id: string }
+        Args: Record<PropertyKey, never> | { user_id: string }
         Returns: boolean
       }
       is_daily_checkin_available: {
@@ -1404,6 +1404,10 @@ export type Database = {
       }
       is_referral_power_user: {
         Args: { p_user_id: string }
+        Returns: boolean
+      }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       is_treasury_admin: {
