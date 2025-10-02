@@ -30,15 +30,9 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
   onPurchaseComplete
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
-  
-  console.log('🔵 BuyNCTRButton render, modalOpen =', modalOpen);
 
   const handleBuyClick = () => {
-    console.log('🛒 Buy NCTR button clicked - opening modal');
-    console.log('🔓 Current modalOpen state BEFORE:', modalOpen);
     setModalOpen(true);
-    // Force immediate check
-    setTimeout(() => console.log('🔓 State after setState (should be true):', modalOpen), 0);
   };
 
   const defaultContent = (

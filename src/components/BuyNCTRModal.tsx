@@ -35,7 +35,6 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   current360Lock = 0,
   onPurchaseComplete
 }) => {
-  console.log('🔵 BuyNCTRModal component rendered, open =', open);
   const { currentPrice, formatPrice, formatUSD } = useNCTRPrice();
   const [nctrAmount, setNctrAmount] = useState(suggestedAmount.toString());
   const [usdAmount, setUsdAmount] = useState('');
@@ -112,18 +111,10 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   };
 
   const handleBuyNow = async () => {
-    console.log('🚀🚀🚀 HANDLE BUY NOW CALLED!');
-    console.log('🚀 Starting NCTR purchase flow with Stripe...', { nctrAmount, usdAmount });
-    console.log('💰 Calculated values:', { 
-      nctrAmountParsed: parseFloat(nctrAmount),
-      usdAmountParsed: parseFloat(usdAmount),
-      wholesalePrice 
-    });
     setLoading(true);
     
     try {
       // Call Stripe checkout edge function
-      console.log('📞 Calling create-nctr-checkout function...');
       const { data, error } = await supabase.functions.invoke('create-nctr-checkout', {
         body: {
           nctrAmount: parseFloat(nctrAmount),
@@ -131,23 +122,17 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
         },
       });
 
-      console.log('📦 Response received:', { data, error });
-
       if (error) {
-        console.error('❌ Error from edge function:', error);
         throw error;
       }
 
       if (data?.url) {
-        console.log('✅ Redirecting to Stripe checkout:', data.url);
         // Redirect to Stripe checkout
         window.location.href = data.url;
       } else {
-        console.error('❌ No URL in response, full data:', data);
         throw new Error('No checkout URL returned from Stripe');
       }
     } catch (error) {
-      console.error('💥 Checkout error:', error);
       toast({
         title: "Purchase Error",
         description: error instanceof Error ? error.message : "Failed to initiate purchase. Please try again.",
@@ -165,30 +150,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
     ? (((current360Lock + parseFloat(nctrAmount || '0')) / nextStatus.min_locked_nctr) * 100)
     : 100;
 
-  // Debug modal state
-  useEffect(() => {
-    if (open) {
-      console.log('🎯 BuyNCTRModal opened with:', {
-        nctrAmount,
-        usdAmount,
-        wholesalePrice,
-        suggestedAmount,
-        loading
-      });
-    }
-  }, [open, nctrAmount, usdAmount, wholesalePrice, loading]);
-
   const isButtonDisabled = !nctrAmount || parseFloat(nctrAmount) <= 0 || loading;
-  
-  useEffect(() => {
-    console.log('🔘 Button state:', {
-      nctrAmount,
-      isDisabled: isButtonDisabled,
-      nctrAmountEmpty: !nctrAmount,
-      nctrAmountZero: parseFloat(nctrAmount) <= 0,
-      loading
-    });
-  }, [nctrAmount, isButtonDisabled, loading]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -348,10 +310,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
           {/* Action Button */}
           <Button
-            onClick={() => {
-              console.log('🖱️ Buy button CLICKED!', { nctrAmount, usdAmount, isButtonDisabled });
-              handleBuyNow();
-            }}
+            onClick={handleBuyNow}
             disabled={isButtonDisabled}
             className="w-full h-12 text-base"
             size="lg"
