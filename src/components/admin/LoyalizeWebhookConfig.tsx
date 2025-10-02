@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const LoyalizeWebhookConfig = () => {
   const [copied, setCopied] = useState(false);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [testing, setTesting] = useState(false);
   const [selectedTxId, setSelectedTxId] = useState('');
@@ -44,11 +44,14 @@ export const LoyalizeWebhookConfig = () => {
 
       if (error) throw error;
 
-      if (data?.transactions && data.transactions.length > 0) {
-        setTransactions(data.transactions);
+      // Loyalize v2 API returns transactions in a 'content' array
+      const transactionList = data?.transactions?.content || [];
+      
+      if (transactionList.length > 0) {
+        setTransactions(data.transactions); // Store the full response for pagination
         toast({
           title: "Transactions Fetched",
-          description: `Found ${data.transactions.length} transactions from your Loyalize account`,
+          description: `Found ${transactionList.length} transactions from your Loyalize account`,
         });
       } else {
         toast({
@@ -224,21 +227,21 @@ export const LoyalizeWebhookConfig = () => {
             </Button>
           </div>
 
-          {transactions.length > 0 && (
+          {transactions?.content?.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">
                 Select a transaction ID from your account:
               </p>
               <div className="max-h-48 overflow-y-auto space-y-2">
-                {transactions.slice(0, 10).map((tx) => (
+                {transactions.content.slice(0, 10).map((tx) => (
                   <div
                     key={tx.id}
                     className="flex items-center justify-between bg-muted/50 border border-border rounded-md p-2"
                   >
                     <div className="flex-1 text-sm">
                       <span className="font-mono font-semibold">ID: {tx.id}</span>
-                      {tx.amount && <span className="text-muted-foreground ml-2">(${tx.amount})</span>}
-                      {tx.merchantName && <span className="text-muted-foreground ml-2">- {tx.merchantName}</span>}
+                      {tx.saleAmount && <span className="text-muted-foreground ml-2">(${tx.saleAmount})</span>}
+                      {tx.storeName && <span className="text-muted-foreground ml-2">- {tx.storeName}</span>}
                     </div>
                     <Button
                       variant="outline"
