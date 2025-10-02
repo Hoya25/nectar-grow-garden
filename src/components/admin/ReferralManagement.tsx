@@ -200,7 +200,10 @@ const ReferralManagement = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {stats.total_rewards_paid.toLocaleString()}
+              {stats.total_rewards_paid.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}
             </div>
           </CardContent>
         </Card>

@@ -28,7 +28,10 @@ const BatchLockUpgrade = ({ locks, onUpgradeComplete, availableNCTR = 0 }: Batch
   const { user } = useAuth();
 
   const formatNCTR = (amount: number): string => {
-    return Math.floor(amount).toLocaleString();
+    return Math.floor(amount).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   };
 
   // Calculate upgradeable locks and total amount + available NCTR

@@ -156,7 +156,10 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
           <Alert>
             <TrendingUp className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
-              <span>Available NCTR: <strong>{availableNCTR.toLocaleString()}</strong></span>
+              <span>Available NCTR: <strong>{availableNCTR.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}</strong></span>
               {availableNCTR < 100 && (
                 <BuyNCTRButton 
                   variant="outline" 
@@ -204,7 +207,10 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                       </div>
                       <div className={`flex items-center ${option.textColor}`}>
                         <Award className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span>Min. {option.minAmount.toLocaleString()} NCTR</span>
+                        <span>Min. {option.minAmount.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })} NCTR</span>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -238,7 +244,10 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                   <Input
                     id="lock-amount"
                     type="number"
-                    placeholder={`Min. ${selectedOption?.minAmount.toLocaleString()} NCTR`}
+                    placeholder={`Min. ${selectedOption?.minAmount.toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })} NCTR`}
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     min={selectedOption?.minAmount}
@@ -253,8 +262,14 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                   <div className="space-y-2">
                     <p className="text-sm text-destructive">
                       {numericAmount < (selectedOption?.minAmount || 0) 
-                        ? `Minimum amount is ${selectedOption?.minAmount.toLocaleString()} NCTR`
-                        : `Insufficient balance. Available: ${availableNCTR.toLocaleString()} NCTR`
+                        ? `Minimum amount is ${selectedOption?.minAmount.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })} NCTR`
+                        : `Insufficient balance. Available: ${availableNCTR.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })} NCTR`
                       }
                     </p>
                     {numericAmount > availableNCTR && (
@@ -264,7 +279,10 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                         suggestedAmount={Math.ceil((numericAmount - availableNCTR) / 100) * 100}
                         className="text-primary border-primary"
                       >
-                        Buy {(numericAmount - availableNCTR).toLocaleString()} More NCTR
+                        Buy {(numericAmount - availableNCTR).toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })} More NCTR
                       </BuyNCTRButton>
                     )}
                   </div>
@@ -279,7 +297,10 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground block">Amount:</span>
-                        <p className="font-medium">{numericAmount.toLocaleString()} NCTR</p>
+                        <p className="font-medium">{numericAmount.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })} NCTR</p>
                       </div>
                       <div>
                         <span className="text-muted-foreground block">Duration:</span>

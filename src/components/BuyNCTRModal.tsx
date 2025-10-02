@@ -220,7 +220,10 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                   onClick={() => handleQuickAmount(amount)}
                   className="text-xs min-h-[44px] touch-manipulation"
                 >
-                  <span className="whitespace-nowrap">{amount.toLocaleString()}</span>
+                  <span className="whitespace-nowrap">{amount.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}</span>
                 </Button>
               ))}
             </div>
@@ -274,10 +277,10 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
           <div className="bg-muted/50 p-3 rounded-lg">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Wholesale NCTR Price (360LOCK)</span>
-              <span className="font-semibold">${wholesalePrice.toFixed(4)}</span>
+              <span className="font-semibold">${wholesalePrice.toFixed(2)}</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Market price: {formatPrice(currentPrice)} • You save {((currentPrice - wholesalePrice) / currentPrice * 100).toFixed(0)}%
+              Market price: {formatPrice(currentPrice)} • You save {((currentPrice - wholesalePrice) / currentPrice * 100).toFixed(2)}%
             </p>
           </div>
 
@@ -293,7 +296,10 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm">NCTR Amount</span>
-                <span className="font-bold text-lg">{parseFloat(nctrAmount || '0').toLocaleString()} NCTR</span>
+                <span className="font-bold text-lg">{parseFloat(nctrAmount || '0').toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })} NCTR</span>
               </div>
               
               <div className="flex items-center justify-between">
@@ -373,7 +379,10 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
               <>
                 <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
                 <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                  Level Up - Buy {parseFloat(nctrAmount || '0').toLocaleString()} NCTR
+                  Level Up - Buy {parseFloat(nctrAmount || '0').toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })} NCTR
                   <span className="hidden sm:inline">
                     {usdAmount && ` ($${parseFloat(usdAmount).toFixed(2)})`}
                   </span>

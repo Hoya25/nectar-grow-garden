@@ -41,7 +41,10 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
       <span className="text-xs sm:text-sm whitespace-nowrap">Level Up, Buy NCTR</span>
       {suggestedAmount && (
         <Badge variant="secondary" className="ml-1 sm:ml-2 text-[10px] sm:text-xs px-1.5">
-          {suggestedAmount.toLocaleString()}
+          {suggestedAmount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}
         </Badge>
       )}
     </>
@@ -109,7 +112,10 @@ export const BuyNCTRUpgrade: React.FC<{
       badgeText="Upgrade"
     >
       <Zap className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
-      <span className="text-xs sm:text-sm">Buy {needed.toLocaleString()} NCTR</span>
+      <span className="text-xs sm:text-sm">Buy {needed.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })} NCTR</span>
       <Badge variant="secondary" className="ml-1 sm:ml-2 text-[10px] sm:text-xs px-1.5 whitespace-nowrap">
         → {targetStatus?.toUpperCase()}
       </Badge>
@@ -132,7 +138,10 @@ export const BuyNCTRQuick: React.FC<{
           suggestedAmount={amount}
         >
           <ShoppingCart className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="whitespace-nowrap">{amount.toLocaleString()}</span>
+          <span className="whitespace-nowrap">{amount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}</span>
         </BuyNCTRButton>
       ))}
     </div>

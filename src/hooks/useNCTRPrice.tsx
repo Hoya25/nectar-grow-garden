@@ -146,18 +146,12 @@ export const useNCTRPrice = () => {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: usdValue > 100 ? 2 : 6
+      maximumFractionDigits: 2
     }).format(usdValue);
   };
 
   const formatPrice = (price: number): string => {
-    if (price >= 1) {
-      return price.toFixed(2);
-    } else if (price >= 0.01) {
-      return price.toFixed(4);
-    } else {
-      return price.toFixed(8);
-    }
+    return price.toFixed(2);
   };
 
   const formatChange = (change?: number): string => {

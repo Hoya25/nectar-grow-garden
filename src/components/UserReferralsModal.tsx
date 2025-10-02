@@ -222,7 +222,10 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">{stats.totalRewards.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-primary">{stats.totalRewards.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}</div>
                   <div className="text-sm text-muted-foreground">NCTR Earned</div>
                 </CardContent>
               </Card>

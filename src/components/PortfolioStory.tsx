@@ -126,7 +126,10 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
 
   const formatAmount = (amount: number) => {
     const absAmount = Math.abs(amount);
-    return `${amount > 0 ? '+' : '-'}${absAmount.toLocaleString()} NCTR`;
+    return `${amount > 0 ? '+' : '-'}${absAmount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} NCTR`;
   };
 
   if (loading) {

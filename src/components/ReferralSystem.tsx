@@ -309,7 +309,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and 
               </div>
               <div>
                 <div className="text-xl font-bold text-secondary">
-                  {referralStats.total_earned_from_referrals.toLocaleString()}
+                  {referralStats.total_earned_from_referrals.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
                 </div>
                 <div className="text-xs text-muted-foreground">NCTR Earned</div>
               </div>

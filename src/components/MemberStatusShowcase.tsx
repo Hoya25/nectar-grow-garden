@@ -122,11 +122,14 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
 
   const formatNCTR = (amount: number): string => {
     if (amount >= 1000000) {
-      return (amount / 1000000).toFixed(1) + 'M';
+      return (amount / 1000000).toFixed(2) + 'M';
     } else if (amount >= 1000) {
-      return (amount / 1000).toFixed(1) + 'K';
+      return (amount / 1000).toFixed(2) + 'K';
     }
-    return amount.toLocaleString();
+    return amount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   };
 
   const StatusIcon = statusIcons[currentStatus as keyof typeof statusIcons] || Star;

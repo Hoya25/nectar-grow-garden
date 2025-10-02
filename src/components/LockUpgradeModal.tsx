@@ -25,7 +25,10 @@ const LockUpgradeModal = ({ lock, onUpgradeComplete, children }: LockUpgradeModa
   const [isUpgrading, setIsUpgrading] = useState(false);
 
   const formatNCTR = (amount: number): string => {
-    return Math.floor(amount).toLocaleString();
+    return Math.floor(amount).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   };
 
   const formatDate = (dateString: string): string => {
