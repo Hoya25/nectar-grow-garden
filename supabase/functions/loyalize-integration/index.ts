@@ -269,13 +269,16 @@ serve(async (req) => {
 
           const transactionsData = await transactionsResponse.json()
           console.log(`📦 Raw response data:`, JSON.stringify(transactionsData, null, 2))
-          console.log(`✅ Retrieved ${transactionsData.length || 0} transactions from Loyalize API`)
+          
+          // Loyalize v2 API returns transactions in a 'content' array
+          const transactions = transactionsData.content || []
+          console.log(`✅ Retrieved ${transactions.length} transactions from Loyalize API`)
 
           return new Response(
             JSON.stringify({
               success: true,
-              transactions: transactionsData,
-              count: transactionsData.length || 0
+              transactions: transactionsData, // Return full response for pagination info
+              count: transactions.length
             }),
             {
               headers: {
