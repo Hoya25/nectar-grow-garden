@@ -16,6 +16,7 @@ interface Transaction {
   status: string;
   created_at: string;
   partner_name?: string;
+  purchase_amount?: number;
 }
 
 interface PortfolioStoryProps {
@@ -222,20 +223,21 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <span className="font-semibold text-sm">
-                              {transaction.description || 'Transaction'}
-                            </span>
+                            {transaction.partner_name && (
+                              <Badge variant="secondary" className="text-xs font-semibold">
+                                {transaction.partner_name}
+                              </Badge>
+                            )}
                             {transaction.earning_source === 'token_purchase' && (
                               <Badge className="bg-green-600 text-white text-xs">
                                 NCTR Purchase
                               </Badge>
                             )}
-                            {transaction.partner_name && transaction.earning_source !== 'token_purchase' && (
-                              <Badge variant="secondary" className="text-xs">
-                                {transaction.partner_name}
-                              </Badge>
-                            )}
                           </div>
+                          
+                          <p className="text-sm text-foreground mb-2">
+                            {transaction.description || 'Transaction'}
+                          </p>
                           
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <Clock className="w-3 h-3" />

@@ -949,11 +949,19 @@ export type Database = {
         Returns: string
       }
       award_affiliate_nctr: {
-        Args: {
-          p_base_nctr_amount: number
-          p_earning_source?: string
-          p_user_id: string
-        }
+        Args:
+          | {
+              p_base_nctr_amount: number
+              p_brand_name?: string
+              p_earning_source?: string
+              p_purchase_amount?: number
+              p_user_id: string
+            }
+          | {
+              p_base_nctr_amount: number
+              p_earning_source?: string
+              p_user_id: string
+            }
         Returns: Json
       }
       award_profile_completion_bonus: {

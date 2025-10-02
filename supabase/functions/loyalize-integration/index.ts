@@ -644,20 +644,21 @@ serve(async (req) => {
               continue
             }
 
-            // Get the brand's reward_per_dollar rate from opportunities or brands table
+            // Get the brand's reward rate and name
             const { data: brandData } = await supabase
               .from('brands')
-              .select('nctr_per_dollar')
+              .select('nctr_per_dollar, name')
               .eq('id', mapping.brand_id)
               .single()
             
             // Calculate NCTR based on purchase amount and brand's reward rate
             // Use brand's nctr_per_dollar (defaults to 25 if not set)
             const rewardRate = brandData?.nctr_per_dollar || 25
+            const brandName = brandData?.name || 'Unknown Brand'
             const purchaseAmount = parseFloat(transaction.saleAmount) || 0
             const nctrAmount = purchaseAmount * rewardRate
 
-            console.log(`💰 Purchase: $${purchaseAmount} × ${rewardRate} NCTR/$ = ${nctrAmount} base NCTR`)
+            console.log(`💰 ${brandName} Purchase: $${purchaseAmount} × ${rewardRate} NCTR/$ = ${nctrAmount} base NCTR`)
 
             // Credit user via the award_affiliate_nctr function (applies Wings multiplier)
             const { data: result, error: creditError } = await supabase.rpc(
@@ -665,7 +666,9 @@ serve(async (req) => {
               {
                 p_user_id: mapping.user_id,
                 p_base_nctr_amount: nctrAmount,
-                p_earning_source: 'affiliate_purchase'
+                p_earning_source: 'affiliate_purchase',
+                p_brand_name: brandName,
+                p_purchase_amount: purchaseAmount
               }
             )
 
