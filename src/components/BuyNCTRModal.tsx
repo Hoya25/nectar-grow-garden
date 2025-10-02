@@ -35,6 +35,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   current360Lock = 0,
   onPurchaseComplete
 }) => {
+  console.log('🔵 BuyNCTRModal component rendered, open =', open);
   const { currentPrice, formatPrice, formatUSD } = useNCTRPrice();
   const [nctrAmount, setNctrAmount] = useState(suggestedAmount.toString());
   const [usdAmount, setUsdAmount] = useState('');
@@ -111,6 +112,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   };
 
   const handleBuyNow = async () => {
+    console.log('🚀🚀🚀 HANDLE BUY NOW CALLED!');
     console.log('🚀 Starting NCTR purchase flow with Stripe...', { nctrAmount, usdAmount });
     console.log('💰 Calculated values:', { 
       nctrAmountParsed: parseFloat(nctrAmount),
