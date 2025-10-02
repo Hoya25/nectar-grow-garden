@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useWallet } from '@/hooks/useWallet';
@@ -108,14 +108,6 @@ const Garden = () => {
   const [lastCheckinTime, setLastCheckinTime] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0); // Add refresh trigger
 
-  // Set up real-time transaction notifications
-  useTransactionNotifications({
-    userId: user?.id,
-    onTransactionReceived: () => {
-      // Refresh user data when new transaction arrives
-      fetchUserData();
-    }
-  });
 
   useEffect(() => {
     if (!user) {
@@ -128,7 +120,7 @@ const Garden = () => {
     fetchUserData();
     generateReferralCode();
     fetchReferralStats();
-  }, [user, navigate, refreshKey]); // Add refreshKey to dependencies
+  }, [user, navigate, refreshKey]); // fetchUserData is stable (memoized)
 
   // Real-time updates for earning opportunities
   useEffect(() => {
@@ -305,7 +297,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     }
   };
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
@@ -415,7 +407,18 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  // Memoize the transaction callback to prevent effect restarts
+  const handleTransactionReceived = useCallback(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+  // Set up real-time transaction notifications
+  useTransactionNotifications({
+    userId: user?.id,
+    onTransactionReceived: handleTransactionReceived
+  });
 
   const checkDailyCheckinAvailability = async () => {
     try {
