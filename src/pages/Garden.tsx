@@ -113,8 +113,21 @@ const Garden = () => {
 
   useEffect(() => {
     if (!user) {
-      // Store the current path for redirect after auth
-      sessionStorage.setItem('authRedirect', '/garden');
+      // Check if this is a purchase success redirect
+      const purchaseStatus = searchParams.get('purchase');
+      const nctrAmount = searchParams.get('nctr');
+      
+      if (purchaseStatus === 'success' && nctrAmount) {
+        // Store the purchase info to display after login
+        sessionStorage.setItem('pendingPurchase', JSON.stringify({ 
+          status: 'success', 
+          nctr: nctrAmount 
+        }));
+        sessionStorage.setItem('authRedirect', `/garden?purchase=success&nctr=${nctrAmount}`);
+      } else {
+        sessionStorage.setItem('authRedirect', '/garden');
+      }
+      
       navigate('/auth');
       return;
     }
@@ -122,10 +135,13 @@ const Garden = () => {
     fetchUserData();
     generateReferralCode();
     fetchReferralStats();
-  }, [user, navigate, refreshKey]); // fetchUserData is stable (memoized)
+  }, [user, navigate, refreshKey, searchParams]); // fetchUserData is stable (memoized)
 
   // Handle Stripe purchase success/cancel redirects
   useEffect(() => {
+    // Don't process purchase status if user isn't loaded yet
+    if (!user) return;
+
     const purchaseStatus = searchParams.get('purchase');
     const nctrAmount = searchParams.get('nctr');
 
@@ -133,8 +149,8 @@ const Garden = () => {
       // Show success message
       toast({
         title: "🎉 Purchase Successful!",
-        description: `Your ${parseFloat(nctrAmount).toLocaleString()} NCTR has been locked in 360LOCK. Refreshing your portfolio...`,
-        duration: 5000,
+        description: `Your ${parseFloat(nctrAmount).toLocaleString()} NCTR has been locked in 360LOCK and will appear in your portfolio within a few moments.`,
+        duration: 8000,
       });
 
       // Trigger immediate refresh
@@ -154,7 +170,7 @@ const Garden = () => {
       // Clean up URL
       navigate('/garden', { replace: true });
     }
-  }, [searchParams, navigate, user?.id, toast]);
+  }, [searchParams, navigate, user, toast]);
 
   // Real-time updates for earning opportunities
   useEffect(() => {

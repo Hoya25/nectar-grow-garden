@@ -18,11 +18,18 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState('signin');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [manualReferralCode, setManualReferralCode] = useState('');
+  const [hasPendingPurchase, setHasPendingPurchase] = useState(false);
   
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check for pending purchase
+    const pendingPurchaseStr = sessionStorage.getItem('pendingPurchase');
+    if (pendingPurchaseStr) {
+      setHasPendingPurchase(true);
+    }
+    
     // Check for referral code in URL on component mount
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
@@ -34,6 +41,18 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
+      // Check for pending purchase info
+      const pendingPurchaseStr = sessionStorage.getItem('pendingPurchase');
+      if (pendingPurchaseStr) {
+        try {
+          const pendingPurchase = JSON.parse(pendingPurchaseStr);
+          sessionStorage.removeItem('pendingPurchase');
+          // Don't show toast here - let Garden page handle it
+        } catch (e) {
+          console.error('Error parsing pending purchase:', e);
+        }
+      }
+
       // Check if there's a redirect URL in the query params or session storage
       const urlParams = new URLSearchParams(window.location.search);
       const redirectTo = urlParams.get('redirect') || sessionStorage.getItem('authRedirect') || '/garden';
@@ -82,10 +101,13 @@ const Auth = () => {
       <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm shadow-elegant">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-foreground">
-            Welcome to The Garden
+            {hasPendingPurchase ? '🎉 Purchase Successful!' : 'Welcome to The Garden'}
           </CardTitle>
           <CardDescription>
-            Join our community and start earning NCTR tokens
+            {hasPendingPurchase 
+              ? 'Please sign in to complete your NCTR purchase and see it in your portfolio'
+              : 'Join our community and start earning NCTR tokens'
+            }
           </CardDescription>
         </CardHeader>
         
