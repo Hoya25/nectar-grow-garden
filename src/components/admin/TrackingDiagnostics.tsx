@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,28 @@ export const TrackingDiagnostics = () => {
   const [trackingId, setTrackingId] = useState('');
   const [userId, setUserId] = useState('');
   const [diagnosticResult, setDiagnosticResult] = useState<any>(null);
+  const [recentTrackingIds, setRecentTrackingIds] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load recent tracking IDs on mount
+  useEffect(() => {
+    const loadRecentTracking = async () => {
+      try {
+        const { data } = await supabase
+          .from('affiliate_link_mappings')
+          .select('tracking_id, created_at, user_id')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        
+        setRecentTrackingIds(data || []);
+      } catch (error) {
+        console.error('Failed to load recent tracking IDs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadRecentTracking();
+  }, []);
 
   const checkTracking = async () => {
     if (!trackingId && !userId) {
@@ -147,10 +169,35 @@ export const TrackingDiagnostics = () => {
           <Alert>
             <Database className="h-4 w-4" />
             <AlertDescription>
-              This checks if tracking IDs from Loyalize purchases match entries in our database. 
-              Use this to debug why purchases aren&apos;t being credited.
+              <strong>⚠️ Enter a tracking ID, NOT a product URL!</strong>
+              <br />
+              Tracking IDs look like: <code className="text-xs">68cd62bc2b6bd0277b3b7df3</code>
+              <br />
+              Find them in Loyalize transaction logs or the recent tracking IDs below.
             </AlertDescription>
           </Alert>
+
+          {recentTrackingIds.length > 0 && (
+            <div className="border rounded-lg p-3 bg-muted/50">
+              <h4 className="text-sm font-semibold mb-2">Recent Tracking IDs (click to use):</h4>
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                {recentTrackingIds.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setTrackingId(item.tracking_id)}
+                    className="w-full text-left text-xs font-mono bg-background hover:bg-accent p-2 rounded transition-colors"
+                  >
+                    <div className="flex justify-between items-center">
+                      <code className="text-primary">{item.tracking_id}</code>
+                      <span className="text-muted-foreground text-[10px]">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
