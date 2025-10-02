@@ -50,12 +50,17 @@ export function PendingTransactionsMonitor() {
 
       if (mappingsError) throw mappingsError;
 
-      // Ensure we always set an array
-      const transactionsArray = Array.isArray(loyalizeData?.transactions) 
+      // Parse the nested response structure from Loyalize API
+      // Response format: { success: true, transactions: { content: [...] } }
+      const transactionsArray = Array.isArray(loyalizeData?.transactions?.content) 
+        ? loyalizeData.transactions.content
+        : Array.isArray(loyalizeData?.transactions) 
         ? loyalizeData.transactions 
         : Array.isArray(loyalizeData) 
         ? loyalizeData 
         : [];
+      
+      console.log("📊 Parsed transactions:", transactionsArray.length, "transactions found");
 
       setTransactions(transactionsArray);
       setMappings(Array.isArray(mappingsData) ? mappingsData : []);
