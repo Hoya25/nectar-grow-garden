@@ -1181,6 +1181,18 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                   </Card>
                 </div>
 
+                {/* Buy NCTR Button */}
+                <div className="mb-6 flex justify-center">
+                  <BuyNCTRButton
+                    variant="default"
+                    size="lg"
+                    className="w-full md:w-auto min-w-[200px]"
+                    currentStatus={portfolio?.opportunity_status || 'starter'}
+                    current360Lock={portfolio?.lock_360_nctr || 0}
+                    onPurchaseComplete={fetchUserData}
+                  />
+                </div>
+
                 {/* Easy Button for 360LOCK Commitment */}
                 <div className="mb-6">
                   <BatchLockUpgrade 
