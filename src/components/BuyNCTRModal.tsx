@@ -91,18 +91,24 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   };
 
   const handleNCTRChange = (value: string) => {
-    const numValue = parseFloat(value) || 0;
-    setNctrAmount(value);
-    if (wholesalePrice) {
-      setUsdAmount((numValue * wholesalePrice).toFixed(2));
+    // Allow empty string or valid numbers
+    if (value === '' || !isNaN(parseFloat(value))) {
+      setNctrAmount(value);
+      const numValue = parseFloat(value) || 0;
+      if (wholesalePrice) {
+        setUsdAmount((numValue * wholesalePrice).toFixed(2));
+      }
     }
   };
 
   const handleUSDChange = (value: string) => {
-    const numValue = parseFloat(value) || 0;
-    setUsdAmount(value);
-    if (wholesalePrice && wholesalePrice > 0) {
-      setNctrAmount((numValue / wholesalePrice).toFixed(0));
+    // Allow empty string or valid numbers
+    if (value === '' || !isNaN(parseFloat(value))) {
+      setUsdAmount(value);
+      const numValue = parseFloat(value) || 0;
+      if (wholesalePrice && wholesalePrice > 0) {
+        setNctrAmount((numValue / wholesalePrice).toFixed(0));
+      }
     }
   };
 
@@ -182,7 +188,15 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        onInteractOutside={(e) => {
+          // Prevent closing when clicking outside if checkout is in progress
+          if (loading) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
             <Zap className="w-6 h-6 text-primary" />
@@ -222,8 +236,11 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                   type="number"
                   value={nctrAmount}
                   onChange={(e) => handleNCTRChange(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  onFocus={(e) => e.target.select()}
                   className="pr-16"
                   placeholder="2500"
+                  min="1"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   NCTR
@@ -239,8 +256,12 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                   type="number"
                   value={usdAmount}
                   onChange={(e) => handleUSDChange(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  onFocus={(e) => e.target.select()}
                   className="pr-16"
                   placeholder="0.00"
+                  min="0.01"
+                  step="0.01"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   USD
