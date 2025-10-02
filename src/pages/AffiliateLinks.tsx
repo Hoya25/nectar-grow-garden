@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Link, Store, TrendingUp } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ArrowLeft, Link, Store, TrendingUp, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import UserAffiliateLinks from '@/components/UserAffiliateLinks';
 import IndependentAffiliateLinks from '@/components/IndependentAffiliateLinks';
@@ -32,6 +33,76 @@ const AffiliateLinks = () => {
             </p>
           </div>
         </div>
+
+        {/* Critical Workflow Warning */}
+        <Alert className="mb-6 border-2 border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+          <AlertTriangle className="h-5 w-5 text-amber-600" />
+          <AlertDescription className="text-base">
+            <div className="space-y-3">
+              <p className="font-bold text-amber-900 dark:text-amber-100 text-lg">
+                ⚠️ IMPORTANT: Generate Your Link BEFORE Shopping!
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-start gap-3 bg-white dark:bg-background rounded-lg p-3 border">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 font-bold">
+                    1
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm mb-1 flex items-center gap-2">
+                      <Link className="w-4 h-4" />
+                      Generate Link First
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Click "Generate Link" below for the brand you want to shop at
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 bg-white dark:bg-background rounded-lg p-3 border">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 font-bold">
+                    2
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm mb-1 flex items-center gap-2">
+                      <Store className="w-4 h-4" />
+                      Click Through Link
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Use YOUR generated link to visit the store and complete purchase
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 bg-white dark:bg-background rounded-lg p-3 border">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 font-bold">
+                    3
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm mb-1 flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      Earn NCTR
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Your purchase is tracked & you earn NCTR in 24-72 hours
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-red-100 dark:bg-red-950/30 rounded-lg p-3 border border-red-300 dark:border-red-800">
+                <div className="flex items-center gap-2 mb-2">
+                  <XCircle className="w-4 h-4 text-red-600" />
+                  <span className="font-semibold text-red-900 dark:text-red-100 text-sm">
+                    ❌ Won't Work: Shopping directly at store without generating link first
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  <span className="font-semibold text-green-900 dark:text-green-100 text-sm">
+                    ✅ Will Work: Generate link → Click link → Shop → Get NCTR
+                  </span>
+                </div>
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
