@@ -546,6 +546,177 @@ serve(async (req) => {
         });
       }
 
+      case 'sync_transactions': {
+        console.log('🔄 Syncing Loyalize transactions and crediting users')
+        
+        if (!loyalizeApiKey || loyalizeApiKey.trim() === '') {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'LOYALIZE_API_KEY not configured',
+              processed: 0,
+              credited: 0,
+              skipped: 0,
+              errors: 1
+            }),
+            {
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              },
+              status: 500
+            }
+          )
+        }
+
+        try {
+          // Fetch transactions from Loyalize
+          const transactionsResponse = await fetch(
+            'https://api.loyalize.com/v2/publisher/transactions?page=0&size=100',
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': loyalizeApiKey
+              }
+            }
+          )
+
+          if (!transactionsResponse.ok) {
+            throw new Error(`Failed to fetch transactions: ${transactionsResponse.status}`)
+          }
+
+          const transactionsData = await transactionsResponse.json()
+          const transactions = transactionsData?.content || []
+          
+          console.log(`📊 Found ${transactions.length} transactions from Loyalize`)
+
+          // Fetch all tracking mappings
+          const { data: mappings, error: mappingsError } = await supabase
+            .from('affiliate_link_mappings')
+            .select('tracking_id, user_id, brand_id')
+
+          if (mappingsError) throw mappingsError
+
+          let processed = 0
+          let credited = 0
+          let skipped = 0
+          const details = []
+
+          // Process each PENDING transaction
+          for (const transaction of transactions) {
+            if (transaction.status !== 'PENDING') {
+              skipped++
+              continue
+            }
+
+            processed++
+            const trackingId = transaction.sid || transaction.shopperId
+            const mapping = mappings?.find(m => m.tracking_id === trackingId)
+
+            if (!mapping) {
+              console.log(`⚠️ No mapping found for tracking ID: ${trackingId}`)
+              skipped++
+              details.push({
+                orderNumber: transaction.orderNumber,
+                status: 'skipped',
+                message: 'No user mapping found'
+              })
+              continue
+            }
+
+            // Check if already processed
+            const { data: existing } = await supabase
+              .from('nctr_transactions')
+              .select('id')
+              .eq('external_transaction_id', transaction.id.toString())
+              .single()
+
+            if (existing) {
+              console.log(`✓ Transaction ${transaction.orderNumber} already processed`)
+              skipped++
+              details.push({
+                orderNumber: transaction.orderNumber,
+                status: 'skipped',
+                message: 'Already processed'
+              })
+              continue
+            }
+
+            // Calculate NCTR reward (commission * 100 = NCTR)
+            const nctrAmount = parseFloat(transaction.shopperCommission) * 100
+
+            // Credit user via the award_affiliate_nctr function
+            const { data: result, error: creditError } = await supabase.rpc(
+              'award_affiliate_nctr',
+              {
+                p_user_id: mapping.user_id,
+                p_base_nctr_amount: nctrAmount,
+                p_earning_source: 'affiliate_purchase'
+              }
+            )
+
+            if (creditError) {
+              console.error(`❌ Failed to credit user:`, creditError)
+              details.push({
+                orderNumber: transaction.orderNumber,
+                amount: transaction.saleAmount,
+                status: 'error',
+                message: creditError.message
+              })
+              continue
+            }
+
+            credited++
+            console.log(`✅ Credited ${result.multiplied_amount} NCTR to user for order ${transaction.orderNumber}`)
+            
+            details.push({
+              orderNumber: transaction.orderNumber,
+              amount: transaction.saleAmount,
+              nctr_amount: result.multiplied_amount,
+              status: 'credited',
+              message: `Credited ${result.multiplied_amount} NCTR`
+            })
+          }
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              processed,
+              credited,
+              skipped,
+              errors: processed - credited - skipped,
+              details: details.slice(0, 10) // Return last 10 for display
+            }),
+            {
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              }
+            }
+          )
+        } catch (error) {
+          console.error('❌ Error syncing transactions:', error)
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: (error as Error).message,
+              processed: 0,
+              credited: 0,
+              skipped: 0,
+              errors: 1
+            }),
+            {
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              },
+              status: 500
+            }
+          )
+        }
+      }
+
       default:
         throw new Error(`Unknown action: ${action}`)
     }
