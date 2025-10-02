@@ -189,7 +189,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full"
         onInteractOutside={(e) => {
           // Prevent closing when clicking outside if checkout is in progress
           if (loading) {
@@ -211,25 +211,25 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
           {/* Quick Amount Buttons */}
           <div>
             <Label className="text-sm text-muted-foreground mb-2 block">Quick Select</Label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
               {quickAmounts.map((amount) => (
                 <Button
                   key={amount}
                   variant={nctrAmount === amount.toString() ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleQuickAmount(amount)}
-                  className="text-xs"
+                  className="text-xs min-h-[44px] touch-manipulation"
                 >
-                  {amount.toLocaleString()}
+                  <span className="whitespace-nowrap">{amount.toLocaleString()}</span>
                 </Button>
               ))}
             </div>
           </div>
 
           {/* Amount Input */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="nctr-amount">NCTR Amount</Label>
+              <Label htmlFor="nctr-amount" className="text-sm">NCTR Amount</Label>
               <div className="relative mt-1">
                 <Input
                   id="nctr-amount"
@@ -238,7 +238,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                   onChange={(e) => handleNCTRChange(e.target.value)}
                   onClick={(e) => e.stopPropagation()}
                   onFocus={(e) => e.target.select()}
-                  className="pr-16"
+                  className="pr-16 h-12 text-base"
                   placeholder="2500"
                   min="1"
                 />
@@ -249,7 +249,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="usd-amount">USD Amount</Label>
+              <Label htmlFor="usd-amount" className="text-sm">USD Amount</Label>
               <div className="relative mt-1">
                 <Input
                   id="usd-amount"
@@ -258,7 +258,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                   onChange={(e) => handleUSDChange(e.target.value)}
                   onClick={(e) => e.stopPropagation()}
                   onFocus={(e) => e.target.select()}
-                  className="pr-16"
+                  className="pr-16 h-12 text-base"
                   placeholder="0.00"
                   min="0.01"
                   step="0.01"
@@ -361,20 +361,24 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
           <Button
             onClick={handleBuyNow}
             disabled={isButtonDisabled}
-            className="w-full h-12 text-base"
+            className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
             size="lg"
           >
             {loading ? (
               <>
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Checkout Opened - Complete in New Tab
+                <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
+                <span className="text-xs sm:text-sm">Checkout Opened - Complete in New Tab</span>
               </>
             ) : (
               <>
-                <Zap className="w-4 h-4 mr-2" />
-                Level Up - Buy {parseFloat(nctrAmount || '0').toLocaleString()} NCTR
-                {usdAmount && ` ($${parseFloat(usdAmount).toFixed(2)})`}
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
+                <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                  Level Up - Buy {parseFloat(nctrAmount || '0').toLocaleString()} NCTR
+                  <span className="hidden sm:inline">
+                    {usdAmount && ` ($${parseFloat(usdAmount).toFixed(2)})`}
+                  </span>
+                </span>
+                <ArrowRight className="w-4 h-4 ml-2 flex-shrink-0" />
               </>
             )}
           </Button>

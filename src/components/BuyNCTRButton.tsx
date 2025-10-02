@@ -37,10 +37,10 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
 
   const defaultContent = (
     <>
-      <Zap className="w-4 h-4 mr-2" />
-      <span>Level Up, Buy NCTR</span>
+      <Zap className="w-4 h-4 sm:mr-2 flex-shrink-0" />
+      <span className="text-xs sm:text-sm whitespace-nowrap">Level Up, Buy NCTR</span>
       {suggestedAmount && (
-        <Badge variant="secondary" className="ml-2 text-xs">
+        <Badge variant="secondary" className="ml-1 sm:ml-2 text-[10px] sm:text-xs px-1.5">
           {suggestedAmount.toLocaleString()}
         </Badge>
       )}
@@ -54,7 +54,7 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
           type="button"
           variant={variant}
           size={size}
-          className={`${className}`}
+          className={`min-h-[44px] ${className}`}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -67,7 +67,7 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
         {showBadge && (
           <Badge 
             variant="secondary" 
-            className="absolute -top-2 -right-2 text-xs bg-primary text-primary-foreground animate-pulse"
+            className="absolute -top-2 -right-2 text-[10px] sm:text-xs bg-primary text-primary-foreground animate-pulse px-1.5 py-0.5"
           >
             {badgeText}
           </Badge>
@@ -108,9 +108,9 @@ export const BuyNCTRUpgrade: React.FC<{
       showBadge={true}
       badgeText="Upgrade"
     >
-      <Zap className="w-4 h-4 mr-2" />
-      <span>Buy {needed.toLocaleString()} NCTR</span>
-      <Badge variant="secondary" className="ml-2 text-xs">
+      <Zap className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2 flex-shrink-0" />
+      <span className="text-xs sm:text-sm">Buy {needed.toLocaleString()} NCTR</span>
+      <Badge variant="secondary" className="ml-1 sm:ml-2 text-[10px] sm:text-xs px-1.5 whitespace-nowrap">
         → {targetStatus?.toUpperCase()}
       </Badge>
     </BuyNCTRButton>
@@ -122,17 +122,17 @@ export const BuyNCTRQuick: React.FC<{
   className?: string;
 }> = ({ amounts = [1000, 2500, 5000], className }) => {
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    <div className={`flex flex-wrap gap-1.5 sm:gap-2 ${className}`}>
       {amounts.map(amount => (
         <BuyNCTRButton
           key={amount}
           variant="outline"
           size="sm"
-          className="text-xs"
+          className="text-xs min-w-[80px] sm:min-w-[90px]"
           suggestedAmount={amount}
         >
-          <ShoppingCart className="w-3 h-3 mr-1" />
-          {amount.toLocaleString()}
+          <ShoppingCart className="w-3 h-3 mr-1 flex-shrink-0" />
+          <span className="whitespace-nowrap">{amount.toLocaleString()}</span>
         </BuyNCTRButton>
       ))}
     </div>
