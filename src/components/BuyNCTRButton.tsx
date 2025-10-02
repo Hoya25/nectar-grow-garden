@@ -32,6 +32,7 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleBuyClick = () => {
+    console.log('🛒 Buy NCTR button clicked - opening modal');
     setModalOpen(true);
   };
 

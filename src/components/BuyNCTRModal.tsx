@@ -112,6 +112,11 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
   const handleBuyNow = async () => {
     console.log('🚀 Starting NCTR purchase flow with Stripe...', { nctrAmount, usdAmount });
+    console.log('💰 Calculated values:', { 
+      nctrAmountParsed: parseFloat(nctrAmount),
+      usdAmountParsed: parseFloat(usdAmount),
+      wholesalePrice 
+    });
     setLoading(true);
     
     try {
@@ -136,6 +141,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
         // Redirect to Stripe checkout
         window.location.href = data.url;
       } else {
+        console.error('❌ No URL in response, full data:', data);
         throw new Error('No checkout URL returned from Stripe');
       }
     } catch (error) {
