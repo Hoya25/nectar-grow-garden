@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useWallet } from '@/hooks/useWallet';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
@@ -92,6 +92,7 @@ const Garden = () => {
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress, formatUSD } = useNCTRPrice();
   const { getSetting, loading: settingsLoading } = useSiteSettings(['earning_opportunities_banner_title', 'earning_opportunities_banner_subtitle']);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [locks, setLocks] = useState<LockCommitment[]>([]);
   const [opportunities, setOpportunities] = useState<EarningOpportunity[]>([]);
@@ -121,6 +122,40 @@ const Garden = () => {
     generateReferralCode();
     fetchReferralStats();
   }, [user, navigate, refreshKey]); // fetchUserData is stable (memoized)
+
+  // Handle Stripe purchase success/cancel redirects
+  useEffect(() => {
+    const purchaseStatus = searchParams.get('purchase');
+    const nctrAmount = searchParams.get('nctr');
+
+    if (purchaseStatus === 'success' && nctrAmount) {
+      // Show success message
+      toast({
+        title: "🎉 Purchase Successful!",
+        description: `Your ${parseFloat(nctrAmount).toLocaleString()} NCTR has been locked in 360LOCK. Refreshing your portfolio...`,
+        duration: 5000,
+      });
+
+      // Refresh user data to show new balance after a short delay
+      setTimeout(() => {
+        if (user?.id) {
+          setRefreshKey(prev => prev + 1);
+        }
+      }, 2000);
+
+      // Clean up URL
+      navigate('/garden', { replace: true });
+    } else if (purchaseStatus === 'cancelled') {
+      toast({
+        title: "Purchase Cancelled",
+        description: "Your purchase was cancelled. No charges were made.",
+        variant: "destructive",
+      });
+
+      // Clean up URL
+      navigate('/garden', { replace: true });
+    }
+  }, [searchParams, navigate, user?.id, toast]);
 
   // Real-time updates for earning opportunities
   useEffect(() => {
