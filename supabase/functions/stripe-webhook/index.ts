@@ -8,31 +8,49 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
-  const signature = req.headers.get("stripe-signature");
-  
-  if (!signature) {
-    logStep("ERROR: No signature header");
-    return new Response("No signature", { status: 400 });
-  }
-
-  const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-    apiVersion: "2025-08-27.basil",
-  });
-
-  const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
-  if (!webhookSecret) {
-    logStep("ERROR: Webhook secret not configured");
-    return new Response("Webhook secret not configured", { status: 500 });
-  }
-
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-  );
-
   try {
+    const signature = req.headers.get("stripe-signature");
+    
+    if (!signature) {
+      logStep("ERROR: No signature header");
+      return new Response(JSON.stringify({ error: "No signature header" }), { 
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+    if (!webhookSecret) {
+      logStep("ERROR: Webhook secret not configured");
+      return new Response(JSON.stringify({ error: "Webhook secret not configured" }), { 
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false, autoRefreshToken: false } }
+    );
+
     const body = await req.text();
-    const event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+    let event: Stripe.Event;
+    
+    try {
+      event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+      logStep("✅ Webhook signature verified", { eventType: event.type, eventId: event.id });
+    } catch (err) {
+      logStep("❌ Webhook signature verification failed", { error: err.message });
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
     
     logStep("Event received", { type: event.type, id: event.id });
 
@@ -135,11 +153,13 @@ serve(async (req) => {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("❌ ERROR in stripe-webhook", { message: errorMessage });
+    logStep("❌ ERROR in stripe-webhook", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
     
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    // Return 200 even on error to prevent Stripe from retrying
+    // Log the error for debugging but acknowledge receipt
+    return new Response(JSON.stringify({ received: true, error: errorMessage }), {
       headers: { "Content-Type": "application/json" },
-      status: 400,
+      status: 200,
     });
   }
 });
