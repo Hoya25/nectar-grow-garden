@@ -45,8 +45,10 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Call Loyalize API to get the actual tracking redirect URL
+    // IMPORTANT: Loyalize requires cid (Campaign ID) parameter
     const loyalizeApiUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
-    loyalizeApiUrl.searchParams.set('pid', '3120835'); // Your Loyalize PID
+    loyalizeApiUrl.searchParams.set('pid', '3120835'); // Your Loyalize Publisher ID
+    loyalizeApiUrl.searchParams.set('cid', '0'); // Campaign ID (0 = default campaign)
     if (userId) loyalizeApiUrl.searchParams.set('cp', userId);
     if (trackingId) loyalizeApiUrl.searchParams.set('sid', trackingId);
 
@@ -128,12 +130,19 @@ serve(async (req) => {
     if (userId && trackingId) {
       console.log(`📝 Recording click - User: ${userId}, Tracking: ${trackingId}`);
       try {
+        // Get brand_id for this store
+        const { data: brand } = await supabase
+          .from('brands')
+          .select('id')
+          .eq('loyalize_id', storeId)
+          .single();
+
         const { data: mappingData, error: mappingError } = await supabase
           .from('affiliate_link_mappings')
           .upsert({
             user_id: userId,
             tracking_id: trackingId,
-            loyalize_store_id: storeId,
+            brand_id: brand?.id || null,
             created_at: new Date().toISOString()
           }, {
             onConflict: 'tracking_id'
