@@ -233,10 +233,11 @@ serve(async (req) => {
 
         try {
           // Fetch transactions from Loyalize v2 API
-          // The list endpoint uses API key as query parameter
-          const transactionsResponse = await fetch(`https://api.loyalize.com/v2/transactions?apiKey=${loyalizeApiKey}`, {
+          // Use direct API key in Authorization header (no Bearer prefix) like v1 endpoints
+          const transactionsResponse = await fetch('https://api.loyalize.com/v2/transactions', {
             method: 'GET',
             headers: {
+              'Authorization': loyalizeApiKey,
               'Content-Type': 'application/json',
               'Accept': 'application/json'
             }
