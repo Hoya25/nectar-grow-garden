@@ -952,6 +952,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             type="button"
                             variant="outline"
                             onClick={async () => {
+                              console.log('🔄 Regenerating link for:', formData.partner_name);
+                              
                               // Find brand by partner name
                               const { data: brandData, error } = await supabase
                                 .from('brands')
@@ -959,14 +961,18 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                                 .eq('name', formData.partner_name)
                                 .single();
                               
+                              console.log('📦 Brand lookup result:', { brandData, error });
+                              
                               if (error || !brandData) {
                                 toast({
                                   title: "Brand Not Found",
-                                  description: "Could not find brand in database. Make sure the brand exists.",
+                                  description: `Could not find "${formData.partner_name}" in database.`,
                                   variant: "destructive"
                                 });
                                 return;
                               }
+                              
+                              console.log('🔍 Brand loyalize_id:', brandData.loyalize_id);
                               
                               if (brandData.loyalize_id) {
                                 const newLink = generateUserTrackingLink(
@@ -975,15 +981,20 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                                   brandData.id,
                                   brandData.loyalize_id
                                 );
+                                
+                                console.log('✅ Generated new link:', newLink);
+                                console.log('🔗 Old link:', formData.affiliate_link);
+                                
                                 setFormData({...formData, affiliate_link: newLink});
+                                
                                 toast({
-                                  title: "Link Regenerated",
-                                  description: "Affiliate link updated to use proper Loyalize tracking",
+                                  title: "Link Regenerated ✅",
+                                  description: `Updated to Loyalize tracking link (Store ID: ${brandData.loyalize_id})`,
                                 });
                               } else {
                                 toast({
                                   title: "Not a Loyalize Brand",
-                                  description: "This brand doesn't have a Loyalize ID for tracking",
+                                  description: `"${brandData.name}" doesn't have a Loyalize ID for tracking`,
                                   variant: "destructive"
                                 });
                               }
@@ -991,8 +1002,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             className="w-full"
                           >
                             <RefreshCw className="w-4 h-4 mr-2" />
-                            Regenerate Link
+                            Regenerate Loyalize Link
                           </Button>
+                          <p className="text-xs text-muted-foreground">
+                            Updates affiliate link to use proper Loyalize tracking
+                          </p>
                         </div>
                       )}
                     </div>
