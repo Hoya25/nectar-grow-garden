@@ -32,6 +32,33 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
     fetchTransactions();
   }, [userId, refreshKey]);
 
+  // Real-time subscription for new transactions
+  useEffect(() => {
+    if (!userId) return;
+
+    const channel = supabase
+      .channel('portfolio-transactions')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'nctr_transactions',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('New transaction received:', payload);
+          // Add the new transaction to the list
+          setTransactions(prev => [payload.new as Transaction, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
+
   const fetchTransactions = async () => {
     try {
       setIsRefreshing(true);
