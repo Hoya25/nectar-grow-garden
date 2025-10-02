@@ -229,7 +229,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
   };
 
-  const fetchOpportunities = async () => {
+  const fetchOpportunities = useCallback(async () => {
     try {
       // First, get all active opportunities with their brand info
       const { data: opportunitiesData, error: opportunitiesError } = await supabase
@@ -295,7 +295,33 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     } catch (error) {
       console.error('Error fetching opportunities:', error);
     }
-  };
+  }, []);
+
+  const checkDailyCheckinAvailability = useCallback(async () => {
+    try {
+      const { data: isAvailable } = await supabase.rpc('is_daily_checkin_available', {
+        p_user_id: user?.id
+      });
+      setDailyCheckinAvailable(isAvailable);
+
+      // Get the user's last check-in time for the countdown
+      const { data: lastCheckin } = await supabase
+        .from('nctr_transactions')
+        .select('created_at')
+        .eq('user_id', user?.id)
+        .eq('earning_source', 'daily_checkin')
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      setLastCheckinTime(lastCheckin?.created_at || null);
+    } catch (error) {
+      console.error('Error checking daily checkin availability:', error);
+      setDailyCheckinAvailable(false);
+      setLastCheckinTime(null);
+    }
+  }, [user?.id]);
 
   const fetchUserData = useCallback(async () => {
     try {
@@ -407,7 +433,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, fetchOpportunities, checkDailyCheckinAvailability, toast]);
 
   // Memoize the transaction callback to prevent effect restarts
   const handleTransactionReceived = useCallback(() => {
@@ -419,32 +445,6 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
     userId: user?.id,
     onTransactionReceived: handleTransactionReceived
   });
-
-  const checkDailyCheckinAvailability = async () => {
-    try {
-      const { data: isAvailable } = await supabase.rpc('is_daily_checkin_available', {
-        p_user_id: user?.id
-      });
-      setDailyCheckinAvailable(isAvailable);
-
-      // Get the user's last check-in time for the countdown
-      const { data: lastCheckin } = await supabase
-        .from('nctr_transactions')
-        .select('created_at')
-        .eq('user_id', user?.id)
-        .eq('earning_source', 'daily_checkin')
-        .eq('status', 'completed')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      setLastCheckinTime(lastCheckin?.created_at || null);
-    } catch (error) {
-      console.error('Error checking daily checkin availability:', error);
-      setDailyCheckinAvailable(false);
-      setLastCheckinTime(null);
-    }
-  };
 
   const refreshOpportunities = () => {
     setRefreshKey(prev => prev + 1);
