@@ -34,24 +34,46 @@ export function PendingTransactionsMonitor() {
 
   const fetchPendingTransactions = async () => {
     setLoading(true);
+    console.log("🔍 Starting fetch of pending transactions...");
+    
     try {
       // Fetch from Loyalize
+      console.log("📡 Calling loyalize-integration function...");
       const { data: loyalizeData, error: loyalizeError } = await supabase.functions.invoke(
         'loyalize-integration',
         { body: { action: 'fetch_transactions' } }
       );
 
-      if (loyalizeError) throw loyalizeError;
+      console.log("📦 Raw Loyalize response:", loyalizeData);
+      console.log("❌ Loyalize error:", loyalizeError);
+
+      if (loyalizeError) {
+        console.error("💥 Loyalize error occurred:", loyalizeError);
+        throw loyalizeError;
+      }
 
       // Fetch all tracking mappings
+      console.log("🔗 Fetching tracking mappings...");
       const { data: mappingsData, error: mappingsError } = await supabase
         .from('affiliate_link_mappings')
         .select('tracking_id, user_id, brand_id');
 
-      if (mappingsError) throw mappingsError;
+      console.log("📦 Mappings data:", mappingsData);
+      console.log("❌ Mappings error:", mappingsError);
+
+      if (mappingsError) {
+        console.error("💥 Mappings error occurred:", mappingsError);
+        throw mappingsError;
+      }
 
       // Parse the nested response structure from Loyalize API
       // Response format: { success: true, transactions: { content: [...] } }
+      console.log("🔍 Parsing transaction structure...");
+      console.log("  - loyalizeData type:", typeof loyalizeData);
+      console.log("  - loyalizeData?.transactions type:", typeof loyalizeData?.transactions);
+      console.log("  - loyalizeData?.transactions?.content type:", typeof loyalizeData?.transactions?.content);
+      console.log("  - Array.isArray(loyalizeData?.transactions?.content):", Array.isArray(loyalizeData?.transactions?.content));
+      
       const transactionsArray = Array.isArray(loyalizeData?.transactions?.content) 
         ? loyalizeData.transactions.content
         : Array.isArray(loyalizeData?.transactions) 
@@ -60,28 +82,39 @@ export function PendingTransactionsMonitor() {
         ? loyalizeData 
         : [];
       
-      console.log("📊 Parsed transactions:", transactionsArray.length, "transactions found");
+      console.log("✅ Parsed transactions array:", transactionsArray);
+      console.log("📊 Total transactions found:", transactionsArray.length);
 
       setTransactions(transactionsArray);
       setMappings(Array.isArray(mappingsData) ? mappingsData : []);
       setLastSync(new Date());
+
+      console.log("✅ State updated successfully");
 
       toast({
         title: "✅ Transactions fetched",
         description: `Found ${transactionsArray.length} pending transactions`,
       });
     } catch (error: any) {
-      console.error('Error fetching transactions:', error);
+      console.error('💥 Error fetching transactions:', error);
+      console.error('💥 Error details:', {
+        message: error.message,
+        stack: error.stack,
+        error: error
+      });
+      
       toast({
         title: "❌ Error fetching transactions",
         description: error.message,
         variant: "destructive",
       });
+      
       // Ensure state is reset to empty arrays on error
       setTransactions([]);
       setMappings([]);
     } finally {
       setLoading(false);
+      console.log("🏁 Fetch completed");
     }
   };
 
