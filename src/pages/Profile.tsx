@@ -17,6 +17,7 @@ import { WingsStatusBar } from '@/components/WingsStatusBar';
 import { LevelUpModal } from '@/components/LevelUpModal';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
+import { PortfolioStory } from '@/components/PortfolioStory';
 
 interface UserProfile {
   id: string;
@@ -79,6 +80,7 @@ const Profile = () => {
     new: false,
     confirm: false
   });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -759,6 +761,11 @@ const Profile = () => {
                   </div>
                 )}
               </CardContent>
+            </Card>
+
+            {/* Portfolio Story - Transaction History */}
+            <Card className="bg-card/80 backdrop-blur-sm">
+              <PortfolioStory userId={user?.id || ''} refreshKey={refreshKey} />
             </Card>
           </div>
 
