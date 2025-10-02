@@ -837,6 +837,20 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   />
                 </div>
 
+                {/* Affiliate Link - Manual Override */}
+                <div className="space-y-2">
+                  <Label htmlFor="affiliate_link">Affiliate/Tracking Link</Label>
+                  <Input
+                    id="affiliate_link"
+                    value={formData.affiliate_link}
+                    onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
+                    placeholder="https://..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    The tracking URL users will be redirected to. Can be manually updated here.
+                  </p>
+                </div>
+
                 {/* Brand Selection */}
                 <div className="bg-section-highlight p-4 rounded-lg space-y-4">
                   <h4 className="font-semibold text-foreground flex items-center gap-2">
