@@ -129,7 +129,11 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
                   {/* Timeline dot */}
                   <div className="absolute left-[-9px] top-1 w-4 h-4 rounded-full bg-primary border-2 border-background" />
                   
-                  <div className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className={`bg-card border rounded-lg p-4 hover:shadow-md transition-shadow ${
+                        transaction.earning_source === 'token_purchase' 
+                          ? 'border-green-500/50 bg-green-50/50 dark:bg-green-950/20' 
+                          : ''
+                      }`}>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1">
                         <div className="mt-1">
@@ -140,7 +144,12 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
                             <span className="font-semibold text-sm">
                               {transaction.description || 'Transaction'}
                             </span>
-                            {transaction.partner_name && (
+                            {transaction.earning_source === 'token_purchase' && (
+                              <Badge className="bg-green-600 text-white text-xs">
+                                NCTR Purchase
+                              </Badge>
+                            )}
+                            {transaction.partner_name && transaction.earning_source !== 'token_purchase' && (
                               <Badge variant="secondary" className="text-xs">
                                 {transaction.partner_name}
                               </Badge>
