@@ -142,7 +142,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
     }
   };
 
-  const quickAmounts = [1000, 2500, 5000, 10000];
+  const quickAmounts = [1000, 2500, 5000, 10000, 100000];
   const progressToNext = nextStatus 
     ? ((current360Lock / nextStatus.min_locked_nctr) * 100)
     : 100;
@@ -169,7 +169,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
           {/* Quick Amount Buttons */}
           <div>
             <Label className="text-sm text-muted-foreground mb-2 block">Quick Select</Label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {quickAmounts.map((amount) => (
                 <Button
                   key={amount}
