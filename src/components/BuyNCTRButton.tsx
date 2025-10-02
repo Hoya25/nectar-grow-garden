@@ -37,8 +37,8 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
 
   const defaultContent = (
     <>
-      <ShoppingCart className="w-4 h-4 mr-2" />
-      <span>Buy NCTR</span>
+      <Zap className="w-4 h-4 mr-2" />
+      <span>Level Up, Buy NCTR</span>
       {suggestedAmount && (
         <Badge variant="secondary" className="ml-2 text-xs">
           {suggestedAmount.toLocaleString()}

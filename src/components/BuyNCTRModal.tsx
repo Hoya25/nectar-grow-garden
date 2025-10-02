@@ -92,20 +92,35 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
     setNctrAmount(amount.toString());
   };
 
-  const handleBuyNow = () => {
-    // Open external purchase page with pre-filled amount
-    const url = new URL('https://token.nctr.live/');
-    url.searchParams.set('amount', nctrAmount);
-    url.searchParams.set('type', 'nctr');
-    url.searchParams.set('source', 'garden');
-    window.open(url.toString(), '_blank');
+  const handleBuyNow = async () => {
+    setLoading(true);
     
-    toast({
-      title: "Opening Purchase Page",
-      description: "Complete your purchase on token.nctr.live. Your NCTR will be automatically locked in 360LOCK.",
-    });
-    
-    onOpenChange(false);
+    try {
+      // Call Stripe checkout edge function
+      const { data, error } = await supabase.functions.invoke('create-nctr-checkout', {
+        body: {
+          nctrAmount: parseFloat(nctrAmount),
+          usdAmount: parseFloat(usdAmount),
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Purchase Error",
+        description: error instanceof Error ? error.message : "Failed to initiate purchase. Please try again.",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
   };
 
   const quickAmounts = [1000, 2500, 5000, 10000];
@@ -121,11 +136,11 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
-            <Lock className="w-6 h-6 text-primary" />
-            Buy NCTR → 360LOCK
+            <Zap className="w-6 h-6 text-primary" />
+            Level Up, Buy NCTR
           </DialogTitle>
           <DialogDescription>
-            All purchases automatically lock in 360LOCK for maximum Wings status benefits
+            Purchase NCTR tokens that automatically lock in 360LOCK for maximum Wings status benefits
           </DialogDescription>
         </DialogHeader>
 
@@ -276,14 +291,23 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             className="w-full h-12 text-base"
             size="lg"
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Buy {parseFloat(nctrAmount || '0').toLocaleString()} NCTR
-            {usdAmount && ` for $${usdAmount}`}
-            <ArrowRight className="w-4 h-4 ml-2" />
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Zap className="w-4 h-4 mr-2" />
+                Level Up - Buy {parseFloat(nctrAmount || '0').toLocaleString()} NCTR
+                {usdAmount && ` ($${parseFloat(usdAmount).toFixed(2)})`}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
-            Secure purchase through token.nctr.live • Automatically locks in 360LOCK
+            Secure checkout powered by Stripe • Automatically locks in 360LOCK
           </p>
         </div>
       </DialogContent>
