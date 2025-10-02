@@ -163,6 +163,31 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
     ? (((current360Lock + parseFloat(nctrAmount || '0')) / nextStatus.min_locked_nctr) * 100)
     : 100;
 
+  // Debug modal state
+  useEffect(() => {
+    if (open) {
+      console.log('🎯 BuyNCTRModal opened with:', {
+        nctrAmount,
+        usdAmount,
+        wholesalePrice,
+        suggestedAmount,
+        loading
+      });
+    }
+  }, [open, nctrAmount, usdAmount, wholesalePrice, loading]);
+
+  const isButtonDisabled = !nctrAmount || parseFloat(nctrAmount) <= 0 || loading;
+  
+  useEffect(() => {
+    console.log('🔘 Button state:', {
+      nctrAmount,
+      isDisabled: isButtonDisabled,
+      nctrAmountEmpty: !nctrAmount,
+      nctrAmountZero: parseFloat(nctrAmount) <= 0,
+      loading
+    });
+  }, [nctrAmount, isButtonDisabled, loading]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -321,8 +346,11 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
           {/* Action Button */}
           <Button
-            onClick={handleBuyNow}
-            disabled={!nctrAmount || parseFloat(nctrAmount) <= 0 || loading}
+            onClick={() => {
+              console.log('🖱️ Buy button CLICKED!', { nctrAmount, usdAmount, isButtonDisabled });
+              handleBuyNow();
+            }}
+            disabled={isButtonDisabled}
             className="w-full h-12 text-base"
             size="lg"
           >
