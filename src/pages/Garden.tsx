@@ -137,15 +137,13 @@ const Garden = () => {
         duration: 5000,
       });
 
-      // Refresh user data to show new balance after a short delay
-      setTimeout(() => {
-        if (user?.id) {
-          setRefreshKey(prev => prev + 1);
-        }
-      }, 2000);
+      // Trigger immediate refresh
+      setRefreshKey(prev => prev + 1);
 
-      // Clean up URL
-      navigate('/garden', { replace: true });
+      // Clean up URL after a short delay to let the refresh complete
+      setTimeout(() => {
+        navigate('/garden', { replace: true });
+      }, 1000);
     } else if (purchaseStatus === 'cancelled') {
       toast({
         title: "Purchase Cancelled",
