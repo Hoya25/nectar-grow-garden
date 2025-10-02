@@ -133,9 +133,18 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
       }
 
       if (data?.url) {
-        console.log('✅ Redirecting to Stripe checkout:', data.url);
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
+        console.log('✅ Opening Stripe checkout in new tab:', data.url);
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+        
+        // Reset loading state and close modal
+        setLoading(false);
+        onOpenChange(false);
+        
+        toast({
+          title: "Checkout Opened",
+          description: "Please complete your purchase in the new tab.",
+        });
       } else {
         console.error('❌ No checkout URL in response:', data);
         throw new Error('No checkout URL returned from Stripe');
