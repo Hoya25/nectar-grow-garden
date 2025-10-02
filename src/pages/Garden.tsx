@@ -27,6 +27,7 @@ import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
+import { PortfolioStory } from '@/components/PortfolioStory';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -1278,6 +1279,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
               </CardContent>
             )}
           </Card>
+        </div>
+
+        {/* Portfolio Story - Transaction History */}
+        <div className="mb-8">
+          <PortfolioStory userId={user?.id || ''} refreshKey={refreshKey} />
         </div>
 
         {/* Main Earning Opportunities - Front and Center */}
