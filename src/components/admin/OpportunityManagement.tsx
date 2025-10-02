@@ -944,21 +944,36 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         />
                       </div>
                       
-                      {/* Regenerate Link Button for Loyalize brands */}
-                      {editingOpportunity && selectedBrand && (
+                      {/* Regenerate Link Button - Show in edit mode */}
+                      {editingOpportunity && (
                         <div className="space-y-2">
                           <Label>Update Tracking Link</Label>
                           <Button
                             type="button"
                             variant="outline"
                             onClick={async () => {
-                              const brandDetails = await fetchBrandDetails(selectedBrand.id);
-                              if (brandDetails?.loyalize_id) {
+                              // Find brand by partner name
+                              const { data: brandData, error } = await supabase
+                                .from('brands')
+                                .select('*')
+                                .eq('name', formData.partner_name)
+                                .single();
+                              
+                              if (error || !brandData) {
+                                toast({
+                                  title: "Brand Not Found",
+                                  description: "Could not find brand in database. Make sure the brand exists.",
+                                  variant: "destructive"
+                                });
+                                return;
+                              }
+                              
+                              if (brandData.loyalize_id) {
                                 const newLink = generateUserTrackingLink(
-                                  brandDetails.website_url || '', 
-                                  selectedBrand.name,
-                                  selectedBrand.id,
-                                  brandDetails.loyalize_id
+                                  brandData.website_url || '', 
+                                  brandData.name,
+                                  brandData.id,
+                                  brandData.loyalize_id
                                 );
                                 setFormData({...formData, affiliate_link: newLink});
                                 toast({
@@ -968,7 +983,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                               } else {
                                 toast({
                                   title: "Not a Loyalize Brand",
-                                  description: "This brand doesn't have a Loyalize ID",
+                                  description: "This brand doesn't have a Loyalize ID for tracking",
                                   variant: "destructive"
                                 });
                               }
