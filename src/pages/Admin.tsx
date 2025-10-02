@@ -52,6 +52,7 @@ import ImpactBrandSearch from '@/components/admin/ImpactBrandSearch';
 import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
 import { TrackingDiagnostics } from '@/components/admin/TrackingDiagnostics';
 import LoyalizeWebhookConfig from '@/components/admin/LoyalizeWebhookConfig';
+import { PendingTransactionsMonitor } from '@/components/admin/PendingTransactionsMonitor';
 
 interface AdminStats {
   total_users: number;
@@ -320,6 +321,7 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="purchases" className="space-y-6">
+            <PendingTransactionsMonitor />
             <TrackingDiagnostics />
             <PurchaseTracking />
           </TabsContent>
