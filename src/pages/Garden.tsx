@@ -73,6 +73,13 @@ interface EarningOpportunity {
   lock_360_nctr_reward?: number;
   reward_distribution_type?: string;
   reward_structure?: any;
+  // Joined brand data
+  brands?: {
+    id: string;
+    name: string;
+    loyalize_id: string;
+    is_active: boolean;
+  };
 }
 
 import ProfileModal from '@/components/ProfileModal';
@@ -231,17 +238,45 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
 
   const fetchOpportunities = async () => {
     try {
+      // First, get all active opportunities with their brand info
       const { data: opportunitiesData, error: opportunitiesError } = await supabase
         .from('earning_opportunities')
-        .select('*')
+        .select(`
+          *,
+          brands!inner (
+            id,
+            name,
+            loyalize_id,
+            is_active
+          )
+        `)
         .eq('is_active', true)
+        .eq('brands.is_active', true)
         .order('created_at', { ascending: false });
 
       if (opportunitiesError) {
         console.error('Error fetching opportunities:', opportunitiesError);
       } else {
+        // Filter out opportunities with invalid loyalize_ids (shopping type only)
+        const validOpportunities = (opportunitiesData || []).filter(opp => {
+          // For non-shopping opportunities, allow them through
+          if (opp.opportunity_type !== 'shopping') return true;
+          
+          // For shopping opportunities, require valid brand with real loyalize_id
+          if (!opp.brands || !opp.brands.loyalize_id) return false;
+          
+          // Filter out placeholder IDs (containing dashes but not numeric)
+          const loyalizeId = String(opp.brands.loyalize_id);
+          if (loyalizeId.includes('-') && isNaN(Number(loyalizeId))) {
+            console.warn(`Skipping opportunity "${opp.title}" - invalid loyalize_id: ${loyalizeId}`);
+            return false;
+          }
+          
+          return true;
+        });
+        
         // Sort opportunities to prioritize shopping (with display_order) over bonus/invite
-        const sortedOpportunities = (opportunitiesData || []).sort((a, b) => {
+        const sortedOpportunities = validOpportunities.sort((a, b) => {
           // First, separate by type: shopping opportunities vs bonus/invite
           const aIsShopping = a.opportunity_type === 'shopping';
           const bIsShopping = b.opportunity_type === 'shopping';
@@ -660,12 +695,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
   };
 
   const handleShoppingOpportunity = async (opportunity: EarningOpportunity) => {
-    if (!opportunity.affiliate_link) {
+    // Validate that we have both brand info and a valid loyalize_id
+    if (!opportunity.brands?.id || !opportunity.brands?.loyalize_id) {
       toast({
         title: "Link Not Available",
-        description: "This shopping opportunity doesn't have a configured affiliate link yet.",
+        description: "This shopping opportunity is not properly configured. Please contact support.",
         variant: "destructive",
       });
+      console.error('❌ Shopping opportunity missing brand data:', opportunity);
       return;
     }
 
@@ -673,32 +710,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       console.log('🛍️ Tracking shopping opportunity click:', opportunity.title);
       
       // Generate unique tracking ID for this user + opportunity
-      const trackingId = `tgn_${user?.id?.slice(-8)}_${opportunity.id?.slice(-8)}_${Date.now().toString(36)}`;
+      const trackingId = `tgn_${user?.id?.slice(-8)}_${opportunity.brands.id?.slice(-8)}_${Date.now().toString(36)}`;
       console.log('🆔 Generated tracking ID:', trackingId);
       
-      // Start with the original URL
-      // Build proper Loyalize tracking URL
-      let finalUrl = opportunity.affiliate_link;
-      
-      // If URL has template placeholders, replace them
-      if (finalUrl.includes('{{USER_ID}}')) {
-        finalUrl = finalUrl.replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous');
-      }
-      
-      if (finalUrl.includes('{{TRACKING_ID}}')) {
-        finalUrl = finalUrl.replace(/\{\{TRACKING_ID\}\}/g, trackingId);
-      }
-      
-      // Build proper Loyalize API tracking URL
-      // New format uses api.loyalize.com/v1/stores/{storeId}/tracking with params
-      if (finalUrl.includes('api.loyalize.com/v1/stores/')) {
-        // The URL already has the tracking parameters from the database
-        // We just need to ensure placeholders are replaced (done above)
-        console.log('✅ Using Loyalize API tracking URL:', finalUrl);
-      }
+      // Build Loyalize redirect URL using the brand's loyalize_id
+      const loyalizeStoreId = opportunity.brands.loyalize_id;
+      const finalUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeStoreId}&user=${user?.id}&tracking=${trackingId}`;
       
       console.log('🔗 FINAL tracked URL:', finalUrl);
-      
       
       // Record click tracking (may fail for shopping opportunities not in independent_affiliate_links - that's OK)
       const { error: clickError } = await supabase
@@ -716,14 +735,12 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       }
       
       // CRITICAL: Create tracking mapping for purchase attribution
-      // Use brand_id from opportunity to properly link to brands table
-      const brandIdToUse = opportunity.brand_id || opportunity.id;
       const { error: mappingError } = await supabase
         .from('affiliate_link_mappings')
         .insert({
           tracking_id: trackingId,
           user_id: user?.id,
-          brand_id: brandIdToUse, // Use proper brand_id from opportunity
+          brand_id: opportunity.brands.id, // Use brand_id from joined brands data
         });
       
       if (mappingError) {
@@ -737,8 +754,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       window.open(finalUrl, '_blank');
       console.log('✅ Window.open called');
       
-      
-      // Enhanced notification with tracking confirmation - SHOW THE TRACKING ID
+      // Enhanced notification with tracking confirmation
       const rewardRate = opportunity.reward_per_dollar || 50;
       toast({
         title: `✅ ${opportunity.partner_name || 'Partner'} - Tracking Active!`,
@@ -756,22 +772,9 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       
     } catch (error) {
       console.error('❌ Error handling shopping opportunity:', error);
-      
-      // Fallback: try to open URL anyway but warn user
-      let fallbackUrl = opportunity.affiliate_link;
-      if (fallbackUrl.includes('%7B%7B') || fallbackUrl.includes('{{')) {
-        const trackingId = `fallback_${Date.now()}`;
-        fallbackUrl = fallbackUrl
-          .replace(/%7B%7BUSER_ID%7D%7D/g, user?.id || 'anonymous')
-          .replace(/\{\{USER_ID\}\}/g, user?.id || 'anonymous')
-          .replace(/%7B%7BTRACKING_ID%7D%7D/g, trackingId)
-          .replace(/\{\{TRACKING_ID\}\}/g, trackingId);
-      }
-      
-      window.open(fallbackUrl, '_blank');
       toast({
         title: "⚠️ Tracking Issue", 
-        description: `Link opened but tracking may be limited. Contact support if purchases don't appear.`,
+        description: `Failed to set up tracking. Please try again or contact support.`,
         variant: "destructive",
       });
     }
