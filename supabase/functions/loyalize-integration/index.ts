@@ -233,11 +233,13 @@ serve(async (req) => {
 
         try {
           // Fetch transactions from Loyalize v2 API
+          // Use the same auth format that works with other Loyalize endpoints
           const transactionsResponse = await fetch('https://dev-api.loyalize.com/v2/transactions', {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${loyalizeApiKey}`,
-              'Content-Type': 'application/json'
+              'Authorization': loyalizeApiKey,
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
             }
           })
 
