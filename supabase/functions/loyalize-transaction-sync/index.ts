@@ -76,12 +76,13 @@ serve(async (req) => {
       
       try {
         // Fetch full transaction details from Loyalize v2 API
+        // Use direct API key in Authorization header (no Bearer prefix) like v1 endpoints
         console.log(`   🔑 Using API key: ${loyalizeApiKey.substring(0, 10)}...`)
         const loyalizeResponse = await fetch(
           `https://api.loyalize.com/v2/transactions/${txnId}`,
           {
             headers: {
-              'Authorization': `Bearer ${loyalizeApiKey}`,
+              'Authorization': loyalizeApiKey,
               'Content-Type': 'application/json'
             }
           }
