@@ -44,87 +44,94 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Call Loyalize API to get the actual tracking redirect URL
-    // IMPORTANT: Loyalize requires cid (Campaign ID) parameter
-    const loyalizeApiUrl = new URL(`https://api.loyalize.com/v1/stores/${storeId}/tracking`);
-    loyalizeApiUrl.searchParams.set('pid', '3120835'); // Your Loyalize Publisher ID
-    loyalizeApiUrl.searchParams.set('cid', '0'); // Campaign ID (0 = default campaign)
-    if (userId) loyalizeApiUrl.searchParams.set('cp', userId);
-    if (trackingId) loyalizeApiUrl.searchParams.set('sid', trackingId);
-
-    console.log(`🔗 Calling Loyalize API: ${loyalizeApiUrl.toString()}`);
-    console.log(`   📋 Headers: Authorization=${loyalizeApiKey ? 'SET' : 'NOT SET'}`);
-
-    const loyalizeResponse = await fetch(loyalizeApiUrl.toString(), {
+    // STEP 1: Get store details to retrieve trackingUrl (requires Authorization)
+    console.log(`🔍 Step 1: Fetching store details for storeId: ${storeId}`);
+    const storeDetailsUrl = `https://api.loyalize.com/v1/stores/${storeId}`;
+    
+    const storeResponse = await fetch(storeDetailsUrl, {
       method: 'GET',
       headers: {
         'Authorization': loyalizeApiKey,
         'Content-Type': 'application/json'
-      },
-      redirect: 'manual' // Don't follow redirects automatically
+      }
     });
 
-    console.log(`📡 Loyalize API response status: ${loyalizeResponse.status}`);
-    console.log(`   📋 Response headers:`, Object.fromEntries(loyalizeResponse.headers.entries()));
-    
-    // Log response body for debugging (but don't consume the stream yet)
-    const responseClone = loyalizeResponse.clone();
-    try {
-      const responseText = await responseClone.text();
-      console.log(`   📄 Response body preview:`, responseText.substring(0, 500));
-    } catch (e) {
-      console.log(`   ⚠️ Could not read response body:`, e);
-    }
+    console.log(`📡 Store API response status: ${storeResponse.status}`);
 
-    // Loyalize should return a 302 redirect or a redirect URL in the response
-    let redirectUrl: string | null = null;
-
-    if (loyalizeResponse.status === 302 || loyalizeResponse.status === 301) {
-      redirectUrl = loyalizeResponse.headers.get('Location');
-      console.log(`✅ Got 3xx redirect from Loyalize`);
-      console.log(`   🎯 Location header: ${redirectUrl}`);
-    } else if (loyalizeResponse.status === 200) {
-      // Try to parse JSON response for redirect URL
-      try {
-        const data = await loyalizeResponse.json();
-        console.log(`   📦 Loyalize response data:`, JSON.stringify(data, null, 2));
-        redirectUrl = data.redirectUrl || data.url || data.trackingUrl || data.destinationUrl;
-        console.log(`✅ Extracted tracking URL: ${redirectUrl}`);
-      } catch (e) {
-        console.error('❌ Failed to parse Loyalize JSON response:', e);
+    if (!storeResponse.ok) {
+      console.error(`❌ Failed to fetch store details: ${storeResponse.status} ${storeResponse.statusText}`);
+      if (storeResponse.status === 401) {
+        console.error('   💡 Check: API key permissions');
       }
-    } else if (loyalizeResponse.status === 401) {
-      console.error('❌ 401 Unauthorized from Loyalize API');
-      console.error('   💡 Check: API key permissions, traffic source approval (thegarden.nctr.live)');
-      return new Response('Loyalize API authentication failed', { 
-        status: 500,
-        headers: corsHeaders 
-      });
-    } else {
-      console.error(`❌ Unexpected status ${loyalizeResponse.status} from Loyalize`);
-    }
-
-    // Fallback: Try to get store details and build direct URL
-    if (!redirectUrl) {
-      console.log('⚠️ No redirect URL from Loyalize API, fetching store details...');
       
-      const { data: brand, error: brandError } = await supabase
+      // Fallback to brand website
+      const { data: brand } = await supabase
         .from('brands')
         .select('website_url, name')
         .eq('loyalize_id', storeId)
         .single();
 
-      if (brand && brand.website_url) {
-        redirectUrl = brand.website_url;
-        console.log(`✅ Using brand website URL: ${redirectUrl}`);
-      } else {
-        console.error('❌ Could not find brand or website URL');
-        return new Response('Store not found', { 
-          status: 404,
-          headers: corsHeaders 
+      if (brand?.website_url) {
+        console.log(`⚠️ Using fallback brand URL: ${brand.website_url}`);
+        return new Response(null, {
+          status: 302,
+          headers: {
+            ...corsHeaders,
+            'Location': brand.website_url,
+          },
         });
       }
+      
+      return new Response('Store not found', { 
+        status: 404,
+        headers: corsHeaders 
+      });
     }
+
+    const storeData = await storeResponse.json();
+    const baseTrackingUrl = storeData.trackingUrl;
+    
+    if (!baseTrackingUrl) {
+      console.error('❌ No trackingUrl in store response');
+      console.log('   📦 Store data:', JSON.stringify(storeData, null, 2));
+      
+      // Fallback
+      const { data: brand } = await supabase
+        .from('brands')
+        .select('website_url')
+        .eq('loyalize_id', storeId)
+        .single();
+
+      if (brand?.website_url) {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            ...corsHeaders,
+            'Location': brand.website_url,
+          },
+        });
+      }
+      
+      return new Response('Invalid store configuration', { 
+        status: 500,
+        headers: corsHeaders 
+      });
+    }
+
+    console.log(`✅ Got base tracking URL: ${baseTrackingUrl}`);
+
+    // STEP 2: Append tracking parameters to the trackingUrl (no Authorization needed)
+    const finalTrackingUrl = new URL(baseTrackingUrl);
+    
+    // Add required parameters per Loyalize team instructions
+    finalTrackingUrl.searchParams.set('pid', '3120835'); // Publisher ID
+    if (userId) finalTrackingUrl.searchParams.set('cp', userId); // Custom parameter (user tracking)
+    if (trackingId) finalTrackingUrl.searchParams.set('sid', trackingId); // Sub-affiliate tracking ID
+    
+    // Note: cid (Campaign ID) is already in the base trackingUrl from the API
+    
+    const redirectUrl = finalTrackingUrl.toString();
+    console.log(`🎯 Final public tracking URL: ${redirectUrl}`);
 
     // Record the affiliate link click
     if (userId && trackingId) {
