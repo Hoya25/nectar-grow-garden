@@ -232,6 +232,8 @@ serve(async (req) => {
         }
 
         try {
+          console.log('🔍 Fetching transactions from Loyalize v2 API')
+          
           // Fetch transactions from Loyalize v2 API
           // Use direct API key in Authorization header (no Bearer prefix) like v1 endpoints
           const transactionsResponse = await fetch('https://api.loyalize.com/v2/transactions', {
@@ -242,6 +244,8 @@ serve(async (req) => {
               'Accept': 'application/json'
             }
           })
+
+          console.log(`📡 Loyalize API response status: ${transactionsResponse.status}`)
 
           if (!transactionsResponse.ok) {
             const errorText = await transactionsResponse.text().catch(() => 'Unknown error')
@@ -264,6 +268,7 @@ serve(async (req) => {
           }
 
           const transactionsData = await transactionsResponse.json()
+          console.log(`📦 Raw response data:`, JSON.stringify(transactionsData, null, 2))
           console.log(`✅ Retrieved ${transactionsData.length || 0} transactions from Loyalize API`)
 
           return new Response(
