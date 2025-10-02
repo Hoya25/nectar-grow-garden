@@ -48,37 +48,68 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Enhanced security: validate webhook signature (if configured)
-    const webhookSecret = Deno.env.get('TRANSACTION_WEBHOOK_SECRET');
-    if (webhookSecret) {
-      const signature = req.headers.get('x-webhook-signature');
-      if (!signature) {
-        return new Response(JSON.stringify({ error: 'Missing webhook signature' }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
+    // CRITICAL SECURITY: Mandatory webhook signature verification
+    const webhookSecret = Deno.env.get('LOYALIZE_WEBHOOK_SECRET');
+    if (!webhookSecret) {
+      console.error('[SECURITY] LOYALIZE_WEBHOOK_SECRET not configured');
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
+        status: 503,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    // Enhanced security: rate limiting check
-    const clientIP = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || 'unknown';
-
-    // Parse webhook payload with enhanced security - handle both our format and Loyalize format
+    const signature = req.headers.get('x-webhook-signature');
+    if (!signature) {
+      console.error('[SECURITY] Missing webhook signature', { ip: clientIP });
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const body = await req.text();
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(webhookSecret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign', 'verify']
+    );
+    
+    const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
+    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    if (signature !== expectedSignature) {
+      console.error('[SECURITY] Invalid webhook signature', { ip: clientIP });
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    console.log('[SECURITY] ✅ Webhook signature verified');
+    
+    // Parse validated body
     let rawPayload;
     try {
-      const text = await req.text();
-      if (!text.trim()) {
+      if (!body.trim()) {
         throw new Error('Empty request body');
       }
-      rawPayload = JSON.parse(text);
+      rawPayload = JSON.parse(body);
     } catch (parseError) {
-      return new Response(JSON.stringify({ error: 'Invalid JSON payload' }), {
+      return new Response(JSON.stringify({ error: 'Invalid request format' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // Enhanced security: log webhook with sanitized data (no sensitive info)
+    // Enhanced security: rate limiting check
+    const clientIP = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || 'unknown';
+
+    // Log webhook with sanitized data (no sensitive info)
     console.log('🔔 Received webhook from IP:', clientIP, 'payload keys:', Object.keys(rawPayload))
 
     // Handle Loyalize webhook format - data might be in body field
@@ -137,11 +168,23 @@ serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('❌ Webhook processing error:', error)
+    console.error('[ERROR] Webhook processing error:', error)
+    
+    // Sanitize error for external response
+    let publicError = 'Transaction processing failed';
+    const errorMsg = error instanceof Error ? error.message : '';
+    
+    if (errorMsg.includes('user_id')) {
+      publicError = 'Invalid user reference';
+    } else if (errorMsg.includes('duplicate')) {
+      publicError = 'Duplicate transaction';
+    } else if (errorMsg.includes('Too many')) {
+      publicError = 'Request too large';
+    }
     
     return new Response(JSON.stringify({
       success: false,
-      error: (error instanceof Error ? error.message : 'Unknown error') || 'Webhook processing failed'
+      error: publicError
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

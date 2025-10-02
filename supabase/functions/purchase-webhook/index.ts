@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-signature',
 }
 
 interface PurchaseWebhookPayload {
@@ -13,18 +13,16 @@ interface PurchaseWebhookPayload {
   status: 'completed' | 'pending' | 'failed';
   payment_method: 'credit_card' | 'crypto' | 'bank_transfer';
   timestamp: string;
-  source?: string; // 'garden' for purchases from The Garden
-  lock_type?: '360LOCK' | '90LOCK' | 'available'; // Specify where tokens should go
+  source?: string;
+  lock_type?: '360LOCK' | '90LOCK' | 'available';
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -36,75 +34,105 @@ serve(async (req) => {
       });
     }
 
-    // Enhanced security: validate webhook signature (if configured)
+    // CRITICAL SECURITY: Mandatory webhook signature verification
     const webhookSecret = Deno.env.get('PURCHASE_WEBHOOK_SECRET');
-    if (webhookSecret) {
-      const signature = req.headers.get('x-webhook-signature');
-      if (!signature) {
-        return new Response('Missing webhook signature', { 
-          status: 401,
-          headers: corsHeaders 
-        });
-      }
-      // Add signature validation logic here based on your payment provider
+    if (!webhookSecret) {
+      console.error('[SECURITY] PURCHASE_WEBHOOK_SECRET not configured - refusing all requests');
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), { 
+        status: 503,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    // Enhanced security: rate limiting check
-    const clientIP = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || 'unknown';
+    const signature = req.headers.get('x-webhook-signature');
+    if (!signature) {
+      console.error('[SECURITY] Missing webhook signature', { ip: req.headers.get('x-forwarded-for') });
+      return new Response(JSON.stringify({ error: 'Authentication required' }), { 
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
     
-    // Parse and validate request body with enhanced security
+    const body = await req.text();
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(webhookSecret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign', 'verify']
+    );
+    
+    const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
+    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    if (signature !== expectedSignature) {
+      console.error('[SECURITY] Invalid webhook signature', { ip: req.headers.get('x-forwarded-for') });
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), { 
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    console.log('[SECURITY] ✅ Webhook signature verified');
+
+    // Parse validated body
     let payload: PurchaseWebhookPayload;
     try {
-      const text = await req.text();
-      if (!text.trim()) {
+      if (!body.trim()) {
         throw new Error('Empty request body');
       }
-      payload = JSON.parse(text);
+      payload = JSON.parse(body);
     } catch (parseError) {
-      return new Response('Invalid JSON payload', { 
+      return new Response(JSON.stringify({ error: 'Invalid request format' }), { 
         status: 400,
-        headers: corsHeaders 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // Enhanced security: log webhook with sanitized data (no sensitive info)
-    console.log('Purchase webhook received from IP:', clientIP, 'user_id:', payload.user_id?.substring(0, 8));
-
-    // Enhanced security: validate required fields with type checking
-    if (!payload.user_id || typeof payload.user_id !== 'string' || payload.user_id.length !== 36) {
-      return new Response('Missing or invalid user_id', { 
-        status: 400,
-        headers: corsHeaders 
-      });
+    // Enhanced input validation
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    
+    if (!payload.user_id || !uuidRegex.test(payload.user_id)) {
+      throw new Error('Invalid user_id format');
     }
-
-    if (!payload.amount || typeof payload.amount !== 'number' || payload.amount <= 0 || payload.amount > 1000000) {
-      return new Response('Missing or invalid amount', { 
-        status: 400,
-        headers: corsHeaders 
-      });
+    
+    if (typeof payload.amount !== 'number' || payload.amount <= 0 || payload.amount > 10000) {
+      throw new Error('Invalid amount');
     }
-
-    if (!payload.transaction_id || typeof payload.transaction_id !== 'string' || payload.transaction_id.length < 5) {
-      return new Response('Missing or invalid transaction_id', { 
-        status: 400,
-        headers: corsHeaders 
-      });
+    
+    if (!payload.transaction_id || payload.transaction_id.length < 5 || payload.transaction_id.length > 100) {
+      throw new Error('Invalid transaction_id');
     }
-
-    if (!payload.status || !['completed', 'pending', 'failed'].includes(payload.status)) {
-      return new Response('Missing or invalid status', { 
-        status: 400,
-        headers: corsHeaders 
-      });
+    
+    const validStatuses = ['pending', 'completed', 'failed'];
+    if (!validStatuses.includes(payload.status)) {
+      throw new Error('Invalid status');
+    }
+    
+    // Validate timestamp if provided
+    if (payload.timestamp) {
+      const timestamp = new Date(payload.timestamp);
+      const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      if (timestamp < dayAgo || timestamp > new Date()) {
+        throw new Error('Invalid timestamp');
+      }
+    }
+    
+    // Sanitize string inputs
+    const sanitize = (str: string) => str.replace(/[<>\"']/g, '');
+    if (payload.payment_method) {
+      payload.payment_method = sanitize(payload.payment_method) as any;
     }
 
     // Only process completed purchases
     if (payload.status !== 'completed') {
       console.log(`Purchase not completed yet: ${payload.status}`);
-      return new Response('Purchase not completed', { 
+      return new Response(JSON.stringify({ message: 'Purchase not completed' }), { 
         status: 200,
-        headers: corsHeaders 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
@@ -117,9 +145,9 @@ serve(async (req) => {
 
     if (existingTransaction) {
       console.log('Transaction already processed:', payload.transaction_id);
-      return new Response('Transaction already processed', { 
+      return new Response(JSON.stringify({ message: 'Transaction already processed' }), { 
         status: 200,
-        headers: corsHeaders 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
@@ -236,13 +264,11 @@ serve(async (req) => {
 
         if (statusError) {
           console.error('Error updating user status:', statusError);
-          // Don't throw - the purchase was successful even if status update failed
         }
 
         console.log('User status updated after purchase');
       } catch (statusUpdateError) {
         console.error('Failed to update user status:', statusUpdateError);
-        // Continue - purchase was successful
       }
     }
 
@@ -271,12 +297,24 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Purchase webhook error:', error);
+    console.error('[ERROR] Purchase webhook error:', error);
+    
+    // Sanitize error for external response
+    let publicError = 'Transaction processing failed';
+    const errorMsg = error instanceof Error ? error.message : '';
+    
+    if (errorMsg.includes('user_id')) {
+      publicError = 'Invalid user reference';
+    } else if (errorMsg.includes('duplicate')) {
+      publicError = 'Duplicate transaction';
+    } else if (errorMsg.includes('amount')) {
+      publicError = 'Invalid amount';
+    }
     
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: (error instanceof Error ? error.message : 'Unknown error') || 'Internal server error'
+      JSON.stringify({ 
+        success: false, 
+        error: publicError 
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

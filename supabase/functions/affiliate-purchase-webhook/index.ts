@@ -45,21 +45,85 @@ serve(async (req) => {
       });
     }
 
-    // Parse and validate request body
+    // CRITICAL SECURITY: Mandatory webhook signature verification
+    const webhookSecret = Deno.env.get('AFFILIATE_WEBHOOK_SECRET');
+    if (!webhookSecret) {
+      console.error('[SECURITY] AFFILIATE_WEBHOOK_SECRET not configured');
+      return new Response(JSON.stringify({ error: 'Service unavailable' }), { 
+        status: 503,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const signature = req.headers.get('x-webhook-signature');
+    if (!signature) {
+      console.error('[SECURITY] Missing webhook signature', { ip: req.headers.get('x-forwarded-for') });
+      return new Response(JSON.stringify({ error: 'Authentication required' }), { 
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const body = await req.text();
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(webhookSecret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign', 'verify']
+    );
+    
+    const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
+    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    if (signature !== expectedSignature) {
+      console.error('[SECURITY] Invalid webhook signature', { ip: req.headers.get('x-forwarded-for') });
+      return new Response(JSON.stringify({ error: 'Authentication failed' }), { 
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    console.log('[SECURITY] ✅ Webhook signature verified');
+
+    // Parse validated body
     let payload: AffiliateWebhookPayload;
     try {
-      const text = await req.text();
-      console.log('🔔 Affiliate webhook received:', text);
+      console.log('🔔 Affiliate webhook received');
       
-      if (!text.trim()) {
+      if (!body.trim()) {
         throw new Error('Empty request body');
       }
-      payload = JSON.parse(text);
+      payload = JSON.parse(body);
+      
+      // Enhanced input validation
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      
+      if (payload.user_id && !uuidRegex.test(payload.user_id)) {
+        throw new Error('Invalid user_id format');
+      }
+      
+      if (typeof payload.total_amount !== 'number' || payload.total_amount < 0 || payload.total_amount > 10000) {
+        throw new Error('Invalid amount');
+      }
+      
+      if (payload.products && Array.isArray(payload.products) && payload.products.length > 100) {
+        throw new Error('Too many products');
+      }
+      
+      const validStatuses = ['pending', 'completed', 'paid', 'success', 'failed', 'cancelled', 'refunded'];
+      if (payload.order_status && !validStatuses.includes(payload.order_status.toLowerCase())) {
+        throw new Error('Invalid order_status');
+      }
+      
     } catch (parseError) {
-      console.error('❌ Invalid JSON payload:', parseError);
-      return new Response('Invalid JSON payload', { 
+      console.error('[ERROR] Invalid payload:', parseError);
+      return new Response(JSON.stringify({ error: 'Invalid request format' }), { 
         status: 400,
-        headers: corsHeaders 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
@@ -229,11 +293,23 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('❌ Affiliate webhook error:', error);
+    console.error('[ERROR] Affiliate webhook error:', error);
+    
+    // Sanitize error for external response
+    let publicError = 'Transaction processing failed';
+    const errorMsg = error instanceof Error ? error.message : '';
+    
+    if (errorMsg.includes('user_id')) {
+      publicError = 'Invalid user reference';
+    } else if (errorMsg.includes('duplicate')) {
+      publicError = 'Duplicate transaction';
+    } else if (errorMsg.includes('amount')) {
+      publicError = 'Invalid amount';
+    }
     
     return new Response(JSON.stringify({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: publicError
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500
