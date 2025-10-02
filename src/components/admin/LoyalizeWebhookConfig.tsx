@@ -2,11 +2,17 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Copy, Check, Webhook, ExternalLink, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Copy, Check, Webhook, ExternalLink, AlertCircle, RefreshCw, Zap } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const LoyalizeWebhookConfig = () => {
   const [copied, setCopied] = useState(false);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [selectedTxId, setSelectedTxId] = useState('');
   
   // The webhook URL that Loyalize needs to call
   const webhookUrl = 'https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-transaction-sync';
@@ -26,6 +32,93 @@ export const LoyalizeWebhookConfig = () => {
         description: "Please manually copy the webhook URL",
         variant: "destructive",
       });
+    }
+  };
+
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('loyalize-integration', {
+        body: { action: 'fetch_transactions' }
+      });
+
+      if (error) throw error;
+
+      if (data?.transactions && data.transactions.length > 0) {
+        setTransactions(data.transactions);
+        toast({
+          title: "Transactions Fetched",
+          description: `Found ${data.transactions.length} transactions from your Loyalize account`,
+        });
+      } else {
+        toast({
+          title: "No Transactions",
+          description: "No transactions found in your Loyalize account",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Fetch Failed",
+        description: error.message || "Failed to fetch transactions",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testWebhookWithTransaction = async (txId: string) => {
+    if (!txId) {
+      toast({
+        title: "Transaction ID Required",
+        description: "Please enter a transaction ID to test",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setTesting(true);
+    try {
+      const webhookPayload = {
+        body: {
+          eventType: "NEW_TRANSACTION",
+          data: {
+            transactions: [parseInt(txId)]
+          }
+        }
+      };
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Webhook Test Success",
+          description: `Transaction ${txId} processed successfully`,
+        });
+      } else {
+        toast({
+          title: "Webhook Test Failed",
+          description: result.error || "Failed to process webhook",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Test Failed",
+        description: error.message || "Failed to test webhook",
+        variant: "destructive",
+      });
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -113,8 +206,82 @@ export const LoyalizeWebhookConfig = () => {
           </p>
         </div>
 
+        {/* Transaction Fetcher & Tester */}
+        <div className="space-y-4 pt-4 border-t">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              Test Webhook with Real Transaction
+            </label>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchTransactions}
+              disabled={loading}
+              className="gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Fetch Real Transactions
+            </Button>
+          </div>
+
+          {transactions.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                Select a transaction ID from your account:
+              </p>
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {transactions.slice(0, 10).map((tx) => (
+                  <div
+                    key={tx.id}
+                    className="flex items-center justify-between bg-muted/50 border border-border rounded-md p-2"
+                  >
+                    <div className="flex-1 text-sm">
+                      <span className="font-mono font-semibold">ID: {tx.id}</span>
+                      {tx.amount && <span className="text-muted-foreground ml-2">(${tx.amount})</span>}
+                      {tx.merchantName && <span className="text-muted-foreground ml-2">- {tx.merchantName}</span>}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => testWebhookWithTransaction(tx.id.toString())}
+                      disabled={testing}
+                      className="gap-1"
+                    >
+                      <Zap className="w-3 h-3" />
+                      Test
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Or enter a transaction ID manually:
+            </label>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Enter transaction ID"
+                value={selectedTxId}
+                onChange={(e) => setSelectedTxId(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                onClick={() => testWebhookWithTransaction(selectedTxId)}
+                disabled={testing || !selectedTxId}
+                className="gap-2"
+              >
+                <Zap className="w-4 h-4" />
+                Test Webhook
+              </Button>
+            </div>
+          </div>
+        </div>
+
         {/* Quick Links */}
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2 pt-4 border-t">
           <Button
             variant="outline"
             size="sm"
