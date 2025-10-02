@@ -1133,7 +1133,9 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     <p className="text-2xl font-bold text-primary">
                       {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
                     </p>
-                    <p className="text-xs text-muted-foreground">Total NCTR</p>
+                    <p className="text-xs text-muted-foreground">
+                      {portfolioExpanded ? 'Click to collapse' : 'Click to view history'}
+                    </p>
                   </div>
                   <div className={`transform transition-transform duration-300 ${portfolioExpanded ? 'rotate-180' : ''}`}>
                     <TrendingUp className="w-5 h-5 text-primary" />
@@ -1290,14 +1292,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     </Button>
                   )}
                 </div>
+
+                {/* Portfolio Story - Transaction History */}
+                <div className="mt-6">
+                  <PortfolioStory userId={user?.id || ''} refreshKey={refreshKey} />
+                </div>
               </CardContent>
             )}
           </Card>
-        </div>
-
-        {/* Portfolio Story - Transaction History */}
-        <div className="mb-8">
-          <PortfolioStory userId={user?.id || ''} refreshKey={refreshKey} />
         </div>
 
         {/* Main Earning Opportunities - Front and Center */}
