@@ -93,10 +93,10 @@ serve(async (req) => {
       console.log(`   Tracking ID: ${trackingId || 'MISSING'}`)
 
       try {
-        // Determine user ID
+        // Determine user ID from tracking_id ONLY
         let userId: string | null = null
         
-        // Try tracking ID lookup first
+        // Look up user from tracking ID in affiliate_link_mappings
         if (trackingId) {
           const { data: mapping } = await supabase
             .from('affiliate_link_mappings')
@@ -110,19 +110,14 @@ serve(async (req) => {
           }
         }
         
-        // Fallback to shopper ID
-        if (!userId && shopperId) {
-          userId = shopperId
-          console.log(`   ✅ Using shopper ID as user ID: ${userId.slice(0, 8)}...`)
-        }
-        
+        // No tracking_id or no match found - skip this transaction
         if (!userId) {
-          console.error(`   ❌ Could not determine user ID`)
+          console.error(`   ❌ Could not determine user ID (tracking_id: ${trackingId || 'MISSING'})`)
           results.failed++
           results.details.push({
             transaction_id: transactionId,
             status: 'failed',
-            reason: 'User not found'
+            reason: `No user mapping found for tracking_id: ${trackingId || 'MISSING'}`
           })
           continue
         }
