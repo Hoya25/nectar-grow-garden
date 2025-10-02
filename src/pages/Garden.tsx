@@ -741,9 +741,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       // Enhanced notification with tracking confirmation - SHOW THE TRACKING ID
       const rewardRate = opportunity.reward_per_dollar || 50;
       toast({
-        title: `🔗 ${opportunity.partner_name || 'Partner'} Link Activated!`,
-        description: `Tracking ID: ${trackingId}\nEarn ${rewardRate} NCTR per $1 spent. Your purchases are now tracked!`,
-        duration: 10000, // Show for 10 seconds so you can copy it
+        title: `✅ ${opportunity.partner_name || 'Partner'} - Tracking Active!`,
+        description: `Shop normally and earn ${rewardRate} NCTR per $1 spent. Complete your purchase in the new tab - your rewards will appear automatically within 24-48 hours.\n\nTracking ID: ${trackingId}`,
+        duration: 8000,
+        className: "border-green-500 bg-green-50 dark:bg-green-950",
       });
       
       console.log('🎯 Tracking complete:', {
