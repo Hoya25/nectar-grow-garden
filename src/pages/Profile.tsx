@@ -435,6 +435,13 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* Portfolio Story - Prominent Position */}
+        <div className="mb-8">
+          <Card className="bg-card/80 backdrop-blur-sm">
+            <PortfolioStory userId={user?.id || ''} refreshKey={refreshKey} />
+          </Card>
+        </div>
+
         {/* Wallet Connection - Only show prominently if not connected */}
         {!profile?.wallet_address && (
           <div className="mb-8">
@@ -763,10 +770,6 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Portfolio Story - Transaction History */}
-            <Card className="bg-card/80 backdrop-blur-sm">
-              <PortfolioStory userId={user?.id || ''} refreshKey={refreshKey} />
-            </Card>
           </div>
 
           {/* Sidebar */}
