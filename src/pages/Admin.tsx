@@ -35,6 +35,7 @@ import BannerEditor from '@/components/admin/BannerEditor';
 import ReferralManagement from '@/components/admin/ReferralManagement';
 import InvitesModal from '@/components/admin/InvitesModal';
 import NCTRPriceManager from '@/components/admin/NCTRPriceManager';
+import { WholesalePriceManager } from '@/components/admin/WholesalePriceManager';
 import WithdrawalManagement from '@/components/admin/WithdrawalManagement';
 import AffiliateLinksManagement from '@/components/admin/AffiliateLinksManagement';
 import SecurityMonitor from '@/components/admin/SecurityMonitor';
@@ -331,7 +332,10 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="price">
-            <NCTRPriceManager />
+            <div className="space-y-6">
+              <WholesalePriceManager />
+              <NCTRPriceManager />
+            </div>
           </TabsContent>
 
           <TabsContent value="opportunities">

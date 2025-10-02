@@ -41,17 +41,35 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [statusLevels, setStatusLevels] = useState<StatusLevel[]>([]);
   const [nextStatus, setNextStatus] = useState<StatusLevel | null>(null);
+  const [wholesalePrice, setWholesalePrice] = useState<number>(0.04); // Default wholesale price
 
   useEffect(() => {
     fetchStatusLevels();
+    fetchWholesalePrice();
   }, []);
 
+  const fetchWholesalePrice = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'wholesale_nctr_price')
+        .single();
+
+      if (!error && data) {
+        setWholesalePrice(parseFloat(String(data.setting_value)));
+      }
+    } catch (error) {
+      console.error('Error fetching wholesale price:', error);
+    }
+  };
+
   useEffect(() => {
-    if (currentPrice && nctrAmount) {
-      const usd = (parseFloat(nctrAmount) * currentPrice).toFixed(2);
+    if (wholesalePrice && nctrAmount) {
+      const usd = (parseFloat(nctrAmount) * wholesalePrice).toFixed(2);
       setUsdAmount(usd);
     }
-  }, [nctrAmount, currentPrice]);
+  }, [nctrAmount, wholesalePrice]);
 
   useEffect(() => {
     if (statusLevels.length > 0 && nctrAmount) {
@@ -75,16 +93,16 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   const handleNCTRChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
     setNctrAmount(value);
-    if (currentPrice) {
-      setUsdAmount((numValue * currentPrice).toFixed(2));
+    if (wholesalePrice) {
+      setUsdAmount((numValue * wholesalePrice).toFixed(2));
     }
   };
 
   const handleUSDChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
     setUsdAmount(value);
-    if (currentPrice && currentPrice > 0) {
-      setNctrAmount((numValue / currentPrice).toFixed(0));
+    if (wholesalePrice && wholesalePrice > 0) {
+      setNctrAmount((numValue / wholesalePrice).toFixed(0));
     }
   };
 
@@ -208,12 +226,15 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             </div>
           </div>
 
-          {/* Current Price */}
+          {/* Current Wholesale Price */}
           <div className="bg-muted/50 p-3 rounded-lg">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Current NCTR Price</span>
-              <span className="font-semibold">{formatPrice(currentPrice)}</span>
+              <span className="text-muted-foreground">Wholesale NCTR Price (360LOCK)</span>
+              <span className="font-semibold">${wholesalePrice.toFixed(4)}</span>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Market price: {formatPrice(currentPrice)} • You save {((currentPrice - wholesalePrice) / currentPrice * 100).toFixed(0)}%
+            </p>
           </div>
 
           <Separator />
