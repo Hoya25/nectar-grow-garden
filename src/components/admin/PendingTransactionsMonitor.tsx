@@ -50,13 +50,20 @@ export function PendingTransactionsMonitor() {
 
       if (mappingsError) throw mappingsError;
 
-      setTransactions(loyalizeData?.transactions || []);
-      setMappings(mappingsData || []);
+      // Ensure we always set an array
+      const transactionsArray = Array.isArray(loyalizeData?.transactions) 
+        ? loyalizeData.transactions 
+        : Array.isArray(loyalizeData) 
+        ? loyalizeData 
+        : [];
+
+      setTransactions(transactionsArray);
+      setMappings(Array.isArray(mappingsData) ? mappingsData : []);
       setLastSync(new Date());
 
       toast({
         title: "✅ Transactions fetched",
-        description: `Found ${loyalizeData?.transactions?.length || 0} pending transactions`,
+        description: `Found ${transactionsArray.length} pending transactions`,
       });
     } catch (error: any) {
       console.error('Error fetching transactions:', error);
@@ -65,6 +72,9 @@ export function PendingTransactionsMonitor() {
         description: error.message,
         variant: "destructive",
       });
+      // Ensure state is reset to empty arrays on error
+      setTransactions([]);
+      setMappings([]);
     } finally {
       setLoading(false);
     }
