@@ -283,10 +283,22 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
   };
 
-  const generateUserTrackingLink = (baseUrl: string, brandName: string) => {
+  const generateUserTrackingLink = (baseUrl: string, brandName: string, brandId?: string, loyalizeId?: string) => {
     if (!baseUrl) return '';
     
-    // Create a parameterized link that includes user tracking
+    // If this is a Loyalize brand (has loyalizeId), generate proper Loyalize tracking link
+    if (loyalizeId && /^\d+$/.test(loyalizeId)) {
+      // Generate Loyalize redirect URL with user tracking
+      const loyalizeUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect`;
+      const params = new URLSearchParams({
+        store_id: loyalizeId,
+        user_id: '{{USER_ID}}',  // Placeholder for actual user ID
+        tracking_id: '{{TRACKING_ID}}' // Placeholder for tracking ID
+      });
+      return `${loyalizeUrl}?${params.toString()}`;
+    }
+    
+    // For non-Loyalize brands, create a parameterized link with user tracking
     const url = new URL(baseUrl);
     url.searchParams.set('ref', 'nctr_platform');
     url.searchParams.set('source', brandName.toLowerCase().replace(/\s+/g, '_'));
@@ -890,7 +902,13 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                           setSelectedBrand(brand);
                           // Get brand details and generate tracking link
                           fetchBrandDetails(brand.id).then((brandDetails) => {
-                            const trackingLink = generateUserTrackingLink(brandDetails?.website_url || '', brand.name);
+                            // Generate proper tracking link - use Loyalize redirect if it's a Loyalize brand
+                            const trackingLink = generateUserTrackingLink(
+                              brandDetails?.website_url || '', 
+                              brand.name,
+                              brand.id,
+                              brandDetails?.loyalize_id // Pass loyalize_id to generate proper Loyalize tracking
+                            );
                             
                             setFormData({
                               ...formData,
