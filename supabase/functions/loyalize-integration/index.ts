@@ -210,6 +210,91 @@ serve(async (req) => {
         )
       }
 
+      case 'fetch_transactions': {
+        console.log('🔍 Fetching transactions from Loyalize v2 API')
+        
+        // Check if API key is configured
+        if (!loyalizeApiKey || loyalizeApiKey.trim() === '') {
+          console.warn('LOYALIZE_API_KEY not configured')
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'LOYALIZE_API_KEY not configured. Please add your API key in Edge Functions settings.'
+            }),
+            {
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              },
+              status: 400
+            }
+          )
+        }
+
+        try {
+          // Fetch transactions from Loyalize v2 API
+          const transactionsResponse = await fetch('https://dev-api.loyalize.com/v2/transactions', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${loyalizeApiKey}`,
+              'Content-Type': 'application/json'
+            }
+          })
+
+          if (!transactionsResponse.ok) {
+            const errorText = await transactionsResponse.text().catch(() => 'Unknown error')
+            console.error(`❌ Loyalize transactions API failed: ${transactionsResponse.status}`)
+            console.error(`❌ Error response:`, errorText)
+            
+            return new Response(
+              JSON.stringify({
+                success: false,
+                error: `Loyalize API error: ${transactionsResponse.status} - ${errorText || transactionsResponse.statusText}`
+              }),
+              {
+                headers: {
+                  ...corsHeaders,
+                  'Content-Type': 'application/json'
+                },
+                status: transactionsResponse.status
+              }
+            )
+          }
+
+          const transactionsData = await transactionsResponse.json()
+          console.log(`✅ Retrieved ${transactionsData.length || 0} transactions from Loyalize API`)
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              transactions: transactionsData,
+              count: transactionsData.length || 0
+            }),
+            {
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              }
+            }
+          )
+        } catch (error) {
+          console.error('Error fetching transactions:', error)
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: (error as Error).message || 'Failed to fetch transactions'
+            }),
+            {
+              headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json'
+              },
+              status: 500
+            }
+          )
+        }
+      }
+
       case 'create_opportunity_from_brand': {
         const { 
           brand_id, 
