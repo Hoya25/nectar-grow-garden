@@ -111,9 +111,12 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   };
 
   const handleBuyNow = async () => {
+    console.log('🚀 Buy button clicked', { nctrAmount, usdAmount });
     setLoading(true);
     
     try {
+      console.log('📞 Calling create-nctr-checkout edge function...');
+      
       // Call Stripe checkout edge function
       const { data, error } = await supabase.functions.invoke('create-nctr-checkout', {
         body: {
@@ -122,17 +125,23 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
         },
       });
 
+      console.log('📦 Edge function response:', { data, error });
+
       if (error) {
+        console.error('❌ Edge function error:', error);
         throw error;
       }
 
       if (data?.url) {
+        console.log('✅ Redirecting to Stripe checkout:', data.url);
         // Redirect to Stripe checkout
         window.location.href = data.url;
       } else {
+        console.error('❌ No checkout URL in response:', data);
         throw new Error('No checkout URL returned from Stripe');
       }
     } catch (error) {
+      console.error('💥 Purchase error:', error);
       toast({
         title: "Purchase Error",
         description: error instanceof Error ? error.message : "Failed to initiate purchase. Please try again.",
