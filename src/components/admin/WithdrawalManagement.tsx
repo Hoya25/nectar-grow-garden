@@ -50,27 +50,9 @@ const WithdrawalManagement = () => {
 
   const fetchWithdrawals = async () => {
     try {
-      // Use secure function with enhanced data masking and audit logging
+      // Use secure RPC function to avoid triggering audit logs during SELECT
       const { data, error } = await supabase
-        .from('withdrawal_requests')
-        .select(`
-          id,
-          user_id,
-          wallet_address,
-          nctr_amount,
-          net_amount_nctr,
-          gas_fee_nctr,
-          status,
-          transaction_hash,
-          created_at,
-          processed_at,
-          profiles!inner(
-            username,
-            full_name,
-            email
-          )
-        `)
-        .order('created_at', { ascending: false });
+        .rpc('get_admin_withdrawal_requests');
 
       if (error) {
         // Handle session expiry specifically
@@ -99,11 +81,11 @@ const WithdrawalManagement = () => {
         transaction_hash: item.transaction_hash,
         created_at: item.created_at,
         processed_at: item.processed_at,
-        username_masked: item.profiles?.username ? 
-          `${item.profiles.username.substring(0, 2)}***` : null,
-        full_name: item.profiles?.full_name || null,
-        email_masked: item.profiles?.email ? 
-          `${item.profiles.email.split('@')[0].substring(0, 2)}***@${item.profiles.email.split('@')[1]}` : null,
+        username_masked: item.username ? 
+          `${item.username.substring(0, 2)}***` : null,
+        full_name: item.full_name || null,
+        email_masked: item.email ? 
+          `${item.email.split('@')[0].substring(0, 2)}***@${item.email.split('@')[1]}` : null,
       }));
       
       setWithdrawals(transformedData);

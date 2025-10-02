@@ -1177,6 +1177,24 @@ export type Database = {
           wallet_address_masked: string
         }[]
       }
+      get_admin_withdrawal_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          gas_fee_nctr: number
+          id: string
+          nctr_amount: number
+          net_amount_nctr: number
+          processed_at: string
+          status: string
+          transaction_hash: string
+          user_id: string
+          username: string
+          wallet_address: string
+        }[]
+      }
       get_business_data_access_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
