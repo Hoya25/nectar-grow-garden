@@ -200,9 +200,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         currentStatus={currentStatus}
                         current360Lock={current360NCTR}
                         className="bg-amber-600 hover:bg-amber-700 text-white border-0"
-                      >
-                        Buy {formatNCTR(Math.max(1, 1000 - current360NCTR))} NCTR
-                      </BuyNCTRButton>
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -227,9 +225,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         currentStatus={currentStatus}
                         current360Lock={current360NCTR}
                         className="bg-slate-500 hover:bg-slate-600 text-white border-0"
-                      >
-                        Buy {formatNCTR(Math.max(1, 2500 - current360NCTR))} NCTR
-                      </BuyNCTRButton>
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -254,9 +250,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         currentStatus={currentStatus}
                         current360Lock={current360NCTR}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white border-0"
-                      >
-                        Buy {formatNCTR(Math.max(1, 5000 - current360NCTR))} NCTR
-                      </BuyNCTRButton>
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -281,9 +275,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         currentStatus={currentStatus}
                         current360Lock={current360NCTR}
                         className="bg-slate-500 hover:bg-slate-600 text-white border-0"
-                      >
-                        Buy {formatNCTR(Math.max(1, 10000 - current360NCTR))} NCTR
-                      </BuyNCTRButton>
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -308,9 +300,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         currentStatus={currentStatus}
                         current360Lock={current360NCTR}
                         className="bg-blue-600 hover:bg-blue-700 text-white border-0"
-                      >
-                        Buy {formatNCTR(Math.max(1, 25000 - current360NCTR))} NCTR
-                      </BuyNCTRButton>
+                      />
                     </div>
                   </CardContent>
                 </Card>

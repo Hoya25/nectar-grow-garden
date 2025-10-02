@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Trophy, TrendingUp, ChevronRight, Sparkles, Crown } from 'lucide-react';
+import { Trophy, TrendingUp, ChevronRight, Sparkles, Crown, Zap } from 'lucide-react';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import { LevelUpModal } from '@/components/LevelUpModal';
@@ -178,15 +178,17 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                   </Button>
                 </LevelUpModal>
               ) : (
-                <Button 
+                <BuyNCTRButton 
                   size="sm"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  onClick={() => window.open('https://token.nctr.live', '_blank')}
+                  suggestedAmount={2500}
+                  currentStatus={currentStatus}
+                  current360Lock={current360NCTR}
                 >
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  <span className="hidden sm:inline">Buy NCTR</span>
-                  <span className="sm:hidden">Buy</span>
-                </Button>
+                  <Zap className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">Level Up, Buy NCTR</span>
+                  <span className="sm:hidden">Level Up</span>
+                </BuyNCTRButton>
               )}
             </div>
           </div>
@@ -224,14 +226,16 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                 </Button>
               </LevelUpModal>
             ) : (
-              <Button 
+              <BuyNCTRButton 
                 size="sm"
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={() => window.open('https://token.nctr.live', '_blank')}
+                suggestedAmount={2500}
+                currentStatus={currentStatus}
+                current360Lock={current360NCTR}
               >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Buy NCTR from token.nctr.live
-              </Button>
+                <Zap className="w-4 h-4 mr-2" />
+                Level Up, Buy NCTR
+              </BuyNCTRButton>
             )}
           </div>
         </CardContent>
