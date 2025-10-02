@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, ShoppingCart, Zap } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { ShoppingCart, Zap } from 'lucide-react';
+import { BuyNCTRModal } from './BuyNCTRModal';
 
 interface BuyNCTRButtonProps {
   variant?: 'default' | 'outline' | 'secondary' | 'ghost';
   size?: 'sm' | 'default' | 'lg';
   className?: string;
   children?: React.ReactNode;
-  buyPageUrl?: string; // Will be set later when buy page is ready
   showBadge?: boolean;
   badgeText?: string;
   suggestedAmount?: number;
-  onPurchaseComplete?: (amount: number) => void; // For future integration
+  currentStatus?: string;
+  current360Lock?: number;
+  onPurchaseComplete?: () => void;
 }
 
 export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
@@ -21,25 +22,17 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
   size = 'default',
   className = '',
   children,
-  buyPageUrl, // Currently null, will be set later
   showBadge = false,
   badgeText = 'Quick Buy',
   suggestedAmount,
+  currentStatus,
+  current360Lock,
   onPurchaseComplete
 }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+
   const handleBuyClick = () => {
-    let targetUrl = buyPageUrl || 'https://token.nctr.live/';
-    
-    // Add amount parameter if suggestedAmount is provided
-    if (suggestedAmount && suggestedAmount > 0) {
-      const urlObj = new URL(targetUrl);
-      urlObj.searchParams.set('amount', suggestedAmount.toString());
-      urlObj.searchParams.set('type', 'nctr');
-      urlObj.searchParams.set('source', 'garden');
-      targetUrl = urlObj.toString();
-    }
-    
-    window.open(targetUrl, '_blank');
+    setModalOpen(true);
   };
 
   const defaultContent = (
@@ -55,26 +48,36 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
   );
 
   return (
-    <div className="relative inline-block">
-      <Button
-        variant={variant}
-        size={size}
-        className={`${className}`}
-        onClick={handleBuyClick}
-      >
-        {children || defaultContent}
-        <ExternalLink className="w-3 h-3 ml-1" />
-      </Button>
-      
-      {showBadge && (
-        <Badge 
-          variant="secondary" 
-          className="absolute -top-2 -right-2 text-xs bg-primary text-primary-foreground animate-pulse"
+    <>
+      <div className="relative inline-block">
+        <Button
+          variant={variant}
+          size={size}
+          className={`${className}`}
+          onClick={handleBuyClick}
         >
-          {badgeText}
-        </Badge>
-      )}
-    </div>
+          {children || defaultContent}
+        </Button>
+        
+        {showBadge && (
+          <Badge 
+            variant="secondary" 
+            className="absolute -top-2 -right-2 text-xs bg-primary text-primary-foreground animate-pulse"
+          >
+            {badgeText}
+          </Badge>
+        )}
+      </div>
+
+      <BuyNCTRModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        suggestedAmount={suggestedAmount}
+        currentStatus={currentStatus}
+        current360Lock={current360Lock}
+        onPurchaseComplete={onPurchaseComplete}
+      />
+    </>
   );
 };
 
@@ -83,8 +86,9 @@ export const BuyNCTRUpgrade: React.FC<{
   currentAmount: number;
   targetAmount: number;
   targetStatus: string;
+  currentStatus?: string;
   className?: string;
-}> = ({ currentAmount, targetAmount, targetStatus, className }) => {
+}> = ({ currentAmount, targetAmount, targetStatus, currentStatus, className }) => {
   const needed = Math.max(0, targetAmount - currentAmount);
   
   if (needed <= 0) return null;
@@ -94,6 +98,8 @@ export const BuyNCTRUpgrade: React.FC<{
       variant="outline"
       className={`border-primary text-primary hover:bg-primary hover:text-primary-foreground ${className}`}
       suggestedAmount={needed}
+      currentStatus={currentStatus}
+      current360Lock={currentAmount}
       showBadge={true}
       badgeText="Upgrade"
     >

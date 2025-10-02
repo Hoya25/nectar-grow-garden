@@ -26,6 +26,7 @@ import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
+import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -1201,6 +1202,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     <User className="w-4 h-4 mr-2" />
                     Portfolio Details & Sync
                   </Button>
+                  
+                  <BuyNCTRButton
+                    variant="default"
+                    size="default"
+                    currentStatus={portfolio?.opportunity_status}
+                    current360Lock={portfolio?.lock_360_nctr || 0}
+                    onPurchaseComplete={() => fetchUserData()}
+                  />
                   
                   {(portfolio?.available_nctr && portfolio.available_nctr > 0) && (
                     <Button 
