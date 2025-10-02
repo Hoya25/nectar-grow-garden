@@ -31,7 +31,8 @@ import {
   Image,
   ChevronUp,
   ChevronDown,
-  ArrowUpDown
+  ArrowUpDown,
+  RefreshCw
 } from 'lucide-react';
 
 interface EarningOpportunity {
@@ -943,6 +944,46 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         />
                       </div>
                       
+                      {/* Regenerate Link Button for Loyalize brands */}
+                      {editingOpportunity && selectedBrand && (
+                        <div className="space-y-2">
+                          <Label>Update Tracking Link</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={async () => {
+                              const brandDetails = await fetchBrandDetails(selectedBrand.id);
+                              if (brandDetails?.loyalize_id) {
+                                const newLink = generateUserTrackingLink(
+                                  brandDetails.website_url || '', 
+                                  selectedBrand.name,
+                                  selectedBrand.id,
+                                  brandDetails.loyalize_id
+                                );
+                                setFormData({...formData, affiliate_link: newLink});
+                                toast({
+                                  title: "Link Regenerated",
+                                  description: "Affiliate link updated to use proper Loyalize tracking",
+                                });
+                              } else {
+                                toast({
+                                  title: "Not a Loyalize Brand",
+                                  description: "This brand doesn't have a Loyalize ID",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            className="w-full"
+                          >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Regenerate Link
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Logo section - should be at same level */}
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Brand Logo</Label>
                         
@@ -1014,10 +1055,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="text-xs text-muted-foreground">
-                    💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize, or upload/link brand logos directly
+                    
+                    <div className="text-xs text-muted-foreground">
+                      💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize, or upload/link brand logos directly
+                    </div>
                   </div>
                 </div>
 
