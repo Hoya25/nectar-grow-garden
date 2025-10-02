@@ -27,10 +27,11 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'purchases'>('all');
 
   useEffect(() => {
     fetchTransactions();
-  }, [userId, refreshKey]);
+  }, [userId, refreshKey, filter]);
 
   // Real-time subscription for new transactions
   useEffect(() => {
@@ -62,12 +63,19 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
   const fetchTransactions = async () => {
     try {
       setIsRefreshing(true);
-      const { data, error } = await supabase
+      
+      let query = supabase
         .from('nctr_transactions')
         .select('*')
         .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(50);
+        .order('created_at', { ascending: false });
+      
+      // Apply filter
+      if (filter === 'purchases') {
+        query = query.eq('earning_source', 'token_purchase');
+      }
+      
+      const { data, error } = await query.limit(50);
 
       if (!error && data) {
         setTransactions(data);
@@ -146,16 +154,34 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
             <Clock className="w-5 h-5" />
             Your Portfolio Story
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="gap-2"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={filter === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFilter('all')}
+              className="text-xs"
+            >
+              All
+            </Button>
+            <Button
+              variant={filter === 'purchases' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFilter('purchases')}
+              className="text-xs"
+            >
+              Purchases
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
