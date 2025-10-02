@@ -57,10 +57,15 @@ export const BuyNCTRButton: React.FC<BuyNCTRButtonProps> = ({
     <>
       <div className="relative inline-block">
         <Button
+          type="button"
           variant={variant}
           size={size}
           className={`${className}`}
-          onClick={handleBuyClick}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleBuyClick();
+          }}
         >
           {children || defaultContent}
         </Button>
