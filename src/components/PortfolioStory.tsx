@@ -49,8 +49,13 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
         },
         (payload) => {
           console.log('New transaction received:', payload);
-          // Add the new transaction to the list
-          setTransactions(prev => [payload.new as Transaction, ...prev]);
+          const newTransaction = payload.new as Transaction;
+          // Add the new transaction only if it doesn't already exist (deduplicate)
+          setTransactions(prev => {
+            const exists = prev.some(t => t.id === newTransaction.id);
+            if (exists) return prev;
+            return [newTransaction, ...prev];
+          });
         }
       )
       .subscribe();
