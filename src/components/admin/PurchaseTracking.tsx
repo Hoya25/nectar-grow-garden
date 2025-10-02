@@ -31,9 +31,9 @@ export const PurchaseTracking = () => {
     setSyncResult(null);
     
     try {
-      console.log('🔄 Starting Loyalize sync...');
+      console.log('🔄 Starting Loyalize transaction sync...');
       
-      const { data, error } = await supabase.functions.invoke('loyalize-transaction-sync', {
+      const { data, error } = await supabase.functions.invoke('loyalize-sync-transactions', {
         body: {}
       });
 
@@ -43,7 +43,7 @@ export const PurchaseTracking = () => {
       
       toast({
         title: "✅ Sync Complete",
-        description: `${data.results.credited} transactions credited out of ${data.results.checked} checked`,
+        description: `${data.results.credited} new transactions credited (${data.results.checked} total checked)`,
       });
 
       console.log('✅ Sync result:', data);
