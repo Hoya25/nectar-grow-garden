@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { Clock, TrendingUp, Lock, Gift, ShoppingCart, Users, Zap, CheckCircle } from 'lucide-react';
+import { Clock, TrendingUp, Lock, Gift, ShoppingCart, Users, Zap, CheckCircle, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Transaction {
@@ -25,6 +26,7 @@ interface PortfolioStoryProps {
 export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshKey }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     fetchTransactions();
@@ -32,6 +34,7 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
 
   const fetchTransactions = async () => {
     try {
+      setIsRefreshing(true);
       const { data, error } = await supabase
         .from('nctr_transactions')
         .select('*')
@@ -46,7 +49,12 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
       console.error('Error fetching transactions:', error);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
+  };
+
+  const handleRefresh = () => {
+    fetchTransactions();
   };
 
   const getTransactionIcon = (source: string) => {
@@ -106,10 +114,22 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Clock className="w-5 h-5" />
-          Your Portfolio Story
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5" />
+            Your Portfolio Story
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {transactions.length === 0 ? (
