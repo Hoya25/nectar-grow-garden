@@ -188,6 +188,50 @@ const UserAffiliateLinks = () => {
         </CardHeader>
       </Card>
 
+      {/* Timeline Info Card */}
+      <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="space-y-3">
+              <div>
+                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                  ⏱️ Purchase Credit Timeline
+                </h3>
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  NCTR rewards are credited after merchant confirmation, typically within <strong>24-72 hours</strong> of purchase.
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                  <span><strong>Step 1:</strong> Purchase made through your link</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                  <span><strong>Step 2:</strong> Merchant confirms order (1-24 hours)</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                  <span><strong>Step 3:</strong> Commission reported to system (24-48 hours)</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                  <span><strong>Step 4:</strong> NCTR automatically credited to your account</span>
+                </div>
+              </div>
+
+              <p className="text-xs text-blue-600 dark:text-blue-400 italic">
+                💡 Returns or cancellations may delay or void rewards. Track your pending transactions in your dashboard.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Product URL Input */}
       <Card>
         <CardContent className="p-4">

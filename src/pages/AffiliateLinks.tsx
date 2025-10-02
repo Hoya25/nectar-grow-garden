@@ -189,7 +189,7 @@ const AffiliateLinks = () => {
               <div>
                 <h4 className="font-semibold mb-2">Independent Links Process:</h4>
                 <ol className="text-sm space-y-1 list-decimal list-inside text-muted-foreground">
-                  <li>Add your existing affiliate URL (like Ledger's)</li>
+                  <li>Add your existing affiliate URL (like Ledger&apos;s)</li>
                   <li>We create a tracked redirect link</li>
                   <li>Share the tracked link with your audience</li>
                   <li>Clicks are recorded with user identification</li>
@@ -207,6 +207,33 @@ const AffiliateLinks = () => {
                     https://shop.ledger.com/?r=4c47a8c09777<br/>
                     <span className="text-primary">&nctr_user=abc123de&nctr_ref=xyz789</span>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Credit Timeline Section */}
+            <div className="border-t pt-4 mt-6">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                When Will I Receive NCTR Credits?
+              </h4>
+              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <p className="text-sm text-amber-900 dark:text-amber-100 mb-3">
+                  <strong>Typical Timeline: 24-72 hours</strong> after purchase confirmation
+                </p>
+                <div className="space-y-2 text-sm text-amber-800 dark:text-amber-200">
+                  <p>
+                    🔄 <strong>Why the wait?</strong> Merchants need to confirm orders and prevent fraud. 
+                    Commission tracking systems report to us in batches, typically every 24-48 hours.
+                  </p>
+                  <p>
+                    ⚡ <strong>Auto-sync:</strong> Once reported, NCTR is automatically credited to your account.
+                    You&apos;ll see it appear in your transaction history.
+                  </p>
+                  <p>
+                    ⚠️ <strong>Delays may occur if:</strong> Orders are cancelled, returned, or flagged for review.
+                    Some merchants take 30-90 days to confirm large purchases.
+                  </p>
                 </div>
               </div>
             </div>

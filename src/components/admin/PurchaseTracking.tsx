@@ -124,6 +124,31 @@ export const PurchaseTracking = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Timeline Info for Admins */}
+          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-100 mb-2">
+              ⏱️ Transaction Processing Timeline
+            </h4>
+            <div className="space-y-2 text-xs text-blue-800 dark:text-blue-200">
+              <p>
+                <strong>Typical flow:</strong> Purchase → Merchant confirms (1-24h) → Loyalize reports (24-48h) → Admin sync → User credit
+              </p>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  <span><strong>PENDING:</strong> Order placed, awaiting confirmation</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span><strong>AVAILABLE:</strong> Ready to credit after sync</span>
+                </div>
+              </div>
+              <p className="text-blue-600 dark:text-blue-400 italic mt-2">
+                💡 Most transactions appear within 24-72 hours. Large purchases may take 30-90 days.
+              </p>
+            </div>
+          </div>
+
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
