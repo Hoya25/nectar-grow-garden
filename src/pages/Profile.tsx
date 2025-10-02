@@ -16,6 +16,7 @@ import WalletConnection from '@/components/WalletConnection';
 import { WingsStatusBar } from '@/components/WingsStatusBar';
 import { LevelUpModal } from '@/components/LevelUpModal';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
+import { BuyNCTRButton } from '@/components/BuyNCTRButton';
 
 interface UserProfile {
   id: string;
@@ -420,45 +421,15 @@ const Profile = () => {
               />
             </div>
             
-            {/* Level Up Button */}
-            {portfolio && statusLevels.length > 0 && (() => {
-              const currentStatus = portfolio.opportunity_status || 'starter';
-              const current360NCTR = parseFloat(portfolio.lock_360_nctr?.toString() || '0');
-              const availableNCTR = parseFloat(portfolio.available_nctr?.toString() || '0');
-              
-              // Find next status level
-              const nextStatusLevel = statusLevels.find(level => 
-                level.min_locked_nctr > current360NCTR
-              );
-              
-              // Don't show button if already at highest level
-              if (!nextStatusLevel) return null;
-              
-              return (
-                <LevelUpModal
-                  currentStatus={currentStatus}
-                  current360NCTR={current360NCTR}
-                  availableNCTR={availableNCTR}
-                  nextStatusInfo={{
-                    status: nextStatusLevel.status_name,
-                    required: nextStatusLevel.min_locked_nctr,
-                    multiplier: nextStatusLevel.reward_multiplier.toString()
-                  }}
-                  onEarnMoreClick={() => navigate('/garden')}
-                  onLockCommitmentClick={() => {
-                    toast({
-                      title: "Lock Commitment",
-                      description: "Lock commitment feature coming soon!",
-                    });
-                  }}
-                >
-                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
-                    <TrendingUp className="w-4 h-4 mr-2" />
-                    Level Up
-                  </Button>
-                </LevelUpModal>
-              );
-            })()}
+            {/* Buy NCTR Button */}
+            <BuyNCTRButton
+              variant="default"
+              size="lg"
+              className="whitespace-nowrap"
+              currentStatus={portfolio?.opportunity_status || 'starter'}
+              current360Lock={portfolio?.lock_360_nctr || 0}
+              onPurchaseComplete={fetchProfileData}
+            />
           </div>
         </div>
 
