@@ -30,13 +30,13 @@ export const BaseBadge = ({
       rel="noopener noreferrer"
       className={`inline-flex items-center gap-2 opacity-70 hover:opacity-100 transition-all duration-300 group ${className}`}
     >
-      <span className={`font-medium ${sizes.text}`}>
+      <span className={`font-medium ${sizes.text} leading-none`}>
         Built on
       </span>
       <img 
         src={baseLogo} 
         alt="Base" 
-        className={`w-auto ${sizes.logo} ${filterClasses} transition-all duration-300`}
+        className={`w-auto ${sizes.logo} ${filterClasses} transition-all duration-300 translate-y-[1px]`}
       />
     </a>
   );
