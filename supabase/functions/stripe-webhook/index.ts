@@ -72,8 +72,18 @@ serve(async (req) => {
       const nctrAmountNum = parseFloat(nctr_amount);
       const usdAmount = session.amount_total ? session.amount_total / 100 : 0;
 
+      // Fetch user profile for logging
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('full_name, username, email')
+        .eq('user_id', user_id)
+        .maybeSingle()
+      
+      const userName = profile?.full_name || profile?.username || profile?.email?.split('@')[0] || 'Unknown User'
+
       logStep("Creating transaction", {
         userId: user_id,
+        userName: userName,
         nctrAmount: nctrAmountNum,
         usdAmount,
       });
@@ -141,6 +151,7 @@ serve(async (req) => {
 
       logStep("✅ Purchase processed successfully", {
         userId: user_id,
+        userName: userName,
         nctrAmount: nctrAmountNum,
         sessionId: session.id,
       });

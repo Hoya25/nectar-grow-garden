@@ -150,6 +150,7 @@ serve(async (req) => {
         console.log(`   🔍 Looking up user...`)
         
         let userId: string | null = null
+        let userName: string = 'Unknown User'
         
         // Try tracking ID lookup first
         if (trackingId) {
@@ -176,6 +177,17 @@ serve(async (req) => {
           console.error(`   ❌ Could not determine user ID`)
           results.push({ transaction_id: txnId, error: 'User not found' })
           continue
+        }
+
+        // Fetch user profile for logging
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, username, email')
+          .eq('user_id', userId)
+          .maybeSingle()
+        
+        if (profile) {
+          userName = profile.full_name || profile.username || profile.email?.split('@')[0] || 'Unknown User'
         }
 
         // Check if already credited
@@ -263,12 +275,13 @@ serve(async (req) => {
             status: 'completed'
           })
 
-        console.log(`   ✅ SUCCESS: Credited ${nctrReward} NCTR`)
+        console.log(`   ✅ SUCCESS: Credited ${nctrReward} NCTR to ${userName} (${userId.slice(0, 8)}...)`)
         results.push({ 
           transaction_id: txnId, 
           status: 'success',
           nctr_credited: nctrReward,
-          user_id: userId.slice(0, 8) + '...'
+          user_id: userId.slice(0, 8) + '...',
+          user_name: userName
         })
 
       } catch (error) {

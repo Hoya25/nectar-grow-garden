@@ -157,6 +157,16 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
     )
   }
 
+  // Fetch user profile for logging
+  const { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('full_name, username, email')
+    .eq('user_id', withdrawal.user_id)
+    .maybeSingle()
+  
+  const userName = profile?.full_name || profile?.username || profile?.email?.split('@')[0] || 'Unknown User'
+  console.log(`👤 Processing withdrawal for ${userName} (${withdrawal.user_id.slice(0, 8)}...)`)
+
   try {
     // Update status to processing
     await supabaseClient
@@ -223,7 +233,7 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
       .eq('transaction_type', 'withdrawal')
       .eq('status', 'pending')
 
-    console.log(`🎉 Withdrawal completed successfully for user ${withdrawal.user_id}`)
+    console.log(`🎉 Withdrawal completed successfully for ${userName} (${withdrawal.user_id.slice(0, 8)}...)`)
 
     return new Response(
       JSON.stringify({

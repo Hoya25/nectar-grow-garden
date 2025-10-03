@@ -61,7 +61,26 @@ serve(async (req) => {
     }
 
     const payload: ManualCreditRequest = await req.json()
-    console.log(`🛠️ Manual credit initiated by admin ${user.id.slice(0, 8)}`)
+
+    // Fetch target user profile for logging
+    const { data: targetProfile } = await supabase
+      .from('profiles')
+      .select('full_name, username, email')
+      .eq('user_id', payload.user_id)
+      .maybeSingle()
+    
+    const targetUserName = targetProfile?.full_name || targetProfile?.username || targetProfile?.email?.split('@')[0] || 'Unknown User'
+
+    // Fetch admin profile for logging
+    const { data: adminProfile } = await supabase
+      .from('profiles')
+      .select('full_name, username, email')
+      .eq('user_id', user.id)
+      .maybeSingle()
+    
+    const adminName = adminProfile?.full_name || adminProfile?.username || adminProfile?.email?.split('@')[0] || 'Admin'
+
+    console.log(`🛠️ Manual credit initiated by ${adminName} (${user.id.slice(0, 8)}...) for ${targetUserName} (${payload.user_id.slice(0, 8)}...)`)
 
     // Get brand NCTR rate or use provided rate
     const { data: brand } = await supabase
@@ -149,7 +168,7 @@ serve(async (req) => {
         }
       })
 
-    console.log(`✅ Manually credited ${nctrReward} NCTR to user ${payload.user_id.slice(0, 8)}`)
+    console.log(`✅ Manually credited ${nctrReward} NCTR to ${targetUserName} (${payload.user_id.slice(0, 8)}...)`)
 
     return new Response(
       JSON.stringify({
