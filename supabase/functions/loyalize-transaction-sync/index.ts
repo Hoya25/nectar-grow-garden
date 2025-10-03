@@ -6,6 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Loyalize webhook IP whitelist
+const LOYALIZE_IP_WHITELIST = ['34.171.245.170']
+
 interface LoyalizeTransaction {
   // Based on official Loyalize v2 API documentation
   id: number
@@ -34,6 +37,23 @@ serve(async (req) => {
   }
 
   try {
+    // IP Whitelist check for Loyalize webhooks
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('x-real-ip') ||
+                     req.headers.get('cf-connecting-ip') ||
+                     'unknown'
+    
+    console.log('📍 Webhook request from IP:', clientIP)
+    
+    if (!LOYALIZE_IP_WHITELIST.includes(clientIP)) {
+      console.error('❌ Unauthorized IP address:', clientIP)
+      return new Response(JSON.stringify({ error: 'Unauthorized IP address' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    
+    console.log('✅ IP whitelist check passed')
     console.log('🔔 Loyalize webhook received!')
     console.log(`   Method: ${req.method}`)
     console.log(`   Headers:`, Object.fromEntries(req.headers.entries()))

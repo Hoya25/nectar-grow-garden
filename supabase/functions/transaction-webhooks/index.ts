@@ -6,6 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Loyalize webhook IP whitelist
+const LOYALIZE_IP_WHITELIST = ['34.171.245.170']
+
 interface TransactionWebhook {
   eventType: string
   data: {
@@ -44,70 +47,42 @@ serve(async (req) => {
       })
     }
 
+    // IP Whitelist check for Loyalize webhooks
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('x-real-ip') ||
+                     req.headers.get('cf-connecting-ip') ||
+                     'unknown'
+    
+    console.log('📍 Webhook request from IP:', clientIP)
+    
+    if (!LOYALIZE_IP_WHITELIST.includes(clientIP)) {
+      console.error('❌ Unauthorized IP address:', clientIP)
+      return new Response(JSON.stringify({ error: 'Unauthorized IP address' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    
+    console.log('✅ IP whitelist check passed')
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-    // CRITICAL SECURITY: Mandatory webhook signature verification
-    const webhookSecret = Deno.env.get('LOYALIZE_WEBHOOK_SECRET');
-    if (!webhookSecret) {
-      console.error('[SECURITY] LOYALIZE_WEBHOOK_SECRET not configured');
-      return new Response(JSON.stringify({ error: 'Service unavailable' }), {
-        status: 503,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    const signature = req.headers.get('x-webhook-signature');
-    if (!signature) {
-      console.error('[SECURITY] Missing webhook signature', { ip: clientIP });
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
     
-    const body = await req.text();
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(webhookSecret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign', 'verify']
-    );
-    
-    const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
-    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-    
-    if (signature !== expectedSignature) {
-      console.error('[SECURITY] Invalid webhook signature', { ip: clientIP });
-      return new Response(JSON.stringify({ error: 'Authentication failed' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    console.log('[SECURITY] ✅ Webhook signature verified');
-    
-    // Parse validated body
-    let rawPayload;
+    // Parse request body
+    const body = await req.text()
+    let rawPayload
     try {
       if (!body.trim()) {
-        throw new Error('Empty request body');
+        throw new Error('Empty request body')
       }
-      rawPayload = JSON.parse(body);
+      rawPayload = JSON.parse(body)
     } catch (parseError) {
       return new Response(JSON.stringify({ error: 'Invalid request format' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      })
     }
-
-    // Enhanced security: rate limiting check
-    const clientIP = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || 'unknown';
 
     // Log webhook with sanitized data (no sensitive info)
     console.log('🔔 Received webhook from IP:', clientIP, 'payload keys:', Object.keys(rawPayload))
