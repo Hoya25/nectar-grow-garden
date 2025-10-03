@@ -29,6 +29,7 @@ import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
 import { CustomerServiceBubble } from '@/components/CustomerServiceBubble';
+import { BaseBadge } from '@/components/BaseBadge';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -1174,9 +1175,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           >
             <CardHeader>
               <CardTitle className="text-xl section-heading flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Coins className="w-6 h-6 text-primary" />
                   Your NCTR Portfolio
+                  <BaseBadge size="sm" variant="light" showText={false} />
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="text-right">

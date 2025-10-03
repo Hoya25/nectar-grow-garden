@@ -19,6 +19,7 @@ import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
 import ReferralSystem from '@/components/ReferralSystem';
+import { BaseBadge } from '@/components/BaseBadge';
 
 interface UserProfile {
   id: string;
@@ -483,10 +484,13 @@ const Profile = () => {
           <div className="mb-8">
             <Card className="bg-card/80 backdrop-blur-sm border-2 border-primary/20">
               <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2">
-                  <Wallet className="h-5 w-5 text-primary" />
-                  Connect Your Coinbase Wallet
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-primary" />
+                    Connect Your Coinbase Wallet
+                  </CardTitle>
+                  <BaseBadge size="sm" variant="light" />
+                </div>
               </CardHeader>
               <CardContent>
                 <WalletConnection />
@@ -913,10 +917,13 @@ const Profile = () => {
             {profile?.wallet_address && (
               <Card className="bg-card/50 backdrop-blur-sm">
                 <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Wallet className="h-4 w-4 text-muted-foreground" />
-                    Wallet Management
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Wallet className="h-4 w-4 text-muted-foreground" />
+                      Wallet Management
+                    </CardTitle>
+                    <BaseBadge size="sm" variant="light" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <WalletConnection />

@@ -1,5 +1,5 @@
 import nctrLogo from "@/assets/nctr-logo-grey.png";
-import baseLogo from "@/assets/base-horizontal.svg";
+import { BaseBadge } from "@/components/BaseBadge";
 
 const Footer = () => {
   return (
@@ -44,19 +44,7 @@ const Footer = () => {
                 </p>
                 
                 {/* Built on Base Badge */}
-                <a 
-                  href="https://www.base.org/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-background/80 hover:text-background transition-all duration-300 group"
-                >
-                  <span className="text-sm font-medium">Built on</span>
-                  <img 
-                    src={baseLogo} 
-                    alt="Base" 
-                    className="h-5 w-auto brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                  />
-                </a>
+                <BaseBadge variant="dark" size="md" className="text-background" />
               </div>
               
               <div className="flex items-center gap-6">

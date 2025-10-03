@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { User, Settings, Share2 } from "lucide-react";
 import ReferralSystem from "@/components/ReferralSystem";
+import { BaseBadge } from "@/components/BaseBadge";
 
 const Header = () => {
   const { user, signOut } = useAuth();
@@ -42,6 +43,11 @@ const Header = () => {
         <div className="flex items-center space-x-3 cursor-pointer group"
           onClick={() => navigate('/')}>
           <span className="text-2xl font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300">The Garden</span>
+        </div>
+        
+        {/* Built on Base Badge - Desktop */}
+        <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
+          <BaseBadge size="sm" variant="light" />
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
