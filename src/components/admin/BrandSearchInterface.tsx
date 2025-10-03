@@ -84,7 +84,15 @@ const BrandSearchInterface = ({
   const fetchBrands = async () => {
     setLoading(true);
     try {
-      console.log('Fetching brands for search interface...');
+      console.log('🔍 [BrandSearch] Fetching brands for search interface...');
+      
+      // Check authentication status
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('🔍 [BrandSearch] Auth status:', { 
+        authenticated: !!user, 
+        userId: user?.id 
+      });
+      
       const { data, error } = await supabase
         .from('brands')
         .select('id, name, logo_url, description, category, website_url, commission_rate, nctr_per_dollar, is_active, featured, loyalize_id')
@@ -93,19 +101,26 @@ const BrandSearchInterface = ({
         .order('name');
 
       if (error) {
-        console.error('Supabase error fetching brands:', error);
+        console.error('🔍 [BrandSearch] Supabase error fetching brands:', error);
         throw error;
       }
       
-      console.log(`Successfully fetched ${data?.length || 0} brands`);
+      console.log(`🔍 [BrandSearch] Successfully fetched ${data?.length || 0} brands`);
       
-      // Debug log for Uber brands
+      // Check for specific brands
+      const coinbaseBrands = data?.filter(b => b.name.toLowerCase().includes('coinbase')) || [];
+      console.log(`🔍 [BrandSearch] Found ${coinbaseBrands.length} Coinbase brands:`, 
+        coinbaseBrands.map(b => ({ name: b.name, category: b.category, id: b.loyalize_id }))
+      );
+      
       const uberBrands = data?.filter(b => b.name.toLowerCase().includes('uber')) || [];
-      console.log(`Found ${uberBrands.length} Uber brands:`, uberBrands.map(b => b.name));
+      console.log(`🔍 [BrandSearch] Found ${uberBrands.length} Uber brands:`, 
+        uberBrands.map(b => b.name)
+      );
       
       setBrands(data || []);
     } catch (error) {
-      console.error('Error fetching brands:', error);
+      console.error('🔍 [BrandSearch] Error fetching brands:', error);
       setBrands([]);
     } finally {
       setLoading(false);
@@ -128,9 +143,21 @@ const BrandSearchInterface = ({
     
     const matchesCategory = selectedCategory === 'all' || brandCategory.includes(selectedCategory);
     
+    // Debug logging for search debugging
+    if (searchLower && (brandName.includes(searchLower) || brandName.includes('coinbase'))) {
+      console.log(`🔍 [BrandSearch] Checking "${brand.name}":`, {
+        searchTerm: searchLower,
+        brandName,
+        brandCategory,
+        matchesSearch,
+        matchesCategory,
+        loyalize_id: brand.loyalize_id
+      });
+    }
+    
     // Filter out non-Loyalize gift card sources for Uber
     const isUberGiftCard = brandName.includes('uber') && (brandName.includes('gift') || brandCategory.includes('gift'));
-    const isLoyalizeSourced = brand.loyalize_id && /^\d+$/.test(brand.loyalize_id); // Numeric loyalize_id indicates real API source
+    const isLoyalizeSourced = brand.loyalize_id && /^\d+$/.test(brand.loyalize_id);
     
     // For Uber gift cards, only show Loyalize API sourced ones
     if (isUberGiftCard && !isLoyalizeSourced) {
@@ -138,12 +165,15 @@ const BrandSearchInterface = ({
       return false;
     }
     
-    // Debug logging for Uber searches
-    if (searchLower.includes('uber')) {
-      console.log(`Checking brand: "${brand.name}" - matches search: ${matchesSearch}, matches category: ${matchesCategory}, loyalize_id: ${brand.loyalize_id}`);
-    }
-    
     return matchesSearch && matchesCategory;
+  });
+
+  console.log(`🔍 [BrandSearch] Filter results:`, {
+    totalBrands: brands.length,
+    searchTerm,
+    selectedCategory,
+    filteredCount: filteredBrands.length,
+    firstFive: filteredBrands.slice(0, 5).map(b => b.name)
   });
 
   const handleBrandSelect = (brand: Brand) => {
