@@ -40,9 +40,23 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get request data
+    // Get request data - support both URL params and body
     const url = new URL(req.url);
-    const action = url.searchParams.get('action') || 'search';
+    let action = url.searchParams.get('action');
+    let brandId = url.searchParams.get('brand_id');
+    
+    // Try to get from request body if not in URL
+    if (req.method === 'POST') {
+      try {
+        const body = await req.json();
+        action = body.action || action || 'search';
+        brandId = body.brand_id || brandId;
+      } catch {
+        action = action || 'search';
+      }
+    } else {
+      action = action || 'search';
+    }
 
     switch (action) {
       case 'search':
@@ -54,8 +68,14 @@ serve(async (req) => {
       case 'sync':
         return await syncAllBrands(loyalizeApiKey, supabase);
       
+      case 'get_brand_details':
+        if (!brandId) {
+          throw new Error('brand_id is required for get_brand_details action');
+        }
+        return await getBrandDetails(brandId, loyalizeApiKey);
+      
       default:
-        throw new Error('Invalid action. Supported: search, import, sync');
+        throw new Error('Invalid action. Supported: search, import, sync, get_brand_details');
     }
 
   } catch (error) {
@@ -195,6 +215,69 @@ async function searchBrands(req: Request, apiKey: string): Promise<Response> {
       note: 'Using enhanced mock data with gift card support - API error',
       error: error instanceof Error ? error.message : 'Unknown error occurred'
     }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+async function getBrandDetails(brandId: string, apiKey: string): Promise<Response> {
+  try {
+    console.log(`📊 Fetching brand details for ID: ${brandId}`);
+    
+    const endpoint = `https://api.loyalize.com/v1/stores/${brandId}`;
+    
+    const response = await fetch(endpoint, {
+      headers: {
+        'Authorization': apiKey,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const storeData = await response.json();
+      console.log(`✅ Successfully fetched brand details: ${storeData.name}`);
+      
+      // Transform to a clean format for display
+      const brandDetails = {
+        id: storeData.id?.toString() || brandId,
+        name: storeData.name || 'Unknown Store',
+        description: storeData.description || storeData.tagline || '',
+        commission_rate: (storeData.commissionRate || 0) * 100, // Convert to percentage
+        category: storeData.categories?.[0] || 'General',
+        website_url: storeData.homePage || '',
+        status: 'active',
+        terms: storeData.terms || '',
+        cookie_duration: storeData.cookieDuration || 30,
+        countries: storeData.countries || ['US']
+      };
+      
+      return new Response(JSON.stringify({
+        success: true,
+        brand: brandDetails
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } else {
+      const errorText = await response.text().catch(() => '');
+      console.error(`❌ Failed to fetch brand details: ${response.status} ${response.statusText}`);
+      console.error(`Response: ${errorText}`);
+      
+      return new Response(JSON.stringify({
+        success: false,
+        error: `Failed to fetch brand details: ${response.status}`
+      }), {
+        status: response.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+  } catch (error) {
+    console.error('❌ Get brand details error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    return new Response(JSON.stringify({
+      success: false,
+      error: errorMessage
+    }), {
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
