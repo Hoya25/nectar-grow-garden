@@ -13,7 +13,12 @@ const brandSubmissionSchema = z.object({
   brandName: z.string().trim().min(1, "Brand name is required").max(100, "Brand name must be less than 100 characters"),
   contactName: z.string().trim().min(1, "Contact name is required").max(100, "Contact name must be less than 100 characters"),
   contactEmail: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
-  website: z.string().trim().url("Invalid website URL").max(500, "Website URL must be less than 500 characters"),
+  website: z.string().trim().min(1, "Website is required").max(500, "Website URL must be less than 500 characters")
+    .refine((val) => {
+      // Accept URLs with or without protocol
+      const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+      return urlPattern.test(val);
+    }, "Please enter a valid website URL"),
   description: z.string().trim().min(10, "Description must be at least 10 characters").max(1000, "Description must be less than 1000 characters"),
 });
 
