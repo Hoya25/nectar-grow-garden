@@ -1063,15 +1063,21 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <h1 className="text-xl sm:text-2xl font-bold nctr-text">
-                  The Garden
-                </h1>
-                <img 
-                  src={nctrLogo} 
-                  alt="NCTR" 
-                  className="h-16 sm:h-28 w-auto opacity-90"
-                />
+              <div className="flex flex-col items-start gap-1">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <h1 className="text-xl sm:text-2xl font-bold nctr-text">
+                    The Garden
+                  </h1>
+                  <img 
+                    src={nctrLogo} 
+                    alt="NCTR" 
+                    className="h-16 sm:h-28 w-auto opacity-90"
+                  />
+                </div>
+                {/* Built on Base Badge - Under NCTR */}
+                <div className="hidden sm:flex ml-auto">
+                  <BaseBadge size="sm" variant="light" />
+                </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <Button 
@@ -1131,10 +1137,6 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                 <p className="text-sm font-semibold text-section-accent">
                   ${formatPrice(currentPrice)}
                 </p>
-              </div>
-              {/* Built on Base Badge */}
-              <div className="hidden lg:flex border-l border-primary/20 pl-3">
-                <BaseBadge size="sm" variant="light" />
               </div>
             </div>
           </div>
