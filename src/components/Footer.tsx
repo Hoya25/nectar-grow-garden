@@ -1,5 +1,5 @@
 import nctrLogo from "@/assets/nctr-logo-grey.png";
-import baseLogo from "@/assets/base-wordmark-white.png";
+import baseLogo from "@/assets/base-horizontal.svg";
 
 const Footer = () => {
   return (
@@ -54,7 +54,7 @@ const Footer = () => {
                   <img 
                     src={baseLogo} 
                     alt="Base" 
-                    className="h-5 w-auto opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                    className="h-5 w-auto brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                   />
                 </a>
               </div>
