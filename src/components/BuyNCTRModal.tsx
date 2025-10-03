@@ -185,6 +185,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
     : 100;
 
   const MINIMUM_USD_AMOUNT = 25;
+  const minimumNCTRAmount = wholesalePrice > 0 ? Math.ceil(MINIMUM_USD_AMOUNT / wholesalePrice) : 625;
   const isButtonDisabled = !nctrAmount || parseFloat(nctrAmount) <= 0 || loading || parseFloat(usdAmount) < MINIMUM_USD_AMOUNT;
 
   return (
@@ -283,6 +284,14 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             <p className="text-xs text-muted-foreground mt-1">
               Market price: {formatPrice(currentPrice)} • You save {((currentPrice - wholesalePrice) / currentPrice * 100).toFixed(2)}%
             </p>
+            <div className="mt-2 pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Minimum purchase: ${MINIMUM_USD_AMOUNT}</span>
+                <span className="font-medium text-primary">
+                  = {minimumNCTRAmount.toLocaleString()} NCTR
+                </span>
+              </div>
+            </div>
           </div>
 
           <Separator />
@@ -368,11 +377,21 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
           {parseFloat(usdAmount) < MINIMUM_USD_AMOUNT && parseFloat(usdAmount) > 0 && (
             <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
               <p className="text-sm text-destructive font-medium">
-                Minimum purchase amount is ${MINIMUM_USD_AMOUNT}.00
+                Minimum purchase amount is ${MINIMUM_USD_AMOUNT}.00 ({minimumNCTRAmount.toLocaleString()} NCTR)
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Current amount: ${parseFloat(usdAmount).toFixed(2)}
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-muted-foreground">
+                  Current: ${parseFloat(usdAmount).toFixed(2)} ({parseFloat(nctrAmount || '0').toLocaleString()} NCTR)
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickAmount(minimumNCTRAmount)}
+                  className="h-7 text-xs"
+                >
+                  Set to minimum
+                </Button>
+              </div>
             </div>
           )}
 
