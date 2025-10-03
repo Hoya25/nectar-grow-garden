@@ -12,9 +12,9 @@ export const BaseBadge = ({
   className = ''
 }: BaseBadgeProps) => {
   const sizeClasses = {
-    sm: { logo: 'h-4', text: 'text-xs' },
-    md: { logo: 'h-5', text: 'text-sm' },
-    lg: { logo: 'h-6', text: 'text-base' }
+    sm: { logo: 'h-5', text: 'text-sm' },
+    md: { logo: 'h-6', text: 'text-base' },
+    lg: { logo: 'h-7', text: 'text-lg' }
   };
 
   const filterClasses = variant === 'dark' 
