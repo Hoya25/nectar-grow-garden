@@ -184,7 +184,8 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
     ? (((current360Lock + parseFloat(nctrAmount || '0')) / nextStatus.min_locked_nctr) * 100)
     : 100;
 
-  const isButtonDisabled = !nctrAmount || parseFloat(nctrAmount) <= 0 || loading;
+  const MINIMUM_USD_AMOUNT = 25;
+  const isButtonDisabled = !nctrAmount || parseFloat(nctrAmount) <= 0 || loading || parseFloat(usdAmount) < MINIMUM_USD_AMOUNT;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -361,6 +362,18 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                 </div>
               </div>
             </>
+          )}
+
+          {/* Minimum Purchase Warning */}
+          {parseFloat(usdAmount) < MINIMUM_USD_AMOUNT && parseFloat(usdAmount) > 0 && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
+              <p className="text-sm text-destructive font-medium">
+                Minimum purchase amount is ${MINIMUM_USD_AMOUNT}.00
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Current amount: ${parseFloat(usdAmount).toFixed(2)}
+              </p>
+            </div>
           )}
 
           {/* Action Button */}
