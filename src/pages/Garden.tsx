@@ -1178,7 +1178,6 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                 <div className="flex items-center gap-3">
                   <Coins className="w-6 h-6 text-primary" />
                   Your NCTR Portfolio
-                  <BaseBadge size="sm" variant="light" showText={false} />
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="text-right">

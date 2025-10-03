@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import FeatureSection from "@/components/FeatureSection";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
+import { BrandSubmissionForm } from "@/components/BrandSubmissionForm";
 
 const Index = () => {
   return (
@@ -62,13 +63,21 @@ const Index = () => {
       />
       
       {/* Partner With The Garden Section */}
-      <FeatureSection
-        title="Partner With The Garden"
-        description="The Garden is built on Base so that we can unlock as many opportunities as possible for our members. Our community is built on loyalty so that our partners can attract and reward their biggest fans."
-        buttonText="Explore Partnership Opportunities →"
-        icon=""
-        gradient={true}
-      />
+      <div className="py-16 px-4">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-premium bg-clip-text text-transparent">
+            Partner With The Garden
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+            The Garden is built on Base so that we can unlock as many opportunities as possible for our members. Our community is built on loyalty so that our partners can attract and reward their biggest fans.
+          </p>
+          <BrandSubmissionForm>
+            <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary text-primary-foreground rounded-xl shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105">
+              Explore Partnership Opportunities →
+            </button>
+          </BrandSubmissionForm>
+        </div>
+      </div>
       
       <FAQ />
       <Footer />
