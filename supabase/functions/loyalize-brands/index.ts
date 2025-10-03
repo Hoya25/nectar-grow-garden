@@ -315,7 +315,7 @@ async function getBrandDetails(brandId: string, apiKey: string): Promise<Respons
           message: 'This brand is not available in the Loyalize affiliate network yet.',
           brand_id: brandId
         }), {
-          status: 404,
+          status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
@@ -325,7 +325,7 @@ async function getBrandDetails(brandId: string, apiKey: string): Promise<Respons
         error: `Failed to fetch brand details: ${response.status}`,
         message: 'Unable to retrieve affiliate program details from Loyalize.'
       }), {
-        status: response.status,
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
