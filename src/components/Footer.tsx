@@ -45,7 +45,7 @@ const Footer = () => {
                 
                 {/* Built on Base Badge */}
                 <a 
-                  href="https://base.org" 
+                  href="https://www.base.org/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-background/80 hover:text-background transition-all duration-300 group"
