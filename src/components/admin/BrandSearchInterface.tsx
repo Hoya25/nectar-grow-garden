@@ -285,7 +285,7 @@ const BrandSearchInterface = ({
           [brand.id]: data.brand
         }));
       } else if (!data.success && data.error) {
-        console.error('❌ Brand not available in Loyalize:', data.message);
+        console.info('ℹ️ Brand not in Loyalize network:', data.message);
         // Store error state with message
         setLoyalizeDetails(prev => ({
           ...prev,
