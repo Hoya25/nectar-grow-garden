@@ -22,20 +22,63 @@
     <script src="//code.tidio.co/rectztr7fq0lawem89ts8lnuzdimmd8k.js" async></script>
     
     <script>
-      // Log when Tidio is ready
+      // Hide Tidio welcome bubble when ready
       document.addEventListener('tidioChat-ready', function() {
         console.log('✅ Tidio Chat is ready and loaded');
+        
+        // Hide the welcome bubble using Tidio API
+        if (window.tidioChatApi) {
+          try {
+            // This hides the welcome message bubble specifically
+            window.tidioChatApi.messageFromOperator = false;
+            console.log('✅ Tidio welcome bubble disabled');
+          } catch (e) {
+            console.log('Tidio API call:', e);
+          }
+        }
+        
+        // Monitor and hide welcome bubbles as they appear
+        const hideWelcomeBubbles = () => {
+          // Target the specific welcome message container
+          const welcomeElements = document.querySelectorAll(
+            'div[data-testid*="message"], div[class*="message-bubble"], div[aria-label*="Chat with"]'
+          );
+          welcomeElements.forEach(el => {
+            const parent = el.closest('div[style*="position"]');
+            if (parent && parent.textContent.includes('Chat with')) {
+              parent.style.display = 'none';
+            }
+          });
+        };
+        
+        // Run immediately and watch for changes
+        hideWelcomeBubbles();
+        const observer = new MutationObserver(hideWelcomeBubbles);
+        observer.observe(document.body, { childList: true, subtree: true });
       });
     </script>
     
-    <!-- CSS to hide only the welcome bubble, keep chat icon visible -->
+    <!-- CSS to hide welcome bubble while keeping chat icon -->
     <style>
-      /* Ensure main Tidio chat widget is visible */
+      /* Hide welcome message bubble specifically */
+      iframe[id*="tidio-chat-iframe"][title*="Tidio"] ~ div,
+      div[id*="tidio-chat"] > div:not(iframe):not([id*="button"]) {
+        display: none !important;
+      }
+      
+      /* Keep chat button/icon visible */
       #tidio-chat,
-      #tidio-chat iframe {
+      #tidio-chat iframe,
+      iframe[id*="tidio-chat-iframe"] {
         display: block !important;
         visibility: visible !important;
-        opacity: 1 !important;
+      }
+      
+      /* Hide any floating message bubbles */
+      div[data-testid*="message-bubble"],
+      div[aria-label*="Chat with us"],
+      div[class*="operator-message"] {
+        display: none !important;
       }
     </style>
   </head>
