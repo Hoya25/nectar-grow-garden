@@ -33,6 +33,27 @@ interface Brand {
   featured?: boolean;
 }
 
+interface BrandOffering {
+  opportunities: Array<{
+    id: string;
+    title: string;
+    opportunity_type: string;
+    nctr_reward?: number;
+    available_nctr_reward?: number;
+    lock_90_nctr_reward?: number;
+    lock_360_nctr_reward?: number;
+    is_active: boolean;
+  }>;
+  campaigns: Array<{
+    id: string;
+    title: string;
+    bonus_multiplier?: number;
+    start_date: string;
+    end_date?: string;
+    is_active: boolean;
+  }>;
+}
+
 interface BrandSearchInterfaceProps {
   onBrandSelect?: (brand: Brand) => void;
   selectedBrand?: Brand | null;
@@ -55,6 +76,8 @@ const BrandSearchInterface = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [brandOfferings, setBrandOfferings] = useState<Record<string, BrandOffering>>({});
+  const [loadingOfferings, setLoadingOfferings] = useState<Record<string, boolean>>({});
   const searchRef = useRef<HTMLDivElement>(null);
 
   const categories = [
@@ -209,6 +232,42 @@ const BrandSearchInterface = ({
     }
   };
 
+  const fetchBrandOfferings = async (brandId: string) => {
+    if (brandOfferings[brandId]) return; // Already fetched
+    
+    setLoadingOfferings(prev => ({ ...prev, [brandId]: true }));
+    
+    try {
+      // Fetch earning opportunities
+      const { data: opportunities, error: oppError } = await supabase
+        .from('earning_opportunities')
+        .select('id, title, opportunity_type, nctr_reward, available_nctr_reward, lock_90_nctr_reward, lock_360_nctr_reward, is_active')
+        .eq('brand_id', brandId);
+
+      if (oppError) throw oppError;
+
+      // Fetch partner campaigns
+      const { data: campaigns, error: campError } = await supabase
+        .from('partner_campaigns')
+        .select('id, title, bonus_multiplier, start_date, end_date, is_active')
+        .eq('brand_id', brandId);
+
+      if (campError) throw campError;
+
+      setBrandOfferings(prev => ({
+        ...prev,
+        [brandId]: {
+          opportunities: opportunities || [],
+          campaigns: campaigns || []
+        }
+      }));
+    } catch (error) {
+      console.error('Error fetching brand offerings:', error);
+    } finally {
+      setLoadingOfferings(prev => ({ ...prev, [brandId]: false }));
+    }
+  };
+
   return (
     <div className={`space-y-3 ${className}`} ref={searchRef}>
       {/* Search Input */}
@@ -315,71 +374,193 @@ const BrandSearchInterface = ({
                   </div>
                 ) : (
                   <div className="py-1">
-                    {filteredBrands.map((brand) => (
-                      <div
-                        key={brand.id}
-                        className="px-3 py-2 hover:bg-muted cursor-pointer border-b border-border/30 last:border-b-0"
-                        onClick={() => handleBrandSelect(brand)}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0">
-                            <BrandLogo 
-                              src={brand.logo_url} 
-                              alt={brand.name}
-                              size="sm"
-                              variant="auto"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <div className="font-medium text-foreground truncate">
-                                {brand.name}
+                    {filteredBrands.map((brand) => {
+                      const offerings = brandOfferings[brand.id];
+                      const isLoadingOfferings = loadingOfferings[brand.id];
+                      
+                      return (
+                        <div
+                          key={brand.id}
+                          className="border-b border-border/30 last:border-b-0"
+                        >
+                          <div
+                            className="px-3 py-2 hover:bg-muted cursor-pointer"
+                            onClick={() => {
+                              handleBrandSelect(brand);
+                              if (!offerings && !isLoadingOfferings) {
+                                fetchBrandOfferings(brand.id);
+                              }
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0">
+                                <BrandLogo 
+                                  src={brand.logo_url} 
+                                  alt={brand.name}
+                                  size="sm"
+                                  variant="auto"
+                                />
                               </div>
-                              {brand.featured && <Star className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
-                              {(brand.category?.toLowerCase().includes('gift') || brand.name.toLowerCase().includes('gift')) && (
-                                <Gift className="w-3 h-3 text-green-500 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <div className="font-medium text-foreground truncate">
+                                    {brand.name}
+                                  </div>
+                                  {brand.featured && <Star className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
+                                  {(brand.category?.toLowerCase().includes('gift') || brand.name.toLowerCase().includes('gift')) && (
+                                    <Gift className="w-3 h-3 text-green-500 flex-shrink-0" />
+                                  )}
+                                  {brand.loyalize_id && /^\d+$/.test(brand.loyalize_id) && (
+                                    <Badge variant="outline" className="text-xs px-1 py-0 h-4 bg-blue-50 text-blue-700 border-blue-200">
+                                      Loyalize
+                                    </Badge>
+                                  )}
+                                </div>
+                                {brand.category && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {brand.category.split('-').map(word => 
+                                      word.charAt(0).toUpperCase() + word.slice(1)
+                                    ).join(' & ')}
+                                  </div>
+                                )}
+                                {showFullDetails && brand.description && (
+                                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                    {brand.description}
+                                  </div>
+                                )}
+                                {showFullDetails && brand.nctr_per_dollar && (
+                                  <div className="text-xs text-primary font-medium mt-1">
+                                    {brand.nctr_per_dollar} NCTR per $1
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {brand.website_url && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      window.open(brand.website_url, '_blank');
+                                    }}
+                                    className="h-6 w-6 p-0"
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    fetchBrandOfferings(brand.id);
+                                  }}
+                                  disabled={isLoadingOfferings}
+                                  className="h-6 w-6 p-0"
+                                  title="Load offerings"
+                                >
+                                  {isLoadingOfferings ? (
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    <ShoppingBag className="w-3 h-3" />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Brand Offerings */}
+                          {offerings && (
+                            <div className="px-3 pb-3 pt-1 bg-muted/30 space-y-2">
+                              {/* Earning Opportunities */}
+                              {offerings.opportunities.length > 0 && (
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1">
+                                    <ShoppingBag className="w-3 h-3" />
+                                    Earning Opportunities ({offerings.opportunities.length})
+                                  </div>
+                                  <div className="space-y-1">
+                                    {offerings.opportunities.map((opp) => (
+                                      <div key={opp.id} className="bg-background rounded p-2 text-xs">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="flex-1 min-w-0">
+                                            <div className="font-medium truncate">{opp.title}</div>
+                                            <div className="text-muted-foreground capitalize">
+                                              {opp.opportunity_type.replace(/_/g, ' ')}
+                                            </div>
+                                          </div>
+                                          <div className="text-right flex-shrink-0">
+                                            {opp.nctr_reward && (
+                                              <div className="text-primary font-medium">{opp.nctr_reward} NCTR</div>
+                                            )}
+                                            {(opp.available_nctr_reward || opp.lock_90_nctr_reward || opp.lock_360_nctr_reward) && (
+                                              <div className="text-[10px] text-muted-foreground">
+                                                {opp.available_nctr_reward && `${opp.available_nctr_reward} avail`}
+                                                {opp.lock_90_nctr_reward && ` ${opp.lock_90_nctr_reward} 90L`}
+                                                {opp.lock_360_nctr_reward && ` ${opp.lock_360_nctr_reward} 360L`}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <Badge 
+                                          variant={opp.is_active ? "default" : "secondary"} 
+                                          className="text-[10px] h-4 px-1 mt-1"
+                                        >
+                                          {opp.is_active ? 'Active' : 'Inactive'}
+                                        </Badge>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
                               )}
-                              {/* Show Loyalize badge for verified API sources */}
-                              {brand.loyalize_id && /^\d+$/.test(brand.loyalize_id) && (
-                                <Badge variant="outline" className="text-xs px-1 py-0 h-4 bg-blue-50 text-blue-700 border-blue-200">
-                                  Loyalize
-                                </Badge>
+
+                              {/* Partner Campaigns */}
+                              {offerings.campaigns.length > 0 && (
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1">
+                                    <Star className="w-3 h-3" />
+                                    Active Campaigns ({offerings.campaigns.length})
+                                  </div>
+                                  <div className="space-y-1">
+                                    {offerings.campaigns.map((camp) => (
+                                      <div key={camp.id} className="bg-background rounded p-2 text-xs">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="flex-1 min-w-0">
+                                            <div className="font-medium truncate">{camp.title}</div>
+                                            <div className="text-muted-foreground text-[10px]">
+                                              {new Date(camp.start_date).toLocaleDateString()}
+                                              {camp.end_date && ` - ${new Date(camp.end_date).toLocaleDateString()}`}
+                                            </div>
+                                          </div>
+                                          {camp.bonus_multiplier && camp.bonus_multiplier > 1 && (
+                                            <div className="text-right flex-shrink-0">
+                                              <div className="text-primary font-medium">{camp.bonus_multiplier}x</div>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <Badge 
+                                          variant={camp.is_active ? "default" : "secondary"} 
+                                          className="text-[10px] h-4 px-1 mt-1"
+                                        >
+                                          {camp.is_active ? 'Active' : 'Inactive'}
+                                        </Badge>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* No Offerings */}
+                              {offerings.opportunities.length === 0 && offerings.campaigns.length === 0 && (
+                                <div className="text-xs text-muted-foreground text-center py-2">
+                                  No active offerings for this brand
+                                </div>
                               )}
                             </div>
-                            {brand.category && (
-                              <div className="text-xs text-muted-foreground">
-                                {brand.category.split('-').map(word => 
-                                  word.charAt(0).toUpperCase() + word.slice(1)
-                                ).join(' & ')}
-                              </div>
-                            )}
-                            {showFullDetails && brand.description && (
-                              <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                {brand.description}
-                              </div>
-                            )}
-                            {showFullDetails && brand.nctr_per_dollar && (
-                              <div className="text-xs text-primary font-medium mt-1">
-                                {brand.nctr_per_dollar} NCTR per $1
-                              </div>
-                            )}
-                          </div>
-                          {brand.website_url && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(brand.website_url, '_blank');
-                              }}
-                              className="h-6 w-6 p-0"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                            </Button>
                           )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
