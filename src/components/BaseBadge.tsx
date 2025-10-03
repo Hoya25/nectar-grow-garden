@@ -25,7 +25,7 @@ export const BaseBadge = ({
 
   return (
     <a 
-      href="https://www.base.org/" 
+      href="https://x.com/baseapp" 
       target="_blank" 
       rel="noopener noreferrer"
       className={`inline-flex items-end gap-2 opacity-70 hover:opacity-100 transition-all duration-300 group ${className}`}
