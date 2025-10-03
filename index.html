@@ -21,34 +21,11 @@
     <!-- Tidio Chat Widget -->
     <script src="//code.tidio.co/rectztr7fq0lawem89ts8lnuzdimmd8k.js" async></script>
     
-    <!-- Configure Tidio to hide default button but allow programmatic control -->
     <script>
-      // Wait for Tidio to fully load
+      // Log when Tidio is ready
       document.addEventListener('tidioChat-ready', function() {
         console.log('✅ Tidio Chat is ready and loaded');
-        if (window.tidioChatApi) {
-          // Only hide the default button - keep widget functional
-          window.tidioChatApi.hide();
-          console.log('✅ Tidio default button hidden');
-        }
       });
-      
-      // CSS to hide only the Tidio default button (not the chat window)
-      const style = document.createElement('style');
-      style.textContent = `
-        /* Hide the default Tidio button ONLY when closed */
-        #tidio-chat:not(.tidio-open) iframe[id*="tidio-chat"] {
-          display: none !important;
-        }
-        
-        /* Ensure chat window can appear when opened */
-        #tidio-chat.tidio-open,
-        #tidio-chat-iframe-modal {
-          display: block !important;
-          visibility: visible !important;
-        }
-      `;
-      document.head.appendChild(style);
     </script>
   </head>
 

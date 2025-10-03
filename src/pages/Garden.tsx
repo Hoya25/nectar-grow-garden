@@ -28,7 +28,6 @@ import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
-import { CustomerServiceBubble } from '@/components/CustomerServiceBubble';
 import { BaseBadge } from '@/components/BaseBadge';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
@@ -1856,9 +1855,6 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         availableNCTR={portfolio?.available_nctr || 0}
         walletAddress={connectedWallet}
       />
-
-      {/* Customer Service Bubble */}
-      <CustomerServiceBubble />
     </div>
   );
 };
