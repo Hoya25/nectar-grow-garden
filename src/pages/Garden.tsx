@@ -1074,7 +1074,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     alt="NCTR" 
                     className="h-16 sm:h-24 w-auto opacity-90"
                   />
-                  <div className="hidden sm:flex -mt-1">
+                  <div className="hidden sm:flex -mt-3">
                     <BaseBadge size="sm" variant="light" asLink={false} />
                   </div>
                 </div>
