@@ -59,7 +59,7 @@ const BrandSearchInterface = ({
   const categories = [
     'all', 'gifts-flowers', 'clothing-footwear-accessories', 'health-beauty', 
     'electronics', 'home-garden', 'automotive', 'food-drink', 'education',
-    'services', 'web', 'books-media'
+    'services', 'web', 'books-media', 'financial-services'
   ];
 
   useEffect(() => {
