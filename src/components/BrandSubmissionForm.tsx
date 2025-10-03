@@ -38,6 +38,26 @@ export const BrandSubmissionForm = ({ children }: BrandSubmissionFormProps) => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const validateField = (fieldName: keyof typeof formData, value: string) => {
+    try {
+      const fieldSchema = brandSubmissionSchema.shape[fieldName];
+      fieldSchema.parse(value);
+      // Clear error if validation passes
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    } catch (error) {
+      // Keep the error if validation fails
+    }
+  };
+
+  const handleFieldChange = (fieldName: keyof typeof formData, value: string) => {
+    setFormData({ ...formData, [fieldName]: value });
+    validateField(fieldName, value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -123,7 +143,7 @@ export const BrandSubmissionForm = ({ children }: BrandSubmissionFormProps) => {
             <Input
               id="brandName"
               value={formData.brandName}
-              onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
+              onChange={(e) => handleFieldChange('brandName', e.target.value)}
               placeholder="Your brand name"
               maxLength={100}
             />
@@ -138,7 +158,7 @@ export const BrandSubmissionForm = ({ children }: BrandSubmissionFormProps) => {
               <Input
                 id="contactName"
                 value={formData.contactName}
-                onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
+                onChange={(e) => handleFieldChange('contactName', e.target.value)}
                 placeholder="Your name"
                 maxLength={100}
               />
@@ -153,7 +173,7 @@ export const BrandSubmissionForm = ({ children }: BrandSubmissionFormProps) => {
                 id="contactEmail"
                 type="email"
                 value={formData.contactEmail}
-                onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                onChange={(e) => handleFieldChange('contactEmail', e.target.value)}
                 placeholder="your@email.com"
                 maxLength={255}
               />
@@ -169,7 +189,7 @@ export const BrandSubmissionForm = ({ children }: BrandSubmissionFormProps) => {
               id="website"
               type="url"
               value={formData.website}
-              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              onChange={(e) => handleFieldChange('website', e.target.value)}
               placeholder="https://yourbrand.com"
               maxLength={500}
             />
@@ -183,7 +203,7 @@ export const BrandSubmissionForm = ({ children }: BrandSubmissionFormProps) => {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => handleFieldChange('description', e.target.value)}
               placeholder="What does your brand do? Why would you like to partner with The Garden?"
               rows={5}
               maxLength={1000}
