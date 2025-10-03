@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { BaseBadge } from "@/components/BaseBadge";
 
 const FAQ = () => {
   const faqs = [
@@ -86,7 +87,24 @@ const FAQ = () => {
                     
                     <AccordionContent className="px-8 pb-6 text-muted-foreground leading-relaxed text-lg">
                       <div className="pl-16 border-l-2 border-gradient-hero/20 ml-6">
-                        {faq.answer}
+                        {index === 1 ? (
+                          <>
+                            <p className="mb-4">NCTR (Nectar) is the primary token you earn by participating in opportunities curated in The Garden. You can stack NCTR in different commitment levels (90LOCK or 360LOCK) to unlock more opportunities and benefits across the crypto universe. Unlocked NCTR is yours to do with as you please, you can trade it for any other crypto you want, cash out or re-lock your NCTR to unlock more future earning and experiential opportunities.</p>
+                            
+                            <div className="my-4 flex items-center gap-2">
+                              <BaseBadge size="sm" variant="light" />
+                            </div>
+                            
+                            <p className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 rounded">
+                              <strong>⚠️ OFFICIAL CONTRACT ADDRESS:</strong> 0x973104fAa7F2B11787557e85953ECA6B4e262328
+                              <br />
+                              <br />
+                              This is the ONLY official NCTR token contract. Do not confuse with any other crypto tokens that may have the same name. Always verify the contract address before any transactions.
+                            </p>
+                          </>
+                        ) : (
+                          faq.answer
+                        )}
                       </div>
                     </AccordionContent>
                   </div>
