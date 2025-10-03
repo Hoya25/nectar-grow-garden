@@ -1064,7 +1064,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-8">
             <div className="flex items-start justify-between sm:items-center sm:flex-1">
               {/* Stacked: The Garden -> NCTR -> Base Badge */}
-              <div className="flex flex-col items-center gap-0.5">
+              <div className="flex flex-col items-center -space-y-1">
                 <h1 className="text-lg sm:text-xl font-bold nctr-text">
                   The Garden
                 </h1>
@@ -1073,7 +1073,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                   alt="NCTR" 
                   className="h-16 sm:h-20 w-auto opacity-90"
                 />
-                <div className="hidden sm:flex -mt-2">
+                <div className="hidden sm:flex -mt-4">
                   <BaseBadge size="sm" variant="light" asLink={false} />
                 </div>
               </div>
