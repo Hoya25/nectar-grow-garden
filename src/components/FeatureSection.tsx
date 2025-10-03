@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface FeatureSectionProps {
   title: string;
@@ -26,6 +27,20 @@ const FeatureSection = ({
   simple = false,
   subtitle
 }: FeatureSectionProps) => {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    if (buttonHref) {
+      // Check if it's an external link
+      if (buttonHref.startsWith('http://') || buttonHref.startsWith('https://')) {
+        window.open(buttonHref, '_blank');
+      } else {
+        // Internal navigation
+        navigate(buttonHref);
+      }
+    }
+  };
+  
   return (
     <section className={`py-32 relative overflow-hidden ${simple ? 'bg-background' : gradient ? 'neon-section animate-neon-pulse' : 'neon-section-subtle'}`}>
       {/* Neon Background Elements */}
@@ -91,11 +106,7 @@ const FeatureSection = ({
                 <Button 
                   size="lg" 
                   className="bg-primary hover:bg-primary-glow text-primary-foreground text-xl px-12 py-8 rounded-2xl shadow-neon hover:shadow-glow-intense transition-all duration-500 hover:scale-105 hover:-translate-y-1 relative overflow-hidden group neon-glow"
-                  onClick={() => {
-                    if (buttonHref) {
-                      window.open(buttonHref, '_blank');
-                    }
-                  }}
+                  onClick={handleClick}
                 >
                   <span className="relative z-10 flex items-center gap-3 font-bold">
                     {buttonText}

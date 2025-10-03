@@ -21,6 +21,7 @@ const Index = () => {
           "Inviting Friends: Share the opportunity with friends; each invite brings more NCTR your way."
         ]}
         buttonText="Enter The Garden →"
+        buttonHref="/garden"
         icon=""
         simple={true}
       />
