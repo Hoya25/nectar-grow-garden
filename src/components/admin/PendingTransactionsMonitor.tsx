@@ -25,10 +25,18 @@ interface TrackingMapping {
   brand_id: string;
 }
 
+interface UserProfile {
+  user_id: string;
+  full_name: string;
+  username: string;
+  email: string;
+}
+
 export function PendingTransactionsMonitor() {
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState<LoyalizeTransaction[]>([]);
   const [mappings, setMappings] = useState<TrackingMapping[]>([]);
+  const [userProfiles, setUserProfiles] = useState<Map<string, UserProfile>>(new Map());
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const { toast } = useToast();
 
@@ -64,6 +72,27 @@ export function PendingTransactionsMonitor() {
       if (mappingsError) {
         console.error("💥 Mappings error occurred:", mappingsError);
         throw mappingsError;
+      }
+
+      // Fetch user profiles for matched transactions
+      const userIds = Array.from(new Set((mappingsData || []).map(m => m.user_id)));
+      if (userIds.length > 0) {
+        console.log("👤 Fetching user profiles...");
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, username, email')
+          .in('user_id', userIds);
+
+        if (profilesError) {
+          console.error("💥 Profiles error occurred:", profilesError);
+        } else {
+          const profilesMap = new Map<string, UserProfile>();
+          (profilesData || []).forEach(profile => {
+            profilesMap.set(profile.user_id, profile);
+          });
+          setUserProfiles(profilesMap);
+          console.log("✅ Loaded profiles for", profilesMap.size, "users");
+        }
       }
 
       // Parse the nested response structure from Loyalize API
@@ -120,8 +149,13 @@ export function PendingTransactionsMonitor() {
 
   const getMatchStatus = (transaction: LoyalizeTransaction) => {
     const trackingId = transaction.sid || transaction.shopperId;
-    const hasMatch = mappings.some(m => m.tracking_id === trackingId);
-    return { hasMatch, trackingId };
+    const mapping = mappings.find(m => m.tracking_id === trackingId);
+    const hasMatch = !!mapping;
+    const userProfile = mapping ? userProfiles.get(mapping.user_id) : undefined;
+    const userName = userProfile 
+      ? (userProfile.full_name || userProfile.username || userProfile.email)
+      : undefined;
+    return { hasMatch, trackingId, userName, userId: mapping?.user_id };
   };
 
   const matchedCount = transactions.filter(t => getMatchStatus(t).hasMatch).length;
@@ -195,7 +229,7 @@ export function PendingTransactionsMonitor() {
               <h3 className="font-semibold">Transaction Details</h3>
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {transactions.map((transaction) => {
-                  const { hasMatch, trackingId } = getMatchStatus(transaction);
+                  const { hasMatch, trackingId, userName } = getMatchStatus(transaction);
                   return (
                     <Card key={transaction.id}>
                       <CardContent className="pt-4">
@@ -218,6 +252,11 @@ export function PendingTransactionsMonitor() {
                                 </Badge>
                               )}
                             </div>
+                            {hasMatch && userName && (
+                              <p className="text-sm font-medium text-primary">
+                                User: {userName}
+                              </p>
+                            )}
                             <p className="text-sm text-muted-foreground">
                               Order: {transaction.orderNumber}
                             </p>
