@@ -533,12 +533,18 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     }
 
     try {
-      const { error } = await supabase
-        .from('earning_opportunities')
-        .delete()
-        .eq('id', opportunity.id);
+      console.log('🗑️ Deleting opportunity:', opportunity.id);
+      
+      const { data, error } = await supabase.rpc('delete_opportunity_secure', {
+        opportunity_id: opportunity.id
+      });
 
-      if (error) throw error;
+      console.log('📊 Delete result:', { data, error });
+
+      if (error) {
+        console.error('❌ Delete failed:', error);
+        throw error;
+      }
 
       await logActivity('deleted', 'opportunity', opportunity.id, { 
         title: opportunity.title 
@@ -555,7 +561,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       console.error('Error deleting opportunity:', error);
       toast({
         title: "Error",
-        description: "Failed to delete opportunity.",
+        description: `Failed to delete opportunity: ${error.message || 'Unknown error'}`,
         variant: "destructive",
       });
     }
@@ -570,25 +576,23 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         newStatus: !opportunity.is_active
       });
 
-      const { data, error } = await supabase
-        .from('earning_opportunities')
-        .update({ is_active: !opportunity.is_active })
-        .eq('id', opportunity.id)
-        .select();
+      const { data, error } = await supabase.rpc('toggle_opportunity_status_secure', {
+        opportunity_id: opportunity.id
+      });
 
-      console.log('📊 Update result:', { data, error });
+      console.log('📊 Toggle result:', { data, error });
 
       if (error) {
-        console.error('❌ Database update failed:', error);
+        console.error('❌ Toggle failed:', error);
         throw error;
       }
 
       if (!data || data.length === 0) {
-        console.error('❌ No rows updated - possible RLS policy issue');
-        throw new Error('Failed to update opportunity - permission denied');
+        console.error('❌ No data returned from toggle function');
+        throw new Error('Failed to update opportunity status');
       }
 
-      console.log('✅ Successfully updated opportunity status');
+      console.log('✅ Successfully toggled opportunity status');
 
       await logActivity(
         opportunity.is_active ? 'deactivated' : 'activated', 
@@ -608,7 +612,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       console.error('Error toggling opportunity status:', error);
       toast({
         title: "Error",
-        description: "Failed to update opportunity status.",
+        description: `Failed to update opportunity status: ${error.message || 'Unknown error'}`,
         variant: "destructive",
       });
     }

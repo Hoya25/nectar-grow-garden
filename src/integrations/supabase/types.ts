@@ -1027,6 +1027,10 @@ export type Database = {
         Args: { x: number }
         Returns: number
       }
+      delete_opportunity_secure: {
+        Args: { opportunity_id: string }
+        Returns: boolean
+      }
       detect_suspicious_activity: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1473,6 +1477,15 @@ export type Database = {
       secure_business_access_check: {
         Args: { p_table_name: string; p_user_id: string }
         Returns: boolean
+      }
+      toggle_opportunity_status_secure: {
+        Args: { opportunity_id: string }
+        Returns: {
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+        }[]
       }
       ultra_secure_admin_check: {
         Args: Record<PropertyKey, never>
