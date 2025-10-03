@@ -1,5 +1,5 @@
 import nctrLogo from "@/assets/nctr-logo-grey.png";
-import baseLogo from "@/assets/base-logo.png";
+import baseLogo from "@/assets/base-wordmark-white.png";
 
 const Footer = () => {
   return (
