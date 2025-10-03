@@ -47,6 +47,9 @@ interface LoyalizeBrandDetails {
   status?: string;
   terms?: string;
   cookie_duration?: number;
+  error?: boolean;
+  error_type?: string;
+  error_message?: string;
 }
 
 interface BrandSearchInterfaceProps {
@@ -253,7 +256,19 @@ const BrandSearchInterface = ({
 
       if (error) {
         console.error('❌ Error fetching Loyalize brand details:', error);
-        throw error;
+        // Store error state
+        setLoyalizeDetails(prev => ({
+          ...prev,
+          [brand.id]: {
+            id: brand.id,
+            name: brand.name,
+            error: true,
+            error_type: 'api_error',
+            error_message: error.message || 'Failed to fetch brand details',
+            commission_rate: brand.commission_rate || 0,
+          }
+        }));
+        return;
       }
 
       if (!data) {
@@ -268,6 +283,20 @@ const BrandSearchInterface = ({
         setLoyalizeDetails(prev => ({
           ...prev,
           [brand.id]: data.brand
+        }));
+      } else if (!data.success && data.error) {
+        console.error('❌ Brand not available in Loyalize:', data.message);
+        // Store error state with message
+        setLoyalizeDetails(prev => ({
+          ...prev,
+          [brand.id]: {
+            id: brand.id,
+            name: brand.name,
+            error: true,
+            error_type: data.error,
+            error_message: data.message || 'Brand not available in Loyalize network',
+            commission_rate: brand.commission_rate || 0,
+          }
         }));
       } else {
         console.error('❌ Invalid response format:', data);
@@ -497,108 +526,131 @@ const BrandSearchInterface = ({
                                 </div>
                               )}
 
-                              {/* Show offerings when loaded */}
+                              {/* Show offerings when loaded OR error */}
                               {loyalizeData && (
-                                <div className="px-3 pb-3 pt-1 bg-gradient-to-r from-blue-50/50 to-transparent border-l-2 border-blue-400 space-y-2">
-                                  <div className="text-xs font-medium text-blue-700 mb-1.5 flex items-center gap-2">
-                                    <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 bg-blue-100 text-blue-700 border-blue-300">
-                                      <ShoppingBag className="w-3 h-3 mr-1 inline" />
-                                      Loyalize API
-                                    </Badge>
-                                    Affiliate Program Details
-                                  </div>
-                                  
-                                   <div className="bg-background rounded-lg p-3 space-y-2 shadow-sm">
-                                    {/* Commission Information */}
-                                    {loyalizeData.commission_type === 'flat' ? (
-                                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-green-50 to-green-50/20 border border-green-200 rounded-md">
-                                        <span className="text-green-700 font-medium text-xs">💵 One-Time Payment:</span>
-                                        <span className="font-bold text-green-700 text-base">
-                                          {loyalizeData.commission_currency} ${loyalizeData.commission_value}
-                                        </span>
-                                      </div>
-                                    ) : loyalizeData.commission_rate && loyalizeData.commission_rate > 0 ? (
-                                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-blue-50 to-blue-50/20 border border-blue-200 rounded-md">
-                                        <span className="text-blue-700 font-medium text-xs">📊 Ongoing Commission:</span>
-                                        <span className="font-bold text-blue-700 text-base">{loyalizeData.commission_rate}%</span>
-                                      </div>
-                                    ) : (
-                                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-50/20 border border-gray-200 rounded-md">
-                                        <span className="text-gray-700 font-medium text-xs">Commission:</span>
-                                        <span className="text-gray-600 text-xs">Contact for details</span>
-                                      </div>
-                                    )}
-                                    
-                                    {/* Commission Details if available */}
-                                    {loyalizeData.commission_details && (
-                                      <div className="pt-2 border-t">
-                                        <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Commission Details</div>
-                                        <div className="text-xs text-foreground bg-muted/30 p-2 rounded">
-                                          {typeof loyalizeData.commission_details === 'string' 
-                                            ? loyalizeData.commission_details 
-                                            : JSON.stringify(loyalizeData.commission_details, null, 2)}
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    {/* Cookie Duration */}
-                                    {loyalizeData.cookie_duration && (
-                                      <div className="flex items-center justify-between text-xs">
-                                        <span className="text-muted-foreground font-medium">Cookie Duration:</span>
-                                        <span className="font-semibold">{loyalizeData.cookie_duration} days</span>
-                                      </div>
-                                    )}
-
-                                    {/* Category */}
-                                    {loyalizeData.category && (
-                                      <div className="flex items-center justify-between text-xs">
-                                        <span className="text-muted-foreground font-medium">Category:</span>
-                                        <span className="font-medium capitalize">{loyalizeData.category.replace(/-/g, ' ')}</span>
-                                      </div>
-                                    )}
-
-                                    {/* Status */}
-                                    {loyalizeData.status && (
-                                      <div className="flex items-center justify-between text-xs">
-                                        <span className="text-muted-foreground font-medium">Status:</span>
-                                        <Badge 
-                                          variant={loyalizeData.status === 'active' ? 'default' : 'secondary'}
-                                          className="text-[10px] h-4 px-1"
-                                        >
-                                          {loyalizeData.status}
+                                <div className={`px-3 pb-3 pt-1 ${loyalizeData.error ? 'bg-gradient-to-r from-red-50/50 to-transparent border-l-2 border-red-400' : 'bg-gradient-to-r from-blue-50/50 to-transparent border-l-2 border-blue-400'} space-y-2`}>
+                                  {loyalizeData.error ? (
+                                    // Error state
+                                    <>
+                                      <div className="text-xs font-medium text-red-700 mb-1.5 flex items-center gap-2">
+                                        <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 bg-red-100 text-red-700 border-red-300">
+                                          ⚠️ Not Available
                                         </Badge>
+                                        {loyalizeData.error_type === 'not_found' ? 'Brand Not in Loyalize Network' : 'Error Loading Details'}
                                       </div>
-                                    )}
-
-                                    {/* Description */}
-                                    {loyalizeData.description && (
-                                      <div className="pt-2 border-t">
-                                        <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Description</div>
-                                        <div className="text-xs text-foreground">{loyalizeData.description}</div>
+                                      <div className="bg-background rounded-lg p-3 space-y-2 shadow-sm border border-red-200">
+                                        <p className="text-xs text-red-600">{loyalizeData.error_message}</p>
+                                        {loyalizeData.commission_rate > 0 && (
+                                          <p className="text-xs text-muted-foreground">
+                                            Database commission rate: {(loyalizeData.commission_rate * 100).toFixed(2)}%
+                                          </p>
+                                        )}
                                       </div>
-                                    )}
-
-                                    {/* Terms */}
-                                    {loyalizeData.terms && (
-                                      <div className="pt-2 border-t">
-                                        <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Terms & Conditions</div>
-                                        <div className="text-xs text-foreground max-h-20 overflow-y-auto">{loyalizeData.terms}</div>
+                                    </>
+                                  ) : (
+                                    // Success state
+                                    <>
+                                      <div className="text-xs font-medium text-blue-700 mb-1.5 flex items-center gap-2">
+                                        <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 bg-blue-100 text-blue-700 border-blue-300">
+                                          <ShoppingBag className="w-3 h-3 mr-1 inline" />
+                                          Loyalize API
+                                        </Badge>
+                                        Affiliate Program Details
                                       </div>
-                                    )}
+                                      
+                                      <div className="bg-background rounded-lg p-3 space-y-2 shadow-sm">
+                                        {/* Commission Information */}
+                                        {loyalizeData.commission_type === 'flat' ? (
+                                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-green-50 to-green-50/20 border border-green-200 rounded-md">
+                                            <span className="text-green-700 font-medium text-xs">💵 One-Time Payment:</span>
+                                            <span className="font-bold text-green-700 text-base">
+                                              {loyalizeData.commission_currency} ${loyalizeData.commission_value}
+                                            </span>
+                                          </div>
+                                        ) : loyalizeData.commission_rate && loyalizeData.commission_rate > 0 ? (
+                                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-blue-50 to-blue-50/20 border border-blue-200 rounded-md">
+                                            <span className="text-blue-700 font-medium text-xs">📊 Ongoing Commission:</span>
+                                            <span className="font-bold text-blue-700 text-base">{loyalizeData.commission_rate}%</span>
+                                          </div>
+                                        ) : (
+                                          <div className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-50/20 border border-gray-200 rounded-md">
+                                            <span className="text-gray-700 font-medium text-xs">Commission:</span>
+                                            <span className="text-gray-600 text-xs">Contact for details</span>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Commission Details if available */}
+                                        {loyalizeData.commission_details && (
+                                          <div className="pt-2 border-t">
+                                            <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Commission Details</div>
+                                            <div className="text-xs text-foreground bg-muted/30 p-2 rounded">
+                                              {typeof loyalizeData.commission_details === 'string' 
+                                                ? loyalizeData.commission_details 
+                                                : JSON.stringify(loyalizeData.commission_details, null, 2)}
+                                            </div>
+                                          </div>
+                                        )}
 
-                                    {/* Website Link */}
-                                    {loyalizeData.website_url && (
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => window.open(loyalizeData.website_url, '_blank')}
-                                        className="w-full mt-2 h-7 text-xs gap-2"
-                                      >
-                                        <ExternalLink className="w-3 h-3" />
-                                        Visit Merchant Site
-                                      </Button>
-                                    )}
-                                  </div>
+                                        {/* Cookie Duration */}
+                                        {loyalizeData.cookie_duration && (
+                                          <div className="flex items-center justify-between text-xs">
+                                            <span className="text-muted-foreground font-medium">Cookie Duration:</span>
+                                            <span className="font-semibold">{loyalizeData.cookie_duration} days</span>
+                                          </div>
+                                        )}
+
+                                        {/* Category */}
+                                        {loyalizeData.category && (
+                                          <div className="flex items-center justify-between text-xs">
+                                            <span className="text-muted-foreground font-medium">Category:</span>
+                                            <span className="font-medium capitalize">{loyalizeData.category.replace(/-/g, ' ')}</span>
+                                          </div>
+                                        )}
+
+                                        {/* Status */}
+                                        {loyalizeData.status && (
+                                          <div className="flex items-center justify-between text-xs">
+                                            <span className="text-muted-foreground font-medium">Status:</span>
+                                            <Badge 
+                                              variant={loyalizeData.status === 'active' ? 'default' : 'secondary'}
+                                              className="text-[10px] h-4 px-1"
+                                            >
+                                              {loyalizeData.status}
+                                            </Badge>
+                                          </div>
+                                        )}
+
+                                        {/* Description */}
+                                        {loyalizeData.description && (
+                                          <div className="pt-2 border-t">
+                                            <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Description</div>
+                                            <div className="text-xs text-foreground">{loyalizeData.description}</div>
+                                          </div>
+                                        )}
+
+                                        {/* Terms */}
+                                        {loyalizeData.terms && (
+                                          <div className="pt-2 border-t">
+                                            <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Terms & Conditions</div>
+                                            <div className="text-xs text-foreground max-h-20 overflow-y-auto">{loyalizeData.terms}</div>
+                                          </div>
+                                        )}
+
+                                        {/* Website Link */}
+                                        {loyalizeData.website_url && (
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => window.open(loyalizeData.website_url, '_blank')}
+                                            className="w-full mt-2 h-7 text-xs gap-2"
+                                          >
+                                            <ExternalLink className="w-3 h-3" />
+                                            Visit Merchant Site
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               )}
 

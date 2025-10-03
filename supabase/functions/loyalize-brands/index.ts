@@ -305,11 +305,25 @@ async function getBrandDetails(brandId: string, apiKey: string): Promise<Respons
     } else {
       const errorText = await response.text().catch(() => '');
       console.error(`❌ Failed to fetch brand details: ${response.status} ${response.statusText}`);
-      console.error(`Response: ${errorText}`);
+      console.error(`ERROR Response: ${errorText}`);
+      
+      // Check if it's a "Record not found" error
+      if (response.status === 404 || errorText.includes('Record not found')) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: 'not_found',
+          message: 'This brand is not available in the Loyalize affiliate network yet.',
+          brand_id: brandId
+        }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
       
       return new Response(JSON.stringify({
         success: false,
-        error: `Failed to fetch brand details: ${response.status}`
+        error: `Failed to fetch brand details: ${response.status}`,
+        message: 'Unable to retrieve affiliate program details from Loyalize.'
       }), {
         status: response.status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
