@@ -1311,88 +1311,44 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         {/* Invite Friends - Best Way to Earn NCTR */}
         <div className="mb-8">
           {opportunities.filter(op => op.opportunity_type === 'invite' && !completedOpportunityIds.includes(op.id)).map(opportunity => (
-            <Card key={opportunity.id} className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/30 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
-              <CardContent className="p-6 sm:p-8">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-primary" />
+            <Card key={opportunity.id} className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/30 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs font-semibold text-primary/70 uppercase tracking-wider mb-1">Best Way to Earn</div>
+                      <h3 className="text-lg font-bold text-primary mb-1">{opportunity.title}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-1">{opportunity.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-xs font-semibold text-primary/70 uppercase tracking-wider mb-1">Best Way to Earn</div>
-                    <h3 className="text-xl font-bold text-primary">{opportunity.title}</h3>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">{opportunity.description}</p>
-
-                <div className="text-center py-4 mb-4">
-                  {/* Total NCTR Earn Opportunity */}
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <span className="text-3xl font-bold text-primary">
-                      {(() => {
-                        const baseReward = 1000;
-                        return formatNCTR(baseReward * userMultiplier);
-                      })()} NCTR
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {userMultiplier > 1 ? (
-                      <span>
-                        Wings <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus: <span className={`font-bold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{userMultiplier}x</span> multiplier
-                      </span>
-                    ) : 'Per friend who joins'}
-                  </p>
                   
-                  {/* Bounty Breakdown */}
-                  <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
-                </div>
-
-                <Button 
-                  className="w-full bg-primary hover:bg-primary-glow text-primary-foreground text-base py-6 group-hover:scale-[1.02] transition-all duration-300 mb-4"
-                  size="lg"
-                >
-                  {opportunity.title} →
-                </Button>
-
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="text-center py-3 bg-green-50 rounded-lg border border-green-100">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <span className="text-lg font-bold text-green-600">{formatNCTR(opportunity.nctr_reward * userMultiplier)}</span>
-                      <span className="text-xs text-green-600 font-semibold">NCTR</span>
+                  <div className="text-right ml-4">
+                    <div className="text-2xl font-bold text-primary">
+                      {formatNCTR((opportunity.nctr_reward || 1000) * userMultiplier)}
                     </div>
-                    <div className="text-xs text-muted-foreground">for you</div>
-                  </div>
-
-                  <div className="text-center py-3 bg-green-50 rounded-lg border border-green-100">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <span className="text-lg font-bold text-green-600">{formatNCTR(1000)}</span>
-                      <span className="text-xs text-green-600 font-semibold">NCTR</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">for friend</div>
+                    <div className="text-xs text-muted-foreground">NCTR per friend</div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-2">
-                    <Button onClick={(e) => { e.stopPropagation(); shareViaEmail(); }} variant="outline" size="sm" className="text-xs">
-                      <Mail className="w-3 h-3 mr-1" />
-                      Email
-                    </Button>
-                    <Button onClick={(e) => { e.stopPropagation(); shareViaText(); }} variant="outline" size="sm" className="text-xs">
-                      <MessageCircle className="w-3 h-3 mr-1" />
-                      Text
-                    </Button>
-                    <Button onClick={(e) => { e.stopPropagation(); shareViaWhatsApp(); }} variant="outline" size="sm" className="text-xs">
-                      <MessageCircle className="w-3 h-3 mr-1" />
-                      WhatsApp
-                    </Button>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-xs text-muted-foreground">Code</div>
-                    <div className="text-sm font-mono font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
-                      {referralCode}
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    className="flex-1 bg-primary hover:bg-primary-glow text-primary-foreground group-hover:scale-[1.01] transition-all"
+                    size="default"
+                  >
+                    Start Inviting →
+                  </Button>
+                  
+                  <Button 
+                    onClick={(e) => { e.stopPropagation(); copyInviteLink(); }} 
+                    variant="outline" 
+                    size="default"
+                    className="border-primary/30 hover:bg-primary/10"
+                  >
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
