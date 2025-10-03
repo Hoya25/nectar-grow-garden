@@ -281,12 +281,12 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
 
   const fetchOpportunities = useCallback(async () => {
     try {
-      // First, get all active opportunities with their brand info
+      // Get all active opportunities with optional brand info (left join to include invite opportunities)
       const { data: opportunitiesData, error: opportunitiesError } = await supabase
         .from('earning_opportunities')
         .select(`
           *,
-          brands!inner (
+          brands (
             id,
             name,
             loyalize_id,
@@ -294,7 +294,6 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           )
         `)
         .eq('is_active', true)
-        .eq('brands.is_active', true)
         .order('created_at', { ascending: false });
 
       if (opportunitiesError) {
@@ -302,11 +301,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       } else {
         // Filter out opportunities with invalid loyalize_ids (shopping type only)
         const validOpportunities = (opportunitiesData || []).filter(opp => {
-          // For non-shopping opportunities, allow them through
+          // For non-shopping opportunities (invite, social, bonus, etc.), allow them through
           if (opp.opportunity_type !== 'shopping') return true;
           
-          // For shopping opportunities, require valid brand with real loyalize_id
-          if (!opp.brands || !opp.brands.loyalize_id) return false;
+          // For shopping opportunities, require valid brand with active status and real loyalize_id
+          if (!opp.brands || !opp.brands.is_active || !opp.brands.loyalize_id) return false;
           
           // Filter out placeholder IDs (containing dashes but not numeric)
           const loyalizeId = String(opp.brands.loyalize_id);
