@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
@@ -858,87 +859,90 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     Brand Partner Selection
                   </h4>
                   
-                  {/* Impact.com Brand Search */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Search Impact.com Network (US Brands)</Label>
-                    <ImpactBrandSearch 
-                      onOpportunitiesUpdated={async () => {
-                        await fetchOpportunities(true);
-                        onStatsUpdate();
-                      }}
-                      onBrandSelect={(brandData) => {
-                        // Auto-populate form with Impact.com brand data
-                        const nctrPerDollar = brandData.commissionRate * 20; // Convert commission % to NCTR per dollar
-                        
-                        setFormData({
-                          ...formData,
-                          partner_name: brandData.name,
-                          partner_logo_url: brandData.logoUrl || '',
-                          affiliate_link: brandData.affiliateLink,
-                          title: `Shop with ${brandData.name}`,
-                          description: brandData.description,
-                          reward_per_dollar: nctrPerDollar,
-                          opportunity_type: 'shopping'
-                        });
-                        
-                        setLogoPreview(brandData.logoUrl || '');
-                        
-                        toast({
-                          title: "Brand Loaded",
-                          description: `${brandData.name} details populated in form`,
-                        });
-                      }}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Search Impact.com's US affiliate network - when you generate a tracking link, it will automatically populate the opportunity form below
-                    </p>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-border"></div>
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-section-highlight px-2 text-muted-foreground">Or search local brands</span>
-                    </div>
-                  </div>
-                  
-                  {/* Local Brand Search */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Search Added Brands & Gift Cards</Label>
-                    <BrandSearchInterface
-                      onBrandSelect={(brand) => {
-                        if (brand) {
-                          setSelectedBrand(brand);
-                          // Get brand details and generate tracking link
-                          fetchBrandDetails(brand.id).then((brandDetails) => {
-                            // Generate proper tracking link - use Loyalize redirect if it's a Loyalize brand
-                            const trackingLink = generateUserTrackingLink(
-                              brandDetails?.website_url || '', 
-                              brand.name,
-                              brand.id,
-                              brandDetails?.loyalize_id // Pass loyalize_id to generate proper Loyalize tracking
-                            );
-                            
-                            setFormData({
-                              ...formData,
-                              partner_name: brand.name,
-                              partner_logo_url: brand.logo_url || '',
-                              affiliate_link: trackingLink,
-                              title: `Shop with ${brand.name}`,
-                              description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`,
-                              display_order: formData.display_order // Preserve existing display order
+                  <Tabs defaultValue="loyalize" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="loyalize">
+                        Loyalize Brands & Gift Cards
+                      </TabsTrigger>
+                      <TabsTrigger value="impact">
+                        Impact.com Network
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="loyalize" className="space-y-2 mt-4">
+                      <Label className="text-sm font-medium">Search Added Brands & Gift Cards (Loyalize)</Label>
+                      <BrandSearchInterface
+                        onBrandSelect={(brand) => {
+                          if (brand) {
+                            setSelectedBrand(brand);
+                            // Get brand details and generate tracking link
+                            fetchBrandDetails(brand.id).then((brandDetails) => {
+                              // Generate proper tracking link - use Loyalize redirect if it's a Loyalize brand
+                              const trackingLink = generateUserTrackingLink(
+                                brandDetails?.website_url || '', 
+                                brand.name,
+                                brand.id,
+                                brandDetails?.loyalize_id // Pass loyalize_id to generate proper Loyalize tracking
+                              );
+                              
+                              setFormData({
+                                ...formData,
+                                partner_name: brand.name,
+                                partner_logo_url: brand.logo_url || '',
+                                affiliate_link: trackingLink,
+                                title: `Shop with ${brand.name}`,
+                                description: brandDetails?.description || `Earn NCTR when you shop with ${brand.name}. Get rewarded for every purchase!`,
+                                display_order: formData.display_order // Preserve existing display order
+                              });
                             });
+                          } else {
+                            setSelectedBrand(null);
+                          }
+                        }}
+                        selectedBrand={selectedBrand}
+                        showFullDetails={true}
+                        placeholder="🔍 Search your added brands and gift cards..."
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Search your added Loyalize brands and gift cards - when you select one, it will automatically populate the form below with tracking links
+                      </p>
+                    </TabsContent>
+                    
+                    <TabsContent value="impact" className="space-y-2 mt-4">
+                      <Label className="text-sm font-medium">Search Impact.com Network (US Brands)</Label>
+                      <ImpactBrandSearch 
+                        onOpportunitiesUpdated={async () => {
+                          await fetchOpportunities(true);
+                          onStatsUpdate();
+                        }}
+                        onBrandSelect={(brandData) => {
+                          // Auto-populate form with Impact.com brand data
+                          const nctrPerDollar = brandData.commissionRate * 20; // Convert commission % to NCTR per dollar
+                          
+                          setFormData({
+                            ...formData,
+                            partner_name: brandData.name,
+                            partner_logo_url: brandData.logoUrl || '',
+                            affiliate_link: brandData.affiliateLink,
+                            title: `Shop with ${brandData.name}`,
+                            description: brandData.description,
+                            reward_per_dollar: nctrPerDollar,
+                            opportunity_type: 'shopping'
                           });
-                        } else {
-                          setSelectedBrand(null);
-                        }
-                      }}
-                      selectedBrand={selectedBrand}
-                      showFullDetails={true}
-                      placeholder="🔍 Search your added brands and gift cards..."
-                    />
-                  </div>
+                          
+                          setLogoPreview(brandData.logoUrl || '');
+                          
+                          toast({
+                            title: "Brand Loaded",
+                            description: `${brandData.name} details populated in form`,
+                          });
+                        }}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Search Impact.com's US affiliate network - when you generate a tracking link, it will automatically populate the opportunity form below
+                      </p>
+                    </TabsContent>
+                  </Tabs>
 
                   {/* Manual Brand Entry */}
                   <div className="space-y-4">
