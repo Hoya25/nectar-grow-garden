@@ -1076,7 +1076,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                 </div>
                 {/* Built on Base Badge - Under NCTR */}
                 <div className="hidden sm:flex ml-auto">
-                  <BaseBadge size="sm" variant="light" />
+                  <BaseBadge size="sm" variant="light" asLink={false} />
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
