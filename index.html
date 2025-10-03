@@ -27,6 +27,40 @@
         console.log('✅ Tidio Chat is ready and loaded');
       });
     </script>
+    
+    <!-- Hide Tidio welcome bubble, keep only icon -->
+    <style>
+      /* Hide the "Chat with us" welcome bubble */
+      #tidio-chat iframe[title*="Tidio"],
+      #tidio-chat-code iframe[title*="Tidio"],
+      div[id*="tidio-chat"] iframe[id*="tidio-chat-iframe"]:not([id*="modal"]) {
+        pointer-events: auto !important;
+      }
+      
+      /* Hide welcome message bubble specifically */
+      .tidio-chat-button-bubble,
+      div[class*="chat-button-bubble"],
+      div[id*="tidio-chat"] div[class*="bubble"],
+      div[id*="tidio-chat"] div[data-testid*="bubble"] {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      /* Keep the chat icon button visible */
+      #tidio-chat-iframe,
+      iframe[id*="tidio-chat-iframe"]:not([id*="modal"]) {
+        display: block !important;
+        visibility: visible !important;
+      }
+      
+      /* Hide any pre-chat messages/bubbles */
+      div[id*="tidio"] div[class*="welcome"],
+      div[id*="tidio"] div[class*="greeting"],
+      div[id*="tidio"] div[aria-label*="chat"],
+      div[class*="TidioChatBubble"] {
+        display: none !important;
+      }
+    </style>
   </head>
 
   <body>
