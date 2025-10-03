@@ -188,8 +188,8 @@ const BrandSearchInterface = ({
             disabled={loading}
             className="h-7 gap-2"
           >
-            <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            <Search className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+            Search
           </Button>
         </div>
         <div className="relative">
