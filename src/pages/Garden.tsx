@@ -294,6 +294,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           )
         `)
         .eq('is_active', true)
+        .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (opportunitiesError) {
