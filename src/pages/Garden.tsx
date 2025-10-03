@@ -1132,6 +1132,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                   ${formatPrice(currentPrice)}
                 </p>
               </div>
+              {/* Built on Base Badge */}
+              <div className="hidden lg:flex border-l border-primary/20 pl-3">
+                <BaseBadge size="sm" variant="light" />
+              </div>
             </div>
           </div>
         </div>
