@@ -26,23 +26,42 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    const payload: ManualCreditRequest = await req.json()
+    // SECURITY: Extract user_id from JWT, not from request body
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-    // Validate admin access
-    const { data: admin } = await supabase
-      .from('admin_users')
-      .select('role, access_level')
-      .eq('user_id', payload.admin_id)
-      .maybeSingle()
+    // Get authenticated user from JWT
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-    if (!admin) {
+    // SECURITY: Verify admin access using secure RPC function
+    const { data: isAdmin, error: adminCheckError } = await supabase.rpc(
+      'check_user_is_admin_secure',
+      { check_user_id: user.id }
+    )
+
+    if (adminCheckError || !isAdmin) {
+      console.error(`❌ Unauthorized admin access attempt by user ${user.id.slice(0, 8)}`)
       return new Response(
         JSON.stringify({ error: 'Unauthorized: Admin access required' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    console.log(`🛠️ Manual credit initiated by admin ${payload.admin_id.slice(0, 8)}`)
+    const payload: ManualCreditRequest = await req.json()
+    console.log(`🛠️ Manual credit initiated by admin ${user.id.slice(0, 8)}`)
 
     // Get brand NCTR rate or use provided rate
     const { data: brand } = await supabase
@@ -113,11 +132,11 @@ serve(async (req) => {
       .select()
       .single()
 
-    // Log admin action
+    // Log admin action (use JWT user_id, not payload)
     await supabase
       .from('admin_activity_log')
       .insert({
-        admin_user_id: payload.admin_id,
+        admin_user_id: user.id,
         action: 'manual_credit',
         resource_type: 'nctr_transactions',
         resource_id: transaction.id,

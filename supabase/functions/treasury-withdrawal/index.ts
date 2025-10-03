@@ -36,7 +36,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Enhanced security: validate JWT token from request
+    // Enhanced security: validate JWT token and verify treasury admin role
     const authHeader = req.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return new Response(
@@ -44,6 +44,44 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
       )
     }
+
+    // Get authenticated user from JWT
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication token' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
+    }
+
+    // CRITICAL SECURITY: Verify user has active treasury admin role
+    const { data: treasuryRole, error: roleError } = await supabaseClient
+      .from('treasury_admin_roles')
+      .select('role_type, is_active, expires_at')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (roleError || !treasuryRole) {
+      console.error(`❌ Unauthorized treasury access attempt by user ${user.id.slice(0, 8)}`)
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: Treasury admin access required' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+      )
+    }
+
+    // Check if role has expired
+    if (treasuryRole.expires_at && new Date(treasuryRole.expires_at) < new Date()) {
+      console.error(`❌ Expired treasury admin role for user ${user.id.slice(0, 8)}`)
+      return new Response(
+        JSON.stringify({ error: 'Treasury admin access expired' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+      )
+    }
+
+    console.log(`✅ Treasury admin verified: ${user.id.slice(0, 8)} (role: ${treasuryRole.role_type})`)
 
     // Parse and validate request body
     let requestBody
