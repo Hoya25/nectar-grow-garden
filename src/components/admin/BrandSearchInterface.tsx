@@ -67,6 +67,17 @@ const BrandSearchInterface = ({
     fetchBrands();
   }, []);
 
+  // Fetch brands when search term or category changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm || selectedCategory !== 'all') {
+        fetchBrands();
+      }
+    }, 300); // Debounce search
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, selectedCategory]);
+
   // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -84,7 +95,7 @@ const BrandSearchInterface = ({
   const fetchBrands = async () => {
     setLoading(true);
     try {
-      console.log('🔍 [BrandSearch] Fetching brands for search interface...');
+      console.log('🔍 [BrandSearch] Fetching brands with search term:', searchTerm);
       
       // Check authentication status
       const { data: { user } } = await supabase.auth.getUser();
@@ -93,13 +104,29 @@ const BrandSearchInterface = ({
         userId: user?.id 
       });
       
-      const { data, error } = await supabase
+      // Build query with server-side filtering for better performance
+      let query = supabase
         .from('brands')
         .select('id, name, logo_url, description, category, website_url, commission_rate, nctr_per_dollar, is_active, featured, loyalize_id')
-        .eq('is_active', true)
+        .eq('is_active', true);
+      
+      // Apply search filter on server side if search term exists
+      if (searchTerm && searchTerm.trim()) {
+        const searchLower = searchTerm.toLowerCase().trim();
+        query = query.or(`name.ilike.%${searchLower}%,description.ilike.%${searchLower}%,category.ilike.%${searchLower}%`);
+      }
+      
+      // Apply category filter on server side
+      if (selectedCategory !== 'all') {
+        query = query.ilike('category', `%${selectedCategory}%`);
+      }
+      
+      query = query
         .order('featured', { ascending: false })
         .order('name')
-        .limit(10000); // Increased limit to load all brands (currently 6,824 active)
+        .limit(1000); // Keep reasonable limit since we're filtering server-side now
+      
+      const { data, error } = await query;
 
       if (error) {
         console.error('🔍 [BrandSearch] Supabase error fetching brands:', error);
@@ -128,33 +155,10 @@ const BrandSearchInterface = ({
     }
   };
 
+  // Minimal client-side filtering for Uber gift card validation only
   const filteredBrands = brands.filter(brand => {
-    if (!searchTerm && selectedCategory === 'all') return true;
-    
-    const searchLower = searchTerm.toLowerCase().trim();
     const brandName = (brand.name || '').toLowerCase();
-    const brandDescription = (brand.description || '').toLowerCase();
     const brandCategory = (brand.category || '').toLowerCase();
-    
-    const matchesSearch = !searchTerm || (
-      brandName.includes(searchLower) ||
-      brandDescription.includes(searchLower) ||
-      brandCategory.includes(searchLower)
-    );
-    
-    const matchesCategory = selectedCategory === 'all' || brandCategory.includes(selectedCategory);
-    
-    // Debug logging for search debugging
-    if (searchLower && (brandName.includes(searchLower) || brandName.includes('coinbase'))) {
-      console.log(`🔍 [BrandSearch] Checking "${brand.name}":`, {
-        searchTerm: searchLower,
-        brandName,
-        brandCategory,
-        matchesSearch,
-        matchesCategory,
-        loyalize_id: brand.loyalize_id
-      });
-    }
     
     // Filter out non-Loyalize gift card sources for Uber
     const isUberGiftCard = brandName.includes('uber') && (brandName.includes('gift') || brandCategory.includes('gift'));
@@ -162,14 +166,13 @@ const BrandSearchInterface = ({
     
     // For Uber gift cards, only show Loyalize API sourced ones
     if (isUberGiftCard && !isLoyalizeSourced) {
-      console.log(`Filtering out non-Loyalize Uber gift card: ${brand.name} (ID: ${brand.loyalize_id})`);
       return false;
     }
     
-    return matchesSearch && matchesCategory;
+    return true;
   });
 
-  console.log(`🔍 [BrandSearch] Filter results:`, {
+  console.log(`🔍 [BrandSearch] Results:`, {
     totalBrands: brands.length,
     searchTerm,
     selectedCategory,
@@ -191,7 +194,9 @@ const BrandSearchInterface = ({
 
   const handleInputChange = (value: string) => {
     setSearchTerm(value);
-    setShowDropdown(true);
+    if (value.trim()) {
+      setShowDropdown(true);
+    }
   };
 
   const clearSelection = () => {
