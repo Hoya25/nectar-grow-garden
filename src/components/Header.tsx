@@ -40,14 +40,16 @@ const Header = () => {
   return (
     <header className="w-full border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-minimal">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-        <div className="flex items-center space-x-3 cursor-pointer group"
-          onClick={() => navigate('/')}>
-          <span className="text-2xl font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300">The Garden</span>
-        </div>
-        
-        {/* Built on Base Badge - Desktop */}
-        <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
-          <BaseBadge size="sm" variant="light" />
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3 cursor-pointer group"
+            onClick={() => navigate('/')}>
+            <span className="text-2xl font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300">The Garden</span>
+          </div>
+          
+          {/* Built on Base Badge - Next to logo */}
+          <div className="hidden lg:flex">
+            <BaseBadge size="sm" variant="light" />
+          </div>
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
