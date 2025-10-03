@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +9,30 @@ const corsHeaders = {
 
 // Loyalize webhook IP whitelist
 const LOYALIZE_IP_WHITELIST = ['34.171.245.170']
+
+// Input validation schemas
+const TransactionWebhookSchema = z.object({
+  eventType: z.string().max(100),
+  data: z.object({
+    transactions: z.array(z.number()).max(100),
+    changes: z.object({
+      newStatus: z.string().max(50),
+    }).passthrough()
+  })
+})
+
+const LoyalizeWebhookSchema = z.object({
+  event_type: z.string().max(100).optional(),
+  eventType: z.string().max(100).optional(),
+  type: z.string().max(100).optional(),
+  event: z.string().max(100).optional(),
+  data: z.any().optional(),
+  payload: z.any().optional(),
+  order_id: z.string().max(200).optional(),
+  transaction_id: z.number().optional(),
+  tracking_id: z.string().max(200).optional(),
+  purchase_amount: z.number().positive().max(1000000).optional(),
+}).passthrough()
 
 interface TransactionWebhook {
   eventType: string
@@ -77,7 +102,15 @@ serve(async (req) => {
         throw new Error('Empty request body')
       }
       rawPayload = JSON.parse(body)
+      
+      // Validate payload schema
+      const validationResult = LoyalizeWebhookSchema.safeParse(rawPayload)
+      if (!validationResult.success) {
+        console.error('Invalid webhook payload schema:', validationResult.error.format())
+        throw new Error('Invalid payload structure')
+      }
     } catch (parseError) {
+      console.error('Webhook validation error:', parseError instanceof Error ? parseError.message : 'Unknown error')
       return new Response(JSON.stringify({ error: 'Invalid request format' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

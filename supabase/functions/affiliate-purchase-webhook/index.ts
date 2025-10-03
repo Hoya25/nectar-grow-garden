@@ -1,10 +1,31 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+// Validation schema for affiliate webhooks
+const AffiliateWebhookSchema = z.object({
+  order_id: z.string().max(200),
+  order_status: z.string().max(50),
+  total_amount: z.number().positive().max(1000000),
+  currency: z.string().max(10),
+  user_id: z.string().uuid().optional(),
+  tracking_id: z.string().max(200).optional(),
+  ref: z.string().max(200).optional(),
+  source: z.string().max(100).optional(),
+  purchase_date: z.string().max(50).optional(),
+  customer_email: z.string().email().max(255).optional(),
+  products: z.array(z.object({
+    name: z.string().max(200),
+    amount: z.number().positive(),
+    quantity: z.number().int().positive(),
+    category: z.string().max(100).optional()
+  })).max(100).optional()
+})
 
 // Interface for giftcards.com and similar affiliate webhooks
 interface AffiliateWebhookPayload {
@@ -91,7 +112,7 @@ serve(async (req) => {
       });
     }
 
-    // Parse validated body
+    // Parse and validate payload
     let payload: AffiliateWebhookPayload;
     try {
       console.log('🔔 Affiliate webhook received');
@@ -99,30 +120,19 @@ serve(async (req) => {
       if (!body.trim()) {
         throw new Error('Empty request body');
       }
-      payload = JSON.parse(body);
+      const rawPayload = JSON.parse(body);
       
-      // Enhanced input validation
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      
-      if (payload.user_id && !uuidRegex.test(payload.user_id)) {
-        throw new Error('Invalid user_id format');
+      // Validate with zod schema
+      const validationResult = AffiliateWebhookSchema.safeParse(rawPayload);
+      if (!validationResult.success) {
+        console.error('Invalid webhook payload schema:', validationResult.error.format());
+        throw new Error('Invalid payload structure');
       }
       
-      if (typeof payload.total_amount !== 'number' || payload.total_amount < 0 || payload.total_amount > 10000) {
-        throw new Error('Invalid amount');
-      }
-      
-      if (payload.products && Array.isArray(payload.products) && payload.products.length > 100) {
-        throw new Error('Too many products');
-      }
-      
-      const validStatuses = ['pending', 'completed', 'paid', 'success', 'failed', 'cancelled', 'refunded'];
-      if (payload.order_status && !validStatuses.includes(payload.order_status.toLowerCase())) {
-        throw new Error('Invalid order_status');
-      }
+      payload = validationResult.data as AffiliateWebhookPayload;
       
     } catch (parseError) {
-      console.error('[ERROR] Invalid payload:', parseError);
+      console.error('[ERROR] Payload validation error:', parseError instanceof Error ? parseError.message : 'Unknown error');
       return new Response(JSON.stringify({ error: 'Invalid request format' }), { 
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
