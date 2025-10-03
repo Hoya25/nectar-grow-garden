@@ -318,14 +318,21 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           return true;
         });
         
-        // Sort opportunities to prioritize shopping (with display_order) over bonus/invite
+        // Sort opportunities to prioritize INVITE opportunities first (best way to earn NCTR)
         const sortedOpportunities = validOpportunities.sort((a, b) => {
-          // First, separate by type: shopping opportunities vs bonus/invite
+          // PRIORITY 1: Invite opportunities (best way to earn)
+          const aIsInvite = a.opportunity_type === 'invite';
+          const bIsInvite = b.opportunity_type === 'invite';
+          
+          if (aIsInvite && !bIsInvite) return -1; // Invite opportunities first
+          if (!aIsInvite && bIsInvite) return 1;
+          
+          // PRIORITY 2: Shopping opportunities
           const aIsShopping = a.opportunity_type === 'shopping';
           const bIsShopping = b.opportunity_type === 'shopping';
           
-          if (aIsShopping && !bIsShopping) return -1; // Shopping first
-          if (!aIsShopping && bIsShopping) return 1;  // Then bonus/invite
+          if (aIsShopping && !bIsShopping) return -1;
+          if (!aIsShopping && bIsShopping) return 1;
           
           // Within shopping opportunities, sort by display_order (ascending - lower numbers first)
           if (aIsShopping && bIsShopping) {
@@ -336,7 +343,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
           
-          // Within bonus/invite opportunities, sort by created_at (newest first)
+          // Within other opportunities, sort by created_at (newest first)
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
         

@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp, ExternalLink, History } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp, ExternalLink, History, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import WalletConnection from '@/components/WalletConnection';
 import { WingsStatusBar } from '@/components/WingsStatusBar';
@@ -18,6 +18,7 @@ import { LevelUpModal } from '@/components/LevelUpModal';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
+import ReferralSystem from '@/components/ReferralSystem';
 
 interface UserProfile {
   id: string;
@@ -425,6 +426,28 @@ const Profile = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* PRIORITY: Invite Friends - Best Way to Earn NCTR */}
+        <div className="mb-8">
+          <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/30 shadow-lg">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-2 bg-primary/20 rounded-lg">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <span className="text-primary">Best Way to Earn NCTR:</span> Invite Friends
+                </div>
+              </CardTitle>
+              <p className="text-muted-foreground mt-2">
+                Earn the most NCTR by inviting friends to join The Garden! You and your friends both get rewarded.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <ReferralSystem />
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Wings Status Bar - Prominent Position */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
