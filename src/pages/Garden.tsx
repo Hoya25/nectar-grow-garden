@@ -1061,8 +1061,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       {/* Header with Wings Status */}
       <header className="section-highlight backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-8">
+            <div className="flex items-start justify-between sm:items-center sm:flex-1">
               {/* Stacked: The Garden -> NCTR -> Base Badge */}
               <div className="flex flex-col items-center gap-0.5">
                 <h1 className="text-lg sm:text-xl font-bold nctr-text">
@@ -1071,7 +1071,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                 <img 
                   src={nctrLogo} 
                   alt="NCTR" 
-                  className="h-10 sm:h-14 w-auto opacity-90"
+                  className="h-16 sm:h-20 w-auto opacity-90"
                 />
                 <div className="hidden sm:flex -mt-2">
                   <BaseBadge size="sm" variant="light" asLink={false} />
