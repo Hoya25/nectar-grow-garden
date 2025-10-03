@@ -1,4 +1,5 @@
 import nctrLogo from "@/assets/nctr-logo-grey.png";
+import baseLogo from "@/assets/base-logo-white.svg";
 
 const Footer = () => {
   return (
@@ -37,9 +38,26 @@ const Footer = () => {
           {/* Premium Footer Bottom */}
           <div className="border-t border-background/20 pt-12">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <p className="text-background/70 text-lg">
-                © 2025 The Garden. All rights reserved.
-              </p>
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <p className="text-background/70 text-lg">
+                  © 2025 The Garden. All rights reserved.
+                </p>
+                
+                {/* Built on Base Badge */}
+                <a 
+                  href="https://base.org" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-background/80 hover:text-background transition-all duration-300 group"
+                >
+                  <span className="text-sm font-medium">Built on</span>
+                  <img 
+                    src={baseLogo} 
+                    alt="Base" 
+                    className="h-5 w-auto opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                  />
+                </a>
+              </div>
               
               <div className="flex items-center gap-6">
                 <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300">
