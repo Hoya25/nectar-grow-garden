@@ -71,7 +71,7 @@ const BrandSearchInterface = ({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchTerm || selectedCategory !== 'all') {
-        fetchBrands();
+        fetchBrands(searchTerm, selectedCategory);
       }
     }, 300); // Debounce search
 
@@ -92,10 +92,13 @@ const BrandSearchInterface = ({
     };
   }, []);
 
-  const fetchBrands = async () => {
+  const fetchBrands = async (currentSearchTerm?: string, currentCategory?: string) => {
     setLoading(true);
     try {
-      console.log('🔍 [BrandSearch] Fetching brands with search term:', searchTerm);
+      const searchValue = currentSearchTerm !== undefined ? currentSearchTerm : searchTerm;
+      const categoryValue = currentCategory !== undefined ? currentCategory : selectedCategory;
+      
+      console.log('🔍 [BrandSearch] Fetching brands with:', { searchValue, categoryValue });
       
       // Check authentication status
       const { data: { user } } = await supabase.auth.getUser();
@@ -111,14 +114,14 @@ const BrandSearchInterface = ({
         .eq('is_active', true);
       
       // Apply search filter on server side if search term exists
-      if (searchTerm && searchTerm.trim()) {
-        const searchLower = searchTerm.toLowerCase().trim();
+      if (searchValue && searchValue.trim()) {
+        const searchLower = searchValue.toLowerCase().trim();
         query = query.or(`name.ilike.%${searchLower}%,description.ilike.%${searchLower}%,category.ilike.%${searchLower}%`);
       }
       
       // Apply category filter on server side
-      if (selectedCategory !== 'all') {
-        query = query.ilike('category', `%${selectedCategory}%`);
+      if (categoryValue !== 'all') {
+        query = query.ilike('category', `%${categoryValue}%`);
       }
       
       query = query
@@ -216,7 +219,7 @@ const BrandSearchInterface = ({
             variant="outline"
             size="sm"
             onClick={() => {
-              fetchBrands();
+              fetchBrands(searchTerm, selectedCategory);
               if (searchTerm) {
                 setShowDropdown(true);
               }
