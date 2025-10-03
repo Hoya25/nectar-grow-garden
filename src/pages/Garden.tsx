@@ -28,6 +28,7 @@ import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
+import { CustomerServiceBubble } from '@/components/CustomerServiceBubble';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -1285,8 +1286,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                   </Card>
                 </div>
 
-                {/* Buy NCTR Button */}
-                <div className="mb-6 flex justify-center">
+                {/* Buy NCTR Button - Hidden on mobile to avoid duplication with banner button */}
+                <div className="mb-6 hidden md:flex justify-center">
                   <BuyNCTRButton
                     variant="default"
                     size="lg"
@@ -1319,13 +1320,16 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                     Portfolio Details & Sync
                   </Button>
                   
-                  <BuyNCTRButton
-                    variant="default"
-                    size="default"
-                    currentStatus={portfolio?.opportunity_status}
-                    current360Lock={portfolio?.lock_360_nctr || 0}
-                    onPurchaseComplete={() => fetchUserData()}
-                  />
+                  {/* Second Buy Button - Only show on desktop */}
+                  <div className="hidden md:block">
+                    <BuyNCTRButton
+                      variant="default"
+                      size="default"
+                      currentStatus={portfolio?.opportunity_status}
+                      current360Lock={portfolio?.lock_360_nctr || 0}
+                      onPurchaseComplete={() => fetchUserData()}
+                    />
+                  </div>
                   
                   {(portfolio?.available_nctr && portfolio.available_nctr > 0) && (
                     <Button 
@@ -1845,6 +1849,9 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         availableNCTR={portfolio?.available_nctr || 0}
         walletAddress={connectedWallet}
       />
+
+      {/* Customer Service Bubble */}
+      <CustomerServiceBubble />
     </div>
   );
 };
