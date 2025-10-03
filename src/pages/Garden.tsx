@@ -1061,21 +1061,17 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       {/* Header with Wings Status */}
       <header className="section-highlight backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-8">
-            <div className="flex items-start justify-between sm:items-center sm:flex-1">
-              {/* Stacked: The Garden -> NCTR -> Base Badge */}
-              <div className="flex flex-col items-center -space-y-1">
-                <h1 className="text-lg sm:text-xl font-bold nctr-text">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <h1 className="text-xl sm:text-2xl font-bold nctr-text">
                   The Garden
                 </h1>
                 <img 
                   src={nctrLogo} 
                   alt="NCTR" 
-                  className="h-16 sm:h-20 w-auto opacity-90"
+                  className="h-16 sm:h-28 w-auto opacity-90"
                 />
-                <div className="hidden sm:flex -mt-4">
-                  <BaseBadge size="sm" variant="light" asLink={false} />
-                </div>
               </div>
               <div className="flex items-center gap-3 sm:gap-4">
                 <Button 
@@ -1119,22 +1115,28 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
               </div>
             </div>
             
-            {/* Compact Status Display in Header */}
-            <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3 border border-primary/20">
-              <div className="flex items-center gap-2">
-                <div>
-                  <p className="text-xs text-muted-foreground">Total NCTR</p>
+            {/* Compact Status Display in Header with Base Badge below */}
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3 border border-primary/20">
+                <div className="flex items-center gap-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Total NCTR</p>
+                    <p className="text-sm font-semibold text-section-accent">
+                      {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
+                    </p>
+                  </div>
+                </div>
+                {/* Live NCTR Price Feed */}
+                <div className="border-l border-primary/20 pl-3">
+                  <p className="text-xs text-muted-foreground">Live Price</p>
                   <p className="text-sm font-semibold text-section-accent">
-                    {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
+                    ${formatPrice(currentPrice)}
                   </p>
                 </div>
               </div>
-              {/* Live NCTR Price Feed */}
-              <div className="border-l border-primary/20 pl-3">
-                <p className="text-xs text-muted-foreground">Live Price</p>
-                <p className="text-sm font-semibold text-section-accent">
-                  ${formatPrice(currentPrice)}
-                </p>
+              {/* Built on Base Badge - Under stats */}
+              <div className="hidden sm:flex pr-2">
+                <BaseBadge size="sm" variant="light" asLink={false} className="scale-75 origin-right" />
               </div>
             </div>
           </div>
