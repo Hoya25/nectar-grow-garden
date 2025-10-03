@@ -3,12 +3,25 @@ import { MessageCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
+declare global {
+  interface Window {
+    tidioChatApi?: {
+      open: () => void;
+      hide: () => void;
+      display: (show: boolean) => void;
+    };
+  }
+}
+
 export const CustomerServiceBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenChat = () => {
-    // Open customer service email or chat
-    window.location.href = 'mailto:support@thegarden.nctr.live?subject=Customer Support Request';
+    // Open Tidio chat widget
+    if (window.tidioChatApi) {
+      window.tidioChatApi.open();
+      setIsOpen(false);
+    }
   };
 
   return (
