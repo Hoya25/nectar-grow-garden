@@ -15,7 +15,8 @@ import {
   ExternalLink,
   Gift,
   X,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 
 interface Brand {
@@ -173,7 +174,23 @@ const BrandSearchInterface = ({
     <div className={`space-y-3 ${className}`} ref={searchRef}>
       {/* Search Input */}
       <div className="space-y-2">
-        <Label>Brand Search</Label>
+        <div className="flex items-center justify-between">
+          <Label>Brand Search</Label>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              fetchBrands();
+              setSearchTerm('');
+              setSelectedCategory('all');
+            }}
+            disabled={loading}
+            className="h-7 gap-2"
+          >
+            <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
         <div className="relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
