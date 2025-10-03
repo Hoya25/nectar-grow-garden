@@ -45,49 +45,51 @@ serve(async (req) => {
       });
     }
 
-    // CRITICAL SECURITY: Mandatory webhook signature verification
-    const webhookSecret = Deno.env.get('AFFILIATE_WEBHOOK_SECRET');
-    if (!webhookSecret) {
-      console.error('[SECURITY] AFFILIATE_WEBHOOK_SECRET not configured');
-      return new Response(JSON.stringify({ error: 'Service unavailable' }), { 
-        status: 503,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    const signature = req.headers.get('x-webhook-signature');
-    if (!signature) {
-      console.error('[SECURITY] Missing webhook signature', { ip: req.headers.get('x-forwarded-for') });
-      return new Response(JSON.stringify({ error: 'Authentication required' }), { 
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
+    // Read body first
     const body = await req.text();
-    const encoder = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(webhookSecret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign', 'verify']
-    );
     
-    const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
-    const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
+    // OPTIONAL: Webhook signature verification (for internal webhooks)
+    // Most affiliate networks (Fanatics, Loyalize, etc.) don't use HMAC signatures
+    const webhookSecret = Deno.env.get('AFFILIATE_WEBHOOK_SECRET');
+    const signature = req.headers.get('x-webhook-signature');
     
-    if (signature !== expectedSignature) {
-      console.error('[SECURITY] Invalid webhook signature', { ip: req.headers.get('x-forwarded-for') });
-      return new Response(JSON.stringify({ error: 'Authentication failed' }), { 
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    if (webhookSecret && signature) {
+      // If both secret and signature exist, verify them
+      console.log('[SECURITY] Verifying webhook signature...');
+      const encoder = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(webhookSecret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign', 'verify']
+      );
+      
+      const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
+      const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      if (signature !== expectedSignature) {
+        console.error('[SECURITY] Invalid webhook signature', { 
+          ip: req.headers.get('x-forwarded-for'),
+          providedSig: signature.slice(0, 10) + '...',
+          expectedSig: expectedSignature.slice(0, 10) + '...'
+        });
+        return new Response(JSON.stringify({ error: 'Authentication failed' }), { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      console.log('[SECURITY] ✅ Webhook signature verified');
+    } else {
+      // Log that we're accepting webhooks without signature verification
+      // This is normal for affiliate networks like Fanatics, Loyalize, etc.
+      console.log('[INFO] Processing webhook without signature verification (affiliate network mode)', {
+        source: req.headers.get('user-agent'),
+        ip: req.headers.get('x-forwarded-for')
       });
     }
-    
-    console.log('[SECURITY] ✅ Webhook signature verified');
 
     // Parse validated body
     let payload: AffiliateWebhookPayload;
