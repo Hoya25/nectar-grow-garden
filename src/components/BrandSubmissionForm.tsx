@@ -187,10 +187,9 @@ export const BrandSubmissionForm = ({ children }: BrandSubmissionFormProps) => {
             <Label htmlFor="website">Website *</Label>
             <Input
               id="website"
-              type="url"
               value={formData.website}
               onChange={(e) => handleFieldChange('website', e.target.value)}
-              placeholder="https://yourbrand.com"
+              placeholder="yourbrand.com or https://yourbrand.com"
               maxLength={500}
             />
             {errors.website && (
