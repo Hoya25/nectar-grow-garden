@@ -563,12 +563,32 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
   const toggleOpportunityStatus = async (opportunity: EarningOpportunity) => {
     try {
-      const { error } = await supabase
+      console.log('🔄 Toggling opportunity status:', {
+        id: opportunity.id,
+        title: opportunity.title,
+        currentStatus: opportunity.is_active,
+        newStatus: !opportunity.is_active
+      });
+
+      const { data, error } = await supabase
         .from('earning_opportunities')
         .update({ is_active: !opportunity.is_active })
-        .eq('id', opportunity.id);
+        .eq('id', opportunity.id)
+        .select();
 
-      if (error) throw error;
+      console.log('📊 Update result:', { data, error });
+
+      if (error) {
+        console.error('❌ Database update failed:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.error('❌ No rows updated - possible RLS policy issue');
+        throw new Error('Failed to update opportunity - permission denied');
+      }
+
+      console.log('✅ Successfully updated opportunity status');
 
       await logActivity(
         opportunity.is_active ? 'deactivated' : 'activated', 
