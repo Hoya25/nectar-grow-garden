@@ -395,9 +395,6 @@ const BrandSearchInterface = ({
                             className="px-3 py-2 hover:bg-muted cursor-pointer"
                             onClick={() => {
                               handleBrandSelect(brand);
-                              if (hasLoyalizeId && !loyalizeData && !isLoadingLoyalize) {
-                                fetchLoyalizeBrandDetails(brand);
-                              }
                             }}
                           >
                             <div className="flex items-start gap-3">
@@ -462,14 +459,18 @@ const BrandSearchInterface = ({
                                     size="sm"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      fetchLoyalizeBrandDetails(brand);
+                                      if (!loyalizeData && !isLoadingLoyalize) {
+                                        fetchLoyalizeBrandDetails(brand);
+                                      }
                                     }}
                                     disabled={isLoadingLoyalize}
                                     className="h-6 w-6 p-0"
-                                    title="Load Loyalize offerings"
+                                    title={loyalizeData ? "View offerings" : "Load Loyalize offerings"}
                                   >
                                     {isLoadingLoyalize ? (
                                       <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : loyalizeData ? (
+                                      <ShoppingBag className="w-3 h-3 text-primary" />
                                     ) : (
                                       <ShoppingBag className="w-3 h-3" />
                                     )}
@@ -480,83 +481,115 @@ const BrandSearchInterface = ({
                           </div>
 
                           {/* Loyalize Brand Details */}
-                          {loyalizeData && hasLoyalizeId && (
-                            <div className="px-3 pb-3 pt-1 bg-muted/30 space-y-2">
-                              <div className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1">
-                                <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 bg-blue-50 text-blue-700 border-blue-200">
-                                  Loyalize API
-                                </Badge>
-                                Brand Offerings
-                              </div>
-                              
-                              <div className="bg-background rounded-lg p-3 space-y-2">
-                                {/* Commission Rate */}
-                                {loyalizeData.commission_rate && (
-                                  <div className="flex items-center justify-between text-xs">
-                                    <span className="text-muted-foreground">Commission Rate:</span>
-                                    <span className="font-medium text-primary">{loyalizeData.commission_rate}%</span>
+                          {hasLoyalizeId && (
+                            <>
+                              {/* Loading State */}
+                              {isLoadingLoyalize && (
+                                <div className="px-3 pb-3 pt-1 bg-muted/30">
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Loading Loyalize offerings...
                                   </div>
-                                )}
+                                </div>
+                              )}
 
-                                {/* Cookie Duration */}
-                                {loyalizeData.cookie_duration && (
-                                  <div className="flex items-center justify-between text-xs">
-                                    <span className="text-muted-foreground">Cookie Duration:</span>
-                                    <span className="font-medium">{loyalizeData.cookie_duration} days</span>
-                                  </div>
-                                )}
-
-                                {/* Category */}
-                                {loyalizeData.category && (
-                                  <div className="flex items-center justify-between text-xs">
-                                    <span className="text-muted-foreground">Category:</span>
-                                    <span className="font-medium capitalize">{loyalizeData.category.replace(/-/g, ' ')}</span>
-                                  </div>
-                                )}
-
-                                {/* Status */}
-                                {loyalizeData.status && (
-                                  <div className="flex items-center justify-between text-xs">
-                                    <span className="text-muted-foreground">Status:</span>
-                                    <Badge 
-                                      variant={loyalizeData.status === 'active' ? 'default' : 'secondary'}
-                                      className="text-[10px] h-4 px-1"
-                                    >
-                                      {loyalizeData.status}
+                              {/* Show offerings when loaded */}
+                              {loyalizeData && (
+                                <div className="px-3 pb-3 pt-1 bg-gradient-to-r from-blue-50/50 to-transparent border-l-2 border-blue-400 space-y-2">
+                                  <div className="text-xs font-medium text-blue-700 mb-1.5 flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 bg-blue-100 text-blue-700 border-blue-300">
+                                      <ShoppingBag className="w-3 h-3 mr-1 inline" />
+                                      Loyalize API
                                     </Badge>
+                                    Affiliate Program Details
                                   </div>
-                                )}
+                                  
+                                  <div className="bg-background rounded-lg p-3 space-y-2 shadow-sm">
+                                    {/* Commission Rate */}
+                                    {loyalizeData.commission_rate && (
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-muted-foreground font-medium">Commission Rate:</span>
+                                        <span className="font-semibold text-primary text-sm">{loyalizeData.commission_rate}%</span>
+                                      </div>
+                                    )}
 
-                                {/* Description */}
-                                {loyalizeData.description && (
-                                  <div className="pt-2 border-t">
-                                    <div className="text-[10px] text-muted-foreground uppercase mb-1">Description</div>
-                                    <div className="text-xs text-foreground">{loyalizeData.description}</div>
+                                    {/* Cookie Duration */}
+                                    {loyalizeData.cookie_duration && (
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-muted-foreground font-medium">Cookie Duration:</span>
+                                        <span className="font-semibold">{loyalizeData.cookie_duration} days</span>
+                                      </div>
+                                    )}
+
+                                    {/* Category */}
+                                    {loyalizeData.category && (
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-muted-foreground font-medium">Category:</span>
+                                        <span className="font-medium capitalize">{loyalizeData.category.replace(/-/g, ' ')}</span>
+                                      </div>
+                                    )}
+
+                                    {/* Status */}
+                                    {loyalizeData.status && (
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-muted-foreground font-medium">Status:</span>
+                                        <Badge 
+                                          variant={loyalizeData.status === 'active' ? 'default' : 'secondary'}
+                                          className="text-[10px] h-4 px-1"
+                                        >
+                                          {loyalizeData.status}
+                                        </Badge>
+                                      </div>
+                                    )}
+
+                                    {/* Description */}
+                                    {loyalizeData.description && (
+                                      <div className="pt-2 border-t">
+                                        <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Description</div>
+                                        <div className="text-xs text-foreground">{loyalizeData.description}</div>
+                                      </div>
+                                    )}
+
+                                    {/* Terms */}
+                                    {loyalizeData.terms && (
+                                      <div className="pt-2 border-t">
+                                        <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Terms & Conditions</div>
+                                        <div className="text-xs text-foreground max-h-20 overflow-y-auto">{loyalizeData.terms}</div>
+                                      </div>
+                                    )}
+
+                                    {/* Website Link */}
+                                    {loyalizeData.website_url && (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => window.open(loyalizeData.website_url, '_blank')}
+                                        className="w-full mt-2 h-7 text-xs gap-2"
+                                      >
+                                        <ExternalLink className="w-3 h-3" />
+                                        Visit Merchant Site
+                                      </Button>
+                                    )}
                                   </div>
-                                )}
+                                </div>
+                              )}
 
-                                {/* Terms */}
-                                {loyalizeData.terms && (
-                                  <div className="pt-2 border-t">
-                                    <div className="text-[10px] text-muted-foreground uppercase mb-1">Terms & Conditions</div>
-                                    <div className="text-xs text-foreground line-clamp-3">{loyalizeData.terms}</div>
-                                  </div>
-                                )}
-
-                                {/* Website Link */}
-                                {loyalizeData.website_url && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => window.open(loyalizeData.website_url, '_blank')}
-                                    className="w-full mt-2 h-7 text-xs gap-2"
+                              {/* Prompt to load if not loaded yet */}
+                              {!loyalizeData && !isLoadingLoyalize && (
+                                <div className="px-3 pb-2 pt-1 bg-muted/30">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      fetchLoyalizeBrandDetails(brand);
+                                    }}
+                                    className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
                                   >
-                                    <ExternalLink className="w-3 h-3" />
-                                    Visit Merchant Site
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
+                                    <ShoppingBag className="w-3 h-3" />
+                                    Click to load Loyalize affiliate program details
+                                  </button>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       );
