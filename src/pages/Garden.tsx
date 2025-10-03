@@ -176,6 +176,8 @@ const Garden = () => {
   useEffect(() => {
     if (!user) return;
 
+    console.log('📡 Setting up real-time subscription for opportunities...');
+
     const channel = supabase
       .channel('earning-opportunities-changes')
       .on(
@@ -186,14 +188,18 @@ const Garden = () => {
           table: 'earning_opportunities'
         },
         (payload) => {
-          console.log('Earning opportunities updated:', payload);
+          console.log('🔔 Earning opportunities changed!', payload);
+          console.log('🔄 Refetching opportunities due to change...');
           // Refetch opportunities when any change occurs
           fetchOpportunities();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 Subscription status:', status);
+      });
 
     return () => {
+      console.log('📡 Cleaning up real-time subscription...');
       supabase.removeChannel(channel);
     };
   }, [user]);
@@ -281,6 +287,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
 
   const fetchOpportunities = useCallback(async () => {
     try {
+      console.log('🔄 Fetching opportunities...');
+      
       // Get all active opportunities with optional brand info (left join to include invite opportunities)
       const { data: opportunitiesData, error: opportunitiesError } = await supabase
         .from('earning_opportunities')
@@ -296,6 +304,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         .eq('is_active', true)
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
+
+      console.log('📊 Raw opportunities data:', opportunitiesData);
 
       if (opportunitiesError) {
         console.error('Error fetching opportunities:', opportunitiesError);
