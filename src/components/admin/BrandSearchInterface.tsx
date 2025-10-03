@@ -224,8 +224,14 @@ const BrandSearchInterface = ({
   };
 
   const fetchLoyalizeBrandDetails = async (brand: Brand) => {
-    if (!brand.loyalize_id) return;
-    if (loyalizeDetails[brand.id]) return; // Already fetched
+    if (!brand.loyalize_id) {
+      console.warn('No loyalize_id for brand:', brand.name);
+      return;
+    }
+    if (loyalizeDetails[brand.id]) {
+      console.log('Already have details for:', brand.name);
+      return; // Already fetched
+    }
     
     setLoadingLoyalize(prev => ({ ...prev, [brand.id]: true }));
     
@@ -239,21 +245,31 @@ const BrandSearchInterface = ({
         }
       });
 
+      console.log('📦 Raw response:', { data, error });
+
       if (error) {
-        console.error('Error fetching Loyalize brand details:', error);
+        console.error('❌ Error fetching Loyalize brand details:', error);
         throw error;
       }
 
-      console.log('✅ Loyalize brand details:', data);
+      if (!data) {
+        console.error('❌ No data returned from edge function');
+        return;
+      }
 
-      if (data?.brand) {
+      console.log('✅ Loyalize brand details received:', data);
+
+      if (data.success && data.brand) {
+        console.log('💾 Storing brand details:', data.brand);
         setLoyalizeDetails(prev => ({
           ...prev,
           [brand.id]: data.brand
         }));
+      } else {
+        console.error('❌ Invalid response format:', data);
       }
     } catch (error) {
-      console.error('Error fetching Loyalize brand details:', error);
+      console.error('💥 Exception fetching Loyalize brand details:', error);
     } finally {
       setLoadingLoyalize(prev => ({ ...prev, [brand.id]: false }));
     }
