@@ -212,74 +212,52 @@ serve(async (req) => {
           .maybeSingle()
 
         const nctrPerDollar = brand?.nctr_per_dollar || 50
-        const nctrReward = amount * nctrPerDollar
+        const baseNctrReward = amount * nctrPerDollar
         
-        console.log(`   💰 Reward: ${nctrReward} NCTR (${nctrPerDollar} per dollar)`)
+        console.log(`   💰 Base Reward: ${baseNctrReward} NCTR (${nctrPerDollar} per dollar)`)
 
-        // Credit the user
-        const { data: currentPortfolio, error: fetchError } = await supabase
-          .from('nctr_portfolio')
-          .select('total_earned')
-          .eq('user_id', userId)
-          .maybeSingle()
-        
-        if (fetchError || !currentPortfolio) {
-          console.error('   ❌ Portfolio error:', fetchError)
-          results.push({ transaction_id: txnId, error: 'Portfolio error' })
-          continue
-        }
-        
-        const newTotalEarned = (currentPortfolio.total_earned || 0) + nctrReward
-        
-        // Update portfolio
-        const { error: portfolioError } = await supabase
-          .from('nctr_portfolio')
-          .update({
-            total_earned: newTotalEarned,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', userId)
+        // Apply reward multiplier using the secure function
+        const { data: rewardResult, error: rewardError } = await supabase.rpc(
+          'award_affiliate_nctr',
+          {
+            p_user_id: userId,
+            p_base_nctr_amount: baseNctrReward,
+            p_earning_source: 'affiliate_purchase'
+          }
+        )
 
-        if (portfolioError) {
-          console.error('   ❌ Portfolio update error:', portfolioError)
-          results.push({ transaction_id: txnId, error: 'Update failed' })
+        if (rewardError || !rewardResult?.success) {
+          console.error('   ❌ Reward calculation error:', rewardError || rewardResult)
+          results.push({ transaction_id: txnId, error: 'Reward calculation failed' })
           continue
         }
 
-        // Create auto-lock
-        await supabase
-          .from('nctr_locks')
-          .insert({
-            user_id: userId,
-            nctr_amount: nctrReward,
-            lock_type: '90LOCK',
-            lock_category: '90LOCK',
-            commitment_days: 90,
-            unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-            can_upgrade: true,
-            original_lock_type: '90LOCK'
-          })
+        const finalNctrReward = rewardResult.multiplied_amount
+        const multiplier = rewardResult.multiplier
+        
+        console.log(`   🎯 Final Reward: ${finalNctrReward} NCTR (${multiplier}x multiplier applied)`)
 
-        // Record transaction
+        // Transaction is already recorded by award_affiliate_nctr function
+        // Just update with external transaction ID
         await supabase
           .from('nctr_transactions')
-          .insert({
-            user_id: userId,
-            transaction_type: 'earned',
-            nctr_amount: nctrReward,
-            purchase_amount: amount,
-            partner_name: brand?.name || storeName,
-            description: `${brand?.name || storeName} purchase via Loyalize ($${amount})`,
-            earning_source: 'affiliate_purchase',
+          .update({
             external_transaction_id: externalTxnId,
-            status: 'completed'
+            purchase_amount: amount,
+            partner_name: brand?.name || storeName
           })
+          .eq('user_id', userId)
+          .eq('earning_source', 'affiliate_purchase')
+          .order('created_at', { ascending: false })
+          .limit(1)
 
-        console.log(`   ✅ SUCCESS: Credited ${nctrReward} NCTR to ${userName} (${userId.slice(0, 8)}...)`)
+        console.log(`   ✅ SUCCESS: Credited ${finalNctrReward} NCTR to ${userName} (${userId.slice(0, 8)}...) with ${multiplier}x Wings multiplier`)
         results.push({ 
           transaction_id: txnId, 
           status: 'success',
-          nctr_credited: nctrReward,
+          base_nctr: baseNctrReward,
+          final_nctr: finalNctrReward,
+          multiplier: multiplier,
           user_id: userId.slice(0, 8) + '...',
           user_name: userName
         })
