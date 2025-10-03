@@ -38,6 +38,10 @@ interface LoyalizeBrandDetails {
   name: string;
   description?: string;
   commission_rate?: number;
+  commission_type?: 'percentage' | 'flat';
+  commission_value?: number;
+  commission_currency?: string;
+  commission_details?: any;
   category?: string;
   website_url?: string;
   status?: string;
@@ -504,12 +508,36 @@ const BrandSearchInterface = ({
                                     Affiliate Program Details
                                   </div>
                                   
-                                  <div className="bg-background rounded-lg p-3 space-y-2 shadow-sm">
-                                    {/* Commission Rate */}
-                                    {loyalizeData.commission_rate && (
-                                      <div className="flex items-center justify-between text-xs">
-                                        <span className="text-muted-foreground font-medium">Commission Rate:</span>
-                                        <span className="font-semibold text-primary text-sm">{loyalizeData.commission_rate}%</span>
+                                   <div className="bg-background rounded-lg p-3 space-y-2 shadow-sm">
+                                    {/* Commission Information */}
+                                    {loyalizeData.commission_type === 'flat' ? (
+                                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-green-50 to-green-50/20 border border-green-200 rounded-md">
+                                        <span className="text-green-700 font-medium text-xs">💵 One-Time Payment:</span>
+                                        <span className="font-bold text-green-700 text-base">
+                                          {loyalizeData.commission_currency} ${loyalizeData.commission_value}
+                                        </span>
+                                      </div>
+                                    ) : loyalizeData.commission_rate && loyalizeData.commission_rate > 0 ? (
+                                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-blue-50 to-blue-50/20 border border-blue-200 rounded-md">
+                                        <span className="text-blue-700 font-medium text-xs">📊 Ongoing Commission:</span>
+                                        <span className="font-bold text-blue-700 text-base">{loyalizeData.commission_rate}%</span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50 to-gray-50/20 border border-gray-200 rounded-md">
+                                        <span className="text-gray-700 font-medium text-xs">Commission:</span>
+                                        <span className="text-gray-600 text-xs">Contact for details</span>
+                                      </div>
+                                    )}
+                                    
+                                    {/* Commission Details if available */}
+                                    {loyalizeData.commission_details && (
+                                      <div className="pt-2 border-t">
+                                        <div className="text-[10px] text-muted-foreground uppercase mb-1 font-semibold">Commission Details</div>
+                                        <div className="text-xs text-foreground bg-muted/30 p-2 rounded">
+                                          {typeof loyalizeData.commission_details === 'string' 
+                                            ? loyalizeData.commission_details 
+                                            : JSON.stringify(loyalizeData.commission_details, null, 2)}
+                                        </div>
                                       </div>
                                     )}
 

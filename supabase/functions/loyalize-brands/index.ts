@@ -237,37 +237,44 @@ async function getBrandDetails(brandId: string, apiKey: string): Promise<Respons
       const storeData = await response.json();
       console.log(`✅ Successfully fetched brand details: ${storeData.name}`);
       console.log(`📋 Raw API response fields:`, Object.keys(storeData));
-      console.log(`💰 Commission fields:`, {
-        commissionRate: storeData.commissionRate,
+      console.log(`💰 Commission structure:`, {
         commission: storeData.commission,
-        rate: storeData.rate,
-        payoutRate: storeData.payoutRate
+        commissionDetails: storeData.commissionDetails,
+        commissionRate: storeData.commissionRate
       });
       
-      // Try to extract commission rate from multiple possible fields
+      // Parse commission - can be one-time flat payment or ongoing percentage
       let commissionRate = 0;
-      if (storeData.commissionRate) {
-        commissionRate = storeData.commissionRate;
-      } else if (storeData.commission) {
-        commissionRate = storeData.commission;
-      } else if (storeData.payoutRate) {
-        commissionRate = storeData.payoutRate;
+      let commissionType = 'percentage'; // 'percentage' or 'flat'
+      let commissionValue = null;
+      let commissionCurrency = null;
+      
+      // Check if commission is an object with value and format
+      if (storeData.commission && typeof storeData.commission === 'object') {
+        if (storeData.commission.format === 'USD' || storeData.commission.format === 'EUR' || storeData.commission.format === 'GBP') {
+          // One-time flat payment
+          commissionType = 'flat';
+          commissionValue = parseFloat(storeData.commission.value);
+          commissionCurrency = storeData.commission.format;
+          console.log(`💵 Flat commission: ${commissionCurrency} ${commissionValue}`);
+        } else if (storeData.commission.format === '%') {
+          // Percentage commission
+          commissionType = 'percentage';
+          commissionRate = parseFloat(storeData.commission.value);
+          console.log(`📊 Percentage commission: ${commissionRate}%`);
+        }
+      } else if (storeData.commissionRate) {
+        // Direct commission rate
+        commissionType = 'percentage';
+        commissionRate = storeData.commissionRate * 100;
+        console.log(`📊 Direct commission rate: ${commissionRate}%`);
       }
       
-      // If still 0, try to get from database
-      let dbCommission = null;
-      if (commissionRate === 0) {
-        console.log(`⚠️ No commission rate in API, checking database for loyalize_id: ${brandId}`);
-        const { data: dbBrand } = await supabaseClient
-          .from('brands')
-          .select('commission_rate')
-          .eq('loyalize_id', brandId)
-          .single();
-        
-        if (dbBrand?.commission_rate) {
-          dbCommission = dbBrand.commission_rate;
-          console.log(`📊 Found DB commission rate: ${dbCommission}%`);
-        }
+      // Extract commission details if available
+      let commissionDetails = null;
+      if (storeData.commissionDetails) {
+        commissionDetails = storeData.commissionDetails;
+        console.log(`📝 Commission details:`, commissionDetails);
       }
       
       // Transform to a clean format for display
@@ -275,11 +282,15 @@ async function getBrandDetails(brandId: string, apiKey: string): Promise<Respons
         id: storeData.id?.toString() || brandId,
         name: storeData.name || 'Unknown Store',
         description: storeData.description || storeData.tagline || '',
-        commission_rate: dbCommission || (commissionRate * 100), // Use DB or convert API percentage
+        commission_type: commissionType,
+        commission_rate: commissionType === 'percentage' ? commissionRate : 0,
+        commission_value: commissionValue,
+        commission_currency: commissionCurrency,
+        commission_details: commissionDetails,
         category: storeData.categories?.[0] || 'General',
         website_url: storeData.homePage || '',
         status: 'active',
-        terms: storeData.terms || storeData.termsAndConditions || '',
+        terms: storeData.storeTerms || storeData.generalTerms || storeData.specificTerms || '',
         cookie_duration: storeData.cookieDuration || storeData.cookieLength || 30,
         countries: storeData.countries || ['US'],
         tracking_url: storeData.trackingUrl || ''
