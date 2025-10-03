@@ -275,6 +275,28 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             </div>
           </div>
 
+          {/* Minimum Purchase Warning - Moved here for visibility */}
+          {parseFloat(usdAmount) < MINIMUM_USD_AMOUNT && parseFloat(usdAmount) > 0 && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 -mt-2">
+              <p className="text-sm text-destructive font-medium">
+                Minimum purchase: ${MINIMUM_USD_AMOUNT}.00 ({minimumNCTRAmount.toLocaleString()} NCTR)
+              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-muted-foreground">
+                  Current: ${parseFloat(usdAmount).toFixed(2)} ({parseFloat(nctrAmount || '0').toLocaleString()} NCTR)
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickAmount(minimumNCTRAmount)}
+                  className="h-7 text-xs"
+                >
+                  Set to minimum
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Current Wholesale Price */}
           <div className="bg-muted/50 p-3 rounded-lg">
             <div className="flex items-center justify-between text-sm">
@@ -370,29 +392,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                   )}
                 </div>
               </div>
-            </>
-          )}
-
-          {/* Minimum Purchase Warning */}
-          {parseFloat(usdAmount) < MINIMUM_USD_AMOUNT && parseFloat(usdAmount) > 0 && (
-            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
-              <p className="text-sm text-destructive font-medium">
-                Minimum purchase amount is ${MINIMUM_USD_AMOUNT}.00 ({minimumNCTRAmount.toLocaleString()} NCTR)
-              </p>
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-muted-foreground">
-                  Current: ${parseFloat(usdAmount).toFixed(2)} ({parseFloat(nctrAmount || '0').toLocaleString()} NCTR)
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleQuickAmount(minimumNCTRAmount)}
-                  className="h-7 text-xs"
-                >
-                  Set to minimum
-                </Button>
-              </div>
-            </div>
+          </>
           )}
 
           {/* Action Button */}
