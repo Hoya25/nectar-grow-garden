@@ -98,7 +98,8 @@ const BrandSearchInterface = ({
         .select('id, name, logo_url, description, category, website_url, commission_rate, nctr_per_dollar, is_active, featured, loyalize_id')
         .eq('is_active', true)
         .order('featured', { ascending: false })
-        .order('name');
+        .order('name')
+        .limit(10000); // Increased limit to load all brands (currently 6,824 active)
 
       if (error) {
         console.error('🔍 [BrandSearch] Supabase error fetching brands:', error);
