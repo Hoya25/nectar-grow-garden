@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-garden-new.jpg";
 import nctrLogo from "@/assets/nctr-n-transparent.png";
 import nctrOverlay from "@/assets/nctr-n-overlay.png";
-import { BaseBadge } from "@/components/BaseBadge";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -21,11 +20,6 @@ const Hero = () => {
       {/* Content with Premium Animations */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          {/* Built on Base Badge */}
-          <div className="flex justify-center mb-4 animate-fade-in-up">
-            <BaseBadge variant="dark" size="sm" className="text-white/90" />
-          </div>
-          
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in-up drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)'}}>
             Everyday Crypto for{" "}
             <span className="text-yellow-300 animate-gradient-shift bg-[length:200%_200%] drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
