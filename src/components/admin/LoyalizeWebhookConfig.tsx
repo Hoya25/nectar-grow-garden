@@ -14,8 +14,8 @@ export const LoyalizeWebhookConfig = () => {
   const [testing, setTesting] = useState(false);
   const [selectedTxId, setSelectedTxId] = useState('');
   
-  // The webhook URL that Loyalize needs to call
-  const webhookUrl = 'https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-transaction-sync';
+  // The webhook URL that Loyalize needs to call - this handles ALL brands
+  const webhookUrl = 'https://rndivcsonsojgelzewkb.supabase.co/functions/v1/transaction-webhooks';
   
   const copyWebhookUrl = async () => {
     try {
