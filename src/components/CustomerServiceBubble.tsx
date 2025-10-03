@@ -17,24 +17,36 @@ export const CustomerServiceBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenChat = () => {
-    // Open Tidio chat widget
-    if (window.tidioChatApi) {
-      console.log('Opening Tidio chat...');
-      window.tidioChatApi.display(true);
-      window.tidioChatApi.open();
-      setIsOpen(false);
+    console.log('🔵 Customer service button clicked');
+    
+    // Check if Tidio is available
+    if (typeof window !== 'undefined' && window.tidioChatApi) {
+      console.log('✅ Tidio API is available, opening chat...');
+      try {
+        // First show the widget
+        window.tidioChatApi.display(true);
+        // Then open it
+        window.tidioChatApi.open();
+        // Close our custom popup
+        setIsOpen(false);
+        console.log('✅ Tidio chat opened successfully');
+      } catch (error) {
+        console.error('❌ Error opening Tidio:', error);
+      }
     } else {
-      console.error('Tidio chat API not available yet');
-      // Fallback: wait a moment and try again
+      console.warn('⚠️ Tidio API not available, will retry...');
+      // Tidio might not be loaded yet, retry after a short delay
       setTimeout(() => {
-        if (window.tidioChatApi) {
+        if (typeof window !== 'undefined' && window.tidioChatApi) {
+          console.log('✅ Tidio API now available after retry');
           window.tidioChatApi.display(true);
           window.tidioChatApi.open();
           setIsOpen(false);
         } else {
-          console.error('Tidio still not loaded after retry');
+          console.error('❌ Tidio API still not available after retry');
+          alert('Chat system is loading, please try again in a moment.');
         }
-      }, 1000);
+      }, 1500);
     }
   };
 
