@@ -840,10 +840,42 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       console.log('✅ Window.open called');
       
       // Enhanced notification with tracking confirmation
-      const rewardRate = opportunity.reward_per_dollar || 50;
+      // Calculate actual reward display based on distribution type
+      let rewardDescription = '';
+      
+      if (opportunity.reward_distribution_type === 'combined') {
+        // For combined distribution, show the per-dollar breakdown
+        const perDollarRewards = [];
+        if (opportunity.available_nctr_reward && opportunity.available_nctr_reward > 0) {
+          perDollarRewards.push(`${opportunity.available_nctr_reward} NCTR (available)`);
+        }
+        if (opportunity.lock_90_nctr_reward && opportunity.lock_90_nctr_reward > 0) {
+          perDollarRewards.push(`${opportunity.lock_90_nctr_reward} NCTR (90LOCK)`);
+        }
+        if (opportunity.lock_360_nctr_reward && opportunity.lock_360_nctr_reward > 0) {
+          perDollarRewards.push(`${opportunity.lock_360_nctr_reward} NCTR (360LOCK)`);
+        }
+        
+        const totalPerDollar = (opportunity.available_nctr_reward || 0) + 
+                               (opportunity.lock_90_nctr_reward || 0) + 
+                               (opportunity.lock_360_nctr_reward || 0);
+        
+        rewardDescription = `Shop normally and earn ${totalPerDollar} NCTR per $1 spent (${perDollarRewards.join(' + ')})`;
+      } else if (opportunity.reward_distribution_type === 'available') {
+        rewardDescription = `Shop normally and earn ${opportunity.available_nctr_reward || 0} NCTR per $1 spent (available immediately)`;
+      } else if (opportunity.reward_distribution_type === 'lock_90') {
+        rewardDescription = `Shop normally and earn ${opportunity.lock_90_nctr_reward || 0} NCTR per $1 spent (90LOCK)`;
+      } else if (opportunity.reward_distribution_type === 'lock_360') {
+        rewardDescription = `Shop normally and earn ${opportunity.lock_360_nctr_reward || 0} NCTR per $1 spent (360LOCK)`;
+      } else {
+        // Legacy mode - use reward_per_dollar
+        const rewardRate = opportunity.reward_per_dollar || 50;
+        rewardDescription = `Shop normally and earn ${rewardRate} NCTR per $1 spent`;
+      }
+      
       toast({
         title: `✅ ${opportunity.partner_name || 'Partner'} - Tracking Active!`,
-        description: `Shop normally and earn ${rewardRate} NCTR per $1 spent. Complete your purchase in the new tab - your rewards will appear automatically within 24-48 hours.\n\nTracking ID: ${trackingId}`,
+        description: `${rewardDescription}. Complete your purchase in the new tab - your rewards will appear automatically within 24-48 hours.\n\nTracking ID: ${trackingId}`,
         duration: 8000,
         className: "border-green-500 bg-green-50 dark:bg-green-950",
       });
