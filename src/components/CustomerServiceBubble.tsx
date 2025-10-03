@@ -19,8 +19,22 @@ export const CustomerServiceBubble = () => {
   const handleOpenChat = () => {
     // Open Tidio chat widget
     if (window.tidioChatApi) {
+      console.log('Opening Tidio chat...');
+      window.tidioChatApi.display(true);
       window.tidioChatApi.open();
       setIsOpen(false);
+    } else {
+      console.error('Tidio chat API not available yet');
+      // Fallback: wait a moment and try again
+      setTimeout(() => {
+        if (window.tidioChatApi) {
+          window.tidioChatApi.display(true);
+          window.tidioChatApi.open();
+          setIsOpen(false);
+        } else {
+          console.error('Tidio still not loaded after retry');
+        }
+      }, 1000);
     }
   };
 
