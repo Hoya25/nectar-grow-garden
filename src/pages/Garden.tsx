@@ -1063,20 +1063,20 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center justify-between">
-              <div className="flex flex-col items-start gap-1">
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <h1 className="text-xl sm:text-2xl font-bold nctr-text">
-                    The Garden
-                  </h1>
+              <div className="flex items-center space-x-4">
+                <h1 className="text-xl sm:text-2xl font-bold nctr-text">
+                  The Garden
+                </h1>
+                {/* NCTR Logo + Base Badge stacked vertically */}
+                <div className="flex flex-col items-center gap-0">
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
-                    className="h-16 sm:h-28 w-auto opacity-90"
+                    className="h-16 sm:h-24 w-auto opacity-90"
                   />
-                </div>
-                {/* Built on Base Badge - Under NCTR */}
-                <div className="hidden sm:flex ml-auto">
-                  <BaseBadge size="sm" variant="light" asLink={false} />
+                  <div className="hidden sm:flex -mt-1">
+                    <BaseBadge size="sm" variant="light" asLink={false} />
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
