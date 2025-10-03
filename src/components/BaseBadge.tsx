@@ -12,9 +12,9 @@ export const BaseBadge = ({
   className = ''
 }: BaseBadgeProps) => {
   const sizeClasses = {
-    sm: { logo: 'h-5', text: 'text-sm' },
-    md: { logo: 'h-6', text: 'text-base' },
-    lg: { logo: 'h-7', text: 'text-lg' }
+    sm: { logo: 'h-5', text: 'text-lg' },
+    md: { logo: 'h-6', text: 'text-xl' },
+    lg: { logo: 'h-7', text: 'text-2xl' }
   };
 
   const filterClasses = variant === 'dark' 
@@ -28,7 +28,7 @@ export const BaseBadge = ({
       href="https://www.base.org/" 
       target="_blank" 
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-2 opacity-70 hover:opacity-100 transition-all duration-300 group ${className}`}
+      className={`inline-flex items-end gap-2 opacity-70 hover:opacity-100 transition-all duration-300 group ${className}`}
     >
       <span className={`font-medium ${sizes.text} leading-none`}>
         Built on
@@ -36,7 +36,7 @@ export const BaseBadge = ({
       <img 
         src={baseLogo} 
         alt="Base" 
-        className={`w-auto ${sizes.logo} ${filterClasses} transition-all duration-300 translate-y-[1px]`}
+        className={`w-auto ${sizes.logo} ${filterClasses} transition-all duration-300`}
       />
     </a>
   );
