@@ -181,8 +181,9 @@ const BrandSearchInterface = ({
             size="sm"
             onClick={() => {
               fetchBrands();
-              setSearchTerm('');
-              setSelectedCategory('all');
+              if (searchTerm) {
+                setShowDropdown(true);
+              }
             }}
             disabled={loading}
             className="h-7 gap-2"

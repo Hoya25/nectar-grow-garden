@@ -780,79 +780,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
               </DialogHeader>
               
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Basic Info */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Opportunity Title *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      placeholder="e.g., Nike Shopping Rewards"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="opportunity_type">Type *</Label>
-                    <Select
-                      value={formData.opportunity_type}
-                      onValueChange={(value) => setFormData({...formData, opportunity_type: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="shopping">Shopping Rewards</SelectItem>
-                        <SelectItem value="invite">Invite Friends</SelectItem>
-                        <SelectItem value="partner">Partner Bonus</SelectItem>
-                        <SelectItem value="bonus">Special Bonus</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="display_order">Display Order</Label>
-                    <Input
-                      id="display_order"
-                      type="number"
-                      min="1"
-                      value={formData.display_order}
-                      onChange={(e) => setFormData({...formData, display_order: parseInt(e.target.value) || 1})}
-                      placeholder="1"
-                    />
-                    <div className="text-xs text-muted-foreground">
-                      Lower numbers appear first
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Describe what users need to do to earn NCTR..."
-                    rows={3}
-                  />
-                </div>
-
-                {/* Affiliate Link - Manual Override */}
-                <div className="space-y-2">
-                  <Label htmlFor="affiliate_link">Affiliate/Tracking Link</Label>
-                  <Input
-                    id="affiliate_link"
-                    value={formData.affiliate_link}
-                    onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
-                    placeholder="https://..."
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    The tracking URL users will be redirected to. Can be manually updated here.
-                  </p>
-                </div>
-
-                {/* Brand Selection */}
+                {/* Brand Selection - MOVED TO TOP */}
                 <div className="bg-section-highlight p-4 rounded-lg space-y-4">
                   <h4 className="font-semibold text-foreground flex items-center gap-2">
                     <ShoppingBag className="w-4 h-4" />
@@ -1102,6 +1030,78 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       💡 Tip: Use "Find Brands" tab to search and add new brands from Loyalize, or upload/link brand logos directly
                     </div>
                   </div>
+                </div>
+
+                {/* Basic Info */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Opportunity Title *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      placeholder="e.g., Nike Shopping Rewards"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="opportunity_type">Type *</Label>
+                    <Select
+                      value={formData.opportunity_type}
+                      onValueChange={(value) => setFormData({...formData, opportunity_type: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="shopping">Shopping Rewards</SelectItem>
+                        <SelectItem value="invite">Invite Friends</SelectItem>
+                        <SelectItem value="partner">Partner Bonus</SelectItem>
+                        <SelectItem value="bonus">Special Bonus</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="display_order">Display Order</Label>
+                    <Input
+                      id="display_order"
+                      type="number"
+                      min="1"
+                      value={formData.display_order}
+                      onChange={(e) => setFormData({...formData, display_order: parseInt(e.target.value) || 1})}
+                      placeholder="1"
+                    />
+                    <div className="text-xs text-muted-foreground">
+                      Lower numbers appear first
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    placeholder="Describe what users need to do to earn NCTR..."
+                    rows={3}
+                  />
+                </div>
+
+                {/* Affiliate Link - Manual Override */}
+                <div className="space-y-2">
+                  <Label htmlFor="affiliate_link">Affiliate/Tracking Link</Label>
+                  <Input
+                    id="affiliate_link"
+                    value={formData.affiliate_link}
+                    onChange={(e) => setFormData({...formData, affiliate_link: e.target.value})}
+                    placeholder="https://..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    The tracking URL users will be redirected to. Can be manually updated here.
+                  </p>
                 </div>
 
                 {/* NCTR Bounty Configuration */}
