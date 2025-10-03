@@ -150,49 +150,49 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                 </DialogContent>
               </Dialog>
 
-              {/* Buy NCTR or Upgrade Action */}
-              {!isDiamondStatus ? (
-                <LevelUpModal
-                  currentStatus={currentStatus}
-                  current360NCTR={current360NCTR}
-                  availableNCTR={availableNCTR}
-                  nextStatusInfo={{
-                    status: nextStatus.status,
-                    required: nextStatus.required,
-                    multiplier: getMultiplier(nextStatus.status)
-                  }}
-                  onEarnMoreClick={() => {
-                    // Scroll to earning opportunities section
-                    const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
-                    if (opportunitiesSection) {
-                      opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                    onEarnMoreClick?.();
-                  }}
-                  onLockCommitmentClick={onUpgradeClick}
-                >
-                  <Button 
+              {/* Buy NCTR or Upgrade Action - Desktop Only */}
+              <div className="hidden sm:flex">
+                {!isDiamondStatus ? (
+                  <LevelUpModal
+                    currentStatus={currentStatus}
+                    current360NCTR={current360NCTR}
+                    availableNCTR={availableNCTR}
+                    nextStatusInfo={{
+                      status: nextStatus.status,
+                      required: nextStatus.required,
+                      multiplier: getMultiplier(nextStatus.status)
+                    }}
+                    onEarnMoreClick={() => {
+                      // Scroll to earning opportunities section
+                      const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
+                      if (opportunitiesSection) {
+                        opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                      onEarnMoreClick?.();
+                    }}
+                    onLockCommitmentClick={onUpgradeClick}
+                  >
+                    <Button 
+                      size="sm"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                    >
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      Level Up
+                    </Button>
+                  </LevelUpModal>
+                ) : (
+                  <BuyNCTRButton 
                     size="sm"
                     className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                    suggestedAmount={2500}
+                    currentStatus={currentStatus}
+                    current360Lock={current360NCTR}
                   >
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    <span className="hidden sm:inline">Level Up</span>
-                    <span className="sm:hidden">Up</span>
-                  </Button>
-                </LevelUpModal>
-              ) : (
-                <BuyNCTRButton 
-                  size="sm"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  suggestedAmount={2500}
-                  currentStatus={currentStatus}
-                  current360Lock={current360NCTR}
-                >
-                  <Zap className="w-4 h-4 mr-1" />
-                  <span className="hidden sm:inline">Level Up, Buy NCTR</span>
-                  <span className="sm:hidden">Level Up</span>
-                </BuyNCTRButton>
-              )}
+                    <Zap className="w-4 h-4 mr-1" />
+                    Level Up, Buy NCTR
+                  </BuyNCTRButton>
+                )}
+              </div>
             </div>
           </div>
           
