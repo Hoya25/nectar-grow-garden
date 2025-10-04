@@ -873,6 +873,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                               
                               setFormData({
                                 ...formData,
+                                brand_id: brand.id, // CRITICAL: Link the brand_id
                                 partner_name: brand.name,
                                 partner_logo_url: brand.logo_url || '',
                                 affiliate_link: trackingLink,
