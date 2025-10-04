@@ -781,16 +781,25 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
           </Select>
           
           <Dialog open={modalOpen} onOpenChange={(open) => {
+            console.log('🔔 Dialog onOpenChange called:', { open, loading, editingOpportunity: !!editingOpportunity });
             // Prevent closing dialog during form submission
             if (!loading) {
               if (open && !editingOpportunity) {
+                console.log('🔄 Calling resetForm because dialog is opening for new opportunity');
                 resetForm();
               }
+              console.log('✅ Setting modalOpen to:', open);
               setModalOpen(open);
+            } else {
+              console.log('⚠️ Not opening dialog because loading is true');
             }
           }}>
             <DialogTrigger asChild>
               <Button 
+                onClick={() => {
+                  console.log('🖱️ Create New Opportunity button clicked!');
+                  console.log('📊 Current state:', { modalOpen, loading, editingOpportunity: !!editingOpportunity });
+                }}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
