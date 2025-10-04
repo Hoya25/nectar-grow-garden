@@ -1063,9 +1063,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 sm:space-x-3">
-                <h1 className="text-xl sm:text-2xl font-bold nctr-text">
-                  The Garden
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl sm:text-2xl font-bold nctr-text">
+                    The Garden
+                  </h1>
+                  <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
+                    BETA
+                  </Badge>
+                </div>
                 <img 
                   src={nctrLogo} 
                   alt="NCTR" 
