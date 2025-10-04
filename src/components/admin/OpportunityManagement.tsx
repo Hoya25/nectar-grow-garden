@@ -427,27 +427,31 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
       if (editingOpportunity) {
         console.log('🔄 Updating opportunity:', editingOpportunity.id, submitData);
+        console.log('🔗 Brand ID being saved:', submitData.brand_id);
         
         try {
-          console.log('🏁 About to call secure function...');
-          const { data, error } = await supabase.rpc('update_opportunity_secure', {
-            opportunity_id: editingOpportunity.id,
-            opportunity_data: submitData
-          });
+          console.log('🏁 About to update opportunity...');
+          
+          // Direct update to ensure all fields are saved properly
+          const { data, error } = await supabase
+            .from('earning_opportunities')
+            .update(submitData)
+            .eq('id', editingOpportunity.id)
+            .select();
 
-          console.log('💾 Function response:', { data, error });
+          console.log('💾 Update response:', { data, error });
 
           if (error) {
-            console.error('❌ Function error:', error);
+            console.error('❌ Update error:', error);
             throw error;
           }
 
           if (!data || data.length === 0) {
-            console.error('❌ No rows were updated by the function');
+            console.error('❌ No rows were updated');
             throw new Error(`Failed to update opportunity. This may be due to insufficient permissions or the record not existing.`);
           }
           
-          console.log('✅ Update successful! Updated rows:', data.length);
+          console.log('✅ Update successful! Updated data:', data[0]);
         } catch (dbError) {
           console.error('💥 Database update failed:', dbError);
           throw dbError;
