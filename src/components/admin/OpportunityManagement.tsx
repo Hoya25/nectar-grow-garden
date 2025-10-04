@@ -462,6 +462,8 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
             .single();
           
           console.log('🔍 Verification query result:', { verifyData, verifyError });
+          console.log('✅ VERIFICATION - brand_id in database:', verifyData?.brand_id);
+          console.log('✅ VERIFICATION - Expected brand_id:', submitData.brand_id);
           
         } catch (dbError: any) {
           console.error('💥 Database update failed:', dbError);
@@ -939,7 +941,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                         <Select
                           value={formData.brand_id || ''}
                           onValueChange={(value) => {
+                            console.log('🔵 Manual brand select changed:', value);
                             const selectedBrand = brands.find(b => b.id === value);
+                            console.log('🔵 Found brand:', selectedBrand);
                             setFormData({
                               ...formData, 
                               brand_id: value || null,
@@ -952,11 +956,15 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             <SelectValue placeholder="Select a brand..." />
                           </SelectTrigger>
                           <SelectContent className="max-h-[300px]">
-                            {brands.map(brand => (
-                              <SelectItem key={brand.id} value={brand.id}>
-                                {brand.name}
-                              </SelectItem>
-                            ))}
+                            {brands.length === 0 ? (
+                              <SelectItem value="none" disabled>No brands available</SelectItem>
+                            ) : (
+                              brands.map(brand => (
+                                <SelectItem key={brand.id} value={brand.id}>
+                                  {brand.name}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                         <p className="text-xs text-muted-foreground">
@@ -964,6 +972,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             `✅ Brand linked: ${brands.find(b => b.id === formData.brand_id)?.name}` : 
                             '⚠️ Shopping opportunities need a brand link to appear in The Garden'
                           }
+                        </p>
+                        <p className="text-xs text-blue-600">
+                          {brands.length} brands loaded. Current selection: {formData.brand_id || 'none'}
                         </p>
                       </div>
                       
