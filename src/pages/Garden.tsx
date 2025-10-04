@@ -1074,7 +1074,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
               <img 
                 src={nctrLogo} 
                 alt="NCTR" 
-                className="h-10 sm:h-12 w-auto opacity-90"
+                className="h-12 sm:h-16 w-auto opacity-90"
               />
             </div>
             
