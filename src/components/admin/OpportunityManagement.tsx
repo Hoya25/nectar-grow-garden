@@ -783,12 +783,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
           <Dialog open={modalOpen} onOpenChange={(open) => {
             // Prevent closing dialog during form submission
             if (!loading) {
+              if (open && !editingOpportunity) {
+                resetForm();
+              }
               setModalOpen(open);
             }
           }}>
             <DialogTrigger asChild>
               <Button 
-                onClick={resetForm}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
               >
                 <Plus className="w-4 h-4 mr-2" />
