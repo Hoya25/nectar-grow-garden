@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { z } from 'zod';
 import BrandSearchInterface from './BrandSearchInterface';
 import ImpactBrandSearch from './ImpactBrandSearch';
 import {
@@ -82,6 +83,37 @@ interface Brand {
 interface OpportunityManagementProps {
   onStatsUpdate: () => void;
 }
+
+// Security: Comprehensive input validation schema
+const opportunitySchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  description: z.string().trim().max(2000, "Description must be less than 2000 characters").optional(),
+  opportunity_type: z.string().min(1, "Type is required"),
+  nctr_reward: z.number().min(0, "Reward must be positive").max(1000000, "Reward exceeds maximum").finite(),
+  reward_per_dollar: z.number().min(0, "Rate must be positive").max(1000, "Rate exceeds maximum").finite(),
+  partner_name: z.string().trim().max(100, "Partner name must be less than 100 characters").optional(),
+  partner_logo_url: z.string().trim().max(500, "Logo URL must be less than 500 characters").optional(),
+  affiliate_link: z.string().trim().max(500, "Affiliate link must be less than 500 characters")
+    .refine((url) => {
+      if (!url) return true; // Optional field
+      // Allow only http://, https://, or placeholder URLs
+      return url.startsWith('http://') || url.startsWith('https://') || url.includes('{{');
+    }, "Invalid URL format. Must use http:// or https://").optional(),
+  video_url: z.string().trim().max(500, "Video URL must be less than 500 characters")
+    .refine((url) => {
+      if (!url) return true; // Optional field
+      return url.startsWith('http://') || url.startsWith('https://');
+    }, "Invalid URL format. Must use http:// or https://").optional(),
+  video_title: z.string().trim().max(200, "Video title must be less than 200 characters").optional(),
+  video_description: z.string().trim().max(1000, "Video description must be less than 1000 characters").optional(),
+  display_order: z.number().int().min(0, "Display order must be positive").max(999, "Display order exceeds maximum"),
+  brand_id: z.string().uuid().nullable().optional(),
+  available_nctr_reward: z.number().min(0).max(1000000).finite().optional(),
+  lock_90_nctr_reward: z.number().min(0).max(1000000).finite().optional(),
+  lock_360_nctr_reward: z.number().min(0).max(1000000).finite().optional(),
+  reward_distribution_type: z.string().optional(),
+  is_active: z.boolean()
+});
 
 const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) => {
   const { logActivity } = useAdmin();
@@ -402,6 +434,21 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     console.log('✏️ Editing opportunity ID:', editingOpportunity?.id);
     console.log('🖼️ Logo file present:', !!logoFile);
     console.log('🆕 Creating new:', !editingOpportunity);
+    
+    // Security: Validate all inputs before submission
+    try {
+      opportunitySchema.parse(formData);
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        const firstError = validationError.issues[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
     
     setLoading(true);
 
