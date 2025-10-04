@@ -10,9 +10,12 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BrandLogo } from '@/components/ui/brand-logo';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 import BrandSearchInterface from './BrandSearchInterface';
 import ImpactBrandSearch from './ImpactBrandSearch';
 import {
@@ -33,7 +36,9 @@ import {
   ChevronUp,
   ChevronDown,
   ArrowUpDown,
-  RefreshCw
+  RefreshCw,
+  ChevronsUpDown,
+  Check
 } from 'lucide-react';
 
 interface EarningOpportunity {
@@ -940,35 +945,53 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="brand_select">Link to Brand (Required for Shopping)</Label>
-                        <Select
-                          value={formData.brand_id || ''}
-                          onValueChange={(value) => {
-                            console.log('🔵 Manual brand select changed:', value);
-                            const selectedBrand = brands.find(b => b.id === value);
-                            console.log('🔵 Found brand:', selectedBrand);
-                            setFormData({
-                              ...formData, 
-                              brand_id: value || null,
-                              partner_name: selectedBrand?.name || formData.partner_name,
-                              partner_logo_url: selectedBrand?.logo_url || formData.partner_logo_url
-                            });
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a brand..." />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-[300px]">
-                            {brands.length === 0 ? (
-                              <SelectItem value="none" disabled>No brands available</SelectItem>
-                            ) : (
-                              brands.map(brand => (
-                                <SelectItem key={brand.id} value={brand.id}>
-                                  {brand.name}
-                                </SelectItem>
-                              ))
-                            )}
-                          </SelectContent>
-                        </Select>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between"
+                            >
+                              {formData.brand_id
+                                ? brands.find(b => b.id === formData.brand_id)?.name
+                                : "Select a brand..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0 pointer-events-auto" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search brands..." className="h-9" />
+                              <CommandList>
+                                <CommandEmpty>No brand found.</CommandEmpty>
+                                <CommandGroup>
+                                  {brands.map((brand) => (
+                                    <CommandItem
+                                      key={brand.id}
+                                      value={brand.name}
+                                      onSelect={() => {
+                                        console.log('🔵 Brand selected:', brand.name);
+                                        setFormData({
+                                          ...formData,
+                                          brand_id: brand.id,
+                                          partner_name: brand.name,
+                                          partner_logo_url: brand.logo_url || formData.partner_logo_url
+                                        });
+                                      }}
+                                    >
+                                      {brand.name}
+                                      <Check
+                                        className={cn(
+                                          "ml-auto h-4 w-4",
+                                          formData.brand_id === brand.id ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         <p className="text-xs text-muted-foreground">
                           {formData.brand_id ? 
                             `✅ Brand linked: ${brands.find(b => b.id === formData.brand_id)?.name}` : 
