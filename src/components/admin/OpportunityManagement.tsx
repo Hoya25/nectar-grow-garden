@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -807,11 +807,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
               </Button>
             </DialogTrigger>
             
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-[9999]">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto !bg-white dark:!bg-gray-900 !border-4 !border-red-500">
               <DialogHeader>
                 <DialogTitle className="text-xl text-foreground">
                   {editingOpportunity ? 'Edit Opportunity' : 'Create New Opportunity'}
                 </DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground">
+                  Fill out the form below to {editingOpportunity ? 'update' : 'create'} an earning opportunity.
+                </DialogDescription>
               </DialogHeader>
               
               <form onSubmit={handleSubmit} className="space-y-6">
