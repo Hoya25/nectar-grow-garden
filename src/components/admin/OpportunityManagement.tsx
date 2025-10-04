@@ -426,35 +426,47 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       console.log('🎯 About to process database operation...');
 
       if (editingOpportunity) {
-        console.log('🔄 Updating opportunity:', editingOpportunity.id, submitData);
+        console.log('🔄 Updating opportunity:', editingOpportunity.id);
+        console.log('📦 Submit data:', JSON.stringify(submitData, null, 2));
         console.log('🔗 Brand ID being saved:', submitData.brand_id);
         
         try {
-          console.log('🏁 About to update opportunity...');
+          console.log('🏁 About to update opportunity with brand_id:', submitData.brand_id);
           
-          // Direct update to ensure all fields are saved properly
-          const { data, error } = await supabase
-            .from('earning_opportunities')
-            .update(submitData)
-            .eq('id', editingOpportunity.id)
-            .select();
+          // Try using the secure update function that respects admin permissions
+          const { data, error } = await supabase.rpc('update_opportunity_secure', {
+            opportunity_id: editingOpportunity.id,
+            opportunity_data: submitData
+          });
 
-          console.log('💾 Update response:', { data, error });
+          console.log('💾 RPC response:', { data, error });
 
           if (error) {
-            console.error('❌ Update error:', error);
-            throw error;
+            console.error('❌ RPC error:', error);
+            console.error('❌ Error details:', JSON.stringify(error, null, 2));
+            throw new Error(`Database error: ${error.message || 'Unknown error'}`);
           }
 
-          if (!data || data.length === 0) {
-            console.error('❌ No rows were updated');
-            throw new Error(`Failed to update opportunity. This may be due to insufficient permissions or the record not existing.`);
+          if (!data) {
+            console.error('❌ No data returned from RPC');
+            throw new Error('Update failed - no data returned. Check admin permissions.');
           }
           
-          console.log('✅ Update successful! Updated data:', data[0]);
-        } catch (dbError) {
+          console.log('✅ Update successful via RPC!');
+          
+          // Verify the update by fetching the record
+          const { data: verifyData, error: verifyError } = await supabase
+            .from('earning_opportunities')
+            .select('id, brand_id, partner_name')
+            .eq('id', editingOpportunity.id)
+            .single();
+          
+          console.log('🔍 Verification query result:', { verifyData, verifyError });
+          
+        } catch (dbError: any) {
           console.error('💥 Database update failed:', dbError);
-          throw dbError;
+          console.error('💥 Full error:', JSON.stringify(dbError, null, 2));
+          throw new Error(`Failed to update opportunity: ${dbError.message || 'Unknown error'}. Check console for details.`);
         }
 
         try {
