@@ -177,7 +177,10 @@ const Header = () => {
           )}
         </nav>
 
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center gap-2">
+          <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20">
+            BETA
+          </Badge>
           {user ? (
             <div className="flex items-center gap-2">
               <Dialog>
