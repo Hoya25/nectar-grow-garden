@@ -807,7 +807,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
               </Button>
             </DialogTrigger>
             
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-[9999]">
               <DialogHeader>
                 <DialogTitle className="text-xl text-foreground">
                   {editingOpportunity ? 'Edit Opportunity' : 'Create New Opportunity'}
