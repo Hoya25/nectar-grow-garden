@@ -48,13 +48,13 @@ const Footer = () => {
               </div>
               
               <div className="flex items-center gap-6">
-                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300">
+                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300 bg-transparent">
                   Privacy Policy
                 </button>
-                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300">
+                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300 bg-transparent">
                   Terms of Service  
                 </button>
-                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300">
+                <button className="text-background/70 hover:text-background hover:scale-110 transition-all duration-300 bg-transparent">
                   Contact
                 </button>
               </div>
