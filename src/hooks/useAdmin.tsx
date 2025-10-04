@@ -23,14 +23,9 @@ export const useAdmin = () => {
       return;
     }
 
-    // Only check admin status if user is anderson@projectbutterfly.io
-    if (user.email === 'anderson@projectbutterfly.io') {
-      checkAdminStatus();
-    } else {
-      setIsAdmin(false);
-      setAdminUser(null);
-      setLoading(false);
-    }
+    // Check admin status for all authenticated users
+    // RLS policies will naturally return empty for non-admins
+    checkAdminStatus();
   }, [user]);
 
   const checkAdminStatus = async () => {
