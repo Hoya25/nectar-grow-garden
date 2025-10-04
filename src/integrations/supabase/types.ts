@@ -1015,6 +1015,14 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: Json
       }
+      create_admin_user_secure: {
+        Args: {
+          p_access_level: string
+          p_access_reason?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       create_secure_referral: {
         Args: { p_referral_code: string; p_referred_user_id: string }
         Returns: Json
@@ -1470,6 +1478,10 @@ export type Database = {
         Args: { p_referral_id: string }
         Returns: Json
       }
+      revoke_admin_access_secure: {
+        Args: { p_reason?: string; p_user_id: string }
+        Returns: Json
+      }
       revoke_treasury_access: {
         Args: { revocation_reason: string; target_user_id: string }
         Returns: Json
@@ -1490,6 +1502,14 @@ export type Database = {
       ultra_secure_admin_check: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      update_admin_access_secure: {
+        Args: {
+          p_new_access_level: string
+          p_reason?: string
+          p_user_id: string
+        }
+        Returns: Json
       }
       update_opportunity_admin: {
         Args: { opportunity_data: Json; opportunity_id: string }
