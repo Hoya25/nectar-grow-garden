@@ -958,10 +958,10 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-full p-0 pointer-events-auto" align="start">
+                          <PopoverContent className="w-[400px] p-0" align="start">
                             <Command>
-                              <CommandInput placeholder="Search brands..." className="h-9" />
-                              <CommandList>
+                              <CommandInput placeholder="Type to search brands..." />
+                              <CommandList className="max-h-[300px] overflow-y-auto">
                                 <CommandEmpty>No brand found.</CommandEmpty>
                                 <CommandGroup>
                                   {brands.map((brand) => (
