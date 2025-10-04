@@ -37,10 +37,13 @@
           }
         }
         
-        // Continuously hide welcome bubbles
+        // Continuously hide welcome bubbles - only check Tidio-specific elements
         const hideWelcomeBubbles = () => {
-          // Get all iframes
-          const iframes = document.querySelectorAll('iframe[id*="tidio"]');
+          // Only target elements within the #tidio-chat container
+          const tidioContainer = document.getElementById('tidio-chat');
+          if (!tidioContainer) return;
+          
+          const iframes = tidioContainer.querySelectorAll('iframe[id*="tidio"]');
           iframes.forEach(iframe => {
             try {
               // Hide any sibling divs that aren't the button
@@ -57,25 +60,13 @@
             } catch (e) {}
           });
           
-          // Hide any visible message bubbles
-          const selectors = [
-            'div[style*="position: fixed"]',
-            'div[style*="position: absolute"]'
-          ];
-          
-          selectors.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => {
-              // Check if it's a Tidio element but not the main chat button
-              if (el.innerHTML?.includes('Chat') || el.innerHTML?.includes('message')) {
-                const isButton = el.querySelector('iframe[id*="tidio-chat-code"]');
-                if (!isButton && (el.offsetWidth > 50 || el.offsetHeight > 50)) {
-                  el.style.display = 'none';
-                  el.style.visibility = 'hidden';
-                  el.style.opacity = '0';
-                  el.style.pointerEvents = 'none';
-                }
-              }
-            });
+          // Only hide message bubbles within the Tidio container
+          const messageBubbles = tidioContainer.querySelectorAll('div[data-testid*="message"], div[class*="message-bubble"]');
+          messageBubbles.forEach(el => {
+            el.style.display = 'none';
+            el.style.visibility = 'hidden';
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
           });
         };
         
@@ -90,7 +81,7 @@
     
     <!-- CSS to hide welcome bubble while keeping chat icon -->
     <style>
-      /* Aggressively hide all Tidio elements except the main button */
+      /* Only hide Tidio elements - be very specific to avoid catching dialogs */
       #tidio-chat > div:not([id*="button"]):not(iframe) {
         display: none !important;
         visibility: hidden !important;
@@ -98,8 +89,8 @@
         pointer-events: none !important;
       }
       
-      /* Hide sibling divs next to Tidio iframes */
-      iframe[id*="tidio"] ~ div {
+      /* Hide sibling divs next to Tidio iframes ONLY within tidio container */
+      #tidio-chat iframe[id*="tidio"] ~ div {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -116,13 +107,12 @@
         opacity: 1 !important;
       }
       
-      /* Hide all Tidio popups and message bubbles */
-      div[data-testid*="message"],
-      div[class*="message-bubble"],
-      div[aria-label*="Chat"],
-      div[class*="operator-message"],
-      div[class*="tidio-"] > div[style*="position: fixed"],
-      div[class*="tidio-"] > div[style*="position: absolute"] {
+      /* Hide Tidio popups/bubbles - ONLY inside #tidio-chat */
+      #tidio-chat div[data-testid*="message"],
+      #tidio-chat div[class*="message-bubble"],
+      #tidio-chat div[class*="operator-message"],
+      #tidio-chat div[class*="tidio-"] > div[style*="position: fixed"],
+      #tidio-chat div[class*="tidio-"] > div[style*="position: absolute"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
