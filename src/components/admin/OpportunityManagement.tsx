@@ -96,6 +96,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
+  const [brandPopoverOpen, setBrandPopoverOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -945,11 +946,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="brand_select">Link to Brand (Required for Shopping)</Label>
-                        <Popover>
+                        <Popover open={brandPopoverOpen} onOpenChange={setBrandPopoverOpen}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
                               role="combobox"
+                              aria-expanded={brandPopoverOpen}
                               className="w-full justify-between"
                             >
                               {formData.brand_id
@@ -976,6 +978,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                                           partner_name: brand.name,
                                           partner_logo_url: brand.logo_url || formData.partner_logo_url
                                         });
+                                        setBrandPopoverOpen(false);
                                       }}
                                     >
                                       {brand.name}
