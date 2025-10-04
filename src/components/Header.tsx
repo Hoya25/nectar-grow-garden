@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { User, Settings, Share2 } from "lucide-react";
 import ReferralSystem from "@/components/ReferralSystem";
 import { BaseBadge } from "@/components/BaseBadge";
+import { Badge } from "@/components/ui/badge";
 
 const Header = () => {
   const { user, signOut } = useAuth();
@@ -41,9 +42,12 @@ const Header = () => {
     <header className="w-full border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-minimal">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-3 cursor-pointer group"
+          <div className="flex items-center gap-3 cursor-pointer group"
             onClick={() => navigate('/')}>
             <span className="text-2xl font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300">The Garden</span>
+            <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
+              BETA
+            </Badge>
           </div>
           
           {/* Built on Base Badge - Next to logo */}
