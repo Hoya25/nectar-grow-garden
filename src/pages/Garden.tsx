@@ -1061,10 +1061,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       <header className="section-highlight backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-4">
           {/* Top Row: Logo and Actions */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-bold nctr-text">
+                <h1 className="text-xl sm:text-2xl font-bold nctr-text whitespace-nowrap">
                   The Garden
                 </h1>
                 <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
@@ -1074,11 +1074,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
               <img 
                 src={nctrLogo} 
                 alt="NCTR" 
-                className="h-12 sm:h-16 w-auto opacity-90"
+                className="h-10 sm:h-12 w-auto opacity-90"
               />
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <Button 
                 variant="outline" 
                 size="sm"
