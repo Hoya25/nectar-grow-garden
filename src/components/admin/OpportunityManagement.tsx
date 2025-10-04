@@ -434,34 +434,13 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
           console.log('🏁 About to update opportunity with brand_id:', submitData.brand_id);
           console.log('🏁 Full submit data:', JSON.stringify(submitData, null, 2));
           
-          // Use direct UPDATE to bypass any RPC issues
-          const { data, error } = await supabase
-            .from('earning_opportunities')
-            .update({
-              title: submitData.title,
-              description: submitData.description,
-              opportunity_type: submitData.opportunity_type,
-              nctr_reward: submitData.nctr_reward,
-              reward_per_dollar: submitData.reward_per_dollar,
-              partner_name: submitData.partner_name,
-              partner_logo_url: submitData.partner_logo_url,
-              affiliate_link: submitData.affiliate_link,
-              video_url: submitData.video_url,
-              video_title: submitData.video_title,
-              video_description: submitData.video_description,
-              is_active: submitData.is_active,
-              display_order: submitData.display_order,
-              brand_id: submitData.brand_id, // Direct brand_id update
-              available_nctr_reward: submitData.available_nctr_reward,
-              lock_90_nctr_reward: submitData.lock_90_nctr_reward,
-              lock_360_nctr_reward: submitData.lock_360_nctr_reward,
-              reward_distribution_type: submitData.reward_distribution_type,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', editingOpportunity.id)
-            .select();
+          // Use the new admin function that bypasses the complex security check
+          const { data, error } = await supabase.rpc('update_opportunity_admin', {
+            opportunity_id: editingOpportunity.id,
+            opportunity_data: submitData
+          });
 
-          console.log('💾 Direct UPDATE response:', { data, error });
+          console.log('💾 Admin RPC response:', { data, error });
 
           if (error) {
             console.error('❌ Update error:', error);
@@ -469,7 +448,13 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
             throw new Error(`Database error: ${error.message || 'Unknown error'}`);
           }
 
+          if (!data || data.length === 0) {
+            console.error('❌ No data returned from RPC');
+            throw new Error('Update failed - no data returned. Check admin permissions.');
+          }
+
           console.log('✅ Update successful!');
+          console.log('✅ Returned brand_id:', data[0]?.brand_id);
           
           // Verify the update by fetching the record
           const { data: verifyData, error: verifyError } = await supabase

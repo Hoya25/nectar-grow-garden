@@ -1491,6 +1491,13 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      update_opportunity_admin: {
+        Args: { opportunity_data: Json; opportunity_id: string }
+        Returns: {
+          brand_id: string
+          id: string
+        }[]
+      }
       update_opportunity_secure: {
         Args: { opportunity_data: Json; opportunity_id: string }
         Returns: {
