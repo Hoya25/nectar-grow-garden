@@ -52,6 +52,7 @@ interface EarningOpportunity {
   is_active: boolean;
   created_at: string;
   display_order: number;
+  brand_id?: string | null;
   // New reward structure fields
   available_nctr_reward?: number;
   lock_90_nctr_reward?: number;
@@ -104,6 +105,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     video_description: '',
     is_active: true,
     display_order: 0,
+    brand_id: null, // Link to brands table for tracking
     // New reward structure fields
     available_nctr_reward: 0,
     lock_90_nctr_reward: 0,
@@ -220,6 +222,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_description: '',
       is_active: true,
       display_order: maxOrder + 1,
+      brand_id: null,
       // New reward structure fields
       available_nctr_reward: 0,
       lock_90_nctr_reward: 0,
@@ -248,6 +251,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       video_description: opportunity.video_description || '',
       is_active: opportunity.is_active,
       display_order: opportunity.display_order || 0,
+      brand_id: opportunity.brand_id || null,
       // New reward structure fields
       available_nctr_reward: opportunity.available_nctr_reward || 0,
       lock_90_nctr_reward: opportunity.lock_90_nctr_reward || 0,
@@ -914,13 +918,49 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="partner_name">Brand Name</Label>
+                        <Label htmlFor="brand_select">Link to Brand (Required for Shopping)</Label>
+                        <Select
+                          value={formData.brand_id || ''}
+                          onValueChange={(value) => {
+                            const selectedBrand = brands.find(b => b.id === value);
+                            setFormData({
+                              ...formData, 
+                              brand_id: value || null,
+                              partner_name: selectedBrand?.name || formData.partner_name,
+                              partner_logo_url: selectedBrand?.logo_url || formData.partner_logo_url
+                            });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a brand..." />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[300px]">
+                            {brands.map(brand => (
+                              <SelectItem key={brand.id} value={brand.id}>
+                                {brand.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          {formData.brand_id ? 
+                            `✅ Brand linked: ${brands.find(b => b.id === formData.brand_id)?.name}` : 
+                            '⚠️ Shopping opportunities need a brand link to appear in The Garden'
+                          }
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="partner_name">Brand Display Name (Optional)</Label>
                         <Input
                           id="partner_name"
                           value={formData.partner_name}
                           onChange={(e) => setFormData({...formData, partner_name: e.target.value})}
-                          placeholder="Enter brand name"
+                          placeholder="Auto-filled from brand selection"
                         />
+                        <p className="text-xs text-muted-foreground">
+                          Leave blank to use brand name
+                        </p>
                       </div>
                       
                       {/* Regenerate Link Button - Show in edit mode */}
