@@ -15,6 +15,7 @@ import Referrals from "./pages/Referrals";
 import AffiliateLinks from "./pages/AffiliateLinks";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
+import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
 
 const queryClient = new QueryClient();
 
@@ -143,6 +144,7 @@ User agent: ${navigator.userAgent}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <CustomerServiceBubble />
             </WalletProvider>
           </AuthProvider>
         </BrowserRouter>
