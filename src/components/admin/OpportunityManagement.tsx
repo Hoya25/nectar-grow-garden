@@ -430,10 +430,12 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     e.preventDefault();
     
     console.log('🚀 Form submitted! Starting handleSubmit...');
-    console.log('📝 Form data keys:', Object.keys(formData));
+    console.log('📝 FULL Form data:', JSON.stringify(formData, null, 2));
     console.log('✏️ Editing opportunity ID:', editingOpportunity?.id);
     console.log('🖼️ Logo file present:', !!logoFile);
     console.log('🆕 Creating new:', !editingOpportunity);
+    console.log('🎯 opportunity_type:', formData.opportunity_type);
+    console.log('💰 reward_per_dollar:', formData.reward_per_dollar);
     
     // Security: Validate all inputs before submission
     try {
