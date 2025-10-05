@@ -1628,7 +1628,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           )}
 
           {/* Social Media & Other Opportunities */}
-          {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type)).length > 0 && (
+          {opportunities.filter(op => ['social_follow', 'bonus', 'free_trial', 'partner'].includes(op.opportunity_type)).length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
                 <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
