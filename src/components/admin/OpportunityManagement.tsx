@@ -902,15 +902,36 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     Brand Partner Selection
                   </h4>
                   
-                  <Tabs defaultValue="loyalize" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
+                  <Tabs defaultValue="manual" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="manual">
+                        Manual Entry
+                      </TabsTrigger>
                       <TabsTrigger value="loyalize">
-                        Loyalize Brands & Gift Cards
+                        Loyalize Brands
                       </TabsTrigger>
                       <TabsTrigger value="impact">
                         Impact.com Network
                       </TabsTrigger>
                     </TabsList>
+                    
+                    <TabsContent value="manual" className="space-y-4 mt-4">
+                      <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg space-y-3">
+                        <h4 className="font-semibold text-foreground flex items-center gap-2">
+                          <Plus className="w-4 h-4" />
+                          Create Custom Opportunity
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          For brands not in Loyalize or Impact.com (like Rad.Live), enter the details manually below:
+                        </p>
+                        <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                          <li>First, create the brand in the "Brands" tab using "Manual Brand Creation"</li>
+                          <li>Then select it from the "Link to Brand" dropdown below</li>
+                          <li>Enter the affiliate/referral tracking link</li>
+                          <li>Fill in the opportunity details and rewards</li>
+                        </ol>
+                      </div>
+                    </TabsContent>
                     
                     <TabsContent value="loyalize" className="space-y-2 mt-4">
                       <Label className="text-sm font-medium">Search Added Brands & Gift Cards (Loyalize)</Label>
