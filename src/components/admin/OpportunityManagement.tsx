@@ -1869,7 +1869,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                               return total > 0 ? `${total} NCTR` : 'No bounty set';
                             })()}
                           </div>
-                          {opportunity.reward_per_dollar > 0 && (
+                          {opportunity.reward_per_dollar > 0 && opportunity.opportunity_type === 'shopping' && (
                             <div className="text-sm text-purple-600 dark:text-purple-400">
                               +{opportunity.reward_per_dollar} NCTR per $1
                             </div>
@@ -1888,7 +1888,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             <span className="font-medium text-section-accent">{opportunity.nctr_reward} NCTR</span>
                           </div>
                         )}
-                        {opportunity.reward_per_dollar > 0 && (
+                        {opportunity.reward_per_dollar > 0 && opportunity.opportunity_type === 'shopping' && (
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Per Dollar:</span>
                             <span className="font-medium text-section-accent">{opportunity.reward_per_dollar} NCTR</span>
@@ -1921,7 +1921,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             </span>
                           )}
                         </div>
-                        {opportunity.reward_per_dollar > 0 && (
+                        {opportunity.reward_per_dollar > 0 && opportunity.opportunity_type === 'shopping' && (
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Per Dollar:</span>
                             <span className="font-medium text-section-accent">+{opportunity.reward_per_dollar} NCTR</span>
