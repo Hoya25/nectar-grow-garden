@@ -870,6 +870,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       withdrawal_requests: {
         Row: {
           admin_notes: string | null
@@ -1398,8 +1425,23 @@ export type Database = {
         }
         Returns: Json
       }
+      grant_user_role: {
+        Args: {
+          p_expires_at?: string
+          p_role: Database["public"]["Enums"]["app_role"]
+          p_user_id: string
+        }
+        Returns: string
+      }
       has_referral_relationship: {
         Args: { user1_id: string; user2_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
         Returns: boolean
       }
       increment: {
@@ -1486,6 +1528,13 @@ export type Database = {
         Args: { revocation_reason: string; target_user_id: string }
         Returns: Json
       }
+      revoke_user_role: {
+        Args: {
+          p_role: Database["public"]["Enums"]["app_role"]
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       secure_business_access_check: {
         Args: { p_table_name: string; p_user_id: string }
         Returns: boolean
@@ -1536,6 +1585,14 @@ export type Database = {
         Args: { p_lock_id: string }
         Returns: Json
       }
+      user_is_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      user_is_super_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       validate_financial_access: {
         Args: { operation_type?: string; required_role?: string }
         Returns: Json
@@ -1572,7 +1629,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "admin" | "super_admin" | "treasury_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1699,6 +1756,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "admin", "super_admin", "treasury_admin"],
+    },
   },
 } as const
