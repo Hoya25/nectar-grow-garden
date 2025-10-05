@@ -1553,14 +1553,14 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           </div>
 
 
-          {/* Shopping Opportunities */}
-          {opportunities.filter(op => op.opportunity_type === 'shopping' && !completedOpportunityIds.includes(op.id)).length > 0 && (
+          {/* Shopping & Free Trial Opportunities */}
+          {opportunities.filter(op => ['shopping', 'free_trial'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
                 <div className="w-2 h-6 bg-green-500 rounded-full"></div>
                 🟢 Live Opportunities
               </h3>
-              {opportunities.filter(op => op.opportunity_type === 'shopping' && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
+              {opportunities.filter(op => ['shopping', 'free_trial'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
                 <Card 
                   key={opportunity.id} 
                   className="mb-4 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-4 border-l-green-500 bg-gradient-to-r from-green-50/50 to-transparent"
@@ -1649,15 +1649,23 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
             </div>
           )}
 
-          {/* Social Media & Other Opportunities */}
-          {opportunities.filter(op => ['social_follow', 'bonus', 'free_trial', 'partner'].includes(op.opportunity_type)).length > 0 && (
+          {/* Social Media & Other Opportunities - Show uncompleted social_follow/bonus/partner, and completed free_trial */}
+          {opportunities.filter(op => {
+            const isSocialBonusPartner = ['social_follow', 'bonus', 'partner'].includes(op.opportunity_type);
+            const isCompletedFreeTrial = op.opportunity_type === 'free_trial' && completedOpportunityIds.includes(op.id);
+            return isSocialBonusPartner || isCompletedFreeTrial;
+          }).length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
                 <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
                 🔗 Social & Bonus Opportunities
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-                {opportunities.filter(op => ['social_follow', 'bonus', 'free_trial', 'partner'].includes(op.opportunity_type)).map((opportunity) => {
+                {opportunities.filter(op => {
+                  const isSocialBonusPartner = ['social_follow', 'bonus', 'partner'].includes(op.opportunity_type);
+                  const isCompletedFreeTrial = op.opportunity_type === 'free_trial' && completedOpportunityIds.includes(op.id);
+                  return isSocialBonusPartner || isCompletedFreeTrial;
+                }).map((opportunity) => {
                   const isCompleted = completedOpportunityIds.includes(opportunity.id);
                   
                   // Show minimized completed state
