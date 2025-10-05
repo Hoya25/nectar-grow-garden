@@ -192,6 +192,50 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
     }
   };
 
+  const handleBulkDeleteInactive = async () => {
+    const inactiveBrands = brands.filter(b => !b.is_active);
+    
+    if (inactiveBrands.length === 0) {
+      toast({
+        title: "No Inactive Brands",
+        description: "There are no inactive brands to delete.",
+      });
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete all ${inactiveBrands.length} inactive brands? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('brands')
+        .delete()
+        .eq('is_active', false);
+
+      if (error) throw error;
+
+      await logActivity('bulk_deleted', 'brand', null, { 
+        count: inactiveBrands.length,
+        brand_names: inactiveBrands.map(b => b.name).join(', ')
+      });
+
+      toast({
+        title: "Brands Deleted",
+        description: `Successfully deleted ${inactiveBrands.length} inactive brands.`,
+      });
+
+      handleBrandsUpdate();
+    } catch (error) {
+      console.error('Error bulk deleting brands:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete inactive brands.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -228,6 +272,30 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
           </Button>
         </div>
       </div>
+
+      {/* Bulk Actions for Manage Tab */}
+      {activeTab === 'manage' && brands.filter(b => !b.is_active).length > 0 && (
+        <Card className="bg-destructive/10 border-destructive/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Inactive Brands Found</p>
+                <p className="text-sm text-muted-foreground">
+                  {brands.filter(b => !b.is_active).length} inactive brands can be removed
+                </p>
+              </div>
+              <Button 
+                variant="destructive" 
+                onClick={handleBulkDeleteInactive}
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete All Inactive
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Content based on active tab */}
       {activeTab === 'search' ? (
