@@ -499,6 +499,7 @@ export type Database = {
           earning_source: string | null
           external_transaction_id: string | null
           id: string
+          metadata: Json | null
           nctr_amount: number
           opportunity_id: string | null
           partner_name: string | null
@@ -514,6 +515,7 @@ export type Database = {
           earning_source?: string | null
           external_transaction_id?: string | null
           id?: string
+          metadata?: Json | null
           nctr_amount: number
           opportunity_id?: string | null
           partner_name?: string | null
@@ -529,6 +531,7 @@ export type Database = {
           earning_source?: string | null
           external_transaction_id?: string | null
           id?: string
+          metadata?: Json | null
           nctr_amount?: number
           opportunity_id?: string | null
           partner_name?: string | null

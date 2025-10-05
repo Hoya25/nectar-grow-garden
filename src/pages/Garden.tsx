@@ -440,12 +440,12 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
         setLocks(locksData || []);
       }
 
-      // Fetch completed opportunities - but exclude certain types that have special handling
+      // Fetch completed opportunities - include both 'completed' and 'pending_verification' (for free trials)
       const { data: completedData, error: completedError } = await supabase
         .from('nctr_transactions')
         .select('opportunity_id, earning_source')
         .eq('user_id', user?.id)
-        .eq('status', 'completed')
+        .in('status', ['completed', 'pending_verification'])
         .not('opportunity_id', 'is', null);
 
       if (completedError) {
