@@ -1628,7 +1628,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                 🔗 Social & Bonus Opportunities
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-                {opportunities.filter(op => ['social_follow', 'bonus'].includes(op.opportunity_type)).map((opportunity) => {
+                {opportunities.filter(op => ['social_follow', 'bonus', 'free_trial', 'partner'].includes(op.opportunity_type)).map((opportunity) => {
                   const isCompleted = completedOpportunityIds.includes(opportunity.id);
                   
                   // Show minimized completed state

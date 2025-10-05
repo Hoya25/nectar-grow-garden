@@ -851,6 +851,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="shopping">Shopping</SelectItem>
+              <SelectItem value="free_trial">Free Trial</SelectItem>
               <SelectItem value="invite">Invite</SelectItem>
               <SelectItem value="partner">Partner</SelectItem>
               <SelectItem value="bonus">Bonus</SelectItem>
@@ -1258,6 +1259,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="shopping">Shopping Rewards</SelectItem>
+                        <SelectItem value="free_trial">Free Trial</SelectItem>
                         <SelectItem value="invite">Invite Friends</SelectItem>
                         <SelectItem value="partner">Partner Bonus</SelectItem>
                         <SelectItem value="bonus">Special Bonus</SelectItem>
