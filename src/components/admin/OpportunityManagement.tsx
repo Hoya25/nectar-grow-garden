@@ -90,7 +90,7 @@ const opportunitySchema = z.object({
   description: z.string().trim().max(2000, "Description must be less than 2000 characters").optional(),
   opportunity_type: z.string().min(1, "Type is required"),
   nctr_reward: z.number().min(0, "Reward must be positive").max(1000000, "Reward exceeds maximum").finite(),
-  reward_per_dollar: z.number().min(0, "Rate must be positive").max(1000, "Rate exceeds maximum").finite(),
+  reward_per_dollar: z.number().min(0, "Rate must be positive").max(1000, "Rate exceeds maximum").finite().optional(),
   partner_name: z.string().trim().max(100, "Partner name must be less than 100 characters").optional(),
   partner_logo_url: z.string().trim().max(500, "Logo URL must be less than 500 characters").optional(),
   affiliate_link: z.string().trim().max(500, "Affiliate link must be less than 500 characters")
