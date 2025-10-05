@@ -915,8 +915,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       
       toast({
         title: `${opportunity.partner_name || 'Free Trial'} Activated! 🎉`,
-        description: opportunity.description || "Complete the signup in the new tab to claim your reward!",
-        duration: 6000,
+        description: "Complete the signup and return here to mark it complete for your reward!",
+        duration: 8000,
       });
     } else {
       toast({
@@ -1635,12 +1635,52 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                            <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
                          </div>
 
-                        <Button 
+                         <Button 
+                          onClick={() => handleOpportunityClick(opportunity)}
                           className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6"
                           size="lg"
                         >
                           {opportunity.opportunity_type === 'free_trial' ? '🌐 Explore & Earn →' : '🛍️ Shop & Earn →'}
                         </Button>
+                        {opportunity.opportunity_type === 'free_trial' && (
+                          <Button
+                            onClick={async () => {
+                              try {
+                                const { data, error } = await supabase
+                                  .from('nctr_transactions')
+                                  .insert({
+                                    user_id: user?.id,
+                                    transaction_type: 'earned',
+                                    nctr_amount: 0,
+                                    description: `Free trial completion claim: ${opportunity.partner_name || 'Partner'}`,
+                                    earning_source: 'free_trial',
+                                    status: 'pending_verification',
+                                    metadata: { opportunity_id: opportunity.id }
+                                  })
+                                  .select()
+                                  .single();
+
+                                if (error) throw error;
+
+                                toast({
+                                  title: "✅ Completion Submitted!",
+                                  description: "Admin will verify and credit your NCTR reward soon.",
+                                  duration: 5000,
+                                });
+                              } catch (error: any) {
+                                toast({
+                                  title: "⚠️ Submission Failed",
+                                  description: error.message || "Please try again or contact support.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                            variant="outline"
+                            className="w-full border-2 border-primary text-primary hover:bg-primary/10 text-sm py-4 mt-2"
+                          >
+                            ✓ I Completed This Trial
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>

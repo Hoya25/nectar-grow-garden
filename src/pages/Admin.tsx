@@ -55,6 +55,7 @@ import { TrackingDiagnostics } from '@/components/admin/TrackingDiagnostics';
 import LoyalizeWebhookConfig from '@/components/admin/LoyalizeWebhookConfig';
 import { PendingTransactionsMonitor } from '@/components/admin/PendingTransactionsMonitor';
 import { LoyalizeTransactionSync } from '@/components/admin/LoyalizeTransactionSync';
+import { FreeTrialVerification } from '@/components/admin/FreeTrialVerification';
 
 interface AdminStats {
   total_users: number;
@@ -323,6 +324,7 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="purchases" className="space-y-6">
+            <FreeTrialVerification />
             <LoyalizeTransactionSync />
             <PendingTransactionsMonitor />
             <TrackingDiagnostics />
