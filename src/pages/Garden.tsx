@@ -561,6 +561,9 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       case 'partner':
         handleShoppingOpportunity(opportunity);
         break;
+      case 'free_trial':
+        handleFreeTrialOpportunity(opportunity);
+        break;
       default:
         handleGenericOpportunity(opportunity);
         break;
@@ -900,6 +903,25 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       toast({
         title: "⚠️ Tracking Issue", 
         description: `Failed to set up tracking. Please try again or contact support.`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFreeTrialOpportunity = (opportunity: EarningOpportunity) => {
+    // Open the affiliate link for the free trial
+    if (opportunity.affiliate_link) {
+      window.open(opportunity.affiliate_link, '_blank');
+      
+      toast({
+        title: `${opportunity.partner_name || 'Free Trial'} Activated! 🎉`,
+        description: opportunity.description || "Complete the signup in the new tab to claim your reward!",
+        duration: 6000,
+      });
+    } else {
+      toast({
+        title: "Link Not Available",
+        description: "The free trial link is not configured yet.",
         variant: "destructive",
       });
     }
