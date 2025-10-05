@@ -311,6 +311,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
       if (opportunitiesError) {
         console.error('Error fetching opportunities:', opportunitiesError);
       } else {
+        console.log(`📋 Total opportunities fetched: ${opportunitiesData?.length || 0}`);
+        
         // Filter out opportunities with invalid loyalize_ids (shopping type only)
         const validOpportunities = (opportunitiesData || []).filter(opp => {
           // For non-shopping opportunities (invite, social, bonus, etc.), allow them through
@@ -328,6 +330,9 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           
           return true;
         });
+        
+        console.log(`✅ Valid opportunities after filtering: ${validOpportunities.length}`);
+        console.log('📋 Opportunity types:', validOpportunities.map(o => `${o.title} (${o.opportunity_type})`));
         
         // Sort opportunities to prioritize INVITE opportunities first (best way to earn NCTR)
         const sortedOpportunities = validOpportunities.sort((a, b) => {
@@ -357,6 +362,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           // Within other opportunities, sort by created_at (newest first)
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
+        
+        console.log(`📊 Final sorted opportunities count: ${sortedOpportunities.length}`);
         
         setOpportunities(sortedOpportunities);
       }
