@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import LoyalizeBrandSearch from './LoyalizeBrandSearch';
 import BrandGiftCardSearch from './BrandGiftCardSearch';
 import GiftCardTester from './GiftCardTester';
+import ManualBrandCreation from './ManualBrandCreation';
 import { 
   Plus, 
   Building2, 
@@ -379,12 +380,15 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
             </CardContent>
           </Card>
 
+          {/* Manual Brand Creation */}
+          <ManualBrandCreation onBrandCreated={handleBrandsUpdate} />
+
           {/* Loyalize Import Section */}
           <Card className="bg-card/80 backdrop-blur-sm border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Plus className="w-5 h-5" />
-                Import New Brands
+                Import from Loyalize Network
               </CardTitle>
             </CardHeader>
             <CardContent>
