@@ -1639,7 +1639,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                           className="w-full bg-green-600 hover:bg-green-700 text-white text-base py-6"
                           size="lg"
                         >
-                          🛍️ Shop & Earn →
+                          {opportunity.opportunity_type === 'free_trial' ? '🌐 Explore & Earn →' : '🛍️ Shop & Earn →'}
                         </Button>
                       </div>
                     </div>
