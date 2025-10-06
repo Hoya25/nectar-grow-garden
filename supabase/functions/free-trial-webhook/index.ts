@@ -6,8 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Loyalize webhook IP whitelist
-const LOYALIZE_IP_WHITELIST = ['34.171.245.170'];
+// TODO: Add Rad.Live webhook IP whitelist once provided
+// const RAD_LIVE_IP_WHITELIST = ['IP_ADDRESS_HERE'];
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    // IP Whitelist check
+    // Log the incoming IP for debugging
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
                      req.headers.get('x-real-ip') ||
                      req.headers.get('cf-connecting-ip') ||
@@ -23,15 +23,14 @@ serve(async (req) => {
     
     console.log('📍 Free trial webhook request from IP:', clientIP);
     
-    if (!LOYALIZE_IP_WHITELIST.includes(clientIP)) {
-      console.error('❌ Unauthorized IP address:', clientIP);
-      return new Response(JSON.stringify({ error: 'Unauthorized IP address' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    console.log('✅ IP whitelist check passed');
+    // TODO: Enable IP whitelist check once Rad.Live IP is provided
+    // if (!RAD_LIVE_IP_WHITELIST.includes(clientIP)) {
+    //   console.error('❌ Unauthorized IP address:', clientIP);
+    //   return new Response(JSON.stringify({ error: 'Unauthorized IP address' }), {
+    //     status: 403,
+    //     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    //   });
+    // }
 
     const { user_id, opportunity_id } = await req.json();
 
