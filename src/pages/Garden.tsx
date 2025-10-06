@@ -115,22 +115,7 @@ const Garden = () => {
 
   useEffect(() => {
     if (!user) {
-      // Check if this is a purchase success redirect
-      const purchaseStatus = searchParams.get('purchase');
-      const nctrAmount = searchParams.get('nctr');
-      
-      if (purchaseStatus === 'success' && nctrAmount) {
-        // Store the purchase info to display after login
-        sessionStorage.setItem('pendingPurchase', JSON.stringify({ 
-          status: 'success', 
-          nctr: nctrAmount 
-        }));
-        sessionStorage.setItem('authRedirect', `/garden?purchase=success&nctr=${nctrAmount}`);
-      } else {
-        sessionStorage.setItem('authRedirect', '/garden');
-      }
-      
-      navigate('/auth');
+      // Don't auto-redirect - let users see the landing page first
       return;
     }
     
@@ -1081,6 +1066,112 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading your garden...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show landing page for unauthenticated users
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-page">
+        <header className="section-highlight backdrop-blur-sm border-b border-section-border">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold nctr-text">The Garden</h1>
+                <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20">
+                  BETA
+                </Badge>
+              </div>
+              <Button
+                onClick={() => navigate('/auth')}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                Sign In
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto p-6 max-w-4xl">
+          <div className="text-center py-12">
+            <div className="mb-8">
+              <img 
+                src={nctrLogo} 
+                alt="NCTR Logo" 
+                className="h-20 mx-auto mb-6 opacity-90"
+              />
+              <h2 className="text-4xl font-bold mb-4 nctr-text">
+                Welcome to The Garden
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Your personal crypto rewards hub. Earn NCTR tokens through everyday activities like shopping, inviting friends, and engaging with partners.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Gift className="h-5 w-5 text-primary" />
+                    Earn Rewards
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Get 1 NCTR per dollar spent at partner brands and earn bonuses through referrals
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Users className="h-5 w-5 text-primary" />
+                    Build Your Alliance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Invite friends and grow together. Each referral brings rewards for both of you
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                    Wings Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Lock NCTR to unlock higher status tiers and amplify all your earnings
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                size="lg"
+                onClick={() => navigate('/auth')}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg"
+              >
+                Enter The Garden →
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/')}
+                className="border-primary/50 text-primary hover:bg-primary/10 px-8 py-6 text-lg"
+              >
+                ← Back to Home
+              </Button>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
