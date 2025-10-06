@@ -64,6 +64,54 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
   useEffect(() => {
     if (userId) {
       fetchUserActivity();
+      
+      // Set up real-time subscription for portfolio and transaction updates
+      const channel = supabase
+        .channel(`user-activity-${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'nctr_transactions',
+            filter: `user_id=eq.${userId}`
+          },
+          () => {
+            console.log('🔄 Transaction update detected, refreshing...');
+            fetchUserActivity();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'nctr_locks',
+            filter: `user_id=eq.${userId}`
+          },
+          () => {
+            console.log('🔄 Lock update detected, refreshing...');
+            fetchUserActivity();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'nctr_portfolio',
+            filter: `user_id=eq.${userId}`
+          },
+          () => {
+            console.log('🔄 Portfolio update detected, refreshing...');
+            fetchUserActivity();
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [userId]);
 

@@ -451,33 +451,33 @@ const Admin = () => {
               </CardHeader>
             </Card>
             
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-white border border-section-border">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-foreground">
-                    <Users className="w-4 h-4" />
-                    User Management
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">View and manage user accounts</p>
-                </CardHeader>
-                <CardContent>
-                  <UserManagement />
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-white border border-section-border">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-foreground">
-                    <Settings className="w-4 h-4" />
-                    Site Settings
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">Configure platform settings</p>
-                </CardHeader>
-                <CardContent>
-                  <SiteSettingsManagement />
-                </CardContent>
-              </Card>
-            </div>
+            {/* User Management - Moved to top as full-width card */}
+            <Card className="bg-white border border-section-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Users className="w-4 h-4" />
+                  User Management
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">View and manage user accounts</p>
+              </CardHeader>
+              <CardContent>
+                <UserManagement />
+              </CardContent>
+            </Card>
+            
+            {/* Site Settings - Now full-width below user management */}
+            <Card className="bg-white border border-section-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Settings className="w-4 h-4" />
+                  Site Settings
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">Configure platform settings</p>
+              </CardHeader>
+              <CardContent>
+                <SiteSettingsManagement />
+              </CardContent>
+            </Card>
       </TabsContent>
       
       <TabsContent value="affiliate-diagnostics" className="space-y-6">
