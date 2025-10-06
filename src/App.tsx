@@ -41,8 +41,6 @@ const App = () => {
     const urlParams = new URLSearchParams(searchParams);
     const previewParam = urlParams.get('preview');
     const isPreview = previewParam === 'coming-soon';
-    const referrer = document.referrer.toLowerCase();
-    const fromNCTR = referrer.includes('nctr.live');
     
     const debugOutput = `
 === COMING SOON DEBUG (useEffect) ===
@@ -51,9 +49,7 @@ Search params: ${searchParams}
 All URL params: ${Array.from(urlParams.entries())}
 Preview param value: "${previewParam}"
 Is preview exactly 'coming-soon': ${isPreview}
-Document referrer: "${referrer}"
-From NCTR: ${fromNCTR}
-Should show Coming Soon: ${isPreview || fromNCTR}
+Should show Coming Soon: ${isPreview}
 User agent: ${navigator.userAgent}
 ================================
     `;
@@ -62,7 +58,7 @@ User agent: ${navigator.userAgent}
     setDebugInfo(debugOutput);
     
     // Set state based on conditions
-    if (isPreview || fromNCTR) {
+    if (isPreview) {
       console.log('✅ Setting showComingSoon to true');
       setShowComingSoon(true);
     } else {
