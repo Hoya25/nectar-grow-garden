@@ -866,7 +866,7 @@ export type Database = {
           access_reason: string | null
           expires_at: string | null
           granted_at: string
-          granted_by: string
+          granted_by: string | null
           id: string
           is_active: boolean
           last_access_at: string | null
@@ -878,7 +878,7 @@ export type Database = {
           access_reason?: string | null
           expires_at?: string | null
           granted_at?: string
-          granted_by: string
+          granted_by?: string | null
           id?: string
           is_active?: boolean
           last_access_at?: string | null
@@ -890,7 +890,7 @@ export type Database = {
           access_reason?: string | null
           expires_at?: string | null
           granted_at?: string
-          granted_by?: string
+          granted_by?: string | null
           id?: string
           is_active?: boolean
           last_access_at?: string | null
