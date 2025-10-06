@@ -20,6 +20,7 @@ import { BuyNCTRButton } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
 import ReferralSystem from '@/components/ReferralSystem';
 import { BaseBadge } from '@/components/BaseBadge';
+import { WithdrawalModal } from '@/components/WithdrawalModal';
 
 interface UserProfile {
   id: string;
@@ -83,6 +84,7 @@ const Profile = () => {
     confirm: false
   });
   const [refreshKey, setRefreshKey] = useState(0);
+  const [withdrawalModalOpen, setWithdrawalModalOpen] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -215,6 +217,8 @@ const Profile = () => {
           avatar_url: formData.avatar_url || null,
           email: user.email,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
@@ -879,6 +883,24 @@ const Profile = () => {
                      </div>
                    </div>
 
+                   <Separator />
+
+                   <Button 
+                     variant="default" 
+                     className="w-full"
+                     onClick={() => setWithdrawalModalOpen(true)}
+                     disabled={!portfolio.available_nctr || portfolio.available_nctr <= 0 || !profile?.wallet_address}
+                   >
+                     <Wallet className="h-4 w-4 mr-2" />
+                     Withdraw NCTR
+                   </Button>
+
+                   {(!profile?.wallet_address) && (
+                     <p className="text-xs text-muted-foreground text-center">
+                       Connect wallet to enable withdrawals
+                     </p>
+                   )}
+
                    <Button 
                      variant="outline" 
                      className="w-full"
@@ -933,6 +955,17 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {/* Withdrawal Modal */}
+      <WithdrawalModal
+        isOpen={withdrawalModalOpen}
+        onClose={() => {
+          setWithdrawalModalOpen(false);
+          fetchProfileData(); // Refresh data after withdrawal
+        }}
+        availableNCTR={portfolio?.available_nctr || 0}
+        walletAddress={profile?.wallet_address || undefined}
+      />
     </div>
   );
 };
