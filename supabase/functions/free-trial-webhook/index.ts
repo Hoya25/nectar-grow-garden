@@ -6,12 +6,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Loyalize webhook IP whitelist
+const LOYALIZE_IP_WHITELIST = ['34.171.245.170'];
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // IP Whitelist check
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('x-real-ip') ||
+                     req.headers.get('cf-connecting-ip') ||
+                     'unknown';
+    
+    console.log('📍 Free trial webhook request from IP:', clientIP);
+    
+    if (!LOYALIZE_IP_WHITELIST.includes(clientIP)) {
+      console.error('❌ Unauthorized IP address:', clientIP);
+      return new Response(JSON.stringify({ error: 'Unauthorized IP address' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    console.log('✅ IP whitelist check passed');
+
     const { user_id, opportunity_id } = await req.json();
 
     if (!user_id || !opportunity_id) {
