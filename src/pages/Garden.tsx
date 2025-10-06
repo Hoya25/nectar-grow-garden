@@ -34,6 +34,7 @@ import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ShopifyMerchSection } from '@/components/ShopifyMerchSection';
 
 interface Portfolio {
   available_nctr: number;
@@ -1552,6 +1553,15 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
             })}
           </div>
 
+
+          {/* NCTR Merch Store */}
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
+              <div className="w-2 h-6 bg-primary rounded-full"></div>
+              🛍️ Official NCTR Merch
+            </h3>
+            <ShopifyMerchSection />
+          </div>
 
           {/* Shopping & Free Trial Opportunities */}
           {opportunities.filter(op => ['shopping', 'free_trial'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).length > 0 && (

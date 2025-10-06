@@ -780,6 +780,60 @@ export type Database = {
         }
         Relationships: []
       }
+      shopify_orders: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          customer_email: string | null
+          id: string
+          nctr_awarded: number | null
+          nctr_credited: boolean | null
+          order_data: Json | null
+          order_number: string | null
+          order_status: string | null
+          referral_code: string | null
+          referrer_user_id: string | null
+          shopify_order_id: string
+          total_price: number
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          customer_email?: string | null
+          id?: string
+          nctr_awarded?: number | null
+          nctr_credited?: boolean | null
+          order_data?: Json | null
+          order_number?: string | null
+          order_status?: string | null
+          referral_code?: string | null
+          referrer_user_id?: string | null
+          shopify_order_id: string
+          total_price: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          customer_email?: string | null
+          id?: string
+          nctr_awarded?: number | null
+          nctr_credited?: boolean | null
+          order_data?: Json | null
+          order_number?: string | null
+          order_status?: string | null
+          referral_code?: string | null
+          referrer_user_id?: string | null
+          shopify_order_id?: string
+          total_price?: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
