@@ -35,7 +35,7 @@ const Hero = () => {
             <Button 
               size="lg" 
               className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight transition-all duration-500 hover:scale-105 text-lg px-8 py-6 shadow-large group relative overflow-hidden"
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/garden')}
             >
               <span className="relative z-10">Enter The Garden →</span>
               <div className="absolute inset-0 bg-section-highlight opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
