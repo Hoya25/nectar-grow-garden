@@ -238,11 +238,11 @@ const IndependentAffiliateLinks = () => {
           </div>
           <div className="flex gap-2">
             <span className="font-semibold text-blue-600">✓</span>
-            <span>Complete purchase → Merchant reports sale to Loyalize</span>
+            <span>Complete purchase → Merchant reports sale to our network</span>
           </div>
           <div className="flex gap-2">
             <span className="font-semibold text-blue-600">✓</span>
-            <span>Loyalize confirms → We match tracking ID to your account</span>
+            <span>Network confirms → We match tracking ID to your account</span>
           </div>
           <div className="flex gap-2">
             <span className="font-semibold text-blue-600">✓</span>

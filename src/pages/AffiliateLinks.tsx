@@ -221,7 +221,7 @@ const AffiliateLinks = () => {
                       🏪 Integrated Partner Brands
                     </h3>
                     <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
-                      Limited to brands with API integration through Loyalize. Automatic conversion tracking 
+                      Limited to brands with direct API integration. Automatic conversion tracking 
                       but fewer available partners.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
