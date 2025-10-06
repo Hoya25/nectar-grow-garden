@@ -115,7 +115,8 @@ const Garden = () => {
 
   useEffect(() => {
     if (!user) {
-      // Don't auto-redirect - let users see the landing page first
+      // Set loading to false so landing page can show for unauthenticated users
+      setLoading(false);
       return;
     }
     
