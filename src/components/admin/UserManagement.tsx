@@ -242,13 +242,19 @@ const UserManagement = () => {
   const suspendUser = async (user: UserData) => {
     const reason = prompt(`Suspend ${user.full_name || user.username || 'this user'}?\n\nEnter reason for suspension:`);
     
-    if (!reason) return;
+    if (!reason) {
+      console.log('Suspend cancelled - no reason provided');
+      return;
+    }
 
+    console.log('🔄 Attempting to suspend user:', user.user_id, 'Reason:', reason);
     try {
       const { data, error } = await supabase.rpc('suspend_user_account', {
         p_user_id: user.user_id,
         p_reason: reason
       });
+
+      console.log('Suspend response:', { data, error });
 
       if (error) throw error;
 
@@ -260,10 +266,11 @@ const UserManagement = () => {
 
       fetchUsers();
     } catch (error) {
-      console.error('Error suspending user:', error);
+      console.error('❌ Error suspending user:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       toast({
         title: "Error",
-        description: "Failed to suspend user.",
+        description: error instanceof Error ? error.message : "Failed to suspend user.",
         variant: "destructive",
       });
     }
@@ -272,13 +279,19 @@ const UserManagement = () => {
   const revokeNCTR = async (user: UserData) => {
     const reason = prompt(`Revoke NCTR from ${user.full_name || user.username || 'this user'}?\n\nEnter reason for revocation:`);
     
-    if (!reason) return;
+    if (!reason) {
+      console.log('Revoke cancelled - no reason provided');
+      return;
+    }
 
+    console.log('🔄 Attempting to revoke NCTR from user:', user.user_id, 'Reason:', reason);
     try {
       const { data, error } = await supabase.rpc('revoke_fraudulent_nctr', {
         p_user_id: user.user_id,
         p_reason: reason
       });
+
+      console.log('Revoke response:', { data, error });
 
       if (error) throw error;
 
@@ -290,7 +303,8 @@ const UserManagement = () => {
 
       fetchUsers();
     } catch (error) {
-      console.error('Error revoking NCTR:', error);
+      console.error('❌ Error revoking NCTR:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       toast({
         title: "Error",
         description: "Failed to revoke NCTR.",
