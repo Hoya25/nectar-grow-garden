@@ -1,5 +1,8 @@
 project_id = "rndivcsonsojgelzewkb"
 
+[functions.verify-user-profile]
+verify_jwt = false
+
 [functions.affiliate-redirect]
 verify_jwt = false
 
