@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -22,7 +23,8 @@ import {
   UserCheck,
   Link,
   Database,
-  ShoppingCart
+  ShoppingCart,
+  ChevronDown
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
@@ -430,41 +432,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            {/* Bulk Email Sender */}
-            <BulkEmailSender />
-            
-            <BannerEditor />
-            
-            {/* Security Overview */}
-            <SecurityStatus />
-            
-            {/* Treasury Admin Management - Only for super admins */}
-            <Card className="bg-section-highlight border border-section-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-foreground">
-                  <Shield className="w-4 h-4" />
-                  Treasury Admin Management
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Manage who has access to financial data and withdrawal operations
-                </p>
-              </CardHeader>
-              <CardContent>
-                <TreasuryAdminManagement />
-              </CardContent>
-            </Card>
-            
-            {/* Emergency Security Actions - Only for super admins */}
-            <EmergencyActions />
-            
-            <Card className="bg-section-highlight border border-section-border">
-              <CardHeader>
-                <CardTitle className="text-foreground">System Management</CardTitle>
-                <p className="text-muted-foreground">Manage users and configure site settings</p>
-              </CardHeader>
-            </Card>
-            
-            {/* User Management - Moved to top as full-width card */}
+            {/* Primary Management Sections */}
             <Card className="bg-white border border-section-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
@@ -478,7 +446,6 @@ const Admin = () => {
               </CardContent>
             </Card>
             
-            {/* Site Settings - Now full-width below user management */}
             <Card className="bg-white border border-section-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
@@ -491,6 +458,119 @@ const Admin = () => {
                 <SiteSettingsManagement />
               </CardContent>
             </Card>
+
+            {/* Advanced Tools - Collapsible Sections */}
+            <div className="space-y-4 pt-8 border-t">
+              <h3 className="text-lg font-semibold text-muted-foreground">Advanced Tools</h3>
+              
+              {/* Bulk Email Sender */}
+              <Collapsible>
+                <Card className="bg-section-highlight/50 border border-section-border">
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                          Bulk Email Sender
+                        </CardTitle>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent>
+                      <BulkEmailSender />
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+
+              {/* Banner Editor */}
+              <Collapsible>
+                <Card className="bg-section-highlight/50 border border-section-border">
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                          Earning Opportunities Banner
+                        </CardTitle>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent>
+                      <BannerEditor />
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+
+              {/* Security Status */}
+              <Collapsible>
+                <Card className="bg-section-highlight/50 border border-section-border">
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                          <Shield className="w-4 h-4" />
+                          Security Hardening Status
+                        </CardTitle>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent>
+                      <SecurityStatus />
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+
+              {/* Treasury Admin Management */}
+              <Collapsible>
+                <Card className="bg-section-highlight/50 border border-section-border">
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                          <Shield className="w-4 h-4" />
+                          Treasury Admin Management
+                        </CardTitle>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent>
+                      <TreasuryAdminManagement />
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+
+              {/* Emergency Actions */}
+              <Collapsible>
+                <Card className="bg-section-highlight/50 border border-red-200">
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-red-600 text-base">
+                          <Shield className="w-4 h-4" />
+                          Emergency Security Actions
+                        </CardTitle>
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent>
+                      <EmergencyActions />
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+            </div>
       </TabsContent>
       
       <TabsContent value="affiliate-diagnostics" className="space-y-6">
