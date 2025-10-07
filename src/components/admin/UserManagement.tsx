@@ -37,6 +37,7 @@ interface UserProfile {
   wallet_address?: string;
   wallet_connected_at?: string;
   email?: string; // Only available when searching by email
+  account_status?: string; // suspended, active, etc.
 }
 
 interface UserPortfolio {
@@ -75,7 +76,7 @@ const UserManagement = () => {
       }
 
       // Transform the data to match expected format
-      const enrichedUsers: UserData[] = (usersData || []).map(user => ({
+      const enrichedUsers: UserData[] = ((usersData || []) as any[]).map((user: any) => ({
         id: user.id,
         user_id: user.user_id,
         username: user.username,
@@ -85,6 +86,7 @@ const UserManagement = () => {
         updated_at: user.updated_at,
         wallet_address: user.wallet_address,
         wallet_connected_at: user.wallet_connected_at,
+        account_status: user.account_status,
         portfolio: {
           available_nctr: user.available_nctr,
           pending_nctr: user.pending_nctr,
@@ -127,7 +129,7 @@ const UserManagement = () => {
 
       if (usersError) throw usersError;
 
-      const enrichedUsers: UserData[] = (usersData || []).map(user => ({
+      const enrichedUsers: UserData[] = ((usersData || []) as any[]).map((user: any) => ({
         id: user.id,
         user_id: user.user_id,
         username: user.username,
@@ -136,6 +138,7 @@ const UserManagement = () => {
         avatar_url: user.avatar_url,
         created_at: user.created_at,
         wallet_address: user.wallet_address,
+        account_status: user.account_status,
         portfolio: {
           available_nctr: user.available_nctr,
           pending_nctr: 0,
@@ -435,6 +438,12 @@ const UserManagement = () => {
                         <h4 className="font-semibold">
                           {user.full_name || user.username || 'Anonymous User'}
                         </h4>
+                        {user.account_status === 'suspended' && (
+                          <Badge variant="destructive">
+                            <Ban className="w-3 h-3 mr-1" />
+                            SUSPENDED
+                          </Badge>
+                        )}
                         {user.is_admin && (
                           <Badge variant="secondary" className="bg-gradient-hero text-foreground border-0">
                             <Shield className="w-3 h-3 mr-1" />
