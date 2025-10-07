@@ -1344,6 +1344,30 @@ export type Database = {
           unique_users_today: number
         }[]
       }
+      get_referral_verification_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          referee_account_age_days: number
+          referee_email: string
+          referee_has_transactions: boolean
+          referee_name: string
+          referee_nctr_earned: number
+          referee_profile_complete: boolean
+          referee_transaction_count: number
+          referee_wallet_connected: boolean
+          referral_code: string
+          referral_id: string
+          referred_user_id: string
+          referrer_email: string
+          referrer_name: string
+          referrer_user_id: string
+          reward_credited: boolean
+          rewarded_at: string
+          same_day_signup: boolean
+          status: string
+        }[]
+      }
       get_safe_referral_profile: {
         Args: { target_user_id: string }
         Returns: {

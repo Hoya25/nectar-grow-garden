@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Search, TrendingUp, Gift, Clock, CheckCircle } from 'lucide-react';
+import { Users, Search, TrendingUp, Gift, Clock, CheckCircle, AlertTriangle, Shield, UserCheck } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface ReferralData {
@@ -19,6 +19,13 @@ interface ReferralData {
   referrer_email: string;
   referee_name: string | null;
   referee_email: string;
+  referee_profile_complete: boolean;
+  referee_has_transactions: boolean;
+  referee_transaction_count: number;
+  referee_nctr_earned: number;
+  referee_account_age_days: number;
+  referee_wallet_connected: boolean;
+  same_day_signup: boolean;
 }
 
 interface ReferralStats {
@@ -47,21 +54,19 @@ const ReferralManagement = () => {
     try {
       setLoading(true);
 
-      // Use the new database function to get referrals with names
-      const { data: referralsData, error } = await supabase.rpc('get_user_referrals_with_names', {
-        p_user_id: null // Pass null to get all referrals for admin view
-      });
+      // Use the new verification function to get referrals with verification data
+      const { data: referralsData, error } = await supabase.rpc('get_referral_verification_data');
 
       if (error) {
-        console.error('Error fetching referral data with names:', error);
+        console.error('Error fetching referral data with verification:', error);
         throw error;
       }
 
-      console.log('Fetched referrals with names:', referralsData);
+      console.log('Fetched referrals with verification data:', referralsData);
 
       // Transform data for display
       const transformedReferrals: ReferralData[] = (referralsData || []).map(referral => ({
-        id: referral.id,
+        id: referral.referral_id,
         referral_code: referral.referral_code,
         status: referral.status,
         reward_credited: referral.reward_credited,
@@ -70,7 +75,14 @@ const ReferralManagement = () => {
         referrer_name: referral.referrer_name || null,
         referrer_email: referral.referrer_email || '',
         referee_name: referral.referee_name || null,
-        referee_email: referral.referee_email || ''
+        referee_email: referral.referee_email || '',
+        referee_profile_complete: referral.referee_profile_complete || false,
+        referee_has_transactions: referral.referee_has_transactions || false,
+        referee_transaction_count: referral.referee_transaction_count || 0,
+        referee_nctr_earned: referral.referee_nctr_earned || 0,
+        referee_account_age_days: referral.referee_account_age_days || 0,
+        referee_wallet_connected: referral.referee_wallet_connected || false,
+        same_day_signup: referral.same_day_signup || false
       }));
 
       setReferrals(transformedReferrals);
@@ -127,6 +139,42 @@ const ReferralManagement = () => {
     } else {
       return <Badge variant="secondary">
         {referral.status}
+      </Badge>;
+    }
+  };
+
+  const getRiskLevel = (referral: ReferralData) => {
+    let riskScore = 0;
+    
+    // Risk indicators
+    if (!referral.referee_profile_complete) riskScore += 2;
+    if (!referral.referee_has_transactions) riskScore += 2;
+    if (!referral.referee_wallet_connected) riskScore += 1;
+    if (referral.referee_account_age_days < 1) riskScore += 2;
+    if (referral.same_day_signup) riskScore += 1;
+    
+    if (riskScore >= 5) return 'high';
+    if (riskScore >= 3) return 'medium';
+    return 'low';
+  };
+
+  const getVerificationBadge = (referral: ReferralData) => {
+    const riskLevel = getRiskLevel(referral);
+    
+    if (riskLevel === 'high') {
+      return <Badge variant="destructive" className="gap-1">
+        <AlertTriangle className="w-3 h-3" />
+        High Risk
+      </Badge>;
+    } else if (riskLevel === 'medium') {
+      return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 gap-1">
+        <Shield className="w-3 h-3" />
+        Medium Risk
+      </Badge>;
+    } else {
+      return <Badge className="bg-green-100 text-green-800 border-green-200 gap-1">
+        <UserCheck className="w-3 h-3" />
+        Verified
       </Badge>;
     }
   };
@@ -245,6 +293,8 @@ const ReferralManagement = () => {
                   <TableRow>
                     <TableHead>Referrer</TableHead>
                     <TableHead>Referee</TableHead>
+                    <TableHead>Verification</TableHead>
+                    <TableHead>Activity</TableHead>
                     <TableHead>Code</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Status</TableHead>
@@ -285,6 +335,39 @@ const ReferralManagement = () => {
                             <div className="text-xs text-muted-foreground">
                               {referral.referee_email}
                             </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Age: {referral.referee_account_age_days}d
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          {getVerificationBadge(referral)}
+                          <div className="flex gap-1 mt-1">
+                            {referral.referee_profile_complete && (
+                              <Badge variant="outline" className="text-xs">Profile ✓</Badge>
+                            )}
+                            {referral.referee_wallet_connected && (
+                              <Badge variant="outline" className="text-xs">Wallet ✓</Badge>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm space-y-1">
+                          <div className="flex items-center gap-1">
+                            {referral.referee_has_transactions ? (
+                              <CheckCircle className="w-3 h-3 text-green-600" />
+                            ) : (
+                              <AlertTriangle className="w-3 h-3 text-yellow-600" />
+                            )}
+                            <span className="text-xs">
+                              {referral.referee_transaction_count} txns
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {referral.referee_nctr_earned.toFixed(2)} NCTR
                           </div>
                         </div>
                       </TableCell>
@@ -297,6 +380,11 @@ const ReferralManagement = () => {
                         <div className="text-sm">
                           {formatDate(referral.created_at)}
                         </div>
+                        {referral.same_day_signup && (
+                          <Badge variant="outline" className="text-xs mt-1">
+                            Same day
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(referral)}
