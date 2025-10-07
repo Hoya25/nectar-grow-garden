@@ -31,6 +31,18 @@ serve(async (req) => {
       )
     }
 
+    // Create anon client to validate user JWT
+    const anonClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! }
+        }
+      }
+    )
+
+    // Create service role client for admin operations
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -45,11 +57,11 @@ serve(async (req) => {
       )
     }
 
-    // Get authenticated user from JWT
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token)
+    // Get authenticated user from JWT using anon client
+    const { data: { user }, error: authError } = await anonClient.auth.getUser()
     
     if (authError || !user) {
+      console.error('Auth error:', authError)
       return new Response(
         JSON.stringify({ error: 'Invalid authentication token' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
