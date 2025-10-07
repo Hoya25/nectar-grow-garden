@@ -671,11 +671,14 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string | null
           avatar_url: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          last_login_ip: unknown | null
+          signup_ip: unknown | null
           updated_at: string
           user_id: string
           username: string | null
@@ -683,11 +686,14 @@ export type Database = {
           wallet_connected_at: string | null
         }
         Insert: {
+          account_status?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          last_login_ip?: unknown | null
+          signup_ip?: unknown | null
           updated_at?: string
           user_id: string
           username?: string | null
@@ -695,11 +701,14 @@ export type Database = {
           wallet_connected_at?: string | null
         }
         Update: {
+          account_status?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          last_login_ip?: unknown | null
+          signup_ip?: unknown | null
           updated_at?: string
           user_id?: string
           username?: string | null
@@ -712,6 +721,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          referee_signup_ip: unknown | null
           referral_code: string
           referred_user_id: string
           referrer_user_id: string
@@ -722,6 +732,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          referee_signup_ip?: unknown | null
           referral_code: string
           referred_user_id: string
           referrer_user_id: string
@@ -732,6 +743,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          referee_signup_ip?: unknown | null
           referral_code?: string
           referred_user_id?: string
           referrer_user_id?: string
@@ -1122,6 +1134,16 @@ export type Database = {
       delete_opportunity_secure: {
         Args: { opportunity_id: string }
         Returns: boolean
+      }
+      detect_duplicate_ips: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          account_count: number
+          created_dates: string[]
+          emails: string[]
+          ip_address: unknown
+          user_ids: string[]
+        }[]
       }
       detect_suspicious_activity: {
         Args: Record<PropertyKey, never>
@@ -1609,6 +1631,10 @@ export type Database = {
         Args: { p_reason?: string; p_user_id: string }
         Returns: Json
       }
+      revoke_fraudulent_nctr: {
+        Args: { p_reason?: string; p_user_id: string }
+        Returns: Json
+      }
       revoke_treasury_access: {
         Args: { revocation_reason: string; target_user_id: string }
         Returns: Json
@@ -1623,6 +1649,10 @@ export type Database = {
       secure_business_access_check: {
         Args: { p_table_name: string; p_user_id: string }
         Returns: boolean
+      }
+      suspend_user_account: {
+        Args: { p_reason?: string; p_user_id: string }
+        Returns: Json
       }
       toggle_opportunity_status_secure: {
         Args: { opportunity_id: string }
