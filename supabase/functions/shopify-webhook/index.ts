@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { createHmac } from "https://deno.land/std@0.190.0/node/crypto.ts";
+import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -45,9 +45,20 @@ serve(async (req) => {
     // Verify webhook signature
     const webhookSecret = Deno.env.get("SHOPIFY_WEBHOOK_SECRET");
     if (webhookSecret && hmacHeader) {
-      const hash = createHmac("sha256", webhookSecret)
-        .update(rawBody)
-        .digest("base64");
+      const encoder = new TextEncoder();
+      const keyData = encoder.encode(webhookSecret);
+      const messageData = encoder.encode(rawBody);
+      
+      const cryptoKey = await crypto.subtle.importKey(
+        "raw",
+        keyData,
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"]
+      );
+      
+      const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
+      const hash = btoa(String.fromCharCode(...new Uint8Array(signature)));
       
       if (hash !== hmacHeader) {
         console.error("❌ Invalid webhook signature");
