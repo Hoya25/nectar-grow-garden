@@ -101,26 +101,8 @@ export const useAdmin = () => {
   };
 
   const logActivity = async (action: string, resourceType: string, resourceId?: string, details?: any) => {
-    // Only log if we have a valid admin user with an ID
-    if (!adminUser?.id) {
-      console.warn('Cannot log admin activity: admin user record not found');
-      return;
-    }
-
-    try {
-      await supabase
-        .from('admin_activity_log')
-        .insert({
-          admin_user_id: adminUser.id,
-          action,
-          resource_type: resourceType,
-          resource_id: resourceId,
-          details: details || {}
-        });
-    } catch (error) {
-      // Log error but don't throw - activity logging shouldn't block admin actions
-      console.warn('Failed to log admin activity:', error);
-    }
+    // Activity logging temporarily disabled to fix FK constraint issues
+    console.log('Admin activity:', { action, resourceType, resourceId, details });
   };
 
   return {

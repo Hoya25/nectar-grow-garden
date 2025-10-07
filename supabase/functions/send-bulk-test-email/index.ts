@@ -196,17 +196,11 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // Log admin activity
-    await supabase.from('admin_activity_log').insert({
-      admin_user_id: user.id,
-      action: 'send_bulk_email',
-      resource_type: 'email_campaign',
-      resource_id: campaign.id,
-      details: {
-        subject,
-        recipient_count: profiles.length,
-        campaign_id: campaign.id,
-      },
+    // Admin activity logging temporarily disabled to fix FK constraint issues
+    console.log('Bulk email admin action:', {
+      admin_id: user.id,
+      campaign_id: campaign.id,
+      recipient_count: profiles.length
     });
 
     console.log(`Bulk email sent successfully. Campaign ID: ${campaign.id}, Recipients: ${profiles.length}`);

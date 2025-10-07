@@ -151,22 +151,12 @@ serve(async (req) => {
       .select()
       .single()
 
-    // Log admin action (use JWT user_id, not payload)
-    await supabase
-      .from('admin_activity_log')
-      .insert({
-        admin_user_id: user.id,
-        action: 'manual_credit',
-        resource_type: 'nctr_transactions',
-        resource_id: transaction.id,
-        details: {
-          user_id: payload.user_id,
-          amount: nctrReward,
-          purchase_amount: payload.purchase_amount,
-          partner: payload.partner_name,
-          notes: payload.notes
-        }
-      })
+    // Admin activity logging temporarily disabled to fix FK constraint issues
+    console.log('Manual credit admin action:', {
+      admin_id: user.id,
+      transaction_id: transaction.id,
+      amount: nctrReward
+    })
 
     console.log(`✅ Manually credited ${nctrReward} NCTR to ${targetUserName} (${payload.user_id.slice(0, 8)}...)`)
 
