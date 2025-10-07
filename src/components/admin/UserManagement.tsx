@@ -52,7 +52,6 @@ interface UserData extends UserProfile {
 }
 
 const UserManagement = () => {
-  const { logActivity } = useAdmin();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -193,15 +192,6 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      try {
-        await logActivity('granted_admin', 'user', user.user_id, { 
-          user_name: user.full_name || user.username,
-          user_id: user.user_id
-        });
-      } catch (logError) {
-        console.warn('Failed to log activity:', logError);
-      }
-
       toast({
         title: "Admin Access Granted",
         description: `${user.full_name || user.username || 'User'} is now an admin.`,
@@ -231,15 +221,6 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      try {
-        await logActivity('revoked_admin', 'user', user.user_id, { 
-          user_name: user.full_name || user.username,
-          user_id: user.user_id
-        });
-      } catch (logError) {
-        console.warn('Failed to log activity:', logError);
-      }
-
       toast({
         title: "Admin Access Revoked",
         description: `${user.full_name || user.username || 'User'} is no longer an admin.`,
@@ -250,12 +231,11 @@ const UserManagement = () => {
       console.error('Error removing admin access:', error);
       toast({
         title: "Error",
-        description: "Failed to remove admin access.",
+        description: "Failed to revoke admin access.",
         variant: "destructive",
       });
     }
   };
-
   const suspendUser = async (user: UserData) => {
     const reason = prompt(`Suspend ${user.full_name || user.username || 'this user'}?\n\nEnter reason for suspension:`);
     
