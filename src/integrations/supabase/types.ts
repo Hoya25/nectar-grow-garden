@@ -1321,15 +1321,18 @@ export type Database = {
           available_nctr: number
           avatar_url: string
           created_at: string
-          email: string
           full_name: string
-          lock_360_nctr: number
-          lock_90_nctr: number
+          id: string
+          is_admin: boolean
+          last_login_at: string
           opportunity_status: string
+          pending_nctr: number
           total_earned: number
+          updated_at: string
           user_id: string
           username: string
           wallet_address: string
+          wallet_connected_at: string
         }[]
       }
       get_admin_user_stats: {
