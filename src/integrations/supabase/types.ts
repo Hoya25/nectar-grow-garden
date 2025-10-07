@@ -966,6 +966,69 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_rate_limits: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          ip_address: unknown
+          request_count: number | null
+          window_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          ip_address: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          ip_address?: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
+      webhook_retry_queue: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_error: string | null
+          max_retries: number | null
+          next_retry_at: string | null
+          payload: Json
+          retry_count: number | null
+          updated_at: string | null
+          webhook_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_error?: string | null
+          max_retries?: number | null
+          next_retry_at?: string | null
+          payload: Json
+          retry_count?: number | null
+          updated_at?: string | null
+          webhook_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_error?: string | null
+          max_retries?: number | null
+          next_retry_at?: string | null
+          payload?: Json
+          retry_count?: number | null
+          updated_at?: string | null
+          webhook_type?: string
+        }
+        Relationships: []
+      }
       withdrawal_requests: {
         Row: {
           admin_notes: string | null
@@ -1097,6 +1160,15 @@ export type Database = {
       }
       check_user_is_admin_secure: {
         Args: { check_user_id: string }
+        Returns: boolean
+      }
+      check_webhook_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_ip_address: unknown
+          p_max_requests?: number
+          p_window_minutes?: number
+        }
         Returns: boolean
       }
       cleanup_old_audit_logs: {
