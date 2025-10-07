@@ -909,26 +909,31 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
   const awardDailyBonus = async (opportunity: EarningOpportunity) => {
     try {
-      // Check if user already claimed today's bonus
-      const today = new Date().toISOString().split('T')[0];
-      const { data: existingTransaction } = await supabase
-        .from('nctr_transactions')
-        .select('id')
-        .eq('user_id', user?.id)
-        .eq('opportunity_id', opportunity.id)
-        .gte('created_at', today + 'T00:00:00')
-        .maybeSingle();
+      // Use the proper database function for daily check-in
+      const { data, error } = await supabase.rpc('process_daily_checkin', {
+        p_user_id: user?.id
+      });
 
-      if (existingTransaction) {
+      if (error) throw error;
+
+      const result = data as { success: boolean; message?: string; reward_amount?: number; multiplier?: number };
+
+      if (!result.success) {
         toast({
           title: "Already Claimed!",
-          description: "You've already claimed today's daily bonus. Come back tomorrow!",
+          description: result.message || "You've already claimed today's daily bonus. Come back tomorrow!",
           variant: "destructive",
         });
         return;
       }
 
-      await awardNCTR(opportunity, 'Daily check-in bonus');
+      // Refresh user data to show updated balances
+      await fetchUserData();
+
+      toast({
+        title: "🎉 Daily Bonus Earned!",
+        description: `You've earned ${(result.reward_amount || 0).toFixed(2)} NCTR! (${result.multiplier || 1}x Wings multiplier)`,
+      });
     } catch (error) {
       console.error('Error awarding daily bonus:', error);
       toast({
