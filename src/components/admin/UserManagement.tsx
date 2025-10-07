@@ -504,19 +504,19 @@ const UserManagement = () => {
                       <div>
                         <div className="text-sm text-muted-foreground">Available</div>
                         <div className="font-semibold text-foreground">
-                          {user.portfolio.available_nctr.toFixed(2)} NCTR
+                          {(user.portfolio.available_nctr ?? 0).toFixed(2)} NCTR
                         </div>
                       </div>
                       <div>
                         <div className="text-sm text-muted-foreground">Locked</div>
                         <div className="font-semibold text-orange-500">
-                          {user.portfolio.pending_nctr.toFixed(2)} NCTR
+                          {(user.portfolio.pending_nctr ?? 0).toFixed(2)} NCTR
                         </div>
                       </div>
                       <div>
                         <div className="text-sm text-muted-foreground">Total Earned</div>
                         <div className="font-semibold text-green-500">
-                          {user.portfolio.total_earned.toFixed(2)} NCTR
+                          {(user.portfolio.total_earned ?? 0).toFixed(2)} NCTR
                         </div>
                       </div>
                     </div>
