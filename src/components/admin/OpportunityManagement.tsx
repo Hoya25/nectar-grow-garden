@@ -1703,6 +1703,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     <Label htmlFor="affiliate_link">
                       Affiliate Link {(() => {
                         const isOptional = formData.opportunity_type === 'bonus' || 
+                                         formData.opportunity_type === 'invite' ||
                                          formData.title.toLowerCase().includes('daily') || 
                                          formData.title.toLowerCase().includes('checkin');
                         return isOptional ? '(Optional)' : '*';
@@ -1716,6 +1717,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       placeholder="https://partner-tracking-url.com/?user_id={{USER_ID}}"
                       required={(() => {
                         const isOptional = formData.opportunity_type === 'bonus' || 
+                                         formData.opportunity_type === 'invite' ||
                                          formData.title.toLowerCase().includes('daily') || 
                                          formData.title.toLowerCase().includes('checkin');
                         return !isOptional;
