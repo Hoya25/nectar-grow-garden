@@ -17,9 +17,17 @@ interface ProfileCompletionData {
   eligible_for_bonus: boolean;
 }
 
+interface PendingReferral {
+  id: string;
+  referrer_user_id: string;
+  status: string;
+  created_at: string;
+}
+
 export const useProfileCompletion = () => {
   const { user } = useAuth();
   const [completionData, setCompletionData] = useState<ProfileCompletionData | null>(null);
+  const [pendingReferral, setPendingReferral] = useState<PendingReferral | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchCompletionStatus = async () => {
@@ -37,6 +45,17 @@ export const useProfileCompletion = () => {
       }
 
       setCompletionData(data as unknown as ProfileCompletionData);
+
+      // Check for pending referral rewards
+      const { data: referralData } = await supabase
+        .from('referrals')
+        .select('id, referrer_user_id, status, created_at')
+        .eq('referred_user_id', user.id)
+        .eq('status', 'completed')
+        .eq('reward_credited', false)
+        .maybeSingle();
+
+      setPendingReferral(referralData);
     } catch (error) {
       console.error('Error fetching profile completion:', error);
     } finally {
@@ -78,6 +97,7 @@ export const useProfileCompletion = () => {
 
   return {
     completionData,
+    pendingReferral,
     loading,
     fetchCompletionStatus,
     awardBonus,

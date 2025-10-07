@@ -10,7 +10,7 @@ interface ProfileCompletionBannerProps {
 }
 
 export const ProfileCompletionBanner = ({ showOnComplete = false }: ProfileCompletionBannerProps) => {
-  const { completionData, completionScore, isComplete, eligibleForBonus, awardBonus } = useProfileCompletion();
+  const { completionData, completionScore, isComplete, eligibleForBonus, awardBonus, pendingReferral } = useProfileCompletion();
   const navigate = useNavigate();
 
   // Don't show if complete and showOnComplete is false
@@ -75,9 +75,16 @@ export const ProfileCompletionBanner = ({ showOnComplete = false }: ProfileCompl
           <p className="text-sm text-muted-foreground">
             {isComplete 
               ? 'Your profile is 100% complete!' 
+              : pendingReferral
+              ? 'Complete your profile to unlock 500 NCTR bonus + referral rewards!'
               : 'Earn 500 NCTR by completing your profile'
             }
           </p>
+          {pendingReferral && !isComplete && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
+              ⏳ Referral NCTR pending - Complete profile to receive rewards
+            </p>
+          )}
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-primary">{completionScore}%</div>
