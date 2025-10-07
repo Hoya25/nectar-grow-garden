@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
 import UserDetailModal from './UserDetailModal';
+import { formatDistanceToNow } from 'date-fns';
 import { 
   Users, 
   Search, 
@@ -24,7 +25,8 @@ import {
   Eye,
   MoreHorizontal,
   Ban,
-  AlertTriangle
+  AlertTriangle,
+  Clock
 } from 'lucide-react';
 
 interface UserProfile {
@@ -34,6 +36,7 @@ interface UserProfile {
   full_name: string;
   avatar_url: string;
   created_at: string;
+  last_login_at?: string;
   wallet_address?: string;
   wallet_connected_at?: string;
   email?: string; // Only available when searching by email
@@ -83,6 +86,7 @@ const UserManagement = () => {
         full_name: user.full_name,
         avatar_url: user.avatar_url,
         created_at: user.created_at,
+        last_login_at: user.last_login_at,
         updated_at: user.updated_at,
         wallet_address: user.wallet_address,
         wallet_connected_at: user.wallet_connected_at,
@@ -488,6 +492,12 @@ const UserManagement = () => {
                           <Calendar className="w-3 h-3" />
                           Joined {new Date(user.created_at).toLocaleDateString()}
                         </div>
+                        {user.last_login_at && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            Last seen {formatDistanceToNow(new Date(user.last_login_at), { addSuffix: true })}
+                          </div>
+                        )}
                         {user.wallet_address && (
                           <div className="flex items-center gap-1">
                             <TrendingUp className="w-3 h-3" />
