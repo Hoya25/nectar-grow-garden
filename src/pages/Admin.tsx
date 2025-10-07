@@ -56,6 +56,7 @@ import LoyalizeWebhookConfig from '@/components/admin/LoyalizeWebhookConfig';
 import { PendingTransactionsMonitor } from '@/components/admin/PendingTransactionsMonitor';
 import { LoyalizeTransactionSync } from '@/components/admin/LoyalizeTransactionSync';
 import { FreeTrialVerification } from '@/components/admin/FreeTrialVerification';
+import SocialFollowApproval from '@/components/admin/SocialFollowApproval';
 
 interface AdminStats {
   total_users: number;
@@ -280,10 +281,14 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="purchases" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-10 bg-section-highlight text-xs">
+          <TabsList className="grid w-full grid-cols-11 bg-section-highlight text-xs">
             <TabsTrigger value="purchases" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <ShoppingCart className="w-3 h-3" />
               Purchases
+            </TabsTrigger>
+            <TabsTrigger value="social" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
+              <UserCheck className="w-3 h-3" />
+              Social
             </TabsTrigger>
             <TabsTrigger value="withdrawals" className="flex items-center gap-1 text-foreground data-[state=active]:bg-white data-[state=active]:text-foreground">
               <Activity className="w-3 h-3" />
@@ -329,6 +334,10 @@ const Admin = () => {
             <PendingTransactionsMonitor />
             <TrackingDiagnostics />
             <PurchaseTracking />
+          </TabsContent>
+
+          <TabsContent value="social">
+            <SocialFollowApproval />
           </TabsContent>
 
           <TabsContent value="withdrawals">

@@ -72,6 +72,8 @@ interface EarningOpportunity {
   video_description?: string;
   cta_text?: string;
   brand_id?: string; // Link to brands table for proper tracking
+  social_platform?: string; // e.g., "Instagram", "Twitter", "YouTube"
+  social_handle?: string; // e.g., "@thegarden"
   // New reward structure fields
   available_nctr_reward?: number;
   lock_90_nctr_reward?: number;
@@ -614,18 +616,19 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
     if (opportunity.affiliate_link) {
       window.open(opportunity.affiliate_link, '_blank');
       
-      // Show confirmation modal after a brief delay
+      // Show username prompt after a brief delay
       setTimeout(() => {
-        const confirmCompletion = confirm(`Did you complete the task: "${opportunity.title}"?\n\nClick OK if you successfully followed/subscribed, or Cancel to try again.`);
+        const platformName = opportunity.social_platform || 'social media';
+        const username = prompt(`To verify your follow, please enter your ${platformName} username:\n\n(This will be pending admin approval)`);
         
-        if (confirmCompletion) {
-          awardSocialFollowReward(opportunity);
+        if (username && username.trim()) {
+          awardSocialFollowReward(opportunity, username.trim());
         }
-      }, 2000);
+      }, 3000);
       
       toast({
         title: `Opening ${opportunity.partner_name || 'social platform'}`,
-        description: "Complete the follow/subscribe action, then confirm completion to earn your NCTR reward!",
+        description: "Complete the follow/subscribe action, then enter your username for verification!",
       });
     } else {
       toast({
@@ -636,22 +639,30 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
     }
   };
 
-  const awardSocialFollowReward = async (opportunity: EarningOpportunity) => {
+  const awardSocialFollowReward = async (opportunity: EarningOpportunity, username: string) => {
     try {
-      // Check if already completed
+      // Check if already has a pending or completed claim
       const { data: existingTransaction } = await supabase
         .from('nctr_transactions')
-        .select('id')
+        .select('id, status')
         .eq('user_id', user?.id)
         .eq('opportunity_id', opportunity.id)
         .maybeSingle();
 
       if (existingTransaction) {
-        toast({
-          title: "Already Completed!",
-          description: "You've already earned rewards for this social media task.",
-          variant: "destructive",
-        });
+        if (existingTransaction.status === 'pending') {
+          toast({
+            title: "Already Submitted!",
+            description: "Your claim is pending admin approval. Please wait for verification.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Already Completed!",
+            description: "You've already earned rewards for this social media task.",
+            variant: "destructive",
+          });
+        }
         return;
       }
 
@@ -670,69 +681,42 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         return;
       }
 
-      // Update portfolio - add to appropriate buckets
-      const { error: portfolioError } = await supabase
-        .from('nctr_portfolio')
-        .update({
-          available_nctr: (portfolio?.available_nctr || 0) + availableReward,
-          total_earned: (portfolio?.total_earned || 0) + totalReward,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', user?.id);
-
-      if (portfolioError) throw portfolioError;
-
-      // Create locks for 90LOCK and 360LOCK rewards
-      if (lock90Reward > 0) {
-        await supabase.from('nctr_locks').insert({
-          user_id: user?.id,
-          nctr_amount: lock90Reward,
-          lock_type: '90LOCK',
-          lock_category: '90LOCK',
-          commitment_days: 90,
-          unlock_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-          can_upgrade: true,
-          original_lock_type: '90LOCK'
-        });
-      }
-
-      if (lock360Reward > 0) {
-        await supabase.from('nctr_locks').insert({
-          user_id: user?.id,
-          nctr_amount: lock360Reward,
-          lock_type: '360LOCK',
-          lock_category: '360LOCK', 
-          commitment_days: 360,
-          unlock_date: new Date(Date.now() + 360 * 24 * 60 * 60 * 1000).toISOString(),
-          can_upgrade: false,
-          original_lock_type: '360LOCK'
-        });
-      }
-
-      // Record transaction
+      // Create PENDING transaction with username in metadata
+      const platformName = opportunity.social_platform || 'social_media';
       await supabase.from('nctr_transactions').insert({
         user_id: user?.id,
         transaction_type: 'earned',
         nctr_amount: totalReward,
         opportunity_id: opportunity.id,
-        description: `Completed social media task: ${opportunity.title} (${availableReward} Available + ${lock90Reward} 90LOCK + ${lock360Reward} 360LOCK)`,
+        description: `${opportunity.title}`,
         earning_source: 'social_follow',
-        status: 'completed'
+        status: 'pending',
+        metadata: {
+          platform: platformName,
+          username: username,
+          platform_handle: opportunity.social_handle,
+          claimed_at: new Date().toISOString(),
+          reward_breakdown: {
+            available: availableReward,
+            lock_90: lock90Reward,
+            lock_360: lock360Reward
+          }
+        }
       });
 
-      // Refresh data
+      // Refresh data to show pending status
       await fetchUserData();
 
       toast({
-        title: "🎉 Reward Earned!",
-        description: `You've earned ${formatNCTR(totalReward)} NCTR for completing "${opportunity.title}"!`,
+        title: "✅ Claim Submitted!",
+        description: `Your claim for "${opportunity.title}" is pending admin approval. We'll verify your @${username} follow and credit your rewards soon!`,
       });
 
     } catch (error) {
-      console.error('Error awarding social follow reward:', error);
+      console.error('Error submitting social follow claim:', error);
       toast({
         title: "Error",
-        description: "Failed to award reward. Please try again or contact support.",
+        description: "Failed to submit claim. Please try again or contact support.",
         variant: "destructive",
       });
     }
