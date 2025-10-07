@@ -465,14 +465,14 @@ const Admin = () => {
               
               {/* Bulk Email Sender */}
               <Collapsible>
-                <Card className="bg-section-highlight/50 border border-section-border">
+                <Card className="bg-white border border-green-200">
                   <CollapsibleTrigger className="w-full">
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardHeader className="cursor-pointer hover:bg-green-50 transition-colors">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                        <CardTitle className="flex items-center gap-2 text-green-600 text-base">
                           Bulk Email Sender
                         </CardTitle>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        <ChevronDown className="h-4 w-4 text-green-600" />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
@@ -486,14 +486,14 @@ const Admin = () => {
 
               {/* Banner Editor */}
               <Collapsible>
-                <Card className="bg-section-highlight/50 border border-section-border">
+                <Card className="bg-white border border-green-200">
                   <CollapsibleTrigger className="w-full">
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardHeader className="cursor-pointer hover:bg-green-50 transition-colors">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                        <CardTitle className="flex items-center gap-2 text-green-600 text-base">
                           Earning Opportunities Banner
                         </CardTitle>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        <ChevronDown className="h-4 w-4 text-green-600" />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
@@ -507,15 +507,15 @@ const Admin = () => {
 
               {/* Security Status */}
               <Collapsible>
-                <Card className="bg-section-highlight/50 border border-section-border">
+                <Card className="bg-white border border-green-200">
                   <CollapsibleTrigger className="w-full">
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardHeader className="cursor-pointer hover:bg-green-50 transition-colors">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                        <CardTitle className="flex items-center gap-2 text-green-600 text-base">
                           <Shield className="w-4 h-4" />
                           Security Hardening Status
                         </CardTitle>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        <ChevronDown className="h-4 w-4 text-green-600" />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
@@ -529,15 +529,15 @@ const Admin = () => {
 
               {/* Treasury Admin Management */}
               <Collapsible>
-                <Card className="bg-section-highlight/50 border border-section-border">
+                <Card className="bg-white border border-green-200">
                   <CollapsibleTrigger className="w-full">
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardHeader className="cursor-pointer hover:bg-green-50 transition-colors">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                        <CardTitle className="flex items-center gap-2 text-green-600 text-base">
                           <Shield className="w-4 h-4" />
                           Treasury Admin Management
                         </CardTitle>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        <ChevronDown className="h-4 w-4 text-green-600" />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
@@ -551,15 +551,15 @@ const Admin = () => {
 
               {/* Emergency Actions */}
               <Collapsible>
-                <Card className="bg-section-highlight/50 border border-red-200">
+                <Card className="bg-white border border-red-200">
                   <CollapsibleTrigger className="w-full">
-                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardHeader className="cursor-pointer hover:bg-red-50 transition-colors">
                       <div className="flex items-center justify-between">
                         <CardTitle className="flex items-center gap-2 text-red-600 text-base">
                           <Shield className="w-4 h-4" />
                           Emergency Security Actions
                         </CardTitle>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        <ChevronDown className="h-4 w-4 text-red-600" />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
