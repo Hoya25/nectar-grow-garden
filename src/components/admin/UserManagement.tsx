@@ -16,7 +16,9 @@ import {
   Calendar,
   Mail,
   Eye,
-  MoreHorizontal
+  MoreHorizontal,
+  Ban,
+  AlertTriangle
 } from 'lucide-react';
 
 interface UserProfile {
@@ -111,9 +113,12 @@ const UserManagement = () => {
     }
 
     setLoading(true);
+    console.log('Searching for email:', emailSearchTerm);
     try {
       const { data: usersData, error: usersError } = await supabase
         .rpc('search_users_by_email', { search_email: emailSearchTerm });
+
+      console.log('Search results:', { usersData, usersError });
 
       if (usersError) throw usersError;
 
@@ -142,12 +147,17 @@ const UserManagement = () => {
           title: "No Results",
           description: `No users found with email containing "${emailSearchTerm}".`,
         });
+      } else {
+        toast({
+          title: "Search Complete",
+          description: `Found ${enrichedUsers.length} user(s).`,
+        });
       }
     } catch (error) {
       console.error('Error searching by email:', error);
       toast({
         title: "Search Failed",
-        description: "Failed to search users by email.",
+        description: error instanceof Error ? error.message : "Failed to search users by email.",
         variant: "destructive",
       });
     } finally {
@@ -225,6 +235,76 @@ const UserManagement = () => {
       toast({
         title: "Error",
         description: "Failed to remove admin access.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const suspendUser = async (user: UserData) => {
+    const reason = prompt(`Suspend ${user.full_name || user.username || 'this user'}?\n\nEnter reason for suspension:`);
+    
+    if (!reason) return;
+
+    try {
+      const { data, error } = await supabase.rpc('suspend_user_account', {
+        p_user_id: user.user_id,
+        p_reason: reason
+      });
+
+      if (error) throw error;
+
+      await logActivity('suspended_user', 'user', user.user_id, { 
+        user_name: user.full_name || user.username,
+        user_id: user.user_id,
+        reason
+      });
+
+      toast({
+        title: "User Suspended",
+        description: `${user.full_name || user.username || 'User'} has been suspended.`,
+      });
+
+      fetchUsers();
+    } catch (error) {
+      console.error('Error suspending user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to suspend user.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const revokeNCTR = async (user: UserData) => {
+    const reason = prompt(`Revoke NCTR from ${user.full_name || user.username || 'this user'}?\n\nEnter reason for revocation:`);
+    
+    if (!reason) return;
+
+    try {
+      const { data, error } = await supabase.rpc('revoke_fraudulent_nctr', {
+        p_user_id: user.user_id,
+        p_reason: reason
+      });
+
+      if (error) throw error;
+
+      await logActivity('revoked_nctr', 'user', user.user_id, { 
+        user_name: user.full_name || user.username,
+        user_id: user.user_id,
+        reason
+      });
+
+      toast({
+        title: "NCTR Revoked",
+        description: `All NCTR has been revoked from ${user.full_name || user.username || 'User'}.`,
+      });
+
+      fetchUsers();
+    } catch (error) {
+      console.error('Error revoking NCTR:', error);
+      toast({
+        title: "Error",
+        description: "Failed to revoke NCTR.",
         variant: "destructive",
       });
     }
@@ -434,7 +514,7 @@ const UserManagement = () => {
                   )}
 
                   {/* Admin Actions */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -444,6 +524,27 @@ const UserManagement = () => {
                       <Eye className="w-4 h-4" />
                       View Details
                     </Button>
+                    
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => suspendUser(user)}
+                      className="flex items-center gap-1"
+                    >
+                      <Ban className="w-4 h-4" />
+                      Suspend
+                    </Button>
+
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => revokeNCTR(user)}
+                      className="flex items-center gap-1 text-orange-600 border-orange-600 hover:bg-orange-50"
+                    >
+                      <AlertTriangle className="w-4 h-4" />
+                      Revoke NCTR
+                    </Button>
+
                     {user.is_admin ? (
                       <Button 
                         variant="outline" 
