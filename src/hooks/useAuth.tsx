@@ -74,6 +74,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
     
+    // Capture IP address for fraud detection
+    if (!error) {
+      setTimeout(async () => {
+        try {
+          await supabase.functions.invoke('capture-user-ip', {
+            body: { action: 'signup' }
+          });
+          console.log('✅ IP captured for new signup');
+        } catch (ipError) {
+          console.error('Failed to capture IP (non-blocking):', ipError);
+        }
+      }, 500);
+    }
+    
     // If signup was successful, add user to Mailchimp
     if (!error && fullName) {
       // Parse full name into first and last names
@@ -140,6 +154,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       password,
     });
+    
+    // Capture login IP for tracking
+    if (!error) {
+      setTimeout(async () => {
+        try {
+          await supabase.functions.invoke('capture-user-ip', {
+            body: { action: 'login' }
+          });
+          console.log('✅ Login IP captured');
+        } catch (ipError) {
+          console.error('Failed to capture login IP (non-blocking):', ipError);
+        }
+      }, 500);
+    }
     
     return { error };
   };

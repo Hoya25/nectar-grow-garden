@@ -48,6 +48,7 @@ import LoyalizeBrandManager from '@/components/admin/LoyalizeBrandManager';
 import TreasuryAdminManagement from '@/components/admin/TreasuryAdminManagement';
 import { BulkEmailSender } from '@/components/admin/BulkEmailSender';
 import SuperAdminTransactionHistory from '@/components/admin/SuperAdminTransactionHistory';
+import DuplicateIPDetector from '@/components/admin/DuplicateIPDetector';
 import SuperAdminReferralTracking from '@/components/admin/SuperAdminReferralTracking';
 import ImpactBrandSearch from '@/components/admin/ImpactBrandSearch';
 import { PurchaseTracking } from '@/components/admin/PurchaseTracking';
@@ -398,7 +399,10 @@ const Admin = () => {
           <TabsContent value="referrals">
           <ReferralTestComponent />
           <AffiliateWebhookTester />
-            <ReferralManagement />
+            <div className="space-y-6">
+              <DuplicateIPDetector />
+              <ReferralManagement />
+            </div>
           </TabsContent>
 
           <TabsContent value="webhooks" className="space-y-6">
