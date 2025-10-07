@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
+import { useInviteReward } from '@/hooks/useInviteReward';
 import { Loader2 } from 'lucide-react';
 
 const Auth = () => {
@@ -24,6 +25,7 @@ const Auth = () => {
   const [resetSuccess, setResetSuccess] = useState(false);
   
   const { signUp, signIn, user } = useAuth();
+  const { inviteReward } = useInviteReward();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -229,7 +231,7 @@ const Auth = () => {
               {(referralCode || manualReferralCode.trim()) && (
                 <Alert className="border-green-200 bg-green-50">
                   <AlertDescription className="text-green-800">
-                    🎉 You're signing up with a referral code! You and your referrer will both earn 1000 NCTR when you complete signup.
+                    🎉 You're signing up with a referral code! You and your referrer will both earn {inviteReward} NCTR when you complete signup.
                   </AlertDescription>
                 </Alert>
               )}

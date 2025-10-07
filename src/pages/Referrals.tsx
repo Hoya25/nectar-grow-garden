@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useInviteReward } from '@/hooks/useInviteReward';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ interface ReferralData {
 
 const Referrals = () => {
   const { user } = useAuth();
+  const { inviteReward } = useInviteReward();
   const navigate = useNavigate();
   const [referrals, setReferrals] = useState<ReferralData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -190,7 +192,7 @@ const Referrals = () => {
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Share this code with friends to earn 1000 NCTR for each successful signup!
+                  Share this code with friends to earn {inviteReward} NCTR for each successful signup!
                 </p>
               </CardContent>
             </Card>
@@ -257,12 +259,12 @@ const Referrals = () => {
                           </div>
                           <div className="flex items-center gap-3">
                             {referral.status === 'completed' && referral.reward_credited ? (
-                              <>
+                            <>
                                 <Badge variant="secondary" className="bg-green-100 text-green-700 px-3 py-1">
                                   Rewarded
                                 </Badge>
                                 <div className="text-lg font-semibold text-green-600">
-                                  +1000 NCTR
+                                  +{inviteReward} NCTR
                                 </div>
                               </>
                             ) : (

@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useInviteReward } from '@/hooks/useInviteReward';
 import { toast } from '@/hooks/use-toast';
 import { Copy, Check, Share2, Mail, MessageCircle, Users } from 'lucide-react';
 import nctrLogo from "@/assets/nctr-logo-grey.png";
@@ -22,6 +23,7 @@ interface UserStatus {
 
 const ReferralSystem = () => {
   const { user } = useAuth();
+  const { inviteReward } = useInviteReward();
   const [referralCode, setReferralCode] = useState('');
   const [referralStats, setReferralStats] = useState<ReferralStats>({
     total_referrals: 0,
@@ -132,7 +134,7 @@ const ReferralSystem = () => {
 
       setReferralStats({
         total_referrals: completedReferrals,
-        pending_rewards: pendingReferrals * (1000 * userStatus.reward_multiplier),
+        pending_rewards: pendingReferrals * (inviteReward * userStatus.reward_multiplier),
         total_earned_from_referrals: totalEarned
       });
     } catch (error) {
@@ -170,13 +172,13 @@ const ReferralSystem = () => {
   };
 
   const shareViaEmail = () => {
-    const userReward = Math.round(1000 * userStatus.reward_multiplier);
+    const userReward = Math.round(inviteReward * userStatus.reward_multiplier);
     const subject = "Join The Garden and Start Earning NCTR!";
     const body = `Hey! I wanted to invite you to join The Garden, where you can earn NCTR tokens through everyday activities like shopping.
 
 Use my referral link to get started: ${getReferralLink()}
 
-I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and start participating!`;
+I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you sign up and start participating!`;
     
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
@@ -187,8 +189,8 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and 
   };
 
   const shareViaWhatsApp = () => {
-    const userReward = Math.round(1000 * userStatus.reward_multiplier);
-    const message = `🌱 Join The Garden and start earning NCTR tokens through everyday activities! I earn ${userReward} NCTR and you get 1000 NCTR when you join! Use my referral link: ${getReferralLink()}`;
+    const userReward = Math.round(inviteReward * userStatus.reward_multiplier);
+    const message = `🌱 Join The Garden and start earning NCTR tokens through everyday activities! I earn ${userReward} NCTR and you get ${inviteReward} NCTR when you join! Use my referral link: ${getReferralLink()}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
   };
 
@@ -213,10 +215,10 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up and 
         <div className="text-center py-4">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-2xl font-bold text-primary">
-              {Math.round(1000 * userStatus.reward_multiplier)} NCTR
+              {Math.round(inviteReward * userStatus.reward_multiplier)} NCTR
             </span>
             <span className="text-lg text-foreground">for you,</span>
-            <span className="text-2xl font-bold text-secondary">1000 NCTR</span>
+            <span className="text-2xl font-bold text-secondary">{inviteReward} NCTR</span>
             <span className="text-lg text-foreground">for them</span>
           </div>
           <p className="text-sm text-muted-foreground">

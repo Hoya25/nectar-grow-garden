@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWallet } from '@/hooks/useWallet';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import { useTransactionNotifications } from '@/hooks/useTransactionNotifications';
+import { useInviteReward } from '@/hooks/useInviteReward';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -94,6 +95,7 @@ const Garden = () => {
   const { isAdmin } = useAdmin();
   const { currentPrice, priceChange24h, formatPrice, formatChange, getChangeColor, calculatePortfolioValue, contractAddress, formatUSD } = useNCTRPrice();
   const { getSetting, loading: settingsLoading } = useSiteSettings(['earning_opportunities_banner_title', 'earning_opportunities_banner_subtitle']);
+  const { inviteReward } = useInviteReward();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
@@ -252,13 +254,13 @@ const Garden = () => {
   };
 
   const shareViaEmail = () => {
-    const userReward = Math.round(1000 * userMultiplier);
+    const userReward = Math.round(inviteReward * userMultiplier);
     const subject = "Join The Garden and Start Earning NCTR!";
     const body = `Hey! I wanted to invite you to join The Garden, where you can earn NCTR tokens through everyday activities.
 
 Use my referral link to get started: ${getReferralLink()}
 
-I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
+I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you sign up!`;
     
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
@@ -1960,7 +1962,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
           <DialogHeader>
             <DialogTitle className="flex items-center text-base sm:text-lg">
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              🎉 Invite Friends & Earn {Math.round(1000 * userMultiplier)} NCTR in 360LOCK
+              🎉 Invite Friends & Earn {Math.round(inviteReward * userMultiplier)} NCTR in 360LOCK
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -1969,11 +1971,11 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
               <ul className="text-xs sm:text-sm space-y-1 text-muted-foreground">
                 <li>• Share your unique link below</li>
                 <li>• Friends join using your link</li>
-                <li>• You earn {Math.round(1000 * userMultiplier)} NCTR {userMultiplier > 1 && (
+                <li>• You earn {Math.round(inviteReward * userMultiplier)} NCTR {userMultiplier > 1 && (
                   <span>
                     (<span className={`font-bold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{userMultiplier}x</span> Wings bonus)
                   </span>
-                )} & they get 1000 NCTR in 360LOCK!</li>
+                )} & they get {inviteReward} NCTR in 360LOCK!</li>
               </ul>
             </div>
             

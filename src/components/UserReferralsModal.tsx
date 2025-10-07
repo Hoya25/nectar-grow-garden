@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useInviteReward } from '@/hooks/useInviteReward';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +29,7 @@ interface UserReferralsModalProps {
 
 const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
   const { user } = useAuth();
+  const { inviteReward } = useInviteReward();
   const [isOpen, setIsOpen] = useState(false);
   const [referrals, setReferrals] = useState<ReferralData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -195,7 +197,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Share this code with friends to earn 1000 NCTR for each successful signup!
+                  Share this code with friends to earn {inviteReward} NCTR for each successful signup!
                 </p>
               </CardContent>
             </Card>
@@ -263,7 +265,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
                                   Rewarded
                                 </Badge>
                                 <div className="text-sm font-medium text-green-600">
-                                  +1000 NCTR
+                                  +{inviteReward} NCTR
                                 </div>
                               </>
                             ) : (
