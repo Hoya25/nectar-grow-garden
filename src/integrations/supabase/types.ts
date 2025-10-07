@@ -1245,6 +1245,7 @@ export type Database = {
       get_admin_user_list: {
         Args: Record<PropertyKey, never>
         Returns: {
+          account_status: string
           available_nctr: number
           avatar_url: string
           created_at: string
