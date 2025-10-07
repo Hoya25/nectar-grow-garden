@@ -37,9 +37,9 @@ interface SyncStatus {
 }
 
 interface SyncCredits {
-  available_nctr: number;
-  lock_360_nctr: number;
-  total_credited: number;
+  available: number;
+  lock_360: number;
+  total: number;
 }
 
 const NCTRLiveSync = ({ onSyncComplete }: NCTRLiveSyncProps) => {
@@ -98,6 +98,22 @@ const NCTRLiveSync = ({ onSyncComplete }: NCTRLiveSyncProps) => {
       });
       return;
     }
+    
+    // Get user email from profile
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('user_id', user.id)
+      .single();
+    
+    if (!profileData?.email) {
+      toast({
+        title: "Email Required",
+        description: "Please complete your profile with an email address before syncing.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Basic wallet address validation
     if (walletToUse.length < 20 || !walletToUse.startsWith('0x')) {
@@ -116,7 +132,12 @@ const NCTRLiveSync = ({ onSyncComplete }: NCTRLiveSyncProps) => {
         body: {
           action: 'sync_profile',
           user_id: user.id,
-          wallet_address: walletToUse
+          wallet_address: walletToUse,
+          user_email: profileData.email,
+          // Note: Signature verification is currently handled client-side
+          // In production, implement server-side verification
+          signed_message: undefined,
+          signature: undefined
         }
       });
 
@@ -125,17 +146,17 @@ const NCTRLiveSync = ({ onSyncComplete }: NCTRLiveSyncProps) => {
       if (data.success) {
         setLastSyncResult(data);
         
-        const credits = data.credits_applied as SyncCredits;
+        const credits = data.sync_credits as SyncCredits;
         
-        if (credits.total_credited > 0) {
+        if (credits?.total > 0) {
           toast({
             title: "Sync Successful! 🎉",
-            description: `Credited ${credits.total_credited.toFixed(0)} NCTR to your Wings account (${credits.available_nctr.toFixed(0)} available + ${credits.lock_360_nctr.toFixed(0)} in 360LOCK)`,
+            description: `Credited ${credits.total.toFixed(2)} NCTR to your Wings account (${credits.available.toFixed(2)} available + ${credits.lock_360.toFixed(2)} in 360LOCK)`,
           });
         } else {
           toast({
             title: "Sync Complete",
-            description: "Your Wings account is already up to date with NCTR Live.",
+            description: data.message || "Your Wings account is already up to date with NCTR Live.",
           });
         }
 

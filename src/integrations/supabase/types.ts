@@ -422,6 +422,7 @@ export type Database = {
           created_at: string
           id: string
           last_sync_at: string | null
+          last_sync_error: string | null
           lock_360_nctr: number | null
           lock_90_nctr: number | null
           nctr_live_available: number | null
@@ -438,6 +439,7 @@ export type Database = {
           created_at?: string
           id?: string
           last_sync_at?: string | null
+          last_sync_error?: string | null
           lock_360_nctr?: number | null
           lock_90_nctr?: number | null
           nctr_live_available?: number | null
@@ -454,6 +456,7 @@ export type Database = {
           created_at?: string
           id?: string
           last_sync_at?: string | null
+          last_sync_error?: string | null
           lock_360_nctr?: number | null
           lock_90_nctr?: number | null
           nctr_live_available?: number | null
@@ -488,6 +491,30 @@ export type Database = {
           price_usd?: number
           source?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      nctr_sync_rate_limits: {
+        Row: {
+          id: string
+          last_sync_at: string
+          sync_count: number | null
+          user_id: string
+          window_start: string | null
+        }
+        Insert: {
+          id?: string
+          last_sync_at?: string
+          sync_count?: number | null
+          user_id: string
+          window_start?: string | null
+        }
+        Update: {
+          id?: string
+          last_sync_at?: string
+          sync_count?: number | null
+          user_id?: string
+          window_start?: string | null
         }
         Relationships: []
       }
@@ -678,6 +705,9 @@ export type Database = {
           full_name: string | null
           id: string
           last_login_ip: unknown | null
+          nctr_live_email: string | null
+          nctr_live_user_id: string | null
+          nctr_live_verified: boolean | null
           signup_ip: unknown | null
           updated_at: string
           user_id: string
@@ -693,6 +723,9 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_login_ip?: unknown | null
+          nctr_live_email?: string | null
+          nctr_live_user_id?: string | null
+          nctr_live_verified?: boolean | null
           signup_ip?: unknown | null
           updated_at?: string
           user_id: string
@@ -708,6 +741,9 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_login_ip?: unknown | null
+          nctr_live_email?: string | null
+          nctr_live_user_id?: string | null
+          nctr_live_verified?: boolean | null
           signup_ip?: unknown | null
           updated_at?: string
           user_id?: string
@@ -1148,6 +1184,10 @@ export type Database = {
       }
       check_business_data_rate_limit: {
         Args: { p_table_name: string }
+        Returns: boolean
+      }
+      check_nctr_sync_rate_limit: {
+        Args: { p_user_id: string }
         Returns: boolean
       }
       check_price_access_rate_limit: {
