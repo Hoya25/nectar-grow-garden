@@ -1632,7 +1632,7 @@ export type Database = {
         Returns: Json
       }
       revoke_fraudulent_nctr: {
-        Args: { p_reason?: string; p_user_id: string }
+        Args: { p_reason: string; p_user_id: string }
         Returns: Json
       }
       revoke_treasury_access: {
