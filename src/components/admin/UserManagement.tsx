@@ -191,10 +191,14 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      await logActivity('granted_admin', 'user', user.user_id, { 
-        user_name: user.full_name || user.username,
-        user_id: user.user_id
-      });
+      try {
+        await logActivity('granted_admin', 'user', user.user_id, { 
+          user_name: user.full_name || user.username,
+          user_id: user.user_id
+        });
+      } catch (logError) {
+        console.warn('Failed to log activity:', logError);
+      }
 
       toast({
         title: "Admin Access Granted",
@@ -225,10 +229,14 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      await logActivity('revoked_admin', 'user', user.user_id, { 
-        user_name: user.full_name || user.username,
-        user_id: user.user_id
-      });
+      try {
+        await logActivity('revoked_admin', 'user', user.user_id, { 
+          user_name: user.full_name || user.username,
+          user_id: user.user_id
+        });
+      } catch (logError) {
+        console.warn('Failed to log activity:', logError);
+      }
 
       toast({
         title: "Admin Access Revoked",
@@ -259,11 +267,15 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      await logActivity('suspended_user', 'user', user.user_id, { 
-        user_name: user.full_name || user.username,
-        user_id: user.user_id,
-        reason
-      });
+      try {
+        await logActivity('suspended_user', 'user', user.user_id, { 
+          user_name: user.full_name || user.username,
+          user_id: user.user_id,
+          reason
+        });
+      } catch (logError) {
+        console.warn('Failed to log activity:', logError);
+      }
 
       toast({
         title: "User Suspended",
@@ -294,11 +306,15 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      await logActivity('revoked_nctr', 'user', user.user_id, { 
-        user_name: user.full_name || user.username,
-        user_id: user.user_id,
-        reason
-      });
+      try {
+        await logActivity('revoked_nctr', 'user', user.user_id, { 
+          user_name: user.full_name || user.username,
+          user_id: user.user_id,
+          reason
+        });
+      } catch (logError) {
+        console.warn('Failed to log activity:', logError);
+      }
 
       toast({
         title: "NCTR Revoked",
