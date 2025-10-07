@@ -1646,6 +1646,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_users_by_email: {
+        Args: { search_email: string }
+        Returns: {
+          available_nctr: number
+          avatar_url: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_admin: boolean
+          opportunity_status: string
+          total_earned: number
+          user_id: string
+          username: string
+          wallet_address: string
+        }[]
+      }
       secure_business_access_check: {
         Args: { p_table_name: string; p_user_id: string }
         Returns: boolean

@@ -28,7 +28,7 @@ interface UserProfile {
   created_at: string;
   wallet_address?: string;
   wallet_connected_at?: string;
-  // Note: email is no longer included for security reasons
+  email?: string; // Only available when searching by email
 }
 
 interface UserPortfolio {
@@ -48,6 +48,8 @@ const UserManagement = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [emailSearchTerm, setEmailSearchTerm] = useState('');
+  const [searchByEmail, setSearchByEmail] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
@@ -91,6 +93,61 @@ const UserManagement = () => {
       toast({
         title: "Access Denied",
         description: "Admin privileges required to view user data.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchUsersByEmail = async () => {
+    if (!emailSearchTerm.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter an email to search.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: usersData, error: usersError } = await supabase
+        .rpc('search_users_by_email', { search_email: emailSearchTerm });
+
+      if (usersError) throw usersError;
+
+      const enrichedUsers: UserData[] = (usersData || []).map(user => ({
+        id: user.id,
+        user_id: user.user_id,
+        username: user.username,
+        full_name: user.full_name,
+        email: user.email,
+        avatar_url: user.avatar_url,
+        created_at: user.created_at,
+        wallet_address: user.wallet_address,
+        portfolio: {
+          available_nctr: user.available_nctr,
+          pending_nctr: 0,
+          total_earned: user.total_earned,
+          opportunity_status: user.opportunity_status
+        },
+        is_admin: user.is_admin
+      }));
+
+      setUsers(enrichedUsers);
+      
+      if (enrichedUsers.length === 0) {
+        toast({
+          title: "No Results",
+          description: `No users found with email containing "${emailSearchTerm}".`,
+        });
+      }
+    } catch (error) {
+      console.error('Error searching by email:', error);
+      toast({
+        title: "Search Failed",
+        description: "Failed to search users by email.",
         variant: "destructive",
       });
     } finally {
@@ -196,21 +253,74 @@ const UserManagement = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h3 className="text-xl font-semibold">User Management</h3>
-          <p className="text-muted-foreground">View and manage platform users</p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-xl font-semibold">User Management</h3>
+            <p className="text-muted-foreground">View and manage platform users</p>
+          </div>
         </div>
-        
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-64"
-          />
+
+        {/* Search Controls */}
+        <div className="flex gap-2 items-center">
+          <Button
+            variant={!searchByEmail ? "default" : "outline"}
+            size="sm"
+            onClick={() => {
+              setSearchByEmail(false);
+              setEmailSearchTerm('');
+              fetchUsers();
+            }}
+          >
+            Search by Name
+          </Button>
+          <Button
+            variant={searchByEmail ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSearchByEmail(true)}
+          >
+            <Mail className="w-4 h-4 mr-1" />
+            Search by Email
+          </Button>
         </div>
+
+        {searchByEmail ? (
+          <div className="flex gap-2">
+            <div className="relative flex-1 max-w-md">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Enter email to search..."
+                value={emailSearchTerm}
+                onChange={(e) => setEmailSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && searchUsersByEmail()}
+                className="pl-10"
+              />
+            </div>
+            <Button onClick={searchUsersByEmail}>
+              <Search className="w-4 h-4 mr-1" />
+              Search
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setEmailSearchTerm('');
+                fetchUsers();
+              }}
+            >
+              Clear
+            </Button>
+          </div>
+        ) : (
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name or username..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        )}
       </div>
 
       {/* Users Table */}
@@ -273,6 +383,12 @@ const UserManagement = () => {
                       </div>
                       
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        {user.email && (
+                          <div className="flex items-center gap-1">
+                            <Mail className="w-3 h-3" />
+                            {user.email}
+                          </div>
+                        )}
                         {user.username && (
                           <div className="flex items-center gap-1">
                             <Users className="w-3 h-3" />
