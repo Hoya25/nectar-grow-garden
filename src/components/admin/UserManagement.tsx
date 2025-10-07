@@ -4,6 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { toast } from '@/hooks/use-toast';
@@ -545,25 +551,33 @@ const UserManagement = () => {
                       Revoke NCTR
                     </Button>
 
-                    {user.is_admin ? (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => removeAdmin(user)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        Remove Admin
-                      </Button>
-                    ) : (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => makeAdmin(user)}
-                      >
-                        <Shield className="w-4 h-4 mr-1" />
-                        Make Admin
-                      </Button>
-                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="flex items-center gap-1"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {user.is_admin ? (
+                          <DropdownMenuItem 
+                            onClick={() => removeAdmin(user)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Shield className="w-4 h-4 mr-2" />
+                            Remove Admin Access
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem onClick={() => makeAdmin(user)}>
+                            <Shield className="w-4 h-4 mr-2" />
+                            Grant Admin Access
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </CardContent>
