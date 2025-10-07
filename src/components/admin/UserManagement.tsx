@@ -269,16 +269,7 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      try {
-        await logActivity('suspended_user', 'user', user.user_id, { 
-          user_name: user.full_name || user.username,
-          user_id: user.user_id,
-          reason
-        });
-      } catch (logError) {
-        console.warn('Failed to log activity:', logError);
-      }
-
+      // Database function handles logging internally
       toast({
         title: "User Suspended",
         description: `${user.full_name || user.username || 'User'} has been suspended.`,
@@ -308,16 +299,7 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      try {
-        await logActivity('revoked_nctr', 'user', user.user_id, { 
-          user_name: user.full_name || user.username,
-          user_id: user.user_id,
-          reason
-        });
-      } catch (logError) {
-        console.warn('Failed to log activity:', logError);
-      }
-
+      // Database function handles logging internally
       toast({
         title: "NCTR Revoked",
         description: `All NCTR has been revoked from ${user.full_name || user.username || 'User'}.`,
