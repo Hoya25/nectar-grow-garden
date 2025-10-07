@@ -1120,7 +1120,7 @@ I earn ${userReward} NCTR and you get 1000 NCTR in 360LOCK when you sign up!`;
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Get 1 NCTR per dollar spent at partner brands and earn bonuses through referrals
+                    Earn NCTR by shopping with NCTR Alliance brand partners.
                   </p>
                 </CardContent>
               </Card>
