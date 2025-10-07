@@ -1669,7 +1669,7 @@ export type Database = {
         Returns: boolean
       }
       suspend_user_account: {
-        Args: { p_reason?: string; p_user_id: string }
+        Args: { p_reason: string; p_user_id: string }
         Returns: Json
       }
       toggle_opportunity_status_secure: {
