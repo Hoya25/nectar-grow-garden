@@ -171,10 +171,12 @@ const UserManagement = () => {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.username?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = searchByEmail 
+    ? users // When searching by email, show all results without additional filtering
+    : users.filter(user =>
+        user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.username?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
   const makeAdmin = async (user: UserData) => {
     if (!confirm(`Make ${user.full_name || user.username || 'this user'} an admin? They will have access to manage the platform.`)) {
