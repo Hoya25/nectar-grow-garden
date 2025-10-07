@@ -1537,6 +1537,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      is_email_verified: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       is_referral_power_user: {
         Args: { p_user_id: string }
         Returns: boolean
