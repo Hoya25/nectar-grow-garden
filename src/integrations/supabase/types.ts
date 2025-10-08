@@ -1731,6 +1731,10 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: undefined
       }
+      process_completed_referral: {
+        Args: { p_referred_user_id: string }
+        Returns: Json
+      }
       process_daily_checkin: {
         Args: { p_user_id: string }
         Returns: Json
