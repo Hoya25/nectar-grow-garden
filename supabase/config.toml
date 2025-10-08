@@ -1,5 +1,8 @@
 project_id = "rndivcsonsojgelzewkb"
 
+[functions.nctr-live-webhook]
+verify_jwt = false
+
 [functions.receive-earn-withdrawal]
 verify_jwt = false
 
