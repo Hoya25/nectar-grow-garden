@@ -11,6 +11,7 @@ interface WithdrawalRequest {
   user_email?: string;
   transaction_id: string;
   source: string;
+  user_name?: string;
 }
 
 Deno.serve(async (req) => {
@@ -125,6 +126,7 @@ Deno.serve(async (req) => {
           user_id: userId,
           wallet_address: body.wallet_address,
           email: body.user_email,
+          full_name: body.user_name || null,
           username: body.user_email?.split('@')[0] || 'user_' + userId.substring(0, 8),
         });
 
