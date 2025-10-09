@@ -1365,6 +1365,8 @@ export type Database = {
           id: string
           is_admin: boolean
           last_login_at: string
+          lock_360_nctr: number
+          lock_90_nctr: number
           opportunity_status: string
           pending_nctr: number
           total_earned: number

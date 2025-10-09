@@ -47,6 +47,8 @@ interface UserPortfolio {
   available_nctr: number;
   pending_nctr: number;
   total_earned: number;
+  lock_90_nctr: number;
+  lock_360_nctr: number;
   opportunity_status: string;
 }
 
@@ -95,6 +97,8 @@ const UserManagement = () => {
           available_nctr: user.available_nctr,
           pending_nctr: user.pending_nctr,
           total_earned: user.total_earned,
+          lock_90_nctr: user.lock_90_nctr,
+          lock_360_nctr: user.lock_360_nctr,
           opportunity_status: user.opportunity_status
         },
         is_admin: user.is_admin
@@ -147,6 +151,8 @@ const UserManagement = () => {
           available_nctr: user.available_nctr,
           pending_nctr: 0,
           total_earned: user.total_earned,
+          lock_90_nctr: user.lock_90_nctr || 0,
+          lock_360_nctr: user.lock_360_nctr || 0,
           opportunity_status: user.opportunity_status
         },
         is_admin: user.is_admin
