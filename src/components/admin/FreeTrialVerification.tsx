@@ -30,22 +30,33 @@ export const FreeTrialVerification = () => {
 
   const fetchPendingClaims = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch transactions
+      const { data: transactions, error: txError } = await supabase
         .from('nctr_transactions')
-        .select(`
-          *,
-          profiles (
-            full_name,
-            email,
-            username
-          )
-        `)
+        .select('*')
         .eq('earning_source', 'free_trial')
         .eq('status', 'pending_verification')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPendingClaims(data as any || []);
+      if (txError) throw txError;
+
+      // Fetch profile data for each transaction
+      const userIds = transactions?.map(tx => tx.user_id) || [];
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, email, username')
+        .in('user_id', userIds);
+
+      if (profileError) throw profileError;
+
+      // Merge the data
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p]));
+      const mergedData = transactions?.map(tx => ({
+        ...tx,
+        profiles: profileMap.get(tx.user_id) || { full_name: '', email: '', username: '' }
+      })) || [];
+
+      setPendingClaims(mergedData as any);
     } catch (error: any) {
       toast({
         title: "Error Loading Claims",
