@@ -72,7 +72,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // Fetch profiles
+      // Fetch profiles - include email for super admins
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -109,6 +109,7 @@ const UserManagement = () => {
           user_id: profile.user_id,
           username: profile.username,
           full_name: profile.full_name,
+          email: profile.email, // Include email for super admins
           avatar_url: profile.avatar_url,
           created_at: profile.created_at,
           last_login_at: profile.last_login_at,

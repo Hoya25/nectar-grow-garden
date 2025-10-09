@@ -79,38 +79,40 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
     
     setLoading(true);
     try {
-      // Use secure profile summary instead of sensitive data
-      const { data: profileSummary, error: profileError } = await supabase
-        .rpc('get_admin_safe_profile_summary', { target_user_id: user.user_id });
+      // Fetch full profile data directly for super admins
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.user_id)
+        .single();
 
       if (profileError) {
-        console.error('Error fetching profile summary:', profileError);
-        // Use only non-sensitive fallback data
+        console.error('Error fetching profile data:', profileError);
+        // Use fallback data from the user object
         setUserProfile({
           id: user.id,
           user_id: user.user_id,
-          username: user.username ? user.username.substring(0, 3) + '***' : 'N/A',
-          full_name: 'Access restricted',
+          username: user.username || 'N/A',
+          full_name: user.full_name || 'N/A',
           avatar_url: user.avatar_url,
-          email: 'Access restricted',
+          email: user.email || 'No email',
           created_at: user.created_at,
           updated_at: user.updated_at,
-          wallet_address: 'Access restricted',
+          wallet_address: user.wallet_address,
           wallet_connected_at: user.wallet_connected_at
         });
-      } else if (profileSummary && profileSummary.length > 0) {
-        const summary = profileSummary[0];
+      } else {
         setUserProfile({
-          id: user.id,
-          user_id: summary.user_id,
-          username: summary.username, // Already masked in the function
-          full_name: 'Profile data restricted',
-          avatar_url: user.avatar_url,
-          email: 'Access restricted',
-          created_at: summary.created_at,
-          updated_at: summary.updated_at,
-          wallet_address: summary.has_wallet ? 'Connected (details restricted)' : 'Not connected',
-          wallet_connected_at: user.wallet_connected_at
+          id: profileData.id,
+          user_id: profileData.user_id,
+          username: profileData.username,
+          full_name: profileData.full_name,
+          avatar_url: profileData.avatar_url,
+          email: profileData.email || 'No email',
+          created_at: profileData.created_at,
+          updated_at: profileData.updated_at,
+          wallet_address: profileData.wallet_address,
+          wallet_connected_at: profileData.wallet_connected_at
         });
       }
 
@@ -243,11 +245,11 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
                       </div>
                     )}
                     {userProfile?.email && (
-                      <div className="flex justify-between items-center">
+                      <div className="flex flex-col gap-1">
                         <span className="text-sm text-muted-foreground">Email:</span>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm">{userProfile.email}</span>
-                          {userProfile.email !== 'Access restricted' && userProfile.email !== 'No email' && (
+                          <span className="font-medium text-sm break-all">{userProfile.email}</span>
+                          {userProfile.email !== 'No email' && (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -302,11 +304,11 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
                             Connected
                           </Badge>
                         </div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col gap-1">
                           <span className="text-sm text-muted-foreground">Address:</span>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs">
-                              {userProfile.wallet_address.substring(0, 6)}...{userProfile.wallet_address.substring(-4)}
+                            <span className="font-mono text-xs break-all">
+                              {userProfile.wallet_address}
                             </span>
                             <Button
                               variant="ghost"
