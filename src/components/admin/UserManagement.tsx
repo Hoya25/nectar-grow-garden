@@ -72,37 +72,60 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // Use secure admin function instead of direct queries
-      const { data: usersData, error: usersError } = await supabase
-        .rpc('get_admin_user_list');
+      // Fetch profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (usersError) {
-        throw usersError;
-      }
+      if (profilesError) throw profilesError;
 
-      // Transform the data to match expected format
-      const enrichedUsers: UserData[] = ((usersData || []) as any[]).map((user: any) => ({
-        id: user.id,
-        user_id: user.user_id,
-        username: user.username,
-        full_name: user.full_name,
-        avatar_url: user.avatar_url,
-        created_at: user.created_at,
-        last_login_at: user.last_login_at,
-        updated_at: user.updated_at,
-        wallet_address: user.wallet_address,
-        wallet_connected_at: user.wallet_connected_at,
-        account_status: user.account_status,
-        portfolio: {
-          available_nctr: user.available_nctr,
-          pending_nctr: user.pending_nctr,
-          total_earned: user.total_earned,
-          lock_90_nctr: user.lock_90_nctr,
-          lock_360_nctr: user.lock_360_nctr,
-          opportunity_status: user.opportunity_status
-        },
-        is_admin: user.is_admin
-      }));
+      // Fetch portfolios for all users
+      const userIds = profiles?.map(p => p.user_id) || [];
+      const { data: portfolios, error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .select('*')
+        .in('user_id', userIds);
+
+      if (portfolioError) throw portfolioError;
+
+      // Check admin status for all users
+      const { data: adminUsers, error: adminError } = await supabase
+        .from('admin_users')
+        .select('user_id')
+        .in('user_id', userIds);
+
+      if (adminError) throw adminError;
+
+      // Create lookup maps
+      const portfolioMap = new Map(portfolios?.map(p => [p.user_id, p]));
+      const adminSet = new Set(adminUsers?.map(a => a.user_id));
+
+      // Combine the data
+      const enrichedUsers: UserData[] = (profiles || []).map((profile: any) => {
+        const portfolio = portfolioMap.get(profile.user_id);
+        return {
+          id: profile.id,
+          user_id: profile.user_id,
+          username: profile.username,
+          full_name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          created_at: profile.created_at,
+          last_login_at: profile.last_login_at,
+          wallet_address: profile.wallet_address,
+          wallet_connected_at: profile.wallet_connected_at,
+          account_status: profile.account_status,
+          portfolio: portfolio ? {
+            available_nctr: portfolio.available_nctr,
+            pending_nctr: portfolio.pending_nctr,
+            total_earned: portfolio.total_earned,
+            lock_90_nctr: portfolio.lock_90_nctr,
+            lock_360_nctr: portfolio.lock_360_nctr,
+            opportunity_status: portfolio.opportunity_status
+          } : undefined,
+          is_admin: adminSet.has(profile.user_id)
+        };
+      });
 
       setUsers(enrichedUsers);
     } catch (error) {
@@ -128,49 +151,74 @@ const UserManagement = () => {
     }
 
     setLoading(true);
-    console.log('Searching for email:', emailSearchTerm);
     try {
-      const { data: usersData, error: usersError } = await supabase
-        .rpc('search_users_by_email', { search_email: emailSearchTerm });
+      // Search profiles by email
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .ilike('email', `%${emailSearchTerm}%`);
 
-      console.log('Search results:', { usersData, usersError });
+      if (profilesError) throw profilesError;
 
-      if (usersError) throw usersError;
-
-      const enrichedUsers: UserData[] = ((usersData || []) as any[]).map((user: any) => ({
-        id: user.id,
-        user_id: user.user_id,
-        username: user.username,
-        full_name: user.full_name,
-        email: user.email,
-        avatar_url: user.avatar_url,
-        created_at: user.created_at,
-        wallet_address: user.wallet_address,
-        account_status: user.account_status,
-        portfolio: {
-          available_nctr: user.available_nctr,
-          pending_nctr: 0,
-          total_earned: user.total_earned,
-          lock_90_nctr: user.lock_90_nctr || 0,
-          lock_360_nctr: user.lock_360_nctr || 0,
-          opportunity_status: user.opportunity_status
-        },
-        is_admin: user.is_admin
-      }));
-
-      setUsers(enrichedUsers);
-      
-      if (enrichedUsers.length === 0) {
+      if (!profiles || profiles.length === 0) {
+        setUsers([]);
         toast({
           title: "No Results",
           description: `No users found with email containing "${emailSearchTerm}".`,
         });
-      } else {
-        toast({
-          title: "Search Complete",
-          description: `Found ${enrichedUsers.length} user(s).`,
-        });
+        return;
       }
+
+      // Fetch portfolios for matched users
+      const userIds = profiles.map(p => p.user_id);
+      const { data: portfolios, error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .select('*')
+        .in('user_id', userIds);
+
+      if (portfolioError) throw portfolioError;
+
+      // Check admin status
+      const { data: adminUsers, error: adminError } = await supabase
+        .from('admin_users')
+        .select('user_id')
+        .in('user_id', userIds);
+
+      if (adminError) throw adminError;
+
+      // Create lookup maps
+      const portfolioMap = new Map(portfolios?.map(p => [p.user_id, p]));
+      const adminSet = new Set(adminUsers?.map(a => a.user_id));
+
+      const enrichedUsers: UserData[] = profiles.map((profile: any) => {
+        const portfolio = portfolioMap.get(profile.user_id);
+        return {
+          id: profile.id,
+          user_id: profile.user_id,
+          username: profile.username,
+          full_name: profile.full_name,
+          email: profile.email,
+          avatar_url: profile.avatar_url,
+          created_at: profile.created_at,
+          wallet_address: profile.wallet_address,
+          account_status: profile.account_status,
+          portfolio: portfolio ? {
+            available_nctr: portfolio.available_nctr,
+            pending_nctr: portfolio.pending_nctr,
+            total_earned: portfolio.total_earned,
+            lock_90_nctr: portfolio.lock_90_nctr,
+            lock_360_nctr: portfolio.lock_360_nctr,
+            opportunity_status: portfolio.opportunity_status
+          } : undefined,
+          is_admin: adminSet.has(profile.user_id)
+        };
+      });
+
+      setUsers(enrichedUsers);
+      toast({
+        title: "Search Complete",
+        description: `Found ${enrichedUsers.length} user(s).`,
+      });
     } catch (error) {
       console.error('Error searching by email:', error);
       toast({
