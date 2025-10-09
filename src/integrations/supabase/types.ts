@@ -1773,6 +1773,8 @@ export type Database = {
           created_at: string
           email: string
           full_name: string
+          id: string
+          is_admin: boolean
           lock_360_nctr: number
           lock_90_nctr: number
           opportunity_status: string
