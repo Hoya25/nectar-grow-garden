@@ -98,6 +98,34 @@ export const RewardDisplay = ({
 
   return (
     <div className={config.container}>
+      {/* Token Logos Window - Show all active reward tokens */}
+      <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700 mb-3">
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          {/* NCTR Logo */}
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-950 px-3 py-2 rounded-lg shadow-sm">
+            <img src={nctrLogo} alt="NCTR" className="h-6 w-auto" />
+            <span className="text-xs font-semibold text-primary">NCTR</span>
+          </div>
+          
+          {/* Alliance Token Logo (if enabled) */}
+          {opportunity.alliance_token_enabled && opportunity.alliance_token_symbol && (
+            <div className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/50 dark:to-indigo-950/50 px-3 py-2 rounded-lg shadow-sm border border-purple-200 dark:border-purple-800">
+              {opportunity.alliance_token_logo_url && (
+                <img 
+                  src={opportunity.alliance_token_logo_url} 
+                  alt={opportunity.alliance_token_symbol} 
+                  className="h-6 w-auto"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              )}
+              <span className="text-xs font-semibold text-purple-700 dark:text-purple-400">
+                {opportunity.alliance_token_symbol}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Legacy Reward Display */}
       {isLegacyReward && (
         <>
@@ -184,6 +212,9 @@ export const RewardDisplay = ({
           </div>
           <div className="text-center space-y-2">
             <div className={config.flex + ' justify-center'}>
+              <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
+                +{formatAllianceToken(opportunity.alliance_token_ratio)}
+              </span>
               {opportunity.alliance_token_logo_url && (
                 <img 
                   src={opportunity.alliance_token_logo_url} 
@@ -192,12 +223,11 @@ export const RewardDisplay = ({
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               )}
-              <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
-                +{formatAllianceToken(opportunity.alliance_token_ratio)}
-              </span>
-              <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
-                {opportunity.alliance_token_symbol}
-              </span>
+              {!opportunity.alliance_token_logo_url && (
+                <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
+                  {opportunity.alliance_token_symbol}
+                </span>
+              )}
             </div>
             <div className={`${config.perDollarText} text-purple-600 dark:text-purple-400`}>
               per $1 spent

@@ -1781,17 +1781,47 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="alliance_token_logo_url">Token Logo URL</Label>
-                        <Input
-                          id="alliance_token_logo_url"
-                          type="url"
-                          value={formData.alliance_token_logo_url}
-                          onChange={(e) => setFormData({...formData, alliance_token_logo_url: e.target.value})}
-                          placeholder="https://example.com/token-logo.png"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Token logo to display alongside rewards
-                        </p>
+                        <Label htmlFor="alliance_token_logo_url">Token Logo</Label>
+                        <div className="space-y-2">
+                          <Input
+                            id="alliance_token_logo_file"
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                // Convert to base64 for preview and storage
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setFormData({...formData, alliance_token_logo_url: reader.result as string});
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                          <div className="text-xs text-muted-foreground">Or paste image URL below:</div>
+                          <Input
+                            id="alliance_token_logo_url"
+                            type="text"
+                            value={formData.alliance_token_logo_url}
+                            onChange={(e) => setFormData({...formData, alliance_token_logo_url: e.target.value})}
+                            placeholder="https://example.com/token-logo.png or paste base64"
+                          />
+                          {formData.alliance_token_logo_url && (
+                            <div className="mt-2 p-2 border rounded-lg bg-muted">
+                              <p className="text-xs text-muted-foreground mb-2">Preview:</p>
+                              <img 
+                                src={formData.alliance_token_logo_url} 
+                                alt="Token logo preview" 
+                                className="h-12 w-12 object-contain"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '';
+                                  (e.target as HTMLImageElement).alt = 'Invalid image';
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
