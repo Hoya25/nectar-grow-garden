@@ -207,9 +207,11 @@ export const RewardDisplay = ({
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               )}
-              <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
-                {opportunity.alliance_token_symbol}
-              </span>
+              {!opportunity.alliance_token_logo_url && (
+                <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
+                  {opportunity.alliance_token_symbol}
+                </span>
+              )}
             </div>
             <div className={`${config.perDollarText} text-purple-600 dark:text-purple-400`}>
               per $1 spent
