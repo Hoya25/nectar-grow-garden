@@ -103,7 +103,7 @@ export const RewardDisplay = ({
         <div className="flex items-center justify-center gap-4 flex-wrap">
           {/* NCTR Logo - Transparent background */}
           <div className="flex items-center justify-center px-3 py-2">
-            <img src={nctrLogo} alt="NCTR" className="h-8 w-auto" />
+            <img src={nctrLogo} alt="NCTR" className="h-16 w-auto" />
           </div>
           
           {/* Alliance Token Logo (if enabled) - Transparent background */}
@@ -112,7 +112,7 @@ export const RewardDisplay = ({
               <img 
                 src={opportunity.alliance_token_logo_url} 
                 alt={opportunity.alliance_token_symbol} 
-                className="h-8 w-auto"
+                className="h-16 w-auto"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             </div>
