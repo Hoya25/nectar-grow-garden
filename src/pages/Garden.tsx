@@ -1636,7 +1636,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                             return formatNCTR(total || 50);
                           })()}
                         </span>
-                        <img src={nctrLogo} alt="NCTR" className="h-10 w-auto" />
+                        <img src={nctrLogo} alt="NCTR" className="h-28 w-auto" />
                       </div>
                       <p className="text-sm text-green-600 mb-4">Total Available Bonus</p>
                       
@@ -1745,7 +1745,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                                   }
                                 })()}
                               </span>
-                              <img src={nctrLogo} alt="NCTR" className="h-8 sm:h-10 w-auto" />
+                              <img src={nctrLogo} alt="NCTR" className="h-24 sm:h-28 w-auto" />
                             </div>
                             {/* Only show "Per $1 Spent" for shopping opportunities */}
                             {opportunity.opportunity_type === 'shopping' && (
