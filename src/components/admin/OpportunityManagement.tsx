@@ -1800,15 +1800,15 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                           <Input
                             id="alliance_token_ratio"
                             type="number"
-                            step="0.01"
+                            step="0.00001"
                             min="0"
                             value={formData.alliance_token_ratio}
                             onChange={(e) => setFormData({...formData, alliance_token_ratio: parseFloat(e.target.value) || 0})}
-                            placeholder="10"
+                            placeholder="10.00000"
                             required={formData.alliance_token_enabled}
                           />
                           <p className="text-xs text-muted-foreground">
-                            How many tokens earned per $1 spent
+                            How many tokens earned per $1 spent (up to 5 decimal places)
                           </p>
                         </div>
 
