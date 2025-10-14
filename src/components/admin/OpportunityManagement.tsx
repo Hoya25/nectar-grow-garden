@@ -1792,11 +1792,26 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (file) {
+                                // Validate file size (max 100KB for base64 efficiency)
+                                const maxSizeKB = 100;
+                                const fileSizeKB = file.size / 1024;
+                                
+                                if (fileSizeKB > maxSizeKB) {
+                                  toast({
+                                    title: "⚠️ Image Too Large",
+                                    description: `Image is ${Math.round(fileSizeKB)}KB. Please use an image under ${maxSizeKB}KB for best performance.`,
+                                    variant: "destructive",
+                                  });
+                                  e.target.value = ''; // Clear the file input
+                                  return;
+                                }
+                                
                                 setUploadingLogo(true);
                                 toast({
-                                  title: "Processing Logo",
+                                  title: "🔄 Processing Logo",
                                   description: "Converting image to base64 format...",
                                 });
+                                
                                 // Convert to base64 for preview and storage
                                 const reader = new FileReader();
                                 reader.onloadend = () => {
@@ -1804,22 +1819,23 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                                   setUploadingLogo(false);
                                   toast({
                                     title: "✅ Logo Ready",
-                                    description: "Alliance Token logo has been processed successfully.",
+                                    description: `${file.name} has been processed successfully (${Math.round(fileSizeKB)}KB).`,
                                   });
                                 };
                                 reader.onerror = () => {
                                   setUploadingLogo(false);
                                   toast({
-                                    title: "Error",
-                                    description: "Failed to process logo image.",
+                                    title: "❌ Processing Failed",
+                                    description: "Failed to process logo image. Please try again.",
                                     variant: "destructive",
                                   });
+                                  e.target.value = ''; // Clear the file input
                                 };
                                 reader.readAsDataURL(file);
                               }
                             }}
                           />
-                          <div className="text-xs text-muted-foreground">Or paste image URL below:</div>
+                          <p className="text-xs text-muted-foreground">Recommended: PNG/JPG under 100KB. Or paste URL below:</p>
                           <Input
                             id="alliance_token_logo_url"
                             type="text"
@@ -1829,14 +1845,25 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                           />
                           {formData.alliance_token_logo_url && (
                             <div className="mt-2 p-2 border rounded-lg bg-muted">
-                              <p className="text-xs text-muted-foreground mb-2">Preview:</p>
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-muted-foreground">Preview:</p>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setFormData({...formData, alliance_token_logo_url: ''})}
+                                  className="h-6 text-xs"
+                                >
+                                  Clear
+                                </Button>
+                              </div>
                               <img 
                                 src={formData.alliance_token_logo_url} 
                                 alt="Token logo preview" 
-                                className="h-12 w-12 object-contain"
+                                className="h-16 w-16 object-contain bg-white/50 rounded p-1"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).src = '';
-                                  (e.target as HTMLImageElement).alt = 'Invalid image';
+                                  (e.target as HTMLImageElement).alt = '❌ Invalid image';
                                 }}
                               />
                             </div>
