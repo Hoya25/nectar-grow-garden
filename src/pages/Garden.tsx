@@ -1627,7 +1627,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
                     <div className="text-center py-4 mb-4">
                       {/* Total Available Bonus */}
-                      <div className="flex items-center justify-center gap-1 mb-3">
+                      <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-3xl font-bold text-green-600">
                           {(() => {
                             const total = (opportunity.available_nctr_reward || 0) + 
@@ -1638,7 +1638,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                         </span>
                         <img src={nctrLogo} alt="NCTR" className="h-28 w-auto -ml-8" />
                       </div>
-                      <p className="text-sm text-green-600 mb-4">Total Available Bonus</p>
+                      <p className="text-sm text-green-600 mb-2">Total Available Bonus</p>
                       
                       {/* Reward Breakdown */}
                       <div className="bg-white/50 rounded-lg p-3 mb-4">
@@ -1728,9 +1728,9 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                           </div>
                         </div>
 
-                          <div className="text-center mb-4 sm:mb-6">
+                          <div className="text-center mb-3 sm:mb-4">
                            {/* Total NCTR Earn Opportunity */}
-                            <div className="flex items-center justify-center gap-1 text-2xl sm:text-3xl font-bold text-primary mb-2">
+                            <div className="flex items-center justify-center gap-1 text-2xl sm:text-3xl font-bold text-primary mb-1">
                               <span>
                                 {(() => {
                                   if (opportunity.opportunity_type === 'invite') {
@@ -1749,10 +1749,10 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                             </div>
                             {/* Only show "Per $1 Spent" for shopping opportunities */}
                             {opportunity.opportunity_type === 'shopping' && (
-                              <div className="text-xs sm:text-sm text-muted-foreground mb-4">Per $1 Spent</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground mb-2">Per $1 Spent</div>
                             )}
                             {opportunity.opportunity_type === 'invite' && (
-                              <div className="text-xs sm:text-sm text-muted-foreground mb-4">
+                              <div className="text-xs sm:text-sm text-muted-foreground mb-2">
                                 {userMultiplier > 1 ? (
                                   <span>
                                     Wings <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
