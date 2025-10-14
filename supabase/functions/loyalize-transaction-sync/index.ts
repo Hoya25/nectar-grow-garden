@@ -222,7 +222,9 @@ serve(async (req) => {
           {
             p_user_id: userId,
             p_base_nctr_amount: baseNctrReward,
-            p_earning_source: 'affiliate_purchase'
+            p_earning_source: 'affiliate_purchase',
+            p_brand_name: brand?.name || storeName,
+            p_purchase_amount: amount
           }
         )
 
