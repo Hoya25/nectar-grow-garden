@@ -35,7 +35,12 @@ interface Portfolio {
   lock_90_nctr: number;
   lock_360_nctr: number;
   opportunity_status: string;
-  alliance_tokens?: Record<string, number>;
+  alliance_tokens?: Record<string, {
+    name: string;
+    symbol: string;
+    amount: number;
+    logo_url?: string;
+  }> | null;
 }
 
 interface Lock {
@@ -159,14 +164,16 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
               <Wallet className="h-5 w-5 text-purple-600" />
             </div>
             <div className="space-y-2">
-              {Object.entries(portfolio.alliance_tokens).map(([symbol, amount]) => (
-                <div key={symbol} className="flex items-center justify-between bg-white/50 rounded-lg p-2">
-                  <span className="text-xs font-medium text-purple-900">{symbol}</span>
+              {Object.entries(portfolio.alliance_tokens).map(([key, token]) => (
+                <div key={key} className="flex items-center justify-between bg-white/50 rounded-lg p-2">
+                  <div className="flex items-center gap-2">
+                    {token.logo_url && (
+                      <img src={token.logo_url} alt={token.name} className="w-5 h-5 rounded-full" />
+                    )}
+                    <span className="text-xs font-medium text-purple-900">{token.symbol}</span>
+                  </div>
                   <span className="text-sm font-bold text-purple-700">
-                    {amount.toLocaleString('en-US', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}
+                    {token.amount.toFixed(4)}
                   </span>
                 </div>
               ))}
