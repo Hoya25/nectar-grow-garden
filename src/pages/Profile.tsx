@@ -919,30 +919,30 @@ const Profile = () => {
                      Alliance Token Bonuses
                    </CardTitle>
                    <p className="text-xs text-muted-foreground">
-                     Tokens earned through brand partnerships
+                     {Object.values(portfolio.alliance_tokens).map(t => t.name).join(', ')} earned through partnerships
                    </p>
                  </CardHeader>
                  <CardContent className="space-y-3">
                    {Object.entries(portfolio.alliance_tokens).map(([key, token]) => (
-                     <div key={key} className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
+                     <div key={key} className="flex items-center justify-between p-3 bg-primary/10 rounded-lg border border-primary/20">
                        <div className="flex items-center gap-3">
                          {token.logo_url && (
                            <img 
                              src={token.logo_url} 
                              alt={token.name}
-                             className="w-8 h-8 rounded-full"
+                             className="w-10 h-10 rounded-full"
                            />
                          )}
                          <div>
-                           <div className="font-medium text-foreground">{token.name}</div>
-                           <div className="text-xs text-muted-foreground">{token.symbol}</div>
+                           <div className="font-bold text-foreground text-base">{token.name}</div>
+                           <div className="text-sm text-muted-foreground font-medium">{token.symbol}</div>
                          </div>
                        </div>
                        <div className="text-right">
-                         <div className="font-semibold text-primary">
+                         <div className="font-bold text-primary text-lg">
                            {token.amount.toFixed(4)}
                          </div>
-                         <div className="text-xs text-muted-foreground">{token.symbol}</div>
+                         <div className="text-sm text-muted-foreground font-medium">{token.symbol}</div>
                        </div>
                      </div>
                    ))}
