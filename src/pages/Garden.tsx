@@ -44,6 +44,7 @@ interface Portfolio {
   opportunity_status: string;
   lock_90_nctr: number;
   lock_360_nctr: number;
+  alliance_tokens?: any; // JSONB field storing token balances as {"SOL": 100, "BASE": 250}
 }
 
 interface LockCommitment {
@@ -80,6 +81,13 @@ interface EarningOpportunity {
   lock_360_nctr_reward?: number;
   reward_distribution_type?: string;
   reward_structure?: any;
+  // Alliance Token fields
+  alliance_token_enabled?: boolean;
+  alliance_token_name?: string;
+  alliance_token_symbol?: string;
+  alliance_token_logo_url?: string;
+  alliance_token_ratio?: number;
+  alliance_token_lock_days?: number;
   // Joined brand data
   brands?: {
     id: string;
@@ -394,7 +402,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
-        .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr')
+        .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr, alliance_tokens')
         .eq('user_id', user?.id)
         .single();
 
@@ -1407,6 +1415,39 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     </CardContent>
                   </Card>
                 </div>
+
+                {/* Alliance Tokens Display */}
+                {portfolio?.alliance_tokens && Object.keys(portfolio.alliance_tokens).length > 0 && (
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                      <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wide">
+                        Alliance Token Balances
+                      </h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {Object.entries(portfolio.alliance_tokens as Record<string, number>).map(([symbol, amount]) => (
+                        <Card key={symbol} className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 border-2 border-purple-300 dark:border-purple-700">
+                          <CardContent className="p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-400">{symbol}</span>
+                            </div>
+                            <p className="text-2xl font-bold text-purple-700 dark:text-purple-300 mb-1">
+                              {new Intl.NumberFormat('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 5,
+                              }).format(amount)}
+                            </p>
+                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 text-xs">
+                              🔒 Alliance Token
+                            </Badge>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Buy NCTR Button - Hidden on mobile to avoid duplication with banner button */}
                 <div className="mb-6 hidden md:flex justify-center">

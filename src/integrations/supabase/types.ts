@@ -147,6 +147,56 @@ export type Database = {
         }
         Relationships: []
       }
+      alliance_token_locks: {
+        Row: {
+          created_at: string
+          id: string
+          lock_date: string
+          lock_days: number
+          opportunity_id: string | null
+          status: string
+          token_amount: number
+          token_name: string
+          token_symbol: string
+          unlock_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lock_date?: string
+          lock_days: number
+          opportunity_id?: string | null
+          status?: string
+          token_amount: number
+          token_name: string
+          token_symbol: string
+          unlock_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lock_date?: string
+          lock_days?: number
+          opportunity_id?: string | null
+          status?: string
+          token_amount?: number
+          token_name?: string
+          token_symbol?: string
+          unlock_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alliance_token_locks_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "earning_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_rate_limits: {
         Row: {
           created_at: string | null
@@ -436,6 +486,7 @@ export type Database = {
       }
       nctr_portfolio: {
         Row: {
+          alliance_tokens: Json | null
           available_nctr: number
           created_at: string
           id: string
@@ -453,6 +504,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          alliance_tokens?: Json | null
           available_nctr?: number
           created_at?: string
           id?: string
@@ -470,6 +522,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          alliance_tokens?: Json | null
           available_nctr?: number
           created_at?: string
           id?: string
@@ -538,6 +591,8 @@ export type Database = {
       }
       nctr_transactions: {
         Row: {
+          alliance_token_amount: number | null
+          alliance_token_symbol: string | null
           auto_lock_type: string | null
           created_at: string
           description: string | null
@@ -554,6 +609,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          alliance_token_amount?: number | null
+          alliance_token_symbol?: string | null
           auto_lock_type?: string | null
           created_at?: string
           description?: string | null
@@ -570,6 +627,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          alliance_token_amount?: number | null
+          alliance_token_symbol?: string | null
           auto_lock_type?: string | null
           created_at?: string
           description?: string | null
