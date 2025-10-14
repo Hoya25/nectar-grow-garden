@@ -42,6 +42,12 @@ interface Portfolio {
   lock_360_nctr: number;
   lock_90_nctr: number;
   pending_nctr: number;
+  alliance_tokens?: Record<string, {
+    name: string;
+    symbol: string;
+    amount: number;
+    logo_url?: string;
+  }> | null;
 }
 
 interface StatusLevel {
@@ -126,7 +132,7 @@ const Profile = () => {
       // Fetch portfolio
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
-        .select('opportunity_status, available_nctr, total_earned, lock_360_nctr, lock_90_nctr, pending_nctr')
+        .select('opportunity_status, available_nctr, total_earned, lock_360_nctr, lock_90_nctr, pending_nctr, alliance_tokens')
         .eq('user_id', user?.id)
         .maybeSingle();
 
@@ -179,7 +185,7 @@ const Profile = () => {
         .maybeSingle();
 
       setProfile(profileData);
-      setPortfolio(portfolioData);
+      setPortfolio(portfolioData as Portfolio);
       setStatusLevels(statusLevelsData || []);
       setIsAdmin(!!adminData);
 
@@ -900,17 +906,67 @@ const Profile = () => {
                        Connect wallet to enable withdrawals
                      </p>
                    )}
+                 </CardContent>
+               </Card>
+             )}
 
-                   <Button 
-                     variant="outline" 
-                     className="w-full"
-                     onClick={() => navigate('/garden')}
-                   >
-                     Earn More NCTR
-                   </Button>
-                </CardContent>
-              </Card>
-            )}
+             {/* Alliance Tokens */}
+             {portfolio && portfolio.alliance_tokens && Object.keys(portfolio.alliance_tokens).length > 0 && (
+               <Card className="bg-card/80 backdrop-blur-sm border-2 border-primary/20">
+                 <CardHeader className="pb-4">
+                   <CardTitle className="flex items-center gap-2 text-lg">
+                     <TrendingUp className="h-5 w-5 text-primary" />
+                     Alliance Token Bonuses
+                   </CardTitle>
+                   <p className="text-xs text-muted-foreground">
+                     Tokens earned through brand partnerships
+                   </p>
+                 </CardHeader>
+                 <CardContent className="space-y-3">
+                   {Object.entries(portfolio.alliance_tokens).map(([key, token]) => (
+                     <div key={key} className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg">
+                       <div className="flex items-center gap-3">
+                         {token.logo_url && (
+                           <img 
+                             src={token.logo_url} 
+                             alt={token.name}
+                             className="w-8 h-8 rounded-full"
+                           />
+                         )}
+                         <div>
+                           <div className="font-medium text-foreground">{token.name}</div>
+                           <div className="text-xs text-muted-foreground">{token.symbol}</div>
+                         </div>
+                       </div>
+                       <div className="text-right">
+                         <div className="font-semibold text-primary">
+                           {token.amount.toFixed(4)}
+                         </div>
+                         <div className="text-xs text-muted-foreground">{token.symbol}</div>
+                       </div>
+                     </div>
+                   ))}
+                 </CardContent>
+               </Card>
+             )}
+
+             {/* Wallet Connection if connected */}
+             {profile?.wallet_address && (
+               <Card className="bg-card/80 backdrop-blur-sm">
+                 <CardHeader className="pb-4">
+                   <div className="flex items-center justify-between">
+                     <CardTitle className="flex items-center gap-2 text-lg">
+                       <Wallet className="h-5 w-5 text-foreground" />
+                       Coinbase Wallet
+                     </CardTitle>
+                     <BaseBadge size="sm" variant="light" />
+                   </div>
+                  </CardHeader>
+                  <CardContent>
+                    <WalletConnection />
+                  </CardContent>
+                </Card>
+              )}
 
             {/* NCTR Contract Information */}
             <Card className="bg-card/80 backdrop-blur-sm border-2 border-amber-500/20">
