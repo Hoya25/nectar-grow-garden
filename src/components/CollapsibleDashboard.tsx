@@ -35,6 +35,7 @@ interface Portfolio {
   lock_90_nctr: number;
   lock_360_nctr: number;
   opportunity_status: string;
+  alliance_tokens?: Record<string, number>;
 }
 
 interface Lock {
@@ -149,6 +150,32 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         <h2 className="text-base font-semibold section-heading">Dashboard</h2>
       </div>
       
+      {/* Alliance Tokens Display - Show if user has any */}
+      {portfolio?.alliance_tokens && Object.keys(portfolio.alliance_tokens).length > 0 && (
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 shadow-soft border border-purple-200 col-span-2">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-semibold text-purple-700">Alliance Tokens</p>
+              <Wallet className="h-5 w-5 text-purple-600" />
+            </div>
+            <div className="space-y-2">
+              {Object.entries(portfolio.alliance_tokens).map(([symbol, amount]) => (
+                <div key={symbol} className="flex items-center justify-between bg-white/50 rounded-lg p-2">
+                  <span className="text-xs font-medium text-purple-900">{symbol}</span>
+                  <span className="text-sm font-bold text-purple-700">
+                    {amount.toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-purple-600 mt-2">Locked partner tokens</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Portfolio Overview Cards - Mobile Optimized */}
       <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3 lg:space-y-0">
         <Card className="bg-white shadow-soft border border-section-border/30 col-span-2 sm:col-span-1 lg:col-span-1">
