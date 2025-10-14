@@ -30,7 +30,7 @@ import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
 import { BaseBadge } from '@/components/BaseBadge';
-import nctrLogo from "@/assets/nctr-logo-grey.png";
+import nctrLogo from "@/assets/nctr-logo-transparent.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';

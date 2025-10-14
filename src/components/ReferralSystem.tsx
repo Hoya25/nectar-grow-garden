@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useInviteReward } from '@/hooks/useInviteReward';
 import { toast } from '@/hooks/use-toast';
 import { Copy, Check, Share2, Mail, MessageCircle, Users } from 'lucide-react';
-import nctrLogo from "@/assets/nctr-logo-grey.png";
+import nctrLogo from "@/assets/nctr-logo-transparent.png";
 
 interface ReferralStats {
   total_referrals: number;
