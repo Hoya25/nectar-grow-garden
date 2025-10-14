@@ -225,6 +225,12 @@ export type Database = {
       earning_opportunities: {
         Row: {
           affiliate_link: string | null
+          alliance_token_enabled: boolean | null
+          alliance_token_lock_days: number | null
+          alliance_token_logo_url: string | null
+          alliance_token_name: string | null
+          alliance_token_ratio: number | null
+          alliance_token_symbol: string | null
           available_nctr_reward: number | null
           brand_id: string | null
           created_at: string
@@ -256,6 +262,12 @@ export type Database = {
         }
         Insert: {
           affiliate_link?: string | null
+          alliance_token_enabled?: boolean | null
+          alliance_token_lock_days?: number | null
+          alliance_token_logo_url?: string | null
+          alliance_token_name?: string | null
+          alliance_token_ratio?: number | null
+          alliance_token_symbol?: string | null
           available_nctr_reward?: number | null
           brand_id?: string | null
           created_at?: string
@@ -287,6 +299,12 @@ export type Database = {
         }
         Update: {
           affiliate_link?: string | null
+          alliance_token_enabled?: boolean | null
+          alliance_token_lock_days?: number | null
+          alliance_token_logo_url?: string | null
+          alliance_token_name?: string | null
+          alliance_token_ratio?: number | null
+          alliance_token_symbol?: string | null
           available_nctr_reward?: number | null
           brand_id?: string | null
           created_at?: string

@@ -65,6 +65,13 @@ interface EarningOpportunity {
   lock_360_nctr_reward?: number;
   reward_distribution_type?: string;
   reward_structure?: any;
+  // Alliance Token fields
+  alliance_token_enabled?: boolean;
+  alliance_token_name?: string;
+  alliance_token_symbol?: string;
+  alliance_token_logo_url?: string;
+  alliance_token_ratio?: number;
+  alliance_token_lock_days?: number;
 }
 
 interface Brand {
@@ -112,6 +119,12 @@ const opportunitySchema = z.object({
   lock_90_nctr_reward: z.number().min(0).max(1000000).finite().optional(),
   lock_360_nctr_reward: z.number().min(0).max(1000000).finite().optional(),
   reward_distribution_type: z.string().optional(),
+  alliance_token_enabled: z.boolean().optional(),
+  alliance_token_name: z.string().trim().max(100).optional(),
+  alliance_token_symbol: z.string().trim().max(20).optional(),
+  alliance_token_logo_url: z.string().trim().max(500).optional(),
+  alliance_token_ratio: z.number().min(0).max(1000000).finite().optional(),
+  alliance_token_lock_days: z.number().int().min(0).max(3650).optional(),
   is_active: z.boolean()
 });
 
@@ -148,7 +161,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     available_nctr_reward: 0,
     lock_90_nctr_reward: 0,
     lock_360_nctr_reward: 0,
-    reward_distribution_type: 'legacy'
+    reward_distribution_type: 'legacy',
+    // Alliance Token fields
+    alliance_token_enabled: false,
+    alliance_token_name: '',
+    alliance_token_symbol: '',
+    alliance_token_logo_url: '',
+    alliance_token_ratio: 0,
+    alliance_token_lock_days: 90
   });
 
   useEffect(() => {
@@ -265,7 +285,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       available_nctr_reward: 0,
       lock_90_nctr_reward: 0,
       lock_360_nctr_reward: 0,
-      reward_distribution_type: 'legacy'
+      reward_distribution_type: 'legacy',
+      // Alliance Token fields
+      alliance_token_enabled: false,
+      alliance_token_name: '',
+      alliance_token_symbol: '',
+      alliance_token_logo_url: '',
+      alliance_token_ratio: 0,
+      alliance_token_lock_days: 90
     });
     setEditingOpportunity(null);
     setSelectedBrand(null);
@@ -294,7 +321,14 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       available_nctr_reward: opportunity.available_nctr_reward || 0,
       lock_90_nctr_reward: opportunity.lock_90_nctr_reward || 0,
       lock_360_nctr_reward: opportunity.lock_360_nctr_reward || 0,
-      reward_distribution_type: opportunity.reward_distribution_type || 'legacy'
+      reward_distribution_type: opportunity.reward_distribution_type || 'legacy',
+      // Alliance Token fields
+      alliance_token_enabled: opportunity.alliance_token_enabled || false,
+      alliance_token_name: opportunity.alliance_token_name || '',
+      alliance_token_symbol: opportunity.alliance_token_symbol || '',
+      alliance_token_logo_url: opportunity.alliance_token_logo_url || '',
+      alliance_token_ratio: opportunity.alliance_token_ratio || 0,
+      alliance_token_lock_days: opportunity.alliance_token_lock_days || 90
     });
     
     // Set logo preview for existing logo
@@ -1695,6 +1729,123 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Alliance Token Section */}
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 p-6 rounded-lg border-2 border-purple-200 dark:border-purple-800 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Star className="w-5 h-5 text-purple-600" />
+                      <h4 className="font-bold text-lg text-foreground">Alliance Token Rewards</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="alliance_token_enabled" className="text-sm font-medium">Enable Alliance Token</Label>
+                      <Switch
+                        id="alliance_token_enabled"
+                        checked={formData.alliance_token_enabled}
+                        onCheckedChange={(checked) => setFormData({...formData, alliance_token_enabled: checked})}
+                      />
+                    </div>
+                  </div>
+
+                  {formData.alliance_token_enabled && (
+                    <div className="space-y-4 pt-2">
+                      <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+                        <p className="text-sm text-purple-700 dark:text-purple-400">
+                          💎 Offer additional crypto token rewards alongside NCTR bounties
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="alliance_token_name">Token Name *</Label>
+                          <Input
+                            id="alliance_token_name"
+                            value={formData.alliance_token_name}
+                            onChange={(e) => setFormData({...formData, alliance_token_name: e.target.value})}
+                            placeholder="e.g., Base Token"
+                            required={formData.alliance_token_enabled}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="alliance_token_symbol">Token Symbol *</Label>
+                          <Input
+                            id="alliance_token_symbol"
+                            value={formData.alliance_token_symbol}
+                            onChange={(e) => setFormData({...formData, alliance_token_symbol: e.target.value})}
+                            placeholder="e.g., BASE"
+                            required={formData.alliance_token_enabled}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="alliance_token_logo_url">Token Logo URL</Label>
+                        <Input
+                          id="alliance_token_logo_url"
+                          type="url"
+                          value={formData.alliance_token_logo_url}
+                          onChange={(e) => setFormData({...formData, alliance_token_logo_url: e.target.value})}
+                          placeholder="https://example.com/token-logo.png"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Token logo to display alongside rewards
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="alliance_token_ratio">Tokens per $1 Spent *</Label>
+                          <Input
+                            id="alliance_token_ratio"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={formData.alliance_token_ratio}
+                            onChange={(e) => setFormData({...formData, alliance_token_ratio: parseFloat(e.target.value) || 0})}
+                            placeholder="10"
+                            required={formData.alliance_token_enabled}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            How many tokens earned per $1 spent
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="alliance_token_lock_days">Lock Period (Days) *</Label>
+                          <Input
+                            id="alliance_token_lock_days"
+                            type="number"
+                            step="1"
+                            min="0"
+                            value={formData.alliance_token_lock_days}
+                            onChange={(e) => setFormData({...formData, alliance_token_lock_days: parseInt(e.target.value) || 90})}
+                            placeholder="90"
+                            required={formData.alliance_token_enabled}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Number of days tokens are locked
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Alliance Token Summary */}
+                      {formData.alliance_token_ratio > 0 && (
+                        <div className="bg-indigo-50 dark:bg-indigo-950/30 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                          <h5 className="font-semibold text-indigo-800 dark:text-indigo-300 mb-2">Alliance Token Reward Summary</h5>
+                          <div className="flex items-center gap-2 text-lg font-bold text-indigo-800 dark:text-indigo-300">
+                            <span>{formData.alliance_token_ratio}</span>
+                            <span>{formData.alliance_token_symbol || 'tokens'}</span>
+                            <span className="text-sm font-normal">per $1 spent</span>
+                          </div>
+                          <p className="text-sm text-indigo-600 dark:text-indigo-400 mt-2">
+                            Locked for {formData.alliance_token_lock_days} days
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Links & Activation */}

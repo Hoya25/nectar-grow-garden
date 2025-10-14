@@ -10,6 +10,13 @@ interface RewardDisplayProps {
     lock_360_nctr_reward?: number;
     reward_distribution_type?: string;
     opportunity_type?: string;
+    // Alliance Token fields
+    alliance_token_enabled?: boolean;
+    alliance_token_name?: string;
+    alliance_token_symbol?: string;
+    alliance_token_logo_url?: string;
+    alliance_token_ratio?: number;
+    alliance_token_lock_days?: number;
   };
   size?: 'sm' | 'md' | 'lg';
   showPerDollar?: boolean;
@@ -159,6 +166,39 @@ export const RewardDisplay = ({
               <div className={`${config.perDollarText} text-green-600`}>Available per $1 spent</div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Alliance Token Display */}
+      {opportunity.alliance_token_enabled && opportunity.alliance_token_ratio > 0 && (
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 p-4 rounded-lg border-2 border-purple-300 dark:border-purple-700">
+          <div className={`${config.perDollarText} font-medium text-purple-700 dark:text-purple-400 uppercase tracking-wide text-center mb-2`}>
+            Alliance Token Bonus
+          </div>
+          <div className="text-center space-y-2">
+            <div className={config.flex + ' justify-center'}>
+              {opportunity.alliance_token_logo_url && (
+                <img 
+                  src={opportunity.alliance_token_logo_url} 
+                  alt={opportunity.alliance_token_symbol} 
+                  className={config.logo}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              )}
+              <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
+                +{formatNCTR(opportunity.alliance_token_ratio)}
+              </span>
+              <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
+                {opportunity.alliance_token_symbol}
+              </span>
+            </div>
+            <div className={`${config.perDollarText} text-purple-600 dark:text-purple-400`}>
+              per $1 spent
+            </div>
+            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+              🔒 Locked for {opportunity.alliance_token_lock_days} days
+            </Badge>
+          </div>
         </div>
       )}
     </div>
