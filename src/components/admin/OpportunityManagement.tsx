@@ -122,7 +122,7 @@ const opportunitySchema = z.object({
   alliance_token_enabled: z.boolean().optional(),
   alliance_token_name: z.string().trim().max(100).optional(),
   alliance_token_symbol: z.string().trim().max(20).optional(),
-  alliance_token_logo_url: z.string().trim().max(500).optional(),
+  alliance_token_logo_url: z.string().trim().optional(), // No max length limit for base64 images
   alliance_token_ratio: z.number().min(0).max(1000000).finite().optional(),
   alliance_token_lock_days: z.number().int().min(0).max(3650).optional(),
   is_active: z.boolean()
@@ -1815,7 +1815,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                                 // Convert to base64 for preview and storage
                                 const reader = new FileReader();
                                 reader.onloadend = () => {
-                                  setFormData({...formData, alliance_token_logo_url: reader.result as string});
+                                  setFormData(prev => ({...prev, alliance_token_logo_url: reader.result as string}));
                                   setUploadingLogo(false);
                                   toast({
                                     title: "✅ Logo Ready",
@@ -1836,11 +1836,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             }}
                           />
                           <p className="text-xs text-muted-foreground">Recommended: PNG/JPG under 100KB. Or paste URL below:</p>
-                          <Input
+                           <Input
                             id="alliance_token_logo_url"
                             type="text"
                             value={formData.alliance_token_logo_url}
-                            onChange={(e) => setFormData({...formData, alliance_token_logo_url: e.target.value})}
+                            onChange={(e) => setFormData(prev => ({...prev, alliance_token_logo_url: e.target.value}))}
                             placeholder="https://example.com/token-logo.png or paste base64"
                           />
                           {formData.alliance_token_logo_url && (
@@ -1851,7 +1851,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setFormData({...formData, alliance_token_logo_url: ''})}
+                                  onClick={() => setFormData(prev => ({...prev, alliance_token_logo_url: ''}))}
                                   className="h-6 text-xs"
                                 >
                                   Clear
