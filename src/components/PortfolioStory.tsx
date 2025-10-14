@@ -17,6 +17,8 @@ interface Transaction {
   created_at: string;
   partner_name?: string;
   purchase_amount?: number;
+  alliance_token_amount?: number;
+  alliance_token_symbol?: string;
 }
 
 interface PortfolioStoryProps {
@@ -250,6 +252,14 @@ export const PortfolioStory: React.FC<PortfolioStoryProps> = ({ userId, refreshK
                         <div className={`font-bold text-lg ${getTransactionColor(transaction.transaction_type, transaction.nctr_amount)}`}>
                           {formatAmount(transaction.nctr_amount)}
                         </div>
+                        {transaction.alliance_token_amount && transaction.alliance_token_amount > 0 && (
+                          <div className="text-sm font-semibold text-purple-600 dark:text-purple-400 mt-1">
+                            +{transaction.alliance_token_amount.toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })} {transaction.alliance_token_symbol || 'Alliance Token'}
+                          </div>
+                        )}
                         <Badge 
                           variant={transaction.status === 'completed' ? 'default' : 'secondary'}
                           className="text-xs mt-1"
