@@ -574,8 +574,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         }
 
         toast({
-          title: "Opportunity Updated",
-          description: `${submitData.title} has been updated successfully.`,
+          title: "✅ Opportunity Updated",
+          description: `${submitData.title} has been updated successfully${submitData.alliance_token_enabled ? ' with Alliance Token' : ''}.`,
+          duration: 5000,
         });
       } else {
         console.log('➕ Creating new opportunity...');
@@ -610,8 +611,9 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
         }
 
         toast({
-          title: "Opportunity Created",
-          description: `${submitData.title} has been created successfully.`,
+          title: "✅ Opportunity Created",
+          description: `${submitData.title} has been created successfully${submitData.alliance_token_enabled ? ' with Alliance Token' : ''}.`,
+          duration: 5000,
         });
       }
 
@@ -1790,10 +1792,28 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                             onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (file) {
+                                setUploadingLogo(true);
+                                toast({
+                                  title: "Processing Logo",
+                                  description: "Converting image to base64 format...",
+                                });
                                 // Convert to base64 for preview and storage
                                 const reader = new FileReader();
                                 reader.onloadend = () => {
                                   setFormData({...formData, alliance_token_logo_url: reader.result as string});
+                                  setUploadingLogo(false);
+                                  toast({
+                                    title: "✅ Logo Ready",
+                                    description: "Alliance Token logo has been processed successfully.",
+                                  });
+                                };
+                                reader.onerror = () => {
+                                  setUploadingLogo(false);
+                                  toast({
+                                    title: "Error",
+                                    description: "Failed to process logo image.",
+                                    variant: "destructive",
+                                  });
                                 };
                                 reader.readAsDataURL(file);
                               }
@@ -1943,11 +1963,11 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={loading}
+                    disabled={loading || uploadingLogo}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
                   >
-                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    {editingOpportunity ? 'Update' : 'Create'} Opportunity
+                    {(loading || uploadingLogo) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    {uploadingLogo ? 'Uploading Logo...' : loading ? 'Saving...' : (editingOpportunity ? 'Update Opportunity' : 'Create Opportunity')}
                   </Button>
                 </div>
               </form>
