@@ -411,6 +411,8 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
       if (portfolioError && portfolioError.code !== 'PGRST116') {
         console.error('Portfolio error:', portfolioError);
       } else {
+        console.log('📊 Portfolio Data:', portfolioData);
+        console.log('💎 Alliance Tokens:', portfolioData?.alliance_tokens);
         setPortfolio(portfolioData);
         
         // Fetch user's reward multiplier based on their status
