@@ -35,7 +35,7 @@ import { toast } from '@/hooks/use-toast';
 import { useWallet } from '@/hooks/useWallet';
 import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 import NCTRLiveSync from './NCTRLiveSync';
-import nctrLogo from "@/assets/nctr-logo-transparent.png";
+import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
 
 interface Portfolio {
   available_nctr: number;

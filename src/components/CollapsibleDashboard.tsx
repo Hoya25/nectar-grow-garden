@@ -26,7 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
-import nctrLogo from "@/assets/nctr-logo-transparent.png";
+import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
 
 interface Portfolio {
   available_nctr: number;

@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import nctrLogo from "@/assets/nctr-logo-transparent.png";
+import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
 
 interface RewardDisplayProps {
   opportunity: {
@@ -99,16 +99,16 @@ export const RewardDisplay = ({
   return (
     <div className={config.container}>
       {/* Token Logos Window - Show all active reward tokens */}
-      <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700 mb-3">
+      <div className="p-3 rounded-lg mb-3">
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          {/* NCTR Logo - No text label */}
-          <div className="flex items-center justify-center bg-white dark:bg-slate-950 px-3 py-2 rounded-lg shadow-sm">
+          {/* NCTR Logo - Transparent background */}
+          <div className="flex items-center justify-center px-3 py-2">
             <img src={nctrLogo} alt="NCTR" className="h-8 w-auto" />
           </div>
           
-          {/* Alliance Token Logo (if enabled) - No text label */}
+          {/* Alliance Token Logo (if enabled) - Transparent background */}
           {opportunity.alliance_token_enabled && opportunity.alliance_token_logo_url && (
-            <div className="flex items-center justify-center bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/50 dark:to-indigo-950/50 px-3 py-2 rounded-lg shadow-sm border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center justify-center px-3 py-2">
               <img 
                 src={opportunity.alliance_token_logo_url} 
                 alt={opportunity.alliance_token_symbol} 

@@ -3,7 +3,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, Crown, Award, Star, Gem, Diamond } from 'lucide-react';
-import nctrLogo from "@/assets/nctr-logo-transparent.png";
+import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
 
 interface StatusLevel {
   status_name: string;

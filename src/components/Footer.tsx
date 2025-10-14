@@ -1,4 +1,4 @@
-import nctrLogo from "@/assets/nctr-logo-transparent.png";
+import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
 import { BaseBadge } from "@/components/BaseBadge";
 
 const Footer = () => {
