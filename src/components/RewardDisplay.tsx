@@ -39,6 +39,13 @@ export const RewardDisplay = ({
     }).format(Math.floor(amount));
   };
 
+  const formatAllianceToken = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 5,
+    }).format(amount);
+  };
+
   const getStatusTextColor = (status: string) => {
     switch (status) {
       case 'vip': return 'text-yellow-500';
@@ -186,7 +193,7 @@ export const RewardDisplay = ({
                 />
               )}
               <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
-                +{formatNCTR(opportunity.alliance_token_ratio)}
+                +{formatAllianceToken(opportunity.alliance_token_ratio)}
               </span>
               <span className={`${config.amountText} text-purple-700 dark:text-purple-300`}>
                 {opportunity.alliance_token_symbol}
