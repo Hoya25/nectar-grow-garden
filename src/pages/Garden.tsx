@@ -1634,8 +1634,9 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                                         (opportunity.lock_90_nctr_reward || 0) + 
                                         (opportunity.lock_360_nctr_reward || 0);
                             return formatNCTR(total || 50);
-                          })()} NCTR
+                          })()}
                         </span>
+                        <img src={nctrLogo} alt="NCTR" className="h-8 w-auto" />
                       </div>
                       <p className="text-sm text-green-600 mb-4">Total Available Bonus</p>
                       
@@ -1727,21 +1728,24 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                           </div>
                         </div>
 
-                         <div className="text-center mb-4 sm:mb-6">
+                          <div className="text-center mb-4 sm:mb-6">
                            {/* Total NCTR Earn Opportunity */}
-                            <div className="text-2xl sm:text-3xl font-bold text-primary mb-2">
-                              {(() => {
-                                if (opportunity.opportunity_type === 'invite') {
-                                  // For invite opportunities, show user's multiplied reward
-                                  const baseReward = 1000;
-                                  return formatNCTR(baseReward * userMultiplier);
-                                } else {
-                                  // For other opportunities, show the configured reward
-                                  const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                                  const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
-                                  return formatNCTR(totalReward);
-                                }
-                              })()} NCTR
+                            <div className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-bold text-primary mb-2">
+                              <span>
+                                {(() => {
+                                  if (opportunity.opportunity_type === 'invite') {
+                                    // For invite opportunities, show user's multiplied reward
+                                    const baseReward = 1000;
+                                    return formatNCTR(baseReward * userMultiplier);
+                                  } else {
+                                    // For other opportunities, show the configured reward
+                                    const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                                    const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
+                                    return formatNCTR(totalReward);
+                                  }
+                                })()}
+                              </span>
+                              <img src={nctrLogo} alt="NCTR" className="h-8 w-auto" />
                             </div>
                             {/* Only show "Per $1 Spent" for shopping opportunities */}
                             {opportunity.opportunity_type === 'shopping' && (
