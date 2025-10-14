@@ -1627,7 +1627,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
                     <div className="text-center py-4 mb-4">
                       {/* Total Available Bonus */}
-                      <div className="flex items-center justify-center gap-2 mb-3">
+                      <div className="flex items-center justify-center gap-0.5 mb-3">
                         <span className="text-3xl font-bold text-green-600">
                           {(() => {
                             const total = (opportunity.available_nctr_reward || 0) + 
@@ -1730,7 +1730,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
                           <div className="text-center mb-4 sm:mb-6">
                            {/* Total NCTR Earn Opportunity */}
-                            <div className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-bold text-primary mb-2">
+                            <div className="flex items-center justify-center gap-0.5 text-2xl sm:text-3xl font-bold text-primary mb-2">
                               <span>
                                 {(() => {
                                   if (opportunity.opportunity_type === 'invite') {
