@@ -14,6 +14,7 @@ import { BrandLogo } from '@/components/ui/brand-logo';
 import { Lock360InfoTooltip, Lock90InfoTooltip } from '@/components/ui/info-tooltip';
 import { Coins, TrendingUp, Gift, Users, Power, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { AllianceTokenWalletPrompt } from '@/components/AllianceTokenWalletPrompt';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
 import ReferralSystem from '@/components/ReferralSystem';
 import UserAffiliateLinks from '@/components/UserAffiliateLinks';
@@ -123,6 +124,7 @@ const Garden = () => {
   const [dailyCheckinAvailable, setDailyCheckinAvailable] = useState(true);
   const [lastCheckinTime, setLastCheckinTime] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0); // Add refresh trigger
+  const [hasWallet, setHasWallet] = useState(false);
 
 
   useEffect(() => {
@@ -423,6 +425,17 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             setUserMultiplier(statusLevel.reward_multiplier || 1.0);
           }
         }
+      }
+
+      // Fetch profile to check wallet address
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('wallet_address')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (profileData) {
+        setHasWallet(!!profileData.wallet_address);
       }
 
       // Fetch lock commitments
@@ -1178,6 +1191,15 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
   return (
     <div className="min-h-screen bg-gradient-page">
+      {/* Alliance Token Wallet Prompt */}
+      {user?.id && (
+        <AllianceTokenWalletPrompt 
+          userId={user.id} 
+          hasWallet={hasWallet}
+          onWalletAdded={() => setHasWallet(true)}
+        />
+      )}
+      
       {/* Header with Wings Status */}
       <header className="section-highlight backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-4">
