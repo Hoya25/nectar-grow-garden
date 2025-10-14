@@ -1664,6 +1664,36 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                       </div>
                       
                       <RewardDisplay opportunity={opportunity} size="md" />
+                      
+                      {/* Alliance Token Bonus */}
+                      {opportunity.alliance_token_enabled && opportunity.alliance_token_ratio && opportunity.alliance_token_ratio > 0 && (
+                        <div className="mt-4 p-3 bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/30 rounded-lg">
+                          <div className="text-center">
+                            <h4 className="text-xs font-bold text-primary uppercase mb-2">
+                              Alliance Token Bonus
+                            </h4>
+                            <div className="flex items-center justify-center gap-2 mb-1">
+                              <span className="text-xl font-bold text-primary">
+                                +{opportunity.alliance_token_ratio.toFixed(4)}
+                              </span>
+                              {opportunity.alliance_token_logo_url && (
+                                <img 
+                                  src={opportunity.alliance_token_logo_url} 
+                                  alt={opportunity.alliance_token_name || 'Token'}
+                                  className="h-6 w-6"
+                                />
+                              )}
+                              <span className="text-base font-semibold text-primary">
+                                {opportunity.alliance_token_symbol || opportunity.alliance_token_name}
+                              </span>
+                            </div>
+                            <div className="text-xs text-muted-foreground mb-1">per $1 spent</div>
+                            <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                              🔒 Locked for {opportunity.alliance_token_lock_days || 90} days
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <Button 
@@ -1763,6 +1793,36 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                            
                            {/* Bounty Breakdown */}
                            <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
+                           
+                           {/* Alliance Token Bonus */}
+                           {opportunity.alliance_token_enabled && opportunity.alliance_token_ratio && opportunity.alliance_token_ratio > 0 && opportunity.opportunity_type === 'shopping' && (
+                             <div className="mt-4 p-4 bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/30 rounded-lg">
+                               <div className="text-center">
+                                 <h4 className="text-sm font-bold text-primary uppercase mb-2">
+                                   Alliance Token Bonus
+                                 </h4>
+                                 <div className="flex items-center justify-center gap-2 mb-1">
+                                   <span className="text-2xl font-bold text-primary">
+                                     +{opportunity.alliance_token_ratio.toFixed(4)}
+                                   </span>
+                                   {opportunity.alliance_token_logo_url && (
+                                     <img 
+                                       src={opportunity.alliance_token_logo_url} 
+                                       alt={opportunity.alliance_token_name || 'Token'}
+                                       className="h-8 w-8"
+                                     />
+                                   )}
+                                   <span className="text-lg font-semibold text-primary">
+                                     {opportunity.alliance_token_symbol || opportunity.alliance_token_name}
+                                   </span>
+                                 </div>
+                                 <div className="text-xs text-muted-foreground mb-2">per $1 spent</div>
+                                 <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                                   🔒 Locked for {opportunity.alliance_token_lock_days || 90} days
+                                 </div>
+                               </div>
+                             </div>
+                           )}
                          </div>
 
                          <Button 
