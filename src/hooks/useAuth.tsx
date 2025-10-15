@@ -220,7 +220,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (migrationData?.requiresSignup) {
           console.log('📝 Creating new wallet account...');
           
-          const { error: signUpError } = await supabase.auth.signUp({
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: walletEmail,
             password: deterministicPassword,
             options: {
@@ -238,6 +238,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
 
           console.log('✅ New wallet account created successfully');
+          
+          // For wallet accounts, sign in immediately since email confirmation won't work
+          console.log('🔐 Signing in with new wallet account...');
+          const { error: postSignUpLoginError } = await supabase.auth.signInWithPassword({
+            email: walletEmail,
+            password: deterministicPassword,
+          });
+
+          if (postSignUpLoginError) {
+            console.error('❌ Post-signup sign in failed:', postSignUpLoginError);
+            // If it's just email confirmation required, that's expected and OK
+            if (!postSignUpLoginError.message?.includes('Email not confirmed')) {
+              return { error: postSignUpLoginError };
+            }
+            console.log('⚠️ Email confirmation required - this is expected for new accounts');
+          } else {
+            console.log('✅ Wallet account signed in successfully');
+          }
           
           // Capture IP for new wallet signup
           setTimeout(async () => {
