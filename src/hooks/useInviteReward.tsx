@@ -16,7 +16,7 @@ export const useInviteReward = () => {
         .select('lock_360_nctr_reward')
         .eq('opportunity_type', 'invite')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       

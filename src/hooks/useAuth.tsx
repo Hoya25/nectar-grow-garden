@@ -239,8 +239,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           console.log('✅ New wallet account created successfully');
           
-          // For wallet accounts, sign in immediately since email confirmation won't work
-          console.log('🔐 Signing in with new wallet account...');
+          // Auto-confirm wallet email using edge function
+          console.log('📧 Auto-confirming wallet email...');
+          const { error: confirmError } = await supabase.functions.invoke('auto-confirm-wallet', {
+            body: { email: walletEmail }
+          });
+
+          if (confirmError) {
+            console.error('❌ Auto-confirm failed:', confirmError);
+          } else {
+            console.log('✅ Wallet email auto-confirmed');
+          }
+          
+          // Now sign in with the confirmed account
+          console.log('🔐 Signing in with wallet account...');
           const { error: postSignUpLoginError } = await supabase.auth.signInWithPassword({
             email: walletEmail,
             password: deterministicPassword,
@@ -248,14 +260,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           if (postSignUpLoginError) {
             console.error('❌ Post-signup sign in failed:', postSignUpLoginError);
-            // If it's just email confirmation required, that's expected and OK
-            if (!postSignUpLoginError.message?.includes('Email not confirmed')) {
-              return { error: postSignUpLoginError };
-            }
-            console.log('⚠️ Email confirmation required - this is expected for new accounts');
-          } else {
-            console.log('✅ Wallet account signed in successfully');
+            return { error: postSignUpLoginError };
           }
+          
+          console.log('✅ Wallet account signed in successfully');
           
           // Capture IP for new wallet signup
           setTimeout(async () => {
