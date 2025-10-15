@@ -10,6 +10,7 @@ import { BookOpen, Trophy, Lock, Clock, CheckCircle2, PlayCircle, ArrowLeft } fr
 import { toast } from "sonner";
 import { LearningModuleCard } from "@/components/LearningModuleCard";
 import { QuizModal } from "@/components/QuizModal";
+import { LearningContentModal } from "@/components/LearningContentModal";
 
 interface LearningModule {
   id: string;
@@ -17,6 +18,7 @@ interface LearningModule {
   description: string;
   content_type: string;
   video_url: string | null;
+  article_content: string | null;
   thumbnail_url: string | null;
   duration_minutes: number;
   nctr_reward: number;
@@ -30,6 +32,7 @@ interface LearningModule {
 interface UserProgress {
   module_id: string;
   status: string;
+  content_viewed: boolean;
   quiz_passed: boolean;
   quiz_score: number | null;
   reward_claimed: boolean;
@@ -44,6 +47,7 @@ export default function LearnAndEarn() {
   const [loading, setLoading] = useState(true);
   const [selectedModule, setSelectedModule] = useState<LearningModule | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -88,6 +92,7 @@ export default function LearnAndEarn() {
 
   const handleStartModule = async (module: LearningModule) => {
     setSelectedModule(module);
+    setShowContent(true);
     
     // Mark as started if not already
     if (!progress[module.id]) {
@@ -97,6 +102,7 @@ export default function LearnAndEarn() {
           user_id: user!.id,
           module_id: module.id,
           status: "in_progress",
+          content_viewed: true,
           started_at: new Date().toISOString(),
         });
 
@@ -104,6 +110,17 @@ export default function LearnAndEarn() {
         console.error("Error starting module:", error);
       } else {
         loadModules(); // Reload to get updated progress
+      }
+    } else if (!progress[module.id].content_viewed) {
+      // Mark content as viewed
+      const { error } = await supabase
+        .from("learning_progress")
+        .update({ content_viewed: true })
+        .eq("user_id", user!.id)
+        .eq("module_id", module.id);
+
+      if (!error) {
+        loadModules();
       }
     }
   };
@@ -227,11 +244,29 @@ export default function LearnAndEarn() {
         )}
       </div>
 
+      {/* Learning Content Modal */}
+      {showContent && selectedModule && (
+        <LearningContentModal
+          module={selectedModule}
+          onClose={() => {
+            setShowContent(false);
+            setSelectedModule(null);
+          }}
+          onTakeQuiz={() => {
+            setShowContent(false);
+            setShowQuiz(true);
+          }}
+        />
+      )}
+
       {/* Quiz Modal */}
       {showQuiz && selectedModule && (
         <QuizModal
           module={selectedModule}
-          onClose={() => setShowQuiz(false)}
+          onClose={() => {
+            setShowQuiz(false);
+            setSelectedModule(null);
+          }}
           onComplete={handleQuizComplete}
         />
       )}

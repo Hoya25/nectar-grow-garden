@@ -116,29 +116,25 @@ export function LearningModuleCard({ module, progress, onStart, onTakeQuiz }: Le
 
         {/* Action Buttons */}
         <div className="space-y-2">
-          {!progress && (
-            <Button onClick={onStart} className="w-full">
-              Start Learning
-            </Button>
-          )}
-          
-          {isInProgress && !progress.quiz_passed && (
-            <Button onClick={onTakeQuiz} className="w-full">
-              Take Quiz
-            </Button>
-          )}
-          
-          {isInProgress && progress.quiz_passed && !progress.reward_claimed && (
-            <Button disabled className="w-full">
-              Reward Processing...
-            </Button>
-          )}
-          
-          {isCompleted && progress.reward_claimed && (
+          {isCompleted && progress.reward_claimed ? (
             <Button disabled className="w-full bg-green-500/10 text-green-500 hover:bg-green-500/10">
               <CheckCircle2 className="h-4 w-4 mr-2" />
-              Completed - {progress.reward_claimed ? "Reward Claimed" : "Claim Reward"}
+              Completed - Reward Claimed
             </Button>
+          ) : (
+            <>
+              <Button onClick={onStart} variant="outline" className="w-full">
+                <PlayCircle className="h-4 w-4 mr-2" />
+                {progress ? "Review Content" : "Start Learning"}
+              </Button>
+              
+              {progress && !progress.reward_claimed && (
+                <Button onClick={onTakeQuiz} className="w-full">
+                  <Trophy className="h-4 w-4 mr-2" />
+                  {progress.quiz_passed ? "Reward Processing..." : "Take Quiz"}
+                </Button>
+              )}
+            </>
           )}
         </div>
       </div>
