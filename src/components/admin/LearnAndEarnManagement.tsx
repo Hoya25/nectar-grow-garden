@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { BookOpen, Plus, Edit, Trash2, Save, X, HelpCircle } from "lucide-react";
+import { BookOpen, Plus, Edit, Trash2, Save, X, HelpCircle, Upload, Link as LinkIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ interface LearningModule {
   description: string;
   content_type: string;
   video_url: string | null;
+  article_content: string | null;
   thumbnail_url: string | null;
   duration_minutes: number;
   nctr_reward: number;
@@ -54,6 +56,8 @@ export default function LearnAndEarnManagement() {
   const [showQuizDialog, setShowQuizDialog] = useState(false);
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoInputType, setVideoInputType] = useState<"url" | "upload">("url");
 
   useEffect(() => {
     loadModules();
@@ -105,6 +109,7 @@ export default function LearnAndEarnManagement() {
       description: "",
       content_type: "video",
       video_url: "",
+      article_content: "",
       thumbnail_url: "",
       duration_minutes: 5,
       nctr_reward: 100,
@@ -116,12 +121,43 @@ export default function LearnAndEarnManagement() {
       min_quiz_score: 70,
       display_order: modules.length,
     });
+    setVideoInputType("url");
     setShowModuleDialog(true);
   };
 
   const handleEditModule = (module: LearningModule) => {
     setEditingModule(module);
+    setVideoInputType(module.video_url ? "url" : "upload");
     setShowModuleDialog(true);
+  };
+
+  const handleVideoUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploadingVideo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('learning-videos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('learning-videos')
+        .getPublicUrl(filePath);
+
+      setEditingModule(prev => prev ? { ...prev, video_url: publicUrl } : null);
+      toast.success("Video uploaded successfully");
+    } catch (error: any) {
+      console.error("Error uploading video:", error);
+      toast.error("Failed to upload video");
+    } finally {
+      setUploadingVideo(false);
+    }
   };
 
   const handleSaveModule = async () => {
@@ -133,6 +169,7 @@ export default function LearnAndEarnManagement() {
         description: editingModule.description,
         content_type: editingModule.content_type,
         video_url: editingModule.video_url || null,
+        article_content: editingModule.article_content || null,
         thumbnail_url: editingModule.thumbnail_url || null,
         duration_minutes: editingModule.duration_minutes,
         nctr_reward: editingModule.nctr_reward,
@@ -384,13 +421,90 @@ export default function LearnAndEarnManagement() {
               </div>
 
               <div>
-                <Label>Video URL</Label>
-                <Input
-                  value={editingModule.video_url || ""}
-                  onChange={(e) => setEditingModule({ ...editingModule, video_url: e.target.value })}
-                  placeholder="https://youtube.com/watch?v=..."
-                />
+                <Label>Content Type</Label>
+                <Select
+                  value={editingModule.content_type}
+                  onValueChange={(value) => setEditingModule({ ...editingModule, content_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="video">Video Only</SelectItem>
+                    <SelectItem value="article">Article Only</SelectItem>
+                    <SelectItem value="both">Video + Article</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Video Section */}
+              {(editingModule.content_type === "video" || editingModule.content_type === "both") && (
+                <div className="space-y-3 p-4 border rounded-lg">
+                  <Label className="text-base font-semibold">Video Content</Label>
+                  
+                  <Tabs value={videoInputType} onValueChange={(v) => setVideoInputType(v as "url" | "upload")}>
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="url">
+                        <LinkIcon className="h-4 w-4 mr-2" />
+                        Video URL
+                      </TabsTrigger>
+                      <TabsTrigger value="upload">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Video
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="url" className="space-y-2">
+                      <Input
+                        value={editingModule.video_url || ""}
+                        onChange={(e) => setEditingModule({ ...editingModule, video_url: e.target.value })}
+                        placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Paste a YouTube, Vimeo, or other video URL
+                      </p>
+                    </TabsContent>
+
+                    <TabsContent value="upload" className="space-y-2">
+                      <Input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleVideoUpload(file);
+                        }}
+                        disabled={uploadingVideo}
+                      />
+                      {uploadingVideo && (
+                        <p className="text-sm text-muted-foreground">Uploading video...</p>
+                      )}
+                      {editingModule.video_url && videoInputType === "upload" && (
+                        <p className="text-xs text-green-600">✓ Video uploaded</p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Upload MP4, WebM, or other video files (max 50MB)
+                      </p>
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              )}
+
+              {/* Article Section */}
+              {(editingModule.content_type === "article" || editingModule.content_type === "both") && (
+                <div className="space-y-3 p-4 border rounded-lg">
+                  <Label className="text-base font-semibold">Article Content</Label>
+                  <Textarea
+                    value={editingModule.article_content || ""}
+                    onChange={(e) => setEditingModule({ ...editingModule, article_content: e.target.value })}
+                    placeholder="Write your article content here. You can use HTML for formatting:&#10;&#10;<h2>Section Title</h2>&#10;<p>Paragraph text...</p>&#10;<ul>&#10;  <li>Bullet point</li>&#10;</ul>"
+                    rows={12}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Supports HTML formatting: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;strong&gt;, &lt;em&gt;, etc.
+                  </p>
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
