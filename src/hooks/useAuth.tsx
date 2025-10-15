@@ -178,12 +178,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log('🔐 Starting wallet authentication for:', walletAddress);
 
       // Generate deterministic password using SHA-256
+      // Password must contain lowercase, uppercase, and numbers for Supabase
       const encoder = new TextEncoder();
       const data = encoder.encode(walletAddress.toLowerCase());
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      const deterministicPassword = `wallet_${hashHex.slice(0, 32)}`;
+      // Create password with mixed case to meet Supabase requirements
+      const deterministicPassword = `Wallet${hashHex.slice(0, 28)}9X`;
 
       // Create special wallet email format
       const walletEmail = `${walletAddress.toLowerCase()}@wallet.base.app`;
