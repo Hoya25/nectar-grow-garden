@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
 import { useInviteReward } from '@/hooks/useInviteReward';
 import { Loader2 } from 'lucide-react';
+import WalletConnection from '@/components/WalletConnection';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -123,7 +124,10 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-page flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm shadow-elegant">
+      <div className="w-full max-w-md space-y-6">
+        <WalletConnection />
+        
+        <Card className="bg-card/90 backdrop-blur-sm shadow-elegant">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-foreground">
             {hasPendingPurchase ? '🎉 Purchase Successful!' : 'Welcome to The Garden'}
@@ -305,6 +309,7 @@ const Auth = () => {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
