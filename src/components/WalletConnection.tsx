@@ -12,13 +12,17 @@ const WalletConnection = () => {
   const { signInWithWallet, user } = useAuth();
   const { toast } = useToast();
   const [signingIn, setSigningIn] = useState(false);
+  const [hasAttemptedSignIn, setHasAttemptedSignIn] = useState(false);
 
-  // Auto sign-in after wallet connection
+  // Auto sign-in after wallet connection - only once per connection
   useEffect(() => {
     const handleAutoSignIn = async () => {
-      if (isConnected && address && !user && !signingIn) {
+      // Only attempt sign-in once per wallet connection
+      if (isConnected && address && !user && !signingIn && !hasAttemptedSignIn) {
         console.log('🔐 Auto sign-in triggered for wallet:', address);
         setSigningIn(true);
+        setHasAttemptedSignIn(true); // Prevent retries
+        
         try {
           console.log('📧 Calling signInWithWallet...');
           const { error } = await signInWithWallet(address);
@@ -51,7 +55,14 @@ const WalletConnection = () => {
     };
 
     handleAutoSignIn();
-  }, [isConnected, address, user, signInWithWallet, toast, signingIn]);
+  }, [isConnected, address, user, signInWithWallet, toast, signingIn, hasAttemptedSignIn]);
+
+  // Reset attempt flag when wallet disconnects
+  useEffect(() => {
+    if (!isConnected) {
+      setHasAttemptedSignIn(false);
+    }
+  }, [isConnected]);
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
