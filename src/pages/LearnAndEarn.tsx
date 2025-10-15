@@ -256,6 +256,7 @@ export default function LearnAndEarn() {
             setShowContent(false);
             setShowQuiz(true);
           }}
+          isReviewMode={progress[selectedModule.id]?.reward_claimed === true}
         />
       )}
 

@@ -117,10 +117,18 @@ export function LearningModuleCard({ module, progress, onStart, onTakeQuiz }: Le
         {/* Action Buttons */}
         <div className="space-y-2">
           {isCompleted && progress.reward_claimed ? (
-            <Button disabled className="w-full bg-green-500/10 text-green-500 hover:bg-green-500/10">
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              Completed - Reward Claimed
-            </Button>
+            <>
+              <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20 mb-2">
+                <div className="flex items-center gap-2 text-green-600">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="text-sm font-medium">Completed - Reward Claimed</span>
+                </div>
+              </div>
+              <Button onClick={onStart} variant="outline" className="w-full">
+                <PlayCircle className="h-4 w-4 mr-2" />
+                Review Content
+              </Button>
+            </>
           ) : (
             <>
               <Button onClick={onStart} variant="outline" className="w-full">

@@ -21,9 +21,10 @@ interface LearningContentModalProps {
   module: LearningModule;
   onClose: () => void;
   onTakeQuiz?: () => void;
+  isReviewMode?: boolean;
 }
 
-export function LearningContentModal({ module, onClose, onTakeQuiz }: LearningContentModalProps) {
+export function LearningContentModal({ module, onClose, onTakeQuiz, isReviewMode = false }: LearningContentModalProps) {
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] p-0">
@@ -105,15 +106,19 @@ export function LearningContentModal({ module, onClose, onTakeQuiz }: LearningCo
           </div>
         </ScrollArea>
 
-        <div className="p-6 pt-4 border-t flex gap-3">
-          <Button variant="outline" onClick={onClose} className="flex-1">
+        <div className="p-6 pt-4 border-t flex justify-between items-center gap-3">
+          <Button variant="outline" onClick={onClose}>
             Close
           </Button>
-          {onTakeQuiz && (
-            <Button onClick={onTakeQuiz} className="flex-1">
+          {isReviewMode ? (
+            <div className="text-sm text-muted-foreground italic">
+              Review only - Reward already claimed
+            </div>
+          ) : onTakeQuiz ? (
+            <Button onClick={onTakeQuiz}>
               Take Quiz & Earn {module.nctr_reward} NCTR
             </Button>
-          )}
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>
