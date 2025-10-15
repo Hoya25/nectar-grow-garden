@@ -184,8 +184,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      // Create password with mixed case to meet Supabase requirements
-      const deterministicPassword = `Wallet${hashHex.slice(0, 28)}9X`;
+      // Create password with explicit lowercase, uppercase, and numbers
+      const deterministicPassword = `Wa11et${hashHex.slice(0, 26)}9X`;
 
       // Create special wallet email format
       const walletEmail = `${walletAddress.toLowerCase()}@wallet.base.app`;

@@ -46,8 +46,8 @@ serve(async (req) => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    // Create password with mixed case to meet Supabase requirements
-    const deterministicPassword = `Wallet${hashHex.slice(0, 28)}9X`;
+    // Create password with explicit lowercase, uppercase, and numbers
+    const deterministicPassword = `Wa11et${hashHex.slice(0, 26)}9X`;
 
     console.log(`🔐 Generated deterministic password for wallet`);
 
