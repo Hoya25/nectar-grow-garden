@@ -209,20 +209,21 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   };
 
   const disconnectWallet = async () => {
-    if (!currentUser) return;
-
     try {
-      // Remove wallet address from user profile
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          wallet_address: null, 
-          wallet_connected_at: null 
-        })
-        .eq('user_id', currentUser.id);
+      // Remove wallet address from user profile if logged in
+      if (currentUser) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ 
+            wallet_address: null, 
+            wallet_connected_at: null 
+          })
+          .eq('user_id', currentUser.id);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
+      // Clear wallet state
       setAddress(null);
       setIsConnected(false);
       setProvider(null);
