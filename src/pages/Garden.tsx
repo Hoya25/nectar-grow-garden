@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import { Lock360InfoTooltip, Lock90InfoTooltip } from '@/components/ui/info-tooltip';
-import { Coins, TrendingUp, Gift, Users, Power, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet, RefreshCw } from 'lucide-react';
+import { Coins, TrendingUp, Gift, Users, Power, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet, RefreshCw, BookOpen } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { AllianceTokenWalletPrompt } from '@/components/AllianceTokenWalletPrompt';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
@@ -1778,6 +1778,77 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             })}
           </div>
 
+          {/* Learn and Earn Opportunities */}
+          {opportunities.filter(op => op.opportunity_type === 'learn_and_earn' && !completedOpportunityIds.includes(op.id)).length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
+                <div className="w-2 h-6 bg-primary rounded-full"></div>
+                📚 Learn & Earn
+              </h3>
+              {opportunities.filter(op => op.opportunity_type === 'learn_and_earn' && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
+                <Card 
+                  key={opportunity.id} 
+                  className="mb-4 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-4 border-l-primary bg-gradient-to-r from-primary/5 to-transparent"
+                  onClick={() => navigate('/learn')}
+                >
+                  <CardContent className="p-0">
+                    <div className="flex flex-col lg:flex-row">
+                      <div className="relative flex items-center justify-center lg:w-48 h-32 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
+                        {opportunity.video_url ? (
+                          <div className="relative">
+                            <Play className="w-16 h-16 text-primary" />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                            <BookOpen className="w-8 h-8 text-primary" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="p-4 sm:p-6 lg:p-8 flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-6 gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-lg sm:text-xl font-semibold section-heading truncate">
+                                {opportunity.title}
+                              </h3>
+                              <Badge className="bg-primary text-primary-foreground font-bold ml-2">
+                                LEARN
+                              </Badge>
+                            </div>
+                            <p className="text-sm sm:text-base section-text line-clamp-2">
+                              {opportunity.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-center mb-3 sm:mb-4">
+                          <div className="flex items-center justify-center gap-1 text-2xl sm:text-3xl font-bold text-primary mb-1">
+                            <span>
+                              {formatNCTR((opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))}
+                            </span>
+                            <img src={nctrLogo} alt="NCTR" className="h-24 sm:h-28 w-auto -ml-8" />
+                          </div>
+                          <div className="text-xs sm:text-sm text-muted-foreground mb-2">
+                            Watch, Learn & Take Quiz
+                          </div>
+                          <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
+                        </div>
+
+                        <Button 
+                          onClick={() => navigate('/learn')}
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base py-6"
+                          size="lg"
+                        >
+                          Start Learning →
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
 
           {/* Shopping & Free Trial Opportunities */}
