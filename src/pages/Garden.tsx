@@ -1496,25 +1496,31 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                       </h4>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {Object.entries(portfolio.alliance_tokens as Record<string, number>).map(([symbol, amount]) => (
-                        <Card key={symbol} className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 border-2 border-purple-300 dark:border-purple-700">
-                          <CardContent className="p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2">
-                              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                              <span className="text-sm font-medium text-purple-700 dark:text-purple-400">{symbol}</span>
-                            </div>
-                            <p className="text-2xl font-bold text-purple-700 dark:text-purple-300 mb-1">
-                              {new Intl.NumberFormat('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 5,
-                              }).format(amount)}
-                            </p>
-                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 text-xs">
-                              🔒 Alliance Token
-                            </Badge>
-                          </CardContent>
-                        </Card>
-                      ))}
+                      {Object.entries(portfolio.alliance_tokens as Record<string, any>).map(([symbol, tokenData]) => {
+                        // Handle both simple number format and object format
+                        const amount = typeof tokenData === 'number' ? tokenData : (tokenData?.amount || 0);
+                        const lockInfo = typeof tokenData === 'object' ? tokenData : null;
+                        
+                        return (
+                          <Card key={symbol} className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 border-2 border-purple-300 dark:border-purple-700">
+                            <CardContent className="p-4 text-center">
+                              <div className="flex items-center justify-center gap-2 mb-2">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                <span className="text-sm font-medium text-purple-700 dark:text-purple-400">{symbol}</span>
+                              </div>
+                              <p className="text-2xl font-bold text-purple-700 dark:text-purple-300 mb-1">
+                                {new Intl.NumberFormat('en-US', {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 5,
+                                }).format(amount)}
+                              </p>
+                              <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 text-xs">
+                                🔒 {lockInfo?.lock_category || '360LOCK'}
+                              </Badge>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
