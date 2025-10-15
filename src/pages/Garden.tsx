@@ -366,7 +366,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         console.log(`✅ Valid opportunities after filtering: ${validOpportunities.length}`);
         console.log('📋 Opportunity types:', validOpportunities.map(o => `${o.title} (${o.opportunity_type})`));
         
-        // Sort opportunities: Welcome → Invite → Shopping → Other Learn modules
+        // Sort opportunities: Welcome → Invite → Shopping → Free Trial → Other Learn modules
         const sortedOpportunities = validOpportunities.sort((a, b) => {
           // PRIORITY 1: "Welcome to The Garden" always first
           const aIsWelcome = a.opportunity_type === 'learn_and_earn' && a.title === 'Welcome to The Garden';
@@ -382,15 +382,12 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           if (aIsInvite && !bIsInvite) return -1;
           if (!aIsInvite && bIsInvite) return 1;
           
-          // PRIORITY 3: Shopping opportunities (before other Learn modules)
+          // PRIORITY 3: Shopping opportunities
           const aIsShopping = a.opportunity_type === 'shopping';
           const bIsShopping = b.opportunity_type === 'shopping';
-          const aIsOtherLearn = a.opportunity_type === 'learn_and_earn' && !aIsWelcome;
-          const bIsOtherLearn = b.opportunity_type === 'learn_and_earn' && !bIsWelcome;
           
-          // Shopping beats other Learn modules
-          if (aIsShopping && bIsOtherLearn) return -1;
-          if (aIsOtherLearn && bIsShopping) return 1;
+          if (aIsShopping && !bIsShopping) return -1;
+          if (!aIsShopping && bIsShopping) return 1;
           
           // Within shopping, sort by display_order
           if (aIsShopping && bIsShopping) {
@@ -399,6 +396,17 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             if (aOrder !== bOrder) return aOrder - bOrder;
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
+          
+          // PRIORITY 4: Free trial opportunities (after shopping)
+          const aIsFreeTrial = a.opportunity_type === 'free_trial';
+          const bIsFreeTrial = b.opportunity_type === 'free_trial';
+          
+          if (aIsFreeTrial && !bIsFreeTrial) return -1;
+          if (!aIsFreeTrial && bIsFreeTrial) return 1;
+          
+          // PRIORITY 5: Other Learn modules (after free trial)
+          const aIsOtherLearn = a.opportunity_type === 'learn_and_earn' && !aIsWelcome;
+          const bIsOtherLearn = b.opportunity_type === 'learn_and_earn' && !bIsWelcome;
           
           // Within other Learn modules, sort by display_order
           if (aIsOtherLearn && bIsOtherLearn) {
