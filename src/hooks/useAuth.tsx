@@ -178,19 +178,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log('🔐 Starting wallet authentication for:', walletAddress);
 
       // Generate deterministic password using SHA-256
-      // Password must contain lowercase, uppercase, and numbers for Supabase
       const encoder = new TextEncoder();
       const data = encoder.encode(walletAddress.toLowerCase());
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      // Create password with explicit lowercase, uppercase, and numbers
       const deterministicPassword = `Wa11et${hashHex.slice(0, 26)}9X`;
 
-      // Create special wallet email format (remove 0x prefix for valid email)
-      const walletEmail = `wallet-${walletAddress.toLowerCase().replace('0x', '')}@base.app`;
+      // First, check if this wallet is already linked to an existing user
+      console.log('🔍 Checking if wallet is linked to existing account...');
+      const { data: existingProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('email, user_id')
+        .eq('wallet_address', walletAddress)
+        .maybeSingle();
 
-      console.log('📧 Attempting sign in with wallet email');
+      if (profileError) {
+        console.error('Error checking for existing profile:', profileError);
+      }
+
+      if (existingProfile?.email) {
+        // Wallet is linked to an existing account - sign in with that email
+        console.log('✅ Found existing account linked to wallet, signing in with email:', existingProfile.email);
+        
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: existingProfile.email,
+          password: deterministicPassword,
+        });
+
+        if (signInError) {
+          console.error('❌ Sign in with linked email failed:', signInError);
+          return { error: signInError };
+        }
+
+        console.log('✅ Successfully signed in with linked email account');
+        
+        // Capture login IP
+        setTimeout(async () => {
+          try {
+            await supabase.functions.invoke('capture-user-ip', {
+              body: { action: 'wallet_login' }
+            });
+          } catch (ipError) {
+            console.error('Failed to capture login IP (non-blocking):', ipError);
+          }
+        }, 500);
+
+        return { error: null };
+      }
+
+      // No existing profile found - create new wallet-only account
+      console.log('📧 No existing account found, creating new wallet account');
+      const walletEmail = `wallet-${walletAddress.toLowerCase().replace('0x', '')}@base.app`;
 
       // Attempt to sign in
       let { error: signInError } = await supabase.auth.signInWithPassword({
@@ -268,6 +307,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
 
           console.log('✅ New wallet account created successfully');
+          
+          // Save wallet address to the new profile
+          const { error: profileUpdateError } = await supabase
+            .from('profiles')
+            .update({
+              wallet_address: walletAddress,
+              wallet_connected_at: new Date().toISOString()
+            })
+            .eq('user_id', signUpData.user?.id);
+
+          if (profileUpdateError) {
+            console.error('❌ Failed to save wallet address to profile:', profileUpdateError);
+          } else {
+            console.log('✅ Wallet address saved to new profile');
+          }
           
           // Auto-confirm wallet email using edge function
           console.log('📧 Auto-confirming wallet email...');

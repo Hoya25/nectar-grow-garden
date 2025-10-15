@@ -157,6 +157,26 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
 
       // Only update profile if user is authenticated
       if (currentUser) {
+        // Generate deterministic password for wallet
+        const encoder = new TextEncoder();
+        const data = encoder.encode(walletAddress.toLowerCase());
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        const deterministicPassword = `Wa11et${hashHex.slice(0, 26)}9X`;
+        
+        // Update user's password to the deterministic wallet password
+        // This allows them to sign in with either email+password OR wallet
+        const { error: passwordError } = await supabase.auth.updateUser({
+          password: deterministicPassword
+        });
+
+        if (passwordError) {
+          console.error('Error updating password for wallet:', passwordError);
+        } else {
+          console.log('✅ User password updated for wallet sign-in compatibility');
+        }
+
         // Update user profile with wallet address
         const { error: updateError } = await supabase
           .from('profiles')
@@ -193,7 +213,9 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
 
       toast({
         title: "Wallet Connected",
-        description: `Connected to ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
+        description: currentUser 
+          ? `Wallet linked to your account! You can now sign in with either email or wallet.`
+          : `Connected to ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
       });
 
     } catch (error: any) {
