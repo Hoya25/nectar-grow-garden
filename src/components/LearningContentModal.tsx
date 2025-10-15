@@ -69,7 +69,14 @@ export function LearningContentModal({ module, onClose, onTakeQuiz }: LearningCo
             {/* Article Content */}
             {module.content_type === "article" && module.article_content && (
               <div className="prose prose-slate dark:prose-invert max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: module.article_content }} />
+                <div 
+                  className="whitespace-pre-wrap"
+                  dangerouslySetInnerHTML={{ 
+                    __html: module.article_content.includes('<') 
+                      ? module.article_content 
+                      : module.article_content.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>').replace(/\n/g, '<br>')
+                  }} 
+                />
               </div>
             )}
 
@@ -90,7 +97,14 @@ export function LearningContentModal({ module, onClose, onTakeQuiz }: LearningCo
                 )}
                 {module.article_content && (
                   <div className="prose prose-slate dark:prose-invert max-w-none mt-6">
-                    <div dangerouslySetInnerHTML={{ __html: module.article_content }} />
+                    <div 
+                      className="whitespace-pre-wrap"
+                      dangerouslySetInnerHTML={{ 
+                        __html: module.article_content.includes('<') 
+                          ? module.article_content 
+                          : module.article_content.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>').replace(/\n/g, '<br>')
+                      }} 
+                    />
                   </div>
                 )}
               </>
