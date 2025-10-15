@@ -1323,7 +1323,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="description">Opportunity Description</Label>
+                    <Label htmlFor="description">Opportunity Description (HTML Supported)</Label>
                     <span className="text-xs text-muted-foreground">
                       {formData.description?.length || 0} / 2000 characters
                     </span>
@@ -1332,12 +1332,16 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="✍️ Describe what users need to do to earn NCTR rewards...&#10;&#10;💡 Tips:&#10;• Be clear and specific about requirements&#10;• Mention any minimum purchase amounts&#10;• Explain how rewards are distributed&#10;• Add any special terms or conditions"
+                    placeholder="You can use HTML formatting:&#10;<p>Paragraph text</p>&#10;<strong>Bold text</strong>&#10;<em>Italic text</em>&#10;<ul><li>Bullet point</li></ul>&#10;<br> for line breaks"
                     className="min-h-[120px] resize-y font-mono text-sm"
                     maxLength={2000}
                   />
-                  <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950/20 p-2 rounded border border-blue-200 dark:border-blue-800">
-                    💡 <strong>Formatting tips:</strong> Use line breaks for readability. Keep it clear and concise.
+                  <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950/20 p-3 rounded border border-blue-200 dark:border-blue-800 space-y-1">
+                    <div><strong>💡 HTML Formatting Examples:</strong></div>
+                    <div>• <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;p&gt;...&lt;/p&gt;</code> - Paragraphs</div>
+                    <div>• <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;strong&gt;...&lt;/strong&gt;</code> - Bold text</div>
+                    <div>• <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;ul&gt;&lt;li&gt;...&lt;/li&gt;&lt;/ul&gt;</code> - Bullet lists</div>
+                    <div>• <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;br&gt;</code> - Line breaks</div>
                   </div>
                 </div>
 

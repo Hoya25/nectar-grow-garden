@@ -1601,7 +1601,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     <div className="flex-1">
                       <div className="text-xs font-semibold text-primary/70 uppercase tracking-wider mb-1">Best Way to Earn</div>
                       <h3 className="text-lg font-bold text-primary mb-1">{opportunity.title}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-1">{opportunity.description}</p>
+                      <div className="text-sm text-muted-foreground line-clamp-2" dangerouslySetInnerHTML={{ __html: opportunity.description || '' }} />
                     </div>
                   </div>
                   
@@ -1691,7 +1691,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold text-green-700 mb-0.5">{opportunity.title}</h3>
-                        <p className="text-xs text-green-600">{opportunity.description}</p>
+                        <div className="text-xs text-green-600 line-clamp-2" dangerouslySetInnerHTML={{ __html: opportunity.description || '' }} />
                       </div>
                     </div>
 
@@ -1816,9 +1816,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                                 LEARN
                               </Badge>
                             </div>
-                            <p className="text-xs sm:text-sm section-text line-clamp-2">
-                              {opportunity.description}
-                            </p>
+                            <div className="text-xs sm:text-sm section-text line-clamp-2" dangerouslySetInnerHTML={{ __html: opportunity.description || '' }} />
                           </div>
                         </div>
 
@@ -1893,9 +1891,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                                 LIVE
                               </Badge>
                             </div>
-                            <p className="text-xs sm:text-sm section-text line-clamp-2">
-                              {opportunity.description}
-                            </p>
+                            <div className="text-xs sm:text-sm section-text line-clamp-2" dangerouslySetInnerHTML={{ __html: opportunity.description || '' }} />
                           </div>
                         </div>
 
@@ -2092,9 +2088,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                               <h4 className="font-semibold text-sm mb-1 section-heading">
                                 {opportunity.title}
                               </h4>
-                              <p className="text-xs line-clamp-2 section-text">
-                                {opportunity.description}
-                              </p>
+                              <div className="text-xs line-clamp-2 section-text" dangerouslySetInnerHTML={{ __html: opportunity.description || '' }} />
                             </div>
                           </div>
                         </div>
