@@ -382,7 +382,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           if (aIsInvite && !bIsInvite) return -1;
           if (!aIsInvite && bIsInvite) return 1;
           
-          // PRIORITY 3: Shopping opportunities
+          // PRIORITY 3: Shopping opportunities (after Welcome module)
           const aIsShopping = a.opportunity_type === 'shopping';
           const bIsShopping = b.opportunity_type === 'shopping';
           
@@ -398,12 +398,9 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
           
-          // PRIORITY 4: Remaining Learn and Earn opportunities
-          const aIsLearn = a.opportunity_type === 'learn_and_earn';
-          const bIsLearn = b.opportunity_type === 'learn_and_earn';
-          
-          if (aIsLearn && !bIsLearn) return -1;
-          if (!aIsLearn && bIsLearn) return 1;
+          // PRIORITY 4: All other Learn and Earn opportunities (after shopping)
+          const aIsLearn = a.opportunity_type === 'learn_and_earn' && !aIsWelcome;
+          const bIsLearn = b.opportunity_type === 'learn_and_earn' && !bIsWelcome;
           
           // Within learn opportunities, sort by display_order
           if (aIsLearn && bIsLearn) {
@@ -413,7 +410,11 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
           
-          // Within other opportunities, sort by created_at (newest first)
+          // If one is learn and one is not, learn comes after at this point
+          if (aIsLearn && !bIsLearn) return 1;
+          if (!aIsLearn && bIsLearn) return -1;
+          
+          // For all other opportunities, sort by created_at (newest first)
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
         
