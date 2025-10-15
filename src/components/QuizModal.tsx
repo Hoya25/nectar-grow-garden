@@ -182,6 +182,26 @@ export function QuizModal({ module, onClose, onComplete }: QuizModalProps) {
     );
   }
 
+  // Handle no questions case
+  if (questions.length === 0) {
+    return (
+      <Dialog open onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>No Quiz Available</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-8">
+            <XCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-lg text-muted-foreground mb-4">
+              No quiz questions are available for this module yet.
+            </p>
+            <Button onClick={onClose}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   if (showResults) {
     const percentage = Math.round((score / questions.length) * 100);
     
