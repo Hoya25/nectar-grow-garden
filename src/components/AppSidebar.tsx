@@ -12,7 +12,8 @@ import {
   BarChart3,
   User,
   Settings,
-  Power
+  Power,
+  BookOpen
 } from 'lucide-react';
 import {
   Sidebar,
@@ -112,6 +113,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
 
   const navigationItems = [
     { title: "Profile", url: "/profile", icon: User },
+    { title: "Learn & Earn", url: "/learn", icon: BookOpen },
     ...(isAdmin ? [{ title: "Admin", url: "/admin", icon: Settings }] : []),
   ];
 

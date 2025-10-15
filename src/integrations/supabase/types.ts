@@ -436,6 +436,125 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_modules: {
+        Row: {
+          article_content: string | null
+          category: string | null
+          content_type: string
+          created_at: string | null
+          description: string | null
+          difficulty_level: string | null
+          display_order: number | null
+          duration_minutes: number | null
+          id: string
+          is_active: boolean | null
+          lock_type: string | null
+          min_quiz_score: number | null
+          nctr_reward: number | null
+          requires_quiz: boolean | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          article_content?: string | null
+          category?: string | null
+          content_type?: string
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          display_order?: number | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          lock_type?: string | null
+          min_quiz_score?: number | null
+          nctr_reward?: number | null
+          requires_quiz?: boolean | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          article_content?: string | null
+          category?: string | null
+          content_type?: string
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          display_order?: number | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          lock_type?: string | null
+          min_quiz_score?: number | null
+          nctr_reward?: number | null
+          requires_quiz?: boolean | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      learning_progress: {
+        Row: {
+          completed_at: string | null
+          content_viewed: boolean | null
+          created_at: string | null
+          id: string
+          module_id: string
+          quiz_passed: boolean | null
+          quiz_score: number | null
+          reward_amount: number | null
+          reward_claimed: boolean | null
+          started_at: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          content_viewed?: boolean | null
+          created_at?: string | null
+          id?: string
+          module_id: string
+          quiz_passed?: boolean | null
+          quiz_score?: number | null
+          reward_amount?: number | null
+          reward_claimed?: boolean | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          content_viewed?: boolean | null
+          created_at?: string | null
+          id?: string
+          module_id?: string
+          quiz_passed?: boolean | null
+          quiz_score?: number | null
+          reward_amount?: number | null
+          reward_claimed?: boolean | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_progress_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "learning_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nctr_locks: {
         Row: {
           can_upgrade: boolean | null
@@ -829,6 +948,94 @@ export type Database = {
           wallet_connected_at?: string | null
         }
         Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          answers: Json | null
+          attempt_number: number | null
+          created_at: string | null
+          id: string
+          module_id: string
+          passed: boolean | null
+          score: number
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          attempt_number?: number | null
+          created_at?: string | null
+          id?: string
+          module_id: string
+          passed?: boolean | null
+          score: number
+          total_questions: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json | null
+          attempt_number?: number | null
+          created_at?: string | null
+          id?: string
+          module_id?: string
+          passed?: boolean | null
+          score?: number
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "learning_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string | null
+          display_order: number | null
+          explanation: string | null
+          id: string
+          module_id: string
+          options: Json
+          question_text: string
+          question_type: string | null
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string | null
+          display_order?: number | null
+          explanation?: string | null
+          id?: string
+          module_id: string
+          options: Json
+          question_text: string
+          question_type?: string | null
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string | null
+          display_order?: number | null
+          explanation?: string | null
+          id?: string
+          module_id?: string
+          options?: Json
+          question_text?: string
+          question_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "learning_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       referrals: {
         Row: {
@@ -1816,6 +2023,16 @@ export type Database = {
       }
       process_daily_checkin: {
         Args: { p_user_id: string }
+        Returns: Json
+      }
+      process_quiz_completion: {
+        Args: {
+          p_answers: Json
+          p_module_id: string
+          p_score: number
+          p_total_questions: number
+          p_user_id: string
+        }
         Returns: Json
       }
       process_referral_reward: {

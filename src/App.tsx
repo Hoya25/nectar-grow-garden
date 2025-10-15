@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import Referrals from "./pages/Referrals";
 import AffiliateLinks from "./pages/AffiliateLinks";
+import LearnAndEarn from "./pages/LearnAndEarn";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
@@ -137,6 +138,7 @@ User agent: ${navigator.userAgent}
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/referrals" element={<Referrals />} />
                 <Route path="/affiliate-links" element={<AffiliateLinks />} />
+                <Route path="/learn" element={<LearnAndEarn />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
