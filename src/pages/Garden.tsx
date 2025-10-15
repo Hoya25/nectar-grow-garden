@@ -1788,14 +1788,18 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             })}
           </div>
 
-          {/* Learn and Earn Opportunities */}
-          {opportunities.filter(op => op.opportunity_type === 'learn_and_earn' && !completedOpportunityIds.includes(op.id)).length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
-                <div className="w-2 h-6 bg-primary rounded-full"></div>
-                📚 Learn & Earn
-              </h3>
-              {opportunities.filter(op => op.opportunity_type === 'learn_and_earn' && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
+          {/* Primary Opportunities - Respects Sort Order */}
+          <div className="mb-8 space-y-2">
+            {opportunities
+              .filter(op => 
+                ['learn_and_earn', 'shopping', 'free_trial'].includes(op.opportunity_type) && 
+                !completedOpportunityIds.includes(op.id)
+              )
+              .map((opportunity) => {
+                const isLearnAndEarn = opportunity.opportunity_type === 'learn_and_earn';
+                
+                if (isLearnAndEarn) {
+                  return (
                 <Card 
                   key={opportunity.id} 
                   className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-primary bg-gradient-to-r from-primary/5 to-transparent"
@@ -1854,19 +1858,11 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          )}
-
-
-          {/* Shopping & Free Trial Opportunities */}
-          {opportunities.filter(op => ['shopping', 'free_trial'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
-                <div className="w-2 h-6 bg-green-500 rounded-full"></div>
-                🟢 Live Opportunities
-              </h3>
-              {opportunities.filter(op => ['shopping', 'free_trial'].includes(op.opportunity_type) && !completedOpportunityIds.includes(op.id)).map((opportunity) => (
+                  );
+                }
+                
+                // Shopping & Free Trial
+                return (
                 <Card 
                   key={opportunity.id} 
                   className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-green-500 bg-gradient-to-r from-green-50/50 to-transparent"
@@ -2022,9 +2018,9 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          )}
+                );
+              })}
+          </div>
 
           {/* Social Media & Other Opportunities - Show uncompleted social_follow/bonus/partner, and completed free_trial */}
           {opportunities.filter(op => {
