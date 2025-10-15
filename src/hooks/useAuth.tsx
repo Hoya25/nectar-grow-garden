@@ -200,20 +200,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (existingProfile?.email) {
-        // Wallet is linked to an existing account - sign in with that email
-        console.log('✅ Found existing account linked to wallet, signing in with email:', existingProfile.email);
+        // Wallet is linked to an existing account - use server-side wallet auth
+        console.log('✅ Found existing account linked to wallet, authenticating via server...');
         
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: existingProfile.email,
-          password: deterministicPassword,
+        const { data: authData, error: authError } = await supabase.functions.invoke('wallet-auth', {
+          body: { walletAddress }
         });
 
-        if (signInError) {
-          console.error('❌ Sign in with linked email failed:', signInError);
-          return { error: signInError };
+        if (authError || !authData?.token) {
+          console.error('❌ Server-side wallet auth failed:', authError);
+          return { 
+            error: authError || new Error('Failed to authenticate wallet') 
+          };
         }
 
-        console.log('✅ Successfully signed in with linked email account');
+        console.log('✅ Got auth token from server, verifying OTP...');
+
+        // Use the token to verify and create session
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: authData.token,
+          type: 'magiclink'
+        });
+
+        if (verifyError) {
+          console.error('❌ Token verification failed:', verifyError);
+          return { error: verifyError };
+        }
+
+        console.log('✅ Successfully signed in with linked wallet account');
         
         // Capture login IP
         setTimeout(async () => {
