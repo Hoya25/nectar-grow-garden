@@ -1322,14 +1322,23 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description">Opportunity Description</Label>
+                    <span className="text-xs text-muted-foreground">
+                      {formData.description?.length || 0} / 2000 characters
+                    </span>
+                  </div>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Describe what users need to do to earn NCTR..."
-                    rows={3}
+                    placeholder="✍️ Describe what users need to do to earn NCTR rewards...&#10;&#10;💡 Tips:&#10;• Be clear and specific about requirements&#10;• Mention any minimum purchase amounts&#10;• Explain how rewards are distributed&#10;• Add any special terms or conditions"
+                    className="min-h-[120px] resize-y font-mono text-sm"
+                    maxLength={2000}
                   />
+                  <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950/20 p-2 rounded border border-blue-200 dark:border-blue-800">
+                    💡 <strong>Formatting tips:</strong> Use line breaks for readability. Keep it clear and concise.
+                  </div>
                 </div>
 
                 {/* Affiliate Link - Manual Override */}
@@ -1709,24 +1718,31 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="video_title">Video Title</Label>
                         <Input
                           id="video_title"
                           value={formData.video_title}
                           onChange={(e) => setFormData({...formData, video_title: e.target.value})}
-                          placeholder="About Nike"
+                          placeholder="About Nike - Innovation & Sustainability"
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="video_description">Video Description</Label>
-                        <Input
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="video_description">Video Description</Label>
+                          <span className="text-xs text-muted-foreground">
+                            {formData.video_description?.length || 0} / 500 characters
+                          </span>
+                        </div>
+                        <Textarea
                           id="video_description"
                           value={formData.video_description}
                           onChange={(e) => setFormData({...formData, video_description: e.target.value})}
-                          placeholder="Learn about Nike's innovation..."
+                          placeholder="📹 Brief description of what users will learn from this video...&#10;Example: Learn about Nike's commitment to sustainability and innovation in sportswear"
+                          className="min-h-[80px] resize-y text-sm"
+                          maxLength={500}
                         />
                       </div>
                     </div>
