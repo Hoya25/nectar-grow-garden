@@ -1803,75 +1803,88 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                 ['learn_and_earn', 'shopping', 'free_trial'].includes(op.opportunity_type) && 
                 !completedOpportunityIds.includes(op.id)
               )
-              .map((opportunity) => {
+              .map((opportunity, index, array) => {
                 const isLearnAndEarn = opportunity.opportunity_type === 'learn_and_earn';
+                const prevOpp = index > 0 ? array[index - 1] : null;
+                const showLearnHeader = isLearnAndEarn && (!prevOpp || prevOpp.opportunity_type !== 'learn_and_earn');
+                const showShoppingHeader = opportunity.opportunity_type === 'shopping' && (!prevOpp || !['shopping', 'free_trial'].includes(prevOpp.opportunity_type));
                 
-                if (isLearnAndEarn) {
-                  return (
-                <Card 
-                  key={opportunity.id} 
-                  className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-primary bg-gradient-to-r from-primary/5 to-transparent"
-                  onClick={() => navigate('/learn')}
-                >
-                  <CardContent className="p-0">
-                    <div className="flex flex-col lg:flex-row">
-                      <div className="relative flex items-center justify-center lg:w-24 h-16 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
-                        {opportunity.video_url ? (
-                          <div className="relative">
-                            <Play className="w-8 h-8 text-primary" />
-                          </div>
-                        ) : (
-                          <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                            <BookOpen className="w-4 h-4 text-primary" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-2 sm:p-3 lg:p-4 flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 sm:mb-3 gap-2">
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-1">
-                              <h3 className="text-sm sm:text-base font-semibold section-heading truncate">
-                                {opportunity.title}
-                              </h3>
-                              <Badge className="bg-primary text-primary-foreground font-bold ml-1 text-[10px] px-1.5 py-0.5">
-                                LEARN
-                              </Badge>
-                            </div>
-                            <div className="text-xs sm:text-sm section-text line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
-                          </div>
-                        </div>
-
-                        <div className="text-center mb-1.5 sm:mb-2">
-                          <div className="flex items-center justify-center gap-0.5 text-lg sm:text-xl font-bold text-primary mb-0.5">
-                            <span>
-                              {formatNCTR((opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))}
-                            </span>
-                            <img src={nctrLogo} alt="NCTR" className="h-12 sm:h-14 w-auto -ml-4" />
-                          </div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">
-                            Watch, Learn & Take Quiz
-                          </div>
-                          <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
-                        </div>
-
-                        <Button 
-                          onClick={() => navigate('/learn')}
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-3"
-                          size="sm"
-                        >
-                          Start Learning →
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                  );
-                }
-                
-                // Shopping & Free Trial
                 return (
-                <Card 
+                  <>
+                    {showLearnHeader && (
+                      <h3 className="text-xl font-semibold section-heading mb-4 mt-6 flex items-center gap-2">
+                        <div className="w-2 h-6 bg-primary rounded-full"></div>
+                        📚 Learn & Earn
+                      </h3>
+                    )}
+                    {showShoppingHeader && (
+                      <h3 className="text-xl font-semibold section-heading mb-4 mt-6 flex items-center gap-2">
+                        <div className="w-2 h-6 bg-green-500 rounded-full"></div>
+                        🟢 Live Opportunities
+                      </h3>
+                    )}
+                    
+                    {isLearnAndEarn ? (
+                      <Card 
+                        key={opportunity.id} 
+                        className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-primary bg-gradient-to-r from-primary/5 to-transparent"
+                        onClick={() => navigate('/learn')}
+                      >
+                        <CardContent className="p-0">
+                          <div className="flex flex-col lg:flex-row">
+                            <div className="relative flex items-center justify-center lg:w-24 h-16 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
+                              {opportunity.video_url ? (
+                                <div className="relative">
+                                  <Play className="w-8 h-8 text-primary" />
+                                </div>
+                              ) : (
+                                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                                  <BookOpen className="w-4 h-4 text-primary" />
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="p-2 sm:p-3 lg:p-4 flex-1">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 sm:mb-3 gap-2">
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h3 className="text-sm sm:text-base font-semibold section-heading truncate">
+                                      {opportunity.title}
+                                    </h3>
+                                    <Badge className="bg-primary text-primary-foreground font-bold ml-1 text-[10px] px-1.5 py-0.5">
+                                      LEARN
+                                    </Badge>
+                                  </div>
+                                  <div className="text-xs sm:text-sm section-text line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
+                                </div>
+                              </div>
+
+                              <div className="text-center mb-1.5 sm:mb-2">
+                                <div className="flex items-center justify-center gap-0.5 text-lg sm:text-xl font-bold text-primary mb-0.5">
+                                  <span>
+                                    {formatNCTR((opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))}
+                                  </span>
+                                  <img src={nctrLogo} alt="NCTR" className="h-12 sm:h-14 w-auto -ml-4" />
+                                </div>
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">
+                                  Watch, Learn & Take Quiz
+                                </div>
+                                <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
+                              </div>
+
+                              <Button 
+                                onClick={() => navigate('/learn')}
+                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-3"
+                                size="sm"
+                              >
+                                Start Learning →
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Card
                   key={opportunity.id} 
                   className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-green-500 bg-gradient-to-r from-green-50/50 to-transparent"
                   onClick={() => handleOpportunityClick(opportunity)}
@@ -2026,6 +2039,8 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     </div>
                   </CardContent>
                 </Card>
+                    )}
+                  </>
                 );
               })}
           </div>
