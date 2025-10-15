@@ -17,23 +17,28 @@ const WalletConnection = () => {
   useEffect(() => {
     const handleAutoSignIn = async () => {
       if (isConnected && address && !user && !signingIn) {
+        console.log('🔐 Auto sign-in triggered for wallet:', address);
         setSigningIn(true);
         try {
+          console.log('📧 Calling signInWithWallet...');
           const { error } = await signInWithWallet(address);
           
           if (error) {
+            console.error('❌ Sign in failed:', error);
             toast({
               title: "Sign In Failed",
               description: error.message || "Failed to sign in with wallet",
               variant: "destructive",
             });
           } else {
+            console.log('✅ Sign in successful!');
             toast({
               title: "Success!",
               description: "Signed in with your Base wallet",
             });
           }
         } catch (error: any) {
+          console.error('❌ Sign in error:', error);
           toast({
             title: "Error",
             description: error.message || "An unexpected error occurred",
