@@ -190,11 +190,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data: existingProfile, error: profileError } = await supabase
         .from('profiles')
         .select('email, user_id')
-        .eq('wallet_address', walletAddress)
+        .ilike('wallet_address', walletAddress) // Case-insensitive match
         .maybeSingle();
 
-      if (profileError) {
-        console.error('Error checking for existing profile:', profileError);
+      console.log('🔍 Profile lookup result:', { existingProfile, profileError });
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('❌ Error checking for existing profile:', profileError);
       }
 
       if (existingProfile?.email) {
