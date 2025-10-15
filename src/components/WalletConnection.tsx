@@ -1,13 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, ExternalLink, Copy } from "lucide-react";
+import { Wallet, ExternalLink, Copy, LogIn } from "lucide-react";
 import { useWallet } from "@/hooks/useWallet";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const WalletConnection = () => {
   const { isConnected, address, connectWallet, disconnectWallet, loading } = useWallet();
+  const { signInWithWallet, user } = useAuth();
   const { toast } = useToast();
+  const [signingIn, setSigningIn] = useState(false);
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -28,6 +32,38 @@ const WalletConnection = () => {
       window.open(`https://basescan.org/address/${address}`, '_blank');
     }
   };
+
+  const handleSignInWithWallet = async () => {
+    if (!address) return;
+
+    setSigningIn(true);
+    try {
+      const { error } = await signInWithWallet(address);
+      
+      if (error) {
+        toast({
+          title: "Sign In Failed",
+          description: error.message || "Failed to sign in with wallet",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: "Signed in with your Base wallet",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
+  const isWalletAuthenticated = user?.user_metadata?.wallet_address?.toLowerCase() === address?.toLowerCase();
 
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50">
@@ -59,6 +95,11 @@ const WalletConnection = () => {
                 Connected
               </Badge>
               <Badge variant="secondary">Base Network</Badge>
+              {isWalletAuthenticated && (
+                <Badge variant="default" className="bg-primary/10 text-primary border-primary/20">
+                  Authenticated
+                </Badge>
+              )}
             </div>
             
             <div className="space-y-2">
@@ -89,6 +130,29 @@ const WalletConnection = () => {
             </div>
 
             <div className="pt-2 space-y-2">
+              {!user && (
+                <Button 
+                  onClick={handleSignInWithWallet}
+                  disabled={signingIn}
+                  className="w-full"
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  {signingIn ? "Signing In..." : "Sign In with Wallet"}
+                </Button>
+              )}
+              
+              {user && !isWalletAuthenticated && (
+                <Button 
+                  onClick={handleSignInWithWallet}
+                  disabled={signingIn}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  {signingIn ? "Linking..." : "Link Wallet to Account"}
+                </Button>
+              )}
+              
               <Button 
                 variant="outline" 
                 onClick={disconnectWallet}

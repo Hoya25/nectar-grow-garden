@@ -7,6 +7,7 @@ interface AuthContextType {
   session: Session | null;
   signUp: (email: string, password: string, fullName?: string, referralCode?: string | null) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithWallet: (walletAddress: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -172,6 +173,138 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error };
   };
 
+  const signInWithWallet = async (walletAddress: string) => {
+    try {
+      console.log('🔐 Starting wallet authentication for:', walletAddress);
+
+      // Generate deterministic password using SHA-256
+      const encoder = new TextEncoder();
+      const data = encoder.encode(walletAddress.toLowerCase());
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      const deterministicPassword = `wallet_${hashHex.slice(0, 32)}`;
+
+      // Create special wallet email format
+      const walletEmail = `${walletAddress.toLowerCase()}@wallet.base.app`;
+
+      console.log('📧 Attempting sign in with wallet email');
+
+      // Attempt to sign in
+      let { error: signInError } = await supabase.auth.signInWithPassword({
+        email: walletEmail,
+        password: deterministicPassword,
+      });
+
+      // If user already exists with different password, migrate it
+      if (signInError && signInError.message.includes('Invalid login credentials')) {
+        console.log('🔄 Credentials invalid, attempting password migration...');
+
+        const { data: migrationData, error: migrationError } = await supabase.functions.invoke(
+          'migrate-wallet-password',
+          {
+            body: { walletAddress }
+          }
+        );
+
+        if (migrationError) {
+          console.error('❌ Migration failed:', migrationError);
+          return { error: new Error('Failed to migrate wallet credentials') };
+        }
+
+        console.log('✅ Migration response:', migrationData);
+
+        // If migration says it's a new user, create the account
+        if (migrationData?.requiresSignup) {
+          console.log('📝 Creating new wallet account...');
+          
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: walletEmail,
+            password: deterministicPassword,
+            options: {
+              emailRedirectTo: `${window.location.origin}/`,
+              data: {
+                wallet_address: walletAddress,
+                is_wallet_auth: true,
+              }
+            }
+          });
+
+          if (signUpError) {
+            console.error('❌ Signup failed:', signUpError);
+            return { error: signUpError };
+          }
+
+          console.log('✅ New wallet account created successfully');
+          
+          // Capture IP for new wallet signup
+          setTimeout(async () => {
+            try {
+              await supabase.functions.invoke('capture-user-ip', {
+                body: { action: 'wallet_signup' }
+              });
+            } catch (ipError) {
+              console.error('Failed to capture IP (non-blocking):', ipError);
+            }
+          }, 500);
+
+          return { error: null };
+        }
+
+        // Retry sign in after successful migration
+        console.log('🔄 Retrying sign in after migration...');
+        const { error: retryError } = await supabase.auth.signInWithPassword({
+          email: walletEmail,
+          password: deterministicPassword,
+        });
+
+        if (retryError) {
+          console.error('❌ Retry sign in failed:', retryError);
+          return { error: retryError };
+        }
+
+        console.log('✅ Sign in successful after migration');
+        
+        // Capture login IP
+        setTimeout(async () => {
+          try {
+            await supabase.functions.invoke('capture-user-ip', {
+              body: { action: 'wallet_login' }
+            });
+          } catch (ipError) {
+            console.error('Failed to capture login IP (non-blocking):', ipError);
+          }
+        }, 500);
+
+        return { error: null };
+      }
+
+      if (signInError) {
+        console.error('❌ Sign in error:', signInError);
+        return { error: signInError };
+      }
+
+      console.log('✅ Wallet sign in successful');
+      
+      // Capture login IP
+      setTimeout(async () => {
+        try {
+          await supabase.functions.invoke('capture-user-ip', {
+            body: { action: 'wallet_login' }
+          });
+        } catch (ipError) {
+          console.error('Failed to capture login IP (non-blocking):', ipError);
+        }
+      }, 500);
+
+      return { error: null };
+
+    } catch (error: any) {
+      console.error('❌ Wallet authentication error:', error);
+      return { error: error };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -182,6 +315,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       session,
       signUp,
       signIn,
+      signInWithWallet,
       signOut,
       loading,
     }}>
