@@ -198,6 +198,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         password: deterministicPassword,
       });
 
+      // If email not confirmed, auto-confirm wallet email and retry
+      if (signInError && (signInError.message.includes('Email not confirmed') || (signInError as any).code === 'email_not_confirmed')) {
+        console.log('📧 Email not confirmed, auto-confirming wallet email...');
+        
+        const { error: confirmError } = await supabase.functions.invoke('auto-confirm-wallet', {
+          body: { email: walletEmail }
+        });
+
+        if (confirmError) {
+          console.error('❌ Auto-confirm failed:', confirmError);
+          return { error: new Error('Failed to auto-confirm wallet email') };
+        }
+
+        console.log('✅ Wallet email auto-confirmed, retrying sign in...');
+        
+        // Retry sign in after confirmation
+        const { error: retryError } = await supabase.auth.signInWithPassword({
+          email: walletEmail,
+          password: deterministicPassword,
+        });
+
+        if (retryError) {
+          console.error('❌ Retry sign in failed:', retryError);
+          return { error: retryError };
+        }
+
+        console.log('✅ Sign in successful after auto-confirmation');
+        signInError = null; // Clear the error since sign-in succeeded
+      }
+
       // If user already exists with different password, migrate it
       if (signInError && signInError.message.includes('Invalid login credentials')) {
         console.log('🔄 Credentials invalid, attempting password migration...');
