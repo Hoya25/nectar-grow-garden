@@ -187,8 +187,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Create password with explicit lowercase, uppercase, and numbers
       const deterministicPassword = `Wa11et${hashHex.slice(0, 26)}9X`;
 
-      // Create special wallet email format
-      const walletEmail = `${walletAddress.toLowerCase()}@wallet.base.app`;
+      // Create special wallet email format (remove 0x prefix for valid email)
+      const walletEmail = `wallet-${walletAddress.toLowerCase().replace('0x', '')}@base.app`;
 
       console.log('📧 Attempting sign in with wallet email');
 

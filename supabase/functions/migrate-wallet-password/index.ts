@@ -51,8 +51,8 @@ serve(async (req) => {
 
     console.log(`🔐 Generated deterministic password for wallet`);
 
-    // Find user by wallet email
-    const walletEmail = `${walletAddress.toLowerCase()}@wallet.base.app`;
+    // Find user by wallet email (remove 0x prefix for valid email)
+    const walletEmail = `wallet-${walletAddress.toLowerCase().replace('0x', '')}@base.app`;
     
     const { data: users, error: searchError } = await supabaseAdmin.auth.admin.listUsers();
     
