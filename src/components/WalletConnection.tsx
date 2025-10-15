@@ -5,13 +5,48 @@ import { Wallet, ExternalLink, Copy, LogIn } from "lucide-react";
 import { useWallet } from "@/hooks/useWallet";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const WalletConnection = () => {
   const { isConnected, address, connectWallet, disconnectWallet, loading } = useWallet();
   const { signInWithWallet, user } = useAuth();
   const { toast } = useToast();
   const [signingIn, setSigningIn] = useState(false);
+
+  // Auto sign-in after wallet connection
+  useEffect(() => {
+    const handleAutoSignIn = async () => {
+      if (isConnected && address && !user && !signingIn) {
+        setSigningIn(true);
+        try {
+          const { error } = await signInWithWallet(address);
+          
+          if (error) {
+            toast({
+              title: "Sign In Failed",
+              description: error.message || "Failed to sign in with wallet",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Success!",
+              description: "Signed in with your Base wallet",
+            });
+          }
+        } catch (error: any) {
+          toast({
+            title: "Error",
+            description: error.message || "An unexpected error occurred",
+            variant: "destructive",
+          });
+        } finally {
+          setSigningIn(false);
+        }
+      }
+    };
+
+    handleAutoSignIn();
+  }, [isConnected, address, user, signInWithWallet, toast, signingIn]);
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -82,10 +117,10 @@ const WalletConnection = () => {
             </p>
             <Button 
               onClick={connectWallet} 
-              disabled={loading}
+              disabled={loading || signingIn}
               className="w-full"
             >
-              {loading ? "Connecting..." : "Connect Wallet"}
+              {loading ? "Connecting..." : signingIn ? "Signing In..." : "Connect & Sign In"}
             </Button>
           </div>
         ) : (
@@ -130,17 +165,6 @@ const WalletConnection = () => {
             </div>
 
             <div className="pt-2 space-y-2">
-              {!user && (
-                <Button 
-                  onClick={handleSignInWithWallet}
-                  disabled={signingIn}
-                  className="w-full"
-                >
-                  <LogIn className="h-4 w-4 mr-2" />
-                  {signingIn ? "Signing In..." : "Sign In with Wallet"}
-                </Button>
-              )}
-              
               {user && !isWalletAuthenticated && (
                 <Button 
                   onClick={handleSignInWithWallet}
