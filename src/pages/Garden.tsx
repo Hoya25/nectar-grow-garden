@@ -307,16 +307,47 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 
+      // Also fetch Learn and Earn modules
+      const { data: learningModulesData, error: learningError } = await supabase
+        .from('learning_modules')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
       console.log('📊 Raw opportunities data:', opportunitiesData);
+      console.log('📚 Learning modules data:', learningModulesData);
 
       if (opportunitiesError) {
         console.error('Error fetching opportunities:', opportunitiesError);
       } else {
         console.log(`📋 Total opportunities fetched: ${opportunitiesData?.length || 0}`);
+        console.log(`📚 Total learning modules fetched: ${learningModulesData?.length || 0}`);
+        
+        // Convert learning modules to opportunity format
+        const learningOpportunities = (learningModulesData || []).map(module => ({
+          id: module.id,
+          title: module.title,
+          description: module.description,
+          opportunity_type: 'learn_and_earn',
+          nctr_reward: module.nctr_reward,
+          reward_per_dollar: 0,
+          partner_name: 'The Garden',
+          partner_logo_url: '/nctr-logo.png',
+          video_url: module.video_url,
+          lock_90_nctr_reward: module.lock_type === '90LOCK' ? module.nctr_reward : 0,
+          lock_360_nctr_reward: module.lock_type === '360LOCK' ? module.nctr_reward : 0,
+          reward_distribution_type: module.lock_type === '90LOCK' ? 'lock_90' : 'lock_360',
+          display_order: module.display_order,
+          created_at: module.created_at,
+          brands: null, // Learn opportunities don't have brands
+        }));
+        
+        // Combine opportunities with learning modules
+        const allOpportunities = [...(opportunitiesData || []), ...learningOpportunities];
         
         // Filter out opportunities with invalid loyalize_ids (shopping type only)
-        const validOpportunities = (opportunitiesData || []).filter(opp => {
-          // For non-shopping opportunities (invite, social, bonus, etc.), allow them through
+        const validOpportunities = allOpportunities.filter(opp => {
+          // For non-shopping opportunities (invite, social, bonus, learn, etc.), allow them through
           if (opp.opportunity_type !== 'shopping') return true;
           
           // For shopping opportunities, require valid brand with active status and real loyalize_id
@@ -344,7 +375,22 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           if (aIsInvite && !bIsInvite) return -1; // Invite opportunities first
           if (!aIsInvite && bIsInvite) return 1;
           
-          // PRIORITY 2: Shopping opportunities
+          // PRIORITY 2: Learn and Earn opportunities
+          const aIsLearn = a.opportunity_type === 'learn_and_earn';
+          const bIsLearn = b.opportunity_type === 'learn_and_earn';
+          
+          if (aIsLearn && !bIsLearn) return -1;
+          if (!aIsLearn && bIsLearn) return 1;
+          
+          // Within learn opportunities, sort by display_order
+          if (aIsLearn && bIsLearn) {
+            const aOrder = a.display_order ?? 999;
+            const bOrder = b.display_order ?? 999;
+            if (aOrder !== bOrder) return aOrder - bOrder;
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          }
+          
+          // PRIORITY 3: Shopping opportunities
           const aIsShopping = a.opportunity_type === 'shopping';
           const bIsShopping = b.opportunity_type === 'shopping';
           
