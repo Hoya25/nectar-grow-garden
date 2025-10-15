@@ -24,7 +24,8 @@ import {
   Link,
   Database,
   ShoppingCart,
-  ChevronDown
+  ChevronDown,
+  BookOpen
 } from 'lucide-react';
 import BrandManagement from '@/components/admin/BrandManagement';
 import OpportunityManagement from '@/components/admin/OpportunityManagement';
@@ -60,6 +61,7 @@ import { PendingTransactionsMonitor } from '@/components/admin/PendingTransactio
 import { LoyalizeTransactionSync } from '@/components/admin/LoyalizeTransactionSync';
 import { FreeTrialVerification } from '@/components/admin/FreeTrialVerification';
 import SocialFollowApproval from '@/components/admin/SocialFollowApproval';
+import LearnAndEarnManagement from '@/components/admin/LearnAndEarnManagement';
 
 interface AdminStats {
   total_users: number;
@@ -355,7 +357,10 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="opportunities">
-            <OpportunityManagement onStatsUpdate={fetchAdminStats} />
+            <div className="space-y-6">
+              <LearnAndEarnManagement />
+              <OpportunityManagement onStatsUpdate={fetchAdminStats} />
+            </div>
           </TabsContent>
 
           <TabsContent value="brands">
