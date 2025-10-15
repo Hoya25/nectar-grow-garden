@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { BookOpen, Plus, Edit, Trash2, Save, X, HelpCircle, Upload, Link as LinkIcon } from "lucide-react";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -493,15 +494,14 @@ export default function LearnAndEarnManagement() {
               {(editingModule.content_type === "article" || editingModule.content_type === "both") && (
                 <div className="space-y-3 p-4 border rounded-lg">
                   <Label className="text-base font-semibold">Article Content</Label>
-                  <Textarea
+                  <RichTextEditor
                     value={editingModule.article_content || ""}
-                    onChange={(e) => setEditingModule({ ...editingModule, article_content: e.target.value })}
-                    placeholder="Write your article content here. You can use HTML for formatting:&#10;&#10;<h2>Section Title</h2>&#10;<p>Paragraph text...</p>&#10;<ul>&#10;  <li>Bullet point</li>&#10;</ul>"
-                    rows={12}
-                    className="font-mono text-sm"
+                    onChange={(content) => setEditingModule({ ...editingModule, article_content: content })}
+                    placeholder="Write your article content here. Use the toolbar above to format text with headings, bold, italic, bullet points, and more..."
+                    className="mb-2"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Supports HTML formatting: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;strong&gt;, &lt;em&gt;, etc.
+                    💡 Use the formatting toolbar to add headings, bold text, bullet lists, and more. The content will be automatically formatted for users.
                   </p>
                 </div>
               )}
