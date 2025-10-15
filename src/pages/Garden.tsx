@@ -366,29 +366,21 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         console.log(`✅ Valid opportunities after filtering: ${validOpportunities.length}`);
         console.log('📋 Opportunity types:', validOpportunities.map(o => `${o.title} (${o.opportunity_type})`));
         
-        // Sort opportunities to prioritize INVITE opportunities first (best way to earn NCTR)
+        // Sort opportunities to showcase both opportunity types early in UX
         const sortedOpportunities = validOpportunities.sort((a, b) => {
-          // PRIORITY 1: Invite opportunities (best way to earn)
+          // PRIORITY 1: "Welcome to The Garden" - featured intro module
+          const aIsWelcome = a.opportunity_type === 'learn_and_earn' && a.title === 'Welcome to The Garden';
+          const bIsWelcome = b.opportunity_type === 'learn_and_earn' && b.title === 'Welcome to The Garden';
+          
+          if (aIsWelcome && !bIsWelcome) return -1;
+          if (!aIsWelcome && bIsWelcome) return 1;
+          
+          // PRIORITY 2: Invite opportunities (best way to earn)
           const aIsInvite = a.opportunity_type === 'invite';
           const bIsInvite = b.opportunity_type === 'invite';
           
-          if (aIsInvite && !bIsInvite) return -1; // Invite opportunities first
+          if (aIsInvite && !bIsInvite) return -1;
           if (!aIsInvite && bIsInvite) return 1;
-          
-          // PRIORITY 2: Learn and Earn opportunities
-          const aIsLearn = a.opportunity_type === 'learn_and_earn';
-          const bIsLearn = b.opportunity_type === 'learn_and_earn';
-          
-          if (aIsLearn && !bIsLearn) return -1;
-          if (!aIsLearn && bIsLearn) return 1;
-          
-          // Within learn opportunities, sort by display_order
-          if (aIsLearn && bIsLearn) {
-            const aOrder = a.display_order ?? 999;
-            const bOrder = b.display_order ?? 999;
-            if (aOrder !== bOrder) return aOrder - bOrder;
-            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-          }
           
           // PRIORITY 3: Shopping opportunities
           const aIsShopping = a.opportunity_type === 'shopping';
@@ -403,6 +395,21 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             const bOrder = b.display_order ?? 999;
             if (aOrder !== bOrder) return aOrder - bOrder;
             // Fall back to created_at if display_order is the same
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          }
+          
+          // PRIORITY 4: Remaining Learn and Earn opportunities
+          const aIsLearn = a.opportunity_type === 'learn_and_earn';
+          const bIsLearn = b.opportunity_type === 'learn_and_earn';
+          
+          if (aIsLearn && !bIsLearn) return -1;
+          if (!aIsLearn && bIsLearn) return 1;
+          
+          // Within learn opportunities, sort by display_order
+          if (aIsLearn && bIsLearn) {
+            const aOrder = a.display_order ?? 999;
+            const bOrder = b.display_order ?? 999;
+            if (aOrder !== bOrder) return aOrder - bOrder;
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
           }
           
