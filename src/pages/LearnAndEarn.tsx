@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Trophy, Lock, Clock, CheckCircle2, PlayCircle } from "lucide-react";
+import { BookOpen, Trophy, Lock, Clock, CheckCircle2, PlayCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { LearningModuleCard } from "@/components/LearningModuleCard";
 import { QuizModal } from "@/components/QuizModal";
@@ -37,6 +38,7 @@ interface UserProgress {
 
 export default function LearnAndEarn() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [modules, setModules] = useState<LearningModule[]>([]);
   const [progress, setProgress] = useState<Record<string, UserProgress>>({});
   const [loading, setLoading] = useState(true);
@@ -146,6 +148,14 @@ export default function LearnAndEarn() {
       <div className="bg-gradient-to-r from-primary/20 via-primary/10 to-background border-b">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-3xl">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/garden')}
+              className="mb-4 -ml-2"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to The Garden
+            </Button>
             <div className="flex items-center gap-2 mb-4">
               <BookOpen className="h-8 w-8 text-primary" />
               <h1 className="text-4xl font-bold">Learn & Earn</h1>
