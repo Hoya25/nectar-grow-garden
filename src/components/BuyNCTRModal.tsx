@@ -138,13 +138,14 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   };
 
   const handleBuyNow = async () => {
-    console.log('🚀 Buy button clicked', { nctrAmount, usdAmount });
+    console.log('🚀 Buy button clicked', { nctrAmount, usdAmount, isConnected, address });
     
     // Check if wallet is connected
-    if (!isConnected) {
+    if (!isConnected || !address) {
+      console.log('❌ Wallet not connected, showing error');
       toast({
-        title: "Connect Wallet",
-        description: "Please connect your Coinbase Wallet first",
+        title: "Wallet Not Connected",
+        description: "Please connect your Coinbase Wallet using the button above, then try again.",
         variant: "destructive",
       });
       return;
@@ -495,50 +496,74 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
           {/* Wallet Connection / Action Button */}
           {!isConnected ? (
-            <Button
-              onClick={connectWallet}
-              className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
-              size="lg"
-            >
-              <Wallet className="w-4 h-4 mr-2 flex-shrink-0" />
-              Connect Wallet to Continue
-            </Button>
-          ) : (
-            <Button
-              onClick={handleBuyNow}
-              disabled={isButtonDisabled}
-              className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Zap className="w-4 h-4 mr-2 flex-shrink-0 animate-spin" />
-                  <span className="text-xs sm:text-sm">Processing Payment...</span>
-                </>
-              ) : (
-                <>
-                  <Wallet className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                    Pay {parseFloat(nctrAmount || '0').toLocaleString('en-US', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })} NCTR
-                    <span className="hidden sm:inline">
-                      {usdAmount && ` ($${parseFloat(usdAmount).toFixed(2)} ETH)`}
-                    </span>
-                  </span>
-                  <ArrowRight className="w-4 h-4 ml-2 flex-shrink-0" />
-                </>
-              )}
-            </Button>
-          )}
-
-          {isConnected && (
-            <div className="bg-muted/50 rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground">
-                Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
-              </p>
+            <div className="space-y-3">
+              <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <p className="text-sm text-blue-900 dark:text-blue-100 font-medium mb-2">
+                  Step 1: Connect Your Wallet
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  You need to connect your Coinbase Wallet to purchase NCTR. Click below to connect.
+                </p>
+              </div>
+              <Button
+                onClick={async () => {
+                  try {
+                    await connectWallet();
+                    toast({
+                      title: "Wallet Connected",
+                      description: "You can now proceed with your purchase",
+                    });
+                  } catch (error: any) {
+                    console.error('Wallet connection error:', error);
+                    toast({
+                      title: "Connection Failed",
+                      description: error?.message || "Failed to connect wallet. Please try again.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
+                size="lg"
+              >
+                <Wallet className="w-4 h-4 mr-2 flex-shrink-0" />
+                Connect Coinbase Wallet
+              </Button>
             </div>
+          ) : (
+            <>
+              <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3 mb-3">
+                <p className="text-xs text-green-700 dark:text-green-300">
+                  ✅ Wallet Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+                </p>
+              </div>
+              <Button
+                onClick={handleBuyNow}
+                disabled={isButtonDisabled}
+                className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
+                size="lg"
+              >
+                {loading ? (
+                  <>
+                    <Zap className="w-4 h-4 mr-2 flex-shrink-0 animate-spin" />
+                    <span className="text-xs sm:text-sm">Processing Payment...</span>
+                  </>
+                ) : (
+                  <>
+                    <Wallet className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                      Pay ${parseFloat(usdAmount).toFixed(2)} ETH
+                      <span className="hidden sm:inline">
+                        {` for ${parseFloat(nctrAmount || '0').toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })} NCTR`}
+                      </span>
+                    </span>
+                    <ArrowRight className="w-4 h-4 ml-2 flex-shrink-0" />
+                  </>
+                )}
+              </Button>
+            </>
           )}
 
           <p className="text-xs text-center text-muted-foreground">
