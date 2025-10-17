@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
+import { useWallet } from '@/hooks/useWallet';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Lock, TrendingUp, Zap, ArrowRight, Check, ExternalLink } from 'lucide-react';
+import { Lock, TrendingUp, Zap, ArrowRight, Check, Wallet } from 'lucide-react';
+import { ethers } from 'ethers';
 
 interface BuyNCTRModalProps {
   open: boolean;
@@ -36,16 +38,19 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   onPurchaseComplete
 }) => {
   const { currentPrice, formatPrice, formatUSD } = useNCTRPrice();
+  const { isConnected, address, connectWallet } = useWallet();
   const [nctrAmount, setNctrAmount] = useState(suggestedAmount.toString());
   const [usdAmount, setUsdAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [statusLevels, setStatusLevels] = useState<StatusLevel[]>([]);
   const [nextStatus, setNextStatus] = useState<StatusLevel | null>(null);
   const [wholesalePrice, setWholesalePrice] = useState<number>(0.04); // Default wholesale price
+  const [treasuryAddress, setTreasuryAddress] = useState<string>('');
 
   useEffect(() => {
     fetchStatusLevels();
     fetchWholesalePrice();
+    fetchTreasuryAddress();
   }, []);
 
   const fetchWholesalePrice = async () => {
@@ -61,6 +66,22 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
       }
     } catch (error) {
       console.error('Error fetching wholesale price:', error);
+    }
+  };
+
+  const fetchTreasuryAddress = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'treasury_wallet_address')
+        .single();
+
+      if (!error && data) {
+        setTreasuryAddress(String(data.setting_value));
+      }
+    } catch (error) {
+      console.error('Error fetching treasury address:', error);
     }
   };
 
@@ -118,58 +139,135 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
   const handleBuyNow = async () => {
     console.log('🚀 Buy button clicked', { nctrAmount, usdAmount });
+    
+    // Check if wallet is connected
+    if (!isConnected) {
+      toast({
+        title: "Connect Wallet",
+        description: "Please connect your Coinbase Wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!treasuryAddress) {
+      toast({
+        title: "Configuration Error",
+        description: "Treasury address not configured",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     
     try {
-      console.log('📞 Calling create-nctr-checkout edge function...');
+      console.log('💳 Processing wallet payment...');
       
-      // Call Stripe checkout edge function
-      const { data, error } = await supabase.functions.invoke('create-nctr-checkout', {
-        body: {
-          nctrAmount: parseFloat(nctrAmount),
-          usdAmount: parseFloat(usdAmount),
-        },
+      // Get the provider from window.ethereum
+      const ethereum = (window as any).ethereum;
+      if (!ethereum) {
+        throw new Error('No wallet provider found');
+      }
+
+      const provider = new ethers.BrowserProvider(ethereum);
+      const signer = await provider.getSigner();
+      
+      // Convert USD to Wei (assuming 1 USD = 1 ETH for simplicity, adjust as needed)
+      const amountInEth = parseFloat(usdAmount);
+      const amountInWei = ethers.parseEther(amountInEth.toString());
+
+      console.log('📤 Sending transaction...', {
+        to: treasuryAddress,
+        value: amountInWei.toString(),
+        from: address
       });
 
-      console.log('📦 Edge function response:', { data, error });
+      // Send the transaction
+      const tx = await signer.sendTransaction({
+        to: treasuryAddress,
+        value: amountInWei,
+      });
 
-      if (error) {
-        console.error('❌ Edge function error:', error);
-        throw error;
+      toast({
+        title: "Transaction Sent",
+        description: "Waiting for confirmation...",
+      });
+
+      // Wait for transaction to be mined
+      const receipt = await tx.wait();
+
+      console.log('✅ Transaction confirmed:', receipt);
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
       }
 
-      if (data?.url) {
-        console.log('✅ Opening Stripe checkout in new tab:', data.url);
-        // Open Stripe checkout in a new tab
-        const checkoutWindow = window.open(data.url, '_blank');
-        
-        // Keep loading state while checkout is open
-        // Don't close modal - let user see the instructions
-        
-        toast({
-          title: "Checkout Opened",
-          description: "Complete your purchase in the new tab. This window will stay open.",
-          duration: 10000,
+      // Record the transaction and create the lock
+      const { data: transactionData, error: transactionError } = await supabase
+        .from('nctr_transactions')
+        .insert({
+          user_id: user.id,
+          transaction_type: 'purchase',
+          nctr_amount: parseFloat(nctrAmount),
+          usd_amount: parseFloat(usdAmount),
+          transaction_hash: receipt?.hash || tx.hash,
+          status: 'completed'
+        })
+        .select()
+        .single();
+
+      if (transactionError) throw transactionError;
+
+      // Create 360-day lock
+      const unlockDate = new Date();
+      unlockDate.setDate(unlockDate.getDate() + 360);
+
+      const { error: lockError } = await supabase
+        .from('nctr_locks')
+        .insert({
+          user_id: user.id,
+          nctr_amount: parseFloat(nctrAmount),
+          lock_type: '360lock',
+          unlock_date: unlockDate.toISOString(),
         });
 
-        // Check if window was blocked
-        if (!checkoutWindow) {
-          toast({
-            title: "Popup Blocked",
-            description: "Please allow popups for this site and try again.",
-            variant: "destructive",
-          });
-          setLoading(false);
-        }
-      } else {
-        console.error('❌ No checkout URL in response:', data);
-        throw new Error('No checkout URL returned from Stripe');
-      }
-    } catch (error) {
+      if (lockError) throw lockError;
+
+      // Update user portfolio
+      const { data: portfolio } = await supabase
+        .from('nctr_portfolio')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      const currentLock360 = portfolio?.lock_360_nctr || 0;
+
+      await supabase
+        .from('nctr_portfolio')
+        .upsert({
+          user_id: user.id,
+          lock_360_nctr: currentLock360 + parseFloat(nctrAmount),
+          last_updated: new Date().toISOString()
+        });
+
+      toast({
+        title: "Purchase Successful!",
+        description: `${parseFloat(nctrAmount).toLocaleString()} NCTR locked for 360 days`,
+      });
+
+      setLoading(false);
+      onOpenChange(false);
+      onPurchaseComplete?.();
+
+    } catch (error: any) {
       console.error('💥 Purchase error:', error);
       toast({
         title: "Purchase Error",
-        description: error instanceof Error ? error.message : "Failed to initiate purchase. Please try again.",
+        description: error?.message || "Failed to complete purchase. Please try again.",
         variant: "destructive",
       });
       setLoading(false);
@@ -395,57 +493,56 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
           </>
           )}
 
-          {/* Action Button */}
-          <Button
-            onClick={handleBuyNow}
-            disabled={isButtonDisabled}
-            className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <ExternalLink className="w-4 h-4 mr-2 flex-shrink-0" />
-                <span className="text-xs sm:text-sm">Checkout Opened - Complete in New Tab</span>
-              </>
-            ) : (
-              <>
-                <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
-                <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                  Level Up - Buy {parseFloat(nctrAmount || '0').toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })} NCTR
-                  <span className="hidden sm:inline">
-                    {usdAmount && ` ($${parseFloat(usdAmount).toFixed(2)})`}
+          {/* Wallet Connection / Action Button */}
+          {!isConnected ? (
+            <Button
+              onClick={connectWallet}
+              className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
+              size="lg"
+            >
+              <Wallet className="w-4 h-4 mr-2 flex-shrink-0" />
+              Connect Wallet to Continue
+            </Button>
+          ) : (
+            <Button
+              onClick={handleBuyNow}
+              disabled={isButtonDisabled}
+              className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
+              size="lg"
+            >
+              {loading ? (
+                <>
+                  <Zap className="w-4 h-4 mr-2 flex-shrink-0 animate-spin" />
+                  <span className="text-xs sm:text-sm">Processing Payment...</span>
+                </>
+              ) : (
+                <>
+                  <Wallet className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                    Pay {parseFloat(nctrAmount || '0').toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })} NCTR
+                    <span className="hidden sm:inline">
+                      {usdAmount && ` ($${parseFloat(usdAmount).toFixed(2)} ETH)`}
+                    </span>
                   </span>
-                </span>
-                <ArrowRight className="w-4 h-4 ml-2 flex-shrink-0" />
-              </>
-            )}
-          </Button>
+                  <ArrowRight className="w-4 h-4 ml-2 flex-shrink-0" />
+                </>
+              )}
+            </Button>
+          )}
 
-          {loading && (
-            <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 text-center space-y-2">
-              <p className="text-sm font-medium">✅ Stripe checkout opened in new tab</p>
+          {isConnected && (
+            <div className="bg-muted/50 rounded-lg p-3 text-center">
               <p className="text-xs text-muted-foreground">
-                Complete your purchase there, then return here. Your NCTR will appear automatically.
+                Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setLoading(false);
-                  onOpenChange(false);
-                }}
-                className="mt-2"
-              >
-                Close This Window
-              </Button>
             </div>
           )}
 
           <p className="text-xs text-center text-muted-foreground">
-            Secure checkout powered by Stripe • Automatically locks in 360LOCK
+            Secure payment via Coinbase Wallet • Automatically locks in 360LOCK
           </p>
         </div>
       </DialogContent>
