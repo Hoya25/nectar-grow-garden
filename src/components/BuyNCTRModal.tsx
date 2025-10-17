@@ -75,10 +75,12 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
         .from('site_settings')
         .select('setting_value')
         .eq('setting_key', 'treasury_wallet_address')
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         setTreasuryAddress(String(data.setting_value));
+      } else if (!data) {
+        console.warn('Treasury wallet address not configured in database');
       }
     } catch (error) {
       console.error('Error fetching treasury address:', error);
@@ -153,10 +155,12 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
     if (!treasuryAddress) {
       toast({
-        title: "Configuration Error",
-        description: "Treasury address not configured",
+        title: "Configuration Required",
+        description: "Treasury wallet address not configured. Please contact an administrator to set this up in Admin → Settings.",
         variant: "destructive",
+        duration: 8000,
       });
+      setLoading(false);
       return;
     }
 
