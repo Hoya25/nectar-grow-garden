@@ -46,11 +46,19 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
   const [nextStatus, setNextStatus] = useState<StatusLevel | null>(null);
   const [wholesalePrice, setWholesalePrice] = useState<number>(0.04); // Default wholesale price
   const [treasuryAddress, setTreasuryAddress] = useState<string>('');
+  const [isFetchingConfig, setIsFetchingConfig] = useState(true);
 
   useEffect(() => {
-    fetchStatusLevels();
-    fetchWholesalePrice();
-    fetchTreasuryAddress();
+    const initializeModal = async () => {
+      setIsFetchingConfig(true);
+      await Promise.all([
+        fetchStatusLevels(),
+        fetchWholesalePrice(),
+        fetchTreasuryAddress()
+      ]);
+      setIsFetchingConfig(false);
+    };
+    initializeModal();
   }, []);
 
   const fetchWholesalePrice = async () => {
@@ -299,7 +307,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
 
   const MINIMUM_USD_AMOUNT = 25;
   const minimumNCTRAmount = wholesalePrice > 0 ? Math.ceil(MINIMUM_USD_AMOUNT / wholesalePrice) : 625;
-  const isButtonDisabled = !nctrAmount || parseFloat(nctrAmount) <= 0 || loading || parseFloat(usdAmount) < MINIMUM_USD_AMOUNT;
+  const isButtonDisabled = !nctrAmount || parseFloat(nctrAmount) <= 0 || loading || parseFloat(usdAmount) < MINIMUM_USD_AMOUNT || isFetchingConfig || !treasuryAddress;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -556,7 +564,12 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
                 className="w-full min-h-[52px] sm:h-12 text-sm sm:text-base touch-manipulation"
                 size="lg"
               >
-                {loading ? (
+                {isFetchingConfig ? (
+                  <>
+                    <Zap className="w-4 h-4 mr-2 flex-shrink-0 animate-spin" />
+                    <span className="text-xs sm:text-sm">Loading Configuration...</span>
+                  </>
+                ) : loading ? (
                   <>
                     <Zap className="w-4 h-4 mr-2 flex-shrink-0 animate-spin" />
                     <span className="text-xs sm:text-sm">Processing Payment...</span>
