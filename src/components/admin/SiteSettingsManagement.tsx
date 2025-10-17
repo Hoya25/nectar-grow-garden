@@ -24,6 +24,7 @@ const SiteSettingsManagement = () => {
   const [siteStats, setSiteStats] = useState<SiteStats>({
     brand_partners: "5K+"
   });
+  const [treasuryAddress, setTreasuryAddress] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -53,6 +54,8 @@ const SiteSettingsManagement = () => {
             setNCTRSettings(setting.setting_value as unknown as NCTRSettings);
           } else if (setting.setting_key === 'site_stats') {
             setSiteStats(setting.setting_value as unknown as SiteStats);
+          } else if (setting.setting_key === 'treasury_wallet_address') {
+            setTreasuryAddress(String(setting.setting_value));
           }
         });
       }
@@ -92,6 +95,19 @@ const SiteSettingsManagement = () => {
         .eq('setting_key', 'site_stats');
 
       if (statsError) throw statsError;
+
+      // Update treasury wallet address
+      const { error: treasuryError } = await supabase
+        .from('site_settings')
+        .upsert({ 
+          setting_key: 'treasury_wallet_address',
+          setting_value: treasuryAddress,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'setting_key'
+        });
+
+      if (treasuryError) throw treasuryError;
 
       toast({
         title: "Success",
@@ -189,6 +205,34 @@ const SiteSettingsManagement = () => {
             <p className="text-sm text-muted-foreground">
               Text displayed for brand partners count (e.g., "5K+", "500+")
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Treasury Wallet Configuration</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="treasury-address">Treasury Wallet Address (Base Network)</Label>
+            <Input
+              id="treasury-address"
+              type="text"
+              value={treasuryAddress}
+              onChange={(e) => setTreasuryAddress(e.target.value)}
+              placeholder="0x..."
+              className="font-mono"
+            />
+            <p className="text-sm text-muted-foreground">
+              Base network wallet address for receiving NCTR purchase payments via Coinbase Wallet
+            </p>
+            {treasuryAddress && (
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-xs font-medium">Current Address:</p>
+                <p className="text-xs font-mono break-all">{treasuryAddress}</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
