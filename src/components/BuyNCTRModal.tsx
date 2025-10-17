@@ -77,10 +77,20 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
         .eq('setting_key', 'treasury_wallet_address')
         .maybeSingle();
 
+      console.log('🏦 Treasury address fetch result:', { data, error });
+
       if (!error && data) {
-        setTreasuryAddress(String(data.setting_value));
+        // The setting_value is JSONB, so it's already the actual value
+        const addressValue = typeof data.setting_value === 'string' 
+          ? data.setting_value 
+          : String(data.setting_value);
+        
+        console.log('🏦 Setting treasury address to:', addressValue);
+        setTreasuryAddress(addressValue);
       } else if (!data) {
         console.warn('Treasury wallet address not configured in database');
+      } else {
+        console.error('Error fetching treasury address:', error);
       }
     } catch (error) {
       console.error('Error fetching treasury address:', error);
