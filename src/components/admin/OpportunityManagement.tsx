@@ -67,6 +67,7 @@ interface EarningOpportunity {
   reward_structure?: any;
   // Alliance Token fields
   alliance_token_enabled?: boolean;
+  alliance_token_type?: string;
   alliance_token_name?: string;
   alliance_token_symbol?: string;
   alliance_token_logo_url?: string;
@@ -120,6 +121,7 @@ const opportunitySchema = z.object({
   lock_360_nctr_reward: z.number().min(0).max(1000000).finite().optional(),
   reward_distribution_type: z.string().optional(),
   alliance_token_enabled: z.boolean().optional(),
+  alliance_token_type: z.string().trim().max(50).optional(),
   alliance_token_name: z.string().trim().max(100).optional(),
   alliance_token_symbol: z.string().trim().max(20).optional(),
   alliance_token_logo_url: z.string().trim().optional(), // No max length limit for base64 images
@@ -164,6 +166,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     reward_distribution_type: 'legacy',
     // Alliance Token fields
     alliance_token_enabled: false,
+    alliance_token_type: 'partner_token',
     alliance_token_name: '',
     alliance_token_symbol: '',
     alliance_token_logo_url: '',
@@ -288,6 +291,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       reward_distribution_type: 'legacy',
       // Alliance Token fields
       alliance_token_enabled: false,
+      alliance_token_type: 'partner_token',
       alliance_token_name: '',
       alliance_token_symbol: '',
       alliance_token_logo_url: '',
@@ -324,6 +328,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
       reward_distribution_type: opportunity.reward_distribution_type || 'legacy',
       // Alliance Token fields
       alliance_token_enabled: opportunity.alliance_token_enabled || false,
+      alliance_token_type: opportunity.alliance_token_type || 'partner_token',
       alliance_token_name: opportunity.alliance_token_name || '',
       alliance_token_symbol: opportunity.alliance_token_symbol || '',
       alliance_token_logo_url: opportunity.alliance_token_logo_url || '',
@@ -1775,6 +1780,30 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
                       <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
                         <p className="text-sm text-purple-700 dark:text-purple-400">
                           💎 Offer additional crypto token rewards alongside NCTR bounties
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="alliance_token_type">Token Type</Label>
+                        <Select
+                          value={formData.alliance_token_type}
+                          onValueChange={(value) => setFormData({...formData, alliance_token_type: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="partner_token">🤝 Partner Token</SelectItem>
+                            <SelectItem value="creator_coin">⭐ Creator Coin (Base/Zora)</SelectItem>
+                            <SelectItem value="community_token">👥 Community Token</SelectItem>
+                            <SelectItem value="other">🔷 Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          {formData.alliance_token_type === 'creator_coin' && '⭐ Creator Coins from Base and Zora networks'}
+                          {formData.alliance_token_type === 'partner_token' && '🤝 Standard partner token rewards'}
+                          {formData.alliance_token_type === 'community_token' && '👥 Community-driven token rewards'}
+                          {formData.alliance_token_type === 'other' && '🔷 Custom token type'}
                         </p>
                       </div>
 

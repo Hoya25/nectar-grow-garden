@@ -317,6 +317,7 @@ export type Database = {
           alliance_token_name: string | null
           alliance_token_ratio: number | null
           alliance_token_symbol: string | null
+          alliance_token_type: string | null
           available_nctr_reward: number | null
           brand_id: string | null
           created_at: string
@@ -354,6 +355,7 @@ export type Database = {
           alliance_token_name?: string | null
           alliance_token_ratio?: number | null
           alliance_token_symbol?: string | null
+          alliance_token_type?: string | null
           available_nctr_reward?: number | null
           brand_id?: string | null
           created_at?: string
@@ -391,6 +393,7 @@ export type Database = {
           alliance_token_name?: string | null
           alliance_token_ratio?: number | null
           alliance_token_symbol?: string | null
+          alliance_token_type?: string | null
           available_nctr_reward?: number | null
           brand_id?: string | null
           created_at?: string
