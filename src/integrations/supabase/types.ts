@@ -272,6 +272,42 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_checkin_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number
+          id: string
+          last_checkin_date: string | null
+          longest_streak: number
+          streak_bonuses_earned: number
+          total_checkins: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_checkin_date?: string | null
+          longest_streak?: number
+          streak_bonuses_earned?: number
+          total_checkins?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_checkin_date?: string | null
+          longest_streak?: number
+          streak_bonuses_earned?: number
+          total_checkins?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       earning_opportunities: {
         Row: {
           affiliate_link: string | null
@@ -2022,6 +2058,10 @@ export type Database = {
         Returns: Json
       }
       process_daily_checkin: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      process_daily_checkin_with_streak: {
         Args: { p_user_id: string }
         Returns: Json
       }

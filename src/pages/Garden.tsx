@@ -658,23 +658,37 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         return;
       }
 
-      // Process the daily checkin
-      const { data: result, error } = await supabase.rpc('process_daily_checkin', {
+      // Process the daily checkin with streak tracking
+      const { data: result, error } = await supabase.rpc('process_daily_checkin_with_streak', {
         p_user_id: user?.id
       });
 
       if (error) throw error;
 
-      const checkinResult = result as { success: boolean; reward_amount?: number; message?: string; error?: string };
+      const checkinResult = result as { 
+        success: boolean; 
+        reward_amount?: number; 
+        message?: string; 
+        error?: string;
+        streak?: {
+          current_streak: number;
+          streak_bonus_awarded: boolean;
+          streak_bonus_amount: number;
+          next_bonus_in: number;
+        };
+      };
 
       if (checkinResult.success) {
         // Immediately update UI state
         setDailyCheckinAvailable(false);
-        setLastCheckinTime(new Date().toISOString()); // Set current time as last check-in
+        setLastCheckinTime(new Date().toISOString());
+        
+        const streakInfo = checkinResult.streak;
+        const isStreakBonus = streakInfo?.streak_bonus_awarded;
         
         toast({
-          title: "Daily Bonus Claimed! 🎉",
-          description: `You earned ${checkinResult.reward_amount?.toFixed(2)} NCTR! ${checkinResult.message}`,
+          title: isStreakBonus ? "🔥 Streak Bonus Earned!" : "Daily Bonus Claimed! 🎉",
+          description: checkinResult.message || `You earned ${checkinResult.reward_amount?.toFixed(2)} NCTR!`,
         });
         
         // Refresh user data to show updated balance

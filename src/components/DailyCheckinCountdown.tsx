@@ -1,92 +1,109 @@
-import { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Clock, Flame } from "lucide-react";
+import { useDailyCheckinStreak } from "@/hooks/useDailyCheckinStreak";
+import { Progress } from "@/components/ui/progress";
 
 interface DailyCheckinCountdownProps {
   className?: string;
   onComplete?: () => void;
-  lastCheckinTime?: string | null; // ISO timestamp of user's last check-in
+  lastCheckinTime?: string | null;
 }
 
-export const DailyCheckinCountdown = ({ className = "", onComplete, lastCheckinTime }: DailyCheckinCountdownProps) => {
-  const [timeLeft, setTimeLeft] = useState<{
-    hours: number;
-    minutes: number;
-    seconds: number;
-  }>({ hours: 0, minutes: 0, seconds: 0 });
+export const DailyCheckinCountdown = ({
+  className = "",
+  onComplete,
+  lastCheckinTime,
+}: DailyCheckinCountdownProps) => {
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const { streakData, streakConfig, getDaysUntilNextBonus, getStreakProgress } = useDailyCheckinStreak();
 
   const calculateTimeUntilNextCheckin = () => {
     const now = new Date();
     let targetTime: Date;
 
     if (lastCheckinTime) {
-      // Calculate 24 hours from the user's last check-in time
       const lastCheckin = new Date(lastCheckinTime);
-      targetTime = new Date(lastCheckin.getTime() + (24 * 60 * 60 * 1000));
+      targetTime = new Date(lastCheckin.getTime() + 24 * 60 * 60 * 1000);
     } else {
-      // Fallback to midnight if no last check-in time available
       targetTime = new Date(now);
       targetTime.setHours(24, 0, 0, 0);
     }
-    
+
     const diff = targetTime.getTime() - now.getTime();
-    
-    if (diff <= 0) {
-      return { hours: 0, minutes: 0, seconds: 0 };
-    }
-    
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
-    return { hours, minutes, seconds };
+    return Math.max(0, Math.floor(diff / 1000));
   };
 
   useEffect(() => {
     const updateCountdown = () => {
-      const time = calculateTimeUntilNextCheckin();
-      setTimeLeft(time);
-      
-      // If countdown reaches zero, call onComplete callback
-      if (time.hours === 0 && time.minutes === 0 && time.seconds === 0) {
+      const seconds = calculateTimeUntilNextCheckin();
+      setTimeLeft(seconds);
+
+      if (seconds === 0) {
         onComplete?.();
       }
     };
 
-    // Update immediately
     updateCountdown();
-    
-    // Update every second
     const interval = setInterval(updateCountdown, 1000);
-    
+
     return () => clearInterval(interval);
   }, [onComplete, lastCheckinTime]);
 
-  const formatTime = (value: number) => value.toString().padStart(2, '0');
+  if (timeLeft <= 0) {
+    return null;
+  }
 
-  const isLessThanHour = timeLeft.hours === 0;
-  const isLessThanMinute = timeLeft.hours === 0 && timeLeft.minutes === 0;
+  const hours = Math.floor(timeLeft / 3600);
+  const minutes = Math.floor((timeLeft % 3600) / 60);
+  const daysUntilBonus = getDaysUntilNextBonus();
+  const streakProgress = getStreakProgress();
 
   return (
-    <div className={`flex items-center space-x-1 ${className}`}>
-      <Clock className="w-3 h-3" />
-      <span className="font-mono text-xs">
-        {isLessThanHour ? (
-          isLessThanMinute ? (
-            // Less than a minute - show seconds only
-            <span className="text-orange-600">
-              {formatTime(timeLeft.seconds)}s
-            </span>
-          ) : (
-            // Less than an hour - show minutes and seconds
-            <span className="text-yellow-600">
-              {formatTime(timeLeft.minutes)}:{formatTime(timeLeft.seconds)}
-            </span>
-          )
+    <div className={`space-y-3 ${className}`}>
+      {/* Countdown Timer */}
+      <div className="flex items-center justify-center gap-2 text-sm">
+        <Clock className="w-4 h-4" />
+        {timeLeft < 60 ? (
+          <span className="text-orange-500 font-medium">
+            Less than a minute until next check-in!
+          </span>
+        ) : timeLeft < 3600 ? (
+          <span>
+            Next check-in in{" "}
+            <span className="font-medium text-primary">{minutes}</span>{" "}
+            {minutes === 1 ? "minute" : "minutes"}
+          </span>
         ) : (
-          // More than an hour - show full time
-          `${formatTime(timeLeft.hours)}:${formatTime(timeLeft.minutes)}:${formatTime(timeLeft.seconds)}`
+          <span>
+            Next check-in in{" "}
+            <span className="font-medium text-primary">{hours}</span>{" "}
+            {hours === 1 ? "hour" : "hours"} and{" "}
+            <span className="font-medium text-primary">{minutes}</span>{" "}
+            {minutes === 1 ? "minute" : "minutes"}
+          </span>
         )}
-      </span>
+      </div>
+
+      {/* Streak Progress */}
+      {streakConfig?.enabled && streakData && streakData.current_streak > 0 && (
+        <div className="space-y-2 p-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-orange-500" />
+              <span className="font-medium">
+                {streakData.current_streak} Day Streak
+              </span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {daysUntilBonus} days to bonus
+            </span>
+          </div>
+          <Progress value={streakProgress} className="h-2" />
+          <p className="text-xs text-muted-foreground">
+            {streakConfig.streak_bonus_description}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

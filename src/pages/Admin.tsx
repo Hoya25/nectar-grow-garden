@@ -33,6 +33,7 @@ import UserManagement from '@/components/admin/UserManagement';
 import LoyalizeBrandSync from '@/components/admin/LoyalizeBrandSync';
 import LoyalizeApiTester from '@/components/admin/LoyalizeApiTester';
 import SiteSettingsManagement from '@/components/admin/SiteSettingsManagement';
+import { DailyCheckinStreakManager } from '@/components/admin/DailyCheckinStreakManager';
 import WebhookTester from '@/components/WebhookTester';
 import BannerEditor from '@/components/admin/BannerEditor';
 import ReferralManagement from '@/components/admin/ReferralManagement';
@@ -358,6 +359,7 @@ const Admin = () => {
 
           <TabsContent value="opportunities">
             <div className="space-y-6">
+              <DailyCheckinStreakManager />
               <LearnAndEarnManagement />
               <OpportunityManagement onStatsUpdate={fetchAdminStats} />
             </div>
