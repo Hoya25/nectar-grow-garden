@@ -157,18 +157,20 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
         setReferrals(parsedData.referrals || []);
       }
 
-      // Always fetch portfolio data separately
+      // Always fetch portfolio data separately (maybeSingle to handle missing data)
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
         .select('available_nctr, pending_nctr, total_earned, lock_90_nctr, lock_360_nctr')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (portfolioError) {
         console.error('Portfolio error:', portfolioError);
-      } else {
+      } else if (portfolioData) {
         setPortfolio(portfolioData);
         console.log('✅ Portfolio data loaded:', portfolioData);
+      } else {
+        console.log('⚠️ No portfolio data found for user');
       }
 
     } catch (error) {
