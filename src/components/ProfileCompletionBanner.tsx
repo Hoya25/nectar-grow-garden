@@ -76,13 +76,13 @@ export const ProfileCompletionBanner = ({ showOnComplete = false }: ProfileCompl
             {isComplete 
               ? 'Your profile is 100% complete!' 
               : pendingReferral
-              ? 'Complete your profile to unlock 500 NCTR bonus + referral rewards!'
+              ? 'Complete your profile to unlock 500 NCTR bonus! (Referral rewards awarded after first purchase)'
               : 'Earn 500 NCTR by completing your profile'
             }
           </p>
           {pendingReferral && !isComplete && (
             <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
-              ⏳ Referral NCTR pending - Complete profile to receive rewards
+              ⏳ Referral NCTR pending - Complete profile and make first purchase to receive rewards
             </p>
           )}
         </div>

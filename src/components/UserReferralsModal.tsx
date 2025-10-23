@@ -269,9 +269,14 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
                                 </div>
                               </>
                             ) : (
-                              <Badge variant="outline" className="text-yellow-700">
-                                Pending
-                              </Badge>
+                              <>
+                                <Badge variant="outline" className="text-amber-700 border-amber-400">
+                                  Awaiting First Purchase
+                                </Badge>
+                                <div className="text-xs text-muted-foreground">
+                                  {inviteReward} NCTR pending
+                                </div>
+                              </>
                             )}
                           </div>
                         </div>

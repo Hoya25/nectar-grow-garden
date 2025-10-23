@@ -178,7 +178,7 @@ const ReferralSystem = () => {
 
 Use my referral link to get started: ${getReferralLink()}
 
-I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you sign up and start participating!`;
+We both earn rewards! I get ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK after you complete your profile and make your first purchase through The Garden!`;
     
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
@@ -190,7 +190,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
   const shareViaWhatsApp = () => {
     const userReward = Math.round(inviteReward * userStatus.reward_multiplier);
-    const message = `🌱 Join The Garden and start earning NCTR tokens through everyday activities! I earn ${userReward} NCTR and you get ${inviteReward} NCTR when you join! Use my referral link: ${getReferralLink()}`;
+    const message = `🌱 Join The Garden and start earning NCTR tokens through everyday activities! We both earn ${inviteReward} NCTR (I get ${userReward} with my bonus) after you complete your profile and make your first purchase! Use my referral link: ${getReferralLink()}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
   };
 
@@ -221,13 +221,18 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             <span className="text-2xl font-bold text-secondary">{inviteReward} NCTR</span>
             <span className="text-lg text-foreground">for them</span>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mb-2">
             {userStatus.reward_multiplier > 1 ? (
               <span>
                 Wings <span className={`font-semibold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.opportunity_status}</span> bonus: <span className={`font-bold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.reward_multiplier}x</span> multiplier
               </span>
             ) : 'Most popular way to earn'}
           </p>
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+              ⚠️ Bonuses awarded after friend's first purchase
+            </span>
+          </div>
         </div>
 
         {/* Action Button */}

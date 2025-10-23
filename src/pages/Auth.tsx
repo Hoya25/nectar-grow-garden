@@ -235,7 +235,7 @@ const Auth = () => {
               {(referralCode || manualReferralCode.trim()) && (
                 <Alert className="border-green-200 bg-green-50">
                   <AlertDescription className="text-green-800">
-                    🎉 You're signing up with a referral code! You and your referrer will both earn {inviteReward} NCTR in 360LOCK after you <strong>complete your profile</strong> (add username + connect wallet).
+                    🎉 You're signing up with a referral code! You and your referrer will both earn {inviteReward} NCTR in 360LOCK after you <strong>complete your profile and make your first purchase</strong> through The Garden.
                   </AlertDescription>
                 </Alert>
               )}

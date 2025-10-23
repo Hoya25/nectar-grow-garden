@@ -1220,7 +1220,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Invite friends and grow together. Each referral brings rewards for both of you
+                    Invite friends and grow together. Both earn rewards after completing profile and making their first purchase
                   </p>
                 </CardContent>
               </Card>
