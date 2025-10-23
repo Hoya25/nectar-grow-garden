@@ -157,11 +157,9 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
         setReferrals(parsedData.referrals || []);
       }
 
-      // Always fetch portfolio data separately (maybeSingle to handle missing data)
+      // Fetch portfolio data using admin function that bypasses RLS
       const { data: portfolioData, error: portfolioError } = await supabase
-        .from('nctr_portfolio')
-        .select('available_nctr, pending_nctr, total_earned, lock_90_nctr, lock_360_nctr')
-        .eq('user_id', userId)
+        .rpc('get_admin_user_portfolio', { target_user_id: userId })
         .maybeSingle();
 
       if (portfolioError) {
@@ -205,10 +203,8 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
           .eq('referrer_user_id', userId)
           .order('created_at', { ascending: false }),
         supabase
-          .from('nctr_portfolio')
-          .select('available_nctr, pending_nctr, total_earned, lock_90_nctr, lock_360_nctr')
-          .eq('user_id', userId)
-          .single()
+          .rpc('get_admin_user_portfolio', { target_user_id: userId })
+          .maybeSingle()
       ]);
 
       console.log('📊 Fallback queries results:', {
