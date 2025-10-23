@@ -909,7 +909,7 @@ export type Database = {
           access_count: number | null
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_id: string | null
           window_start: string | null
         }
@@ -917,7 +917,7 @@ export type Database = {
           access_count?: number | null
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_id?: string | null
           window_start?: string | null
         }
@@ -925,7 +925,7 @@ export type Database = {
           access_count?: number | null
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_id?: string | null
           window_start?: string | null
         }
@@ -939,11 +939,11 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
-          last_login_ip: unknown | null
+          last_login_ip: unknown
           nctr_live_email: string | null
           nctr_live_user_id: string | null
           nctr_live_verified: boolean | null
-          signup_ip: unknown | null
+          signup_ip: unknown
           updated_at: string
           user_id: string
           username: string | null
@@ -957,11 +957,11 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
-          last_login_ip?: unknown | null
+          last_login_ip?: unknown
           nctr_live_email?: string | null
           nctr_live_user_id?: string | null
           nctr_live_verified?: boolean | null
-          signup_ip?: unknown | null
+          signup_ip?: unknown
           updated_at?: string
           user_id: string
           username?: string | null
@@ -975,11 +975,11 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
-          last_login_ip?: unknown | null
+          last_login_ip?: unknown
           nctr_live_email?: string | null
           nctr_live_user_id?: string | null
           nctr_live_verified?: boolean | null
-          signup_ip?: unknown | null
+          signup_ip?: unknown
           updated_at?: string
           user_id?: string
           username?: string | null
@@ -1080,7 +1080,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          referee_signup_ip: unknown | null
+          referee_signup_ip: unknown
           referral_code: string
           referred_user_id: string
           referrer_user_id: string
@@ -1091,7 +1091,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          referee_signup_ip?: unknown | null
+          referee_signup_ip?: unknown
           referral_code: string
           referred_user_id: string
           referrer_user_id: string
@@ -1102,7 +1102,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          referee_signup_ip?: unknown | null
+          referee_signup_ip?: unknown
           referral_code?: string
           referred_user_id?: string
           referrer_user_id?: string
@@ -1117,7 +1117,7 @@ export type Database = {
           action_type: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resource_id: string | null
           resource_table: string
           risk_level: string | null
@@ -1129,7 +1129,7 @@ export type Database = {
           action_type: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_table: string
           risk_level?: string | null
@@ -1141,7 +1141,7 @@ export type Database = {
           action_type?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resource_id?: string | null
           resource_table?: string
           risk_level?: string | null
@@ -1449,10 +1449,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_sample_brands: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      add_sample_brands: { Args: never; Returns: string }
       apply_reward_multiplier: {
         Args: { p_base_amount: number; p_user_id: string }
         Returns: number
@@ -1466,22 +1463,25 @@ export type Database = {
         }
         Returns: string
       }
-      award_affiliate_nctr: {
-        Args:
-          | {
+      award_affiliate_nctr:
+        | {
+            Args: {
+              p_base_nctr_amount: number
+              p_earning_source?: string
+              p_user_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
               p_base_nctr_amount: number
               p_brand_name?: string
               p_earning_source?: string
               p_purchase_amount?: number
               p_user_id: string
             }
-          | {
-              p_base_nctr_amount: number
-              p_earning_source?: string
-              p_user_id: string
-            }
-        Returns: Json
-      }
+            Returns: Json
+          }
       award_profile_completion_bonus: {
         Args: { p_user_id: string }
         Returns: Json
@@ -1497,10 +1497,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
-      calculate_user_status: {
-        Args: { user_id: string }
-        Returns: string
-      }
+      calculate_user_status: { Args: { user_id: string }; Returns: string }
       check_admin_access_level: {
         Args: { required_level: string }
         Returns: boolean
@@ -1513,14 +1510,8 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
-      check_price_access_rate_limit: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      check_user_is_admin: {
-        Args: { check_user_id: string }
-        Returns: boolean
-      }
+      check_price_access_rate_limit: { Args: never; Returns: boolean }
+      check_user_is_admin: { Args: { check_user_id: string }; Returns: boolean }
       check_user_is_admin_secure: {
         Args: { check_user_id: string }
         Returns: boolean
@@ -1534,14 +1525,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      cleanup_old_audit_logs: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      commit_all_nctr_to_360lock: {
-        Args: { p_user_id: string }
-        Returns: Json
-      }
+      cleanup_old_audit_logs: { Args: never; Returns: undefined }
+      commit_all_nctr_to_360lock: { Args: { p_user_id: string }; Returns: Json }
       commit_available_to_360lock: {
         Args: { p_amount: number; p_user_id: string }
         Returns: Json
@@ -1562,16 +1547,13 @@ export type Database = {
         Args: { p_nctr_amount: number; p_wallet_address: string }
         Returns: Json
       }
-      decrement: {
-        Args: { x: number }
-        Returns: number
-      }
+      decrement: { Args: { x: number }; Returns: number }
       delete_opportunity_secure: {
         Args: { opportunity_id: string }
         Returns: boolean
       }
       detect_duplicate_ips: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           account_count: number
           created_dates: string[]
@@ -1581,7 +1563,7 @@ export type Database = {
         }[]
       }
       detect_suspicious_activity: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           last_activity: string
           suspicious_actions: number
@@ -1589,7 +1571,7 @@ export type Database = {
         }[]
       }
       detect_suspicious_patterns: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           last_activity: string
           risk_score: number
@@ -1601,18 +1583,9 @@ export type Database = {
         Args: { p_user_email: string }
         Returns: Json
       }
-      enhanced_price_access_control: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      get_admin_financial_access: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      get_admin_financial_access_secure: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      enhanced_price_access_control: { Args: never; Returns: boolean }
+      get_admin_financial_access: { Args: never; Returns: boolean }
+      get_admin_financial_access_secure: { Args: never; Returns: boolean }
       get_admin_profile_summary: {
         Args: { target_user_ids: string[] }
         Returns: {
@@ -1625,7 +1598,7 @@ export type Database = {
         }[]
       }
       get_admin_profiles_safe: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avatar_url: string
           created_at: string
@@ -1660,7 +1633,7 @@ export type Database = {
         }[]
       }
       get_admin_safe_profiles: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avatar_url: string
           created_at: string
@@ -1678,7 +1651,7 @@ export type Database = {
         Returns: Json
       }
       get_admin_user_list: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           account_status: string
           available_nctr: number
@@ -1700,10 +1673,7 @@ export type Database = {
           wallet_connected_at: string
         }[]
       }
-      get_admin_user_stats: {
-        Args: { target_user_id: string }
-        Returns: Json
-      }
+      get_admin_user_stats: { Args: { target_user_id: string }; Returns: Json }
       get_admin_withdrawal_by_id: {
         Args: { withdrawal_id: string }
         Returns: {
@@ -1741,7 +1711,7 @@ export type Database = {
         }[]
       }
       get_admin_withdrawal_requests: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           email: string
@@ -1759,7 +1729,7 @@ export type Database = {
         }[]
       }
       get_business_data_access_summary: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           access_count: number
           last_access: string
@@ -1780,10 +1750,7 @@ export type Database = {
           wallet_masked: string
         }[]
       }
-      get_password_security_status: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_password_security_status: { Args: never; Returns: Json }
       get_public_profile: {
         Args: { profile_user_id: string }
         Returns: {
@@ -1794,7 +1761,7 @@ export type Database = {
         }[]
       }
       get_rate_limit_statistics: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           blocked_requests_estimate: number
           top_user_accesses: number
@@ -1804,7 +1771,7 @@ export type Database = {
         }[]
       }
       get_referral_verification_data: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           referee_account_age_days: number
@@ -1838,7 +1805,7 @@ export type Database = {
         }[]
       }
       get_security_alerts: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           alert_type: string
           count: number
@@ -1848,16 +1815,10 @@ export type Database = {
           severity: string
         }[]
       }
-      get_security_compliance_status: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      get_security_dashboard_data: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_security_compliance_status: { Args: never; Returns: Json }
+      get_security_dashboard_data: { Args: never; Returns: Json }
       get_security_summary: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           active_users_today: number
           critical_events_today: number
@@ -1984,34 +1945,18 @@ export type Database = {
         }
         Returns: boolean
       }
-      increment: {
-        Args: { x: number }
-        Returns: number
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never> | { user_id: string }
-        Returns: boolean
-      }
+      increment: { Args: { x: number }; Returns: number }
+      is_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { user_id: string }; Returns: boolean }
       is_daily_checkin_available: {
         Args: { p_user_id: string }
         Returns: boolean
       }
-      is_email_verified: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      is_referral_power_user: {
-        Args: { p_user_id: string }
-        Returns: boolean
-      }
-      is_super_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_treasury_admin: {
-        Args: { check_user_id: string }
-        Returns: boolean
-      }
+      is_email_verified: { Args: { user_id: string }; Returns: boolean }
+      is_referral_power_user: { Args: { p_user_id: string }; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
+      is_treasury_admin: { Args: { check_user_id: string }; Returns: boolean }
       log_business_data_access: {
         Args: { p_action?: string; p_table_name: string }
         Returns: undefined
@@ -2044,7 +1989,7 @@ export type Database = {
         Returns: string
       }
       monitor_withdrawal_access_patterns: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           access_count: number
           last_access: string
@@ -2060,10 +2005,7 @@ export type Database = {
         Args: { p_referred_user_id: string }
         Returns: Json
       }
-      process_daily_checkin: {
-        Args: { p_user_id: string }
-        Returns: Json
-      }
+      process_daily_checkin: { Args: { p_user_id: string }; Returns: Json }
       process_daily_checkin_with_streak: {
         Args: { p_user_id: string }
         Returns: Json
@@ -2138,10 +2080,7 @@ export type Database = {
           updated_at: string
         }[]
       }
-      ultra_secure_admin_check: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      ultra_secure_admin_check: { Args: never; Returns: boolean }
       update_admin_access_secure: {
         Args: {
           p_new_access_level: string
@@ -2163,26 +2102,11 @@ export type Database = {
           id: string
         }[]
       }
-      update_user_status: {
-        Args: { user_id: string }
-        Returns: Json
-      }
-      upgrade_all_90locks_to_360: {
-        Args: { p_user_id: string }
-        Returns: Json
-      }
-      upgrade_lock_to_360: {
-        Args: { p_lock_id: string }
-        Returns: Json
-      }
-      user_is_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
-      user_is_super_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      update_user_status: { Args: { user_id: string }; Returns: Json }
+      upgrade_all_90locks_to_360: { Args: { p_user_id: string }; Returns: Json }
+      upgrade_lock_to_360: { Args: { p_lock_id: string }; Returns: Json }
+      user_is_admin: { Args: { _user_id: string }; Returns: boolean }
+      user_is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       validate_financial_access: {
         Args: { operation_type?: string; required_role?: string }
         Returns: Json
@@ -2191,12 +2115,15 @@ export type Database = {
         Args: { p_referral_code: string; p_referred_user_id: string }
         Returns: Json
       }
-      validate_referral_request: {
-        Args:
-          | { p_referee_id: string; p_referrer_id: string }
-          | { p_referred_user_id: string; p_referrer_code: string }
-        Returns: Json
-      }
+      validate_referral_request:
+        | {
+            Args: { p_referred_user_id: string; p_referrer_code: string }
+            Returns: Json
+          }
+        | {
+            Args: { p_referee_id: string; p_referrer_id: string }
+            Returns: Json
+          }
       validate_referral_request_enhanced: {
         Args: { p_referee_id: string; p_referrer_id: string }
         Returns: Json
