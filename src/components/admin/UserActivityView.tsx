@@ -157,6 +157,20 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
         setReferrals(parsedData.referrals || []);
       }
 
+      // Always fetch portfolio data separately
+      const { data: portfolioData, error: portfolioError } = await supabase
+        .from('nctr_portfolio')
+        .select('available_nctr, pending_nctr, total_earned, lock_90_nctr, lock_360_nctr')
+        .eq('user_id', userId)
+        .single();
+
+      if (portfolioError) {
+        console.error('Portfolio error:', portfolioError);
+      } else {
+        setPortfolio(portfolioData);
+        console.log('✅ Portfolio data loaded:', portfolioData);
+      }
+
     } catch (error) {
       console.error('❌ Error fetching user activity:', error);
       console.log('🔄 Attempting fallback queries...');
