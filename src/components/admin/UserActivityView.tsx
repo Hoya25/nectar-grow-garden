@@ -50,6 +50,14 @@ interface Referral {
   rewarded_at?: string;
 }
 
+interface Portfolio {
+  available_nctr: number;
+  pending_nctr: number;
+  total_earned: number;
+  lock_90_nctr: number;
+  lock_360_nctr: number;
+}
+
 interface UserActivityViewProps {
   userId: string;
 }
@@ -58,6 +66,7 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [locks, setLocks] = useState<NCTRLock[]>([]);
   const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'transactions' | 'locks' | 'referrals'>('transactions');
 
@@ -162,7 +171,7 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
       console.log('🔄 Using fallback method to fetch activity data...');
       
       // Fallback: fetch data directly using regular queries
-      const [transactionsQuery, locksQuery, referralsQuery] = await Promise.all([
+      const [transactionsQuery, locksQuery, referralsQuery, portfolioQuery] = await Promise.all([
         supabase
           .from('nctr_transactions')
           .select('*')
@@ -178,22 +187,30 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
           .from('referrals')
           .select('*')
           .eq('referrer_user_id', userId)
-          .order('created_at', { ascending: false })
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('nctr_portfolio')
+          .select('available_nctr, pending_nctr, total_earned, lock_90_nctr, lock_360_nctr')
+          .eq('user_id', userId)
+          .single()
       ]);
 
       console.log('📊 Fallback queries results:', {
         transactions: transactionsQuery,
         locks: locksQuery,
-        referrals: referralsQuery
+        referrals: referralsQuery,
+        portfolio: portfolioQuery
       });
 
       if (transactionsQuery.error) console.error('Transactions error:', transactionsQuery.error);
       if (locksQuery.error) console.error('Locks error:', locksQuery.error);
       if (referralsQuery.error) console.error('Referrals error:', referralsQuery.error);
+      if (portfolioQuery.error) console.error('Portfolio error:', portfolioQuery.error);
 
       setTransactions(transactionsQuery.data || []);
       setLocks(locksQuery.data || []);
       setReferrals(referralsQuery.data || []);
+      setPortfolio(portfolioQuery.data || null);
       
       console.log('✅ Fallback data loaded successfully');
       
@@ -252,6 +269,46 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Portfolio Summary Banner */}
+      {portfolio && (
+        <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-1">Available</div>
+                <div className="text-xl font-bold text-green-600">
+                  {portfolio.available_nctr.toFixed(2)}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-1">Pending</div>
+                <div className="text-xl font-bold text-yellow-600">
+                  {portfolio.pending_nctr.toFixed(2)}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-1">90 Lock</div>
+                <div className="text-xl font-bold text-orange-600">
+                  {portfolio.lock_90_nctr.toFixed(2)}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-1">360 Lock</div>
+                <div className="text-xl font-bold text-purple-600">
+                  {portfolio.lock_360_nctr.toFixed(2)}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-1">Total Earned</div>
+                <div className="text-xl font-bold text-primary">
+                  {portfolio.total_earned.toFixed(2)}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Activity Tabs */}
       <div className="flex flex-wrap gap-2">
         <Button
