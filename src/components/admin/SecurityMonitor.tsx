@@ -3,9 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, AlertTriangle, Users, Activity, RefreshCw } from 'lucide-react';
+import { Shield, AlertTriangle, Users, Activity, RefreshCw, Eye } from 'lucide-react';
 
 interface SecurityDashboardData {
   critical_events_today: number;
@@ -14,10 +16,26 @@ interface SecurityDashboardData {
   last_activity: string;
 }
 
+interface SecurityAuditLog {
+  id: string;
+  action_type: string;
+  risk_level: string;
+  user_id: string;
+  resource_table: string;
+  resource_id: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  session_id: string | null;
+  created_at: string;
+}
+
 export const SecurityMonitor = () => {
   const [dashboardData, setDashboardData] = useState<SecurityDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [securityLogs, setSecurityLogs] = useState<SecurityAuditLog[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
   const { toast } = useToast();
 
   const fetchSecurityData = async () => {
@@ -49,6 +67,35 @@ export const SecurityMonitor = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchSecurityLogs = async () => {
+    try {
+      setLogsLoading(true);
+      const { data, error } = await supabase
+        .from('security_audit_log')
+        .select('*')
+        .or('risk_level.eq.critical,risk_level.eq.high')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      setSecurityLogs((data || []) as SecurityAuditLog[]);
+    } catch (err: any) {
+      console.error('Failed to fetch security logs:', err);
+      toast({
+        title: "Error",
+        description: "Failed to load security logs",
+        variant: "destructive",
+      });
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
+  const handleViewDetails = () => {
+    setShowDetailsDialog(true);
+    fetchSecurityLogs();
   };
 
   useEffect(() => {
@@ -195,14 +242,91 @@ export const SecurityMonitor = () => {
             {(dashboardData.critical_events_today > 0 || dashboardData.high_risk_events_today > 5) && (
               <Alert className="border-destructive">
                 <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  High security risk detected. Review security logs immediately.
+                <AlertDescription className="flex items-center justify-between">
+                  <span>High security risk detected. Review security logs immediately.</span>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={handleViewDetails}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
                 </AlertDescription>
               </Alert>
             )}
           </>
         )}
       </CardContent>
+
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Security Audit Log - Critical & High Risk Events
+            </DialogTitle>
+            <DialogDescription>
+              Recent security events requiring attention
+            </DialogDescription>
+          </DialogHeader>
+
+          {logsLoading ? (
+            <div className="flex items-center justify-center p-8">
+              <RefreshCw className="h-6 w-6 animate-spin" />
+            </div>
+          ) : securityLogs.length === 0 ? (
+            <div className="text-center p-8 text-muted-foreground">
+              No critical or high-risk security events found
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Risk Level</TableHead>
+                    <TableHead>Action Type</TableHead>
+                    <TableHead>Resource Table</TableHead>
+                    <TableHead>Resource ID</TableHead>
+                    <TableHead>User ID</TableHead>
+                    <TableHead>IP Address</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {securityLogs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="text-xs whitespace-nowrap">
+                        {new Date(log.created_at).toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={log.risk_level === 'critical' ? 'destructive' : 'default'}>
+                          {log.risk_level}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {log.action_type}
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {log.resource_table}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {log.resource_id ? `${log.resource_id.substring(0, 8)}...` : '-'}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {log.user_id ? `${log.user_id.substring(0, 8)}...` : '-'}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {log.ip_address || '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
