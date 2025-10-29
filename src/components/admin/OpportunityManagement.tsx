@@ -371,8 +371,7 @@ const OpportunityManagement = ({ onStatsUpdate }: OpportunityManagementProps) =>
     
     // If this is a Loyalize brand (has loyalizeId), generate proper Loyalize tracking link
     if (loyalizeId && /^\d+$/.test(loyalizeId)) {
-      // Generate Loyalize redirect URL matching the working NOBull format
-      // Uses "store" parameter (not "store_id") and plain {{}} placeholders
+      // Generate Loyalize redirect URL with store parameter and tracking placeholders
       return `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeId}&user={{USER_ID}}&tracking={{TRACKING_ID}}`;
     }
     

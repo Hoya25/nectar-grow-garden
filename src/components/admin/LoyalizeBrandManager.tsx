@@ -151,35 +151,6 @@ const LoyalizeBrandManager = () => {
     }
   };
 
-  const syncNoBullData = async () => {
-    setSyncing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('loyalize-integration', {
-        body: { action: 'sync_nobull_data' }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast({
-          title: "Success",
-          description: `Synced ${data.brands_synced || 0} NOBull brands. ${data.new_brands || 0} new brands added.`,
-        });
-        await loadBrands();
-      } else {
-        throw new Error(data.error || 'Failed to sync NOBull data');
-      }
-    } catch (error) {
-      console.error('Error syncing NOBull data:', error);
-      toast({
-        title: "Error", 
-        description: `Failed to sync NOBull data: ${error.message}`,
-        variant: "destructive",
-      });
-    } finally {
-      setSyncing(false);
-    }
-  };
 
   const editBrandNCTR = (brand: Brand) => {
     setEditingBrand(brand);
@@ -385,27 +356,15 @@ const LoyalizeBrandManager = () => {
               <Building2 className="w-5 h-5" />
               Loyalize Brand Commission Manager
             </div>
-            <div className="flex gap-2">
-              <Button 
-                onClick={syncBrands}
-                disabled={syncing}
-                variant="outline"
-                size="sm"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-                {syncing ? 'Syncing...' : 'Sync All Brands'}
-              </Button>
-              <Button 
-                onClick={syncNoBullData}
-                disabled={syncing}
-                variant="outline"
-                size="sm"
-                className="bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-90"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-                {syncing ? 'Syncing...' : 'Sync NOBull'}  
-              </Button>
-            </div>
+            <Button 
+              onClick={syncBrands}
+              disabled={syncing}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+              {syncing ? 'Syncing...' : 'Sync All Brands'}
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
