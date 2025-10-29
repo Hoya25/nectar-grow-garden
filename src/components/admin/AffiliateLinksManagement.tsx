@@ -51,7 +51,14 @@ const AffiliateLinksManagement = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setLinks(data || []);
+      
+      // Filter out NoBull links
+      const filteredLinks = (data || []).filter(link => 
+        !link.platform_name.toLowerCase().includes('nobull') &&
+        !link.original_affiliate_url.toLowerCase().includes('nobull')
+      );
+      
+      setLinks(filteredLinks);
     } catch (error) {
       console.error('Error loading affiliate links:', error);
       toast({
