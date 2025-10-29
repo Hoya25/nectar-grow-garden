@@ -69,9 +69,15 @@ const LoyalizeBrandSearch = ({ onBrandImported }: LoyalizeBrandSearchProps) => {
 
       if (error) throw error;
 
-      setBrands(data.brands || []);
+      // Filter out NoBull brand
+      const filteredBrands = (data.brands || []).filter((brand: LoyalizeBrand) => 
+        brand.id !== '30095' && 
+        !brand.name.toLowerCase().includes('nobull')
+      );
+
+      setBrands(filteredBrands);
       
-      if (data.brands?.length === 0) {
+      if (filteredBrands.length === 0) {
         toast({
           title: "No Results",
           description: `No brands found for "${searchTerm}". Try a different search term.`,

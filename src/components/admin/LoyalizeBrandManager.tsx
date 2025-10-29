@@ -236,6 +236,11 @@ const LoyalizeBrandManager = () => {
 
   const filteredAndSortedBrands = brands
     .filter(brand => {
+      // Exclude NoBull brand
+      if (brand.loyalize_id === '30095' || brand.name.toLowerCase().includes('nobull')) {
+        return false;
+      }
+      
       const searchLower = searchTerm.toLowerCase();
       const matchesSearch = !searchTerm || 
         brand.name.toLowerCase().includes(searchLower) ||

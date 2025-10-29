@@ -99,7 +99,13 @@ const LoyalizeBrandSync = ({ onBrandsUpdated }: LoyalizeBrandSyncProps) => {
       if (error) throw error;
       if (!data.success) throw new Error(data.error);
 
-      setBrands(data.brands);
+      // Filter out NoBull brand
+      const filteredBrands = (data.brands || []).filter((brand: Brand) => 
+        brand.loyalize_id !== '30095' && 
+        !brand.name.toLowerCase().includes('nobull')
+      );
+      
+      setBrands(filteredBrands);
     } catch (error) {
       console.error('Error loading brands:', error);
       toast({

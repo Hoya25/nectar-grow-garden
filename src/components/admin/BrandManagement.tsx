@@ -64,6 +64,12 @@ const BrandManagement = ({ onStatsUpdate }: BrandManagementProps) => {
   useEffect(() => {
     let filtered = brands;
 
+    // Exclude NoBull brand
+    filtered = filtered.filter(brand => 
+      brand.loyalize_id !== '30095' && 
+      !brand.name.toLowerCase().includes('nobull')
+    );
+
     // Apply search term filter
     if (searchTerm) {
       filtered = filtered.filter(brand => 
