@@ -1232,6 +1232,51 @@ export type Database = {
         }
         Relationships: []
       }
+      status_tiers: {
+        Row: {
+          badge_color: string | null
+          badge_emoji: string | null
+          benefits: Json | null
+          created_at: string | null
+          display_name: string
+          id: string
+          is_active: boolean | null
+          max_nctr_360_locked: number | null
+          min_nctr_360_locked: number
+          sort_order: number
+          tier_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          badge_color?: string | null
+          badge_emoji?: string | null
+          benefits?: Json | null
+          created_at?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean | null
+          max_nctr_360_locked?: number | null
+          min_nctr_360_locked?: number
+          sort_order?: number
+          tier_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          badge_color?: string | null
+          badge_emoji?: string | null
+          benefits?: Json | null
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean | null
+          max_nctr_360_locked?: number | null
+          min_nctr_360_locked?: number
+          sort_order?: number
+          tier_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       treasury_admin_roles: {
         Row: {
           access_reason: string | null
@@ -1298,6 +1343,127 @@ export type Database = {
         }
         Relationships: []
       }
+      unified_activity_log: {
+        Row: {
+          action_data: Json | null
+          action_type: string
+          created_at: string | null
+          id: string
+          platform: string
+          user_id: string | null
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type: string
+          created_at?: string | null
+          id?: string
+          platform: string
+          user_id?: string | null
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          platform?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unified_activity_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unified_admin_settings: {
+        Row: {
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      unified_profiles: {
+        Row: {
+          auth_user_id: string
+          avatar_url: string | null
+          created_at: string | null
+          crescendo_data: Json | null
+          current_tier_id: string | null
+          display_name: string | null
+          email: string | null
+          garden_data: Json | null
+          id: string
+          last_active_crescendo: string | null
+          last_active_garden: string | null
+          tier_calculated_at: string | null
+          updated_at: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          auth_user_id: string
+          avatar_url?: string | null
+          created_at?: string | null
+          crescendo_data?: Json | null
+          current_tier_id?: string | null
+          display_name?: string | null
+          email?: string | null
+          garden_data?: Json | null
+          id?: string
+          last_active_crescendo?: string | null
+          last_active_garden?: string | null
+          tier_calculated_at?: string | null
+          updated_at?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          auth_user_id?: string
+          avatar_url?: string | null
+          created_at?: string | null
+          crescendo_data?: Json | null
+          current_tier_id?: string | null
+          display_name?: string | null
+          email?: string | null
+          garden_data?: Json | null
+          id?: string
+          last_active_crescendo?: string | null
+          last_active_garden?: string | null
+          tier_calculated_at?: string | null
+          updated_at?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unified_profiles_current_tier_id_fkey"
+            columns: ["current_tier_id"]
+            isOneToOne: false
+            referencedRelation: "status_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           expires_at: string | null
@@ -1324,6 +1490,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wallet_portfolio: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_synced_at: string | null
+          locks: Json | null
+          nctr_360_locked: number | null
+          nctr_90_locked: number | null
+          nctr_balance: number | null
+          nctr_unlocked: number | null
+          sync_source: string | null
+          updated_at: string | null
+          user_id: string | null
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          locks?: Json | null
+          nctr_360_locked?: number | null
+          nctr_90_locked?: number | null
+          nctr_balance?: number | null
+          nctr_unlocked?: number | null
+          sync_source?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          locks?: Json | null
+          nctr_360_locked?: number | null
+          nctr_90_locked?: number | null
+          nctr_balance?: number | null
+          nctr_unlocked?: number | null
+          sync_source?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_portfolio_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_rate_limits: {
         Row: {
@@ -1496,6 +1715,10 @@ export type Database = {
       calculate_profile_completion: {
         Args: { p_user_id: string }
         Returns: Json
+      }
+      calculate_unified_user_tier: {
+        Args: { p_user_id: string }
+        Returns: string
       }
       calculate_user_status: { Args: { user_id: string }; Returns: string }
       check_admin_access_level: {
@@ -1893,6 +2116,7 @@ export type Database = {
           user_name: string
         }[]
       }
+      get_unified_user_with_tier: { Args: { p_user_id: string }; Returns: Json }
       get_user_referrals_with_names: {
         Args: { p_user_id: string }
         Returns: {
