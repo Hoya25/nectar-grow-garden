@@ -253,7 +253,7 @@ serve(async (req) => {
           .order('created_at', { ascending: false })
           .limit(1)
 
-        console.log(`   ✅ SUCCESS: Credited ${finalNctrReward} NCTR to ${userName} (${userId.slice(0, 8)}...) with ${multiplier}x Wings multiplier`)
+        console.log(`   ✅ SUCCESS: Credited ${finalNctrReward} NCTR to ${userName} (${userId.slice(0, 8)}...) with ${multiplier}x Crescendo multiplier`)
         results.push({ 
           transaction_id: txnId, 
           status: 'success',

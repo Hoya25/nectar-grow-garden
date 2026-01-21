@@ -252,7 +252,7 @@ async function calculateSyncCredits(supabase: SupabaseClient, userId: string, nc
     const lock360Increase = Math.max(0, newLock360 - currentLock360);
     
     // Credit logic:
-    // - 360LOCK increase goes to Wings 360LOCK
+    // - 360LOCK increase goes to Crescendo 360LOCK
     // - Remaining increase goes to available NCTR
     const creditTo360Lock = lock360Increase;
     const creditToAvailable = Math.max(0, totalIncrease - lock360Increase);

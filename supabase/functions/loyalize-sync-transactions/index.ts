@@ -189,7 +189,7 @@ serve(async (req) => {
           .order('created_at', { ascending: false })
           .limit(1)
 
-        console.log(`   ✅ SUCCESS: Credited ${finalNctrReward} NCTR (${multiplier}x Wings multiplier)`)
+        console.log(`   ✅ SUCCESS: Credited ${finalNctrReward} NCTR (${multiplier}x Crescendo multiplier)`)
         results.credited++
         results.details.push({
           transaction_id: transactionId,

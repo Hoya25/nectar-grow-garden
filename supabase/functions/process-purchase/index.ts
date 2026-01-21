@@ -166,7 +166,7 @@ serve(async (req) => {
         nctr_amount: finalNCTR,
         purchase_amount,
         partner_name,
-        description: `${partner_name} purchase: $${purchase_amount} (${finalNCTR} NCTR with ${multiplier}x Wings multiplier in 90LOCK)`,
+        description: `${partner_name} purchase: $${purchase_amount} (${finalNCTR} NCTR with ${multiplier}x Crescendo multiplier in 90LOCK)`,
         earning_source: 'affiliate_purchase',
         external_transaction_id,
         status: 'completed'
