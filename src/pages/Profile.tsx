@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp, ExternalLink, History, Users } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp, ExternalLink, History, Users, Check, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import WalletConnection from '@/components/WalletConnection';
 import { CrescendoStatusBar } from '@/components/CrescendoStatusBar';
@@ -31,6 +31,8 @@ interface UserProfile {
   avatar_url: string | null;
   wallet_address: string | null;
   wallet_connected_at: string | null;
+  crescendo_user_id: string | null;
+  crescendo_synced_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -853,6 +855,21 @@ const Profile = () => {
                     <Badge variant={profile?.wallet_address ? "default" : "outline"}>
                       {profile?.wallet_address ? "Connected" : "Not Connected"}
                     </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Crescendo Sync</span>
+                    {profile?.crescendo_user_id ? (
+                      <div className="flex items-center text-green-600 text-sm">
+                        <Check className="w-4 h-4 mr-1" />
+                        Synced
+                      </div>
+                    ) : (
+                      <div className="flex items-center text-amber-600 text-sm">
+                        <RefreshCw className="w-4 h-4 mr-1" />
+                        Not Synced
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
