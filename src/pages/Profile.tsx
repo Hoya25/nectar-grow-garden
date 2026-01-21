@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ArrowLeft, User, Mail, Calendar, Wallet, Shield, Lock, Eye, EyeOff, TrendingUp, ExternalLink, History, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import WalletConnection from '@/components/WalletConnection';
-import { WingsStatusBar } from '@/components/WingsStatusBar';
+import { CrescendoStatusBar } from '@/components/CrescendoStatusBar';
 import { LevelUpModal } from '@/components/LevelUpModal';
 import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
@@ -463,7 +463,7 @@ const Profile = () => {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="flex-1">
-              <WingsStatusBar
+              <CrescendoStatusBar
                 currentStatus={portfolio?.opportunity_status || 'starter'}
                 current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
                 statusLevels={statusLevels}

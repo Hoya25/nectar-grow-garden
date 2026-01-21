@@ -13,7 +13,7 @@ interface StatusLevel {
   benefits: string[];
 }
 
-interface WingsStatusBarProps {
+interface CrescendoStatusBarProps {
   currentStatus: string;
   current360NCTR: number;
   statusLevels: StatusLevel[];
@@ -64,7 +64,7 @@ const getStatusGlow = (status: string) => {
   }
 };
 
-export const WingsStatusBar: React.FC<WingsStatusBarProps> = ({
+export const CrescendoStatusBar: React.FC<CrescendoStatusBarProps> = ({
   currentStatus,
   current360NCTR,
   statusLevels
@@ -107,7 +107,7 @@ export const WingsStatusBar: React.FC<WingsStatusBarProps> = ({
             <div className="flex items-center space-x-2">
               <StatusIcon className="w-5 h-5 text-white" />
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30 font-bold uppercase tracking-wide text-xs">
-                {currentStatus} Wings
+                {currentStatus} Crescendo
               </Badge>
             </div>
             <div className="flex items-center space-x-1">
@@ -139,7 +139,7 @@ export const WingsStatusBar: React.FC<WingsStatusBarProps> = ({
             <div className="flex items-center space-x-2">
               <StatusIcon className="w-6 h-6 text-white" />
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30 font-bold uppercase tracking-wide">
-                {currentStatus} Wings
+                {currentStatus} Crescendo
               </Badge>
             </div>
             <div className="flex items-center space-x-1">
@@ -166,7 +166,7 @@ export const WingsStatusBar: React.FC<WingsStatusBarProps> = ({
         {/* Progress Section */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-white/80">Progress to {nextLevel ? `${nextLevel.status_name.toUpperCase()} Wings` : 'MAX LEVEL'}</span>
+            <span className="text-white/80">Progress to {nextLevel ? `${nextLevel.status_name.toUpperCase()} Crescendo` : 'MAX LEVEL'}</span>
             <span className="text-white font-medium">{Math.round(progressPercentage)}%</span>
           </div>
           
