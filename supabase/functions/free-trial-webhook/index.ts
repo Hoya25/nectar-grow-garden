@@ -4,7 +4,7 @@ import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-signature',
 };
 
 // Validation schema
@@ -13,8 +13,52 @@ const FreeTrialWebhookSchema = z.object({
   opportunity_id: z.string().uuid('Invalid opportunity_id format')
 });
 
-// TODO: Add Rad.Live webhook IP whitelist once provided
-// const RAD_LIVE_IP_WHITELIST = ['IP_ADDRESS_HERE'];
+// Webhook secret for signature verification
+const WEBHOOK_SECRET = Deno.env.get('RAD_LIVE_WEBHOOK_SECRET');
+
+// Helper to verify webhook signature
+async function verifyWebhookSignature(payload: string, signature: string | null): Promise<boolean> {
+  if (!WEBHOOK_SECRET) {
+    console.warn('⚠️ RAD_LIVE_WEBHOOK_SECRET not configured - webhook signature verification disabled');
+    return false; // Fail closed - require secret to be configured
+  }
+  
+  if (!signature) {
+    console.error('❌ Missing webhook signature header');
+    return false;
+  }
+
+  try {
+    // Create HMAC-SHA256 signature
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(WEBHOOK_SECRET),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    
+    const signatureBytes = await crypto.subtle.sign('HMAC', key, encoder.encode(payload));
+    const expectedSignature = Array.from(new Uint8Array(signatureBytes))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    // Constant-time comparison to prevent timing attacks
+    if (signature.length !== expectedSignature.length) {
+      return false;
+    }
+    
+    let result = 0;
+    for (let i = 0; i < signature.length; i++) {
+      result |= signature.charCodeAt(i) ^ expectedSignature.charCodeAt(i);
+    }
+    return result === 0;
+  } catch (error) {
+    console.error('❌ Signature verification error:', error);
+    return false;
+  }
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -22,7 +66,7 @@ serve(async (req) => {
   }
 
   try {
-    // Log the incoming IP for debugging
+    // Log the incoming IP for audit trail
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
                      req.headers.get('x-real-ip') ||
                      req.headers.get('cf-connecting-ip') ||
@@ -30,17 +74,27 @@ serve(async (req) => {
     
     console.log('📍 Free trial webhook request from IP:', clientIP);
     
-    // TODO: Enable IP whitelist check once Rad.Live IP is provided
-    // if (!RAD_LIVE_IP_WHITELIST.includes(clientIP)) {
-    //   console.error('❌ Unauthorized IP address:', clientIP);
-    //   return new Response(JSON.stringify({ error: 'Request could not be processed' }), {
-    //     status: 403,
-    //     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    //   });
-    // }
+    // Get the raw body for signature verification
+    const rawBody = await req.text();
+    const signature = req.headers.get('x-webhook-signature');
+    
+    // Verify webhook signature (required for security)
+    const isValidSignature = await verifyWebhookSignature(rawBody, signature);
+    if (!isValidSignature) {
+      console.error('❌ Invalid webhook signature from IP:', clientIP);
+      return new Response(
+        JSON.stringify({ error: 'Request could not be processed' }),
+        { 
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
+    console.log('✅ Webhook signature verified successfully');
 
     // Parse and validate request body
-    const body = await req.json();
+    const body = JSON.parse(rawBody);
     const validatedData = FreeTrialWebhookSchema.parse(body);
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
