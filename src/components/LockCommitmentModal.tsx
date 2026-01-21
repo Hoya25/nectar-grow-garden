@@ -9,8 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import { Lock, TrendingUp, Calendar, Award, Loader2 } from 'lucide-react';
-import { BuyNCTRButton } from '@/components/BuyNCTRButton';
+import { Lock, TrendingUp, Calendar, Award, Loader2, Gift } from 'lucide-react';
 import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface LockCommitmentModalProps {
@@ -161,14 +160,21 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                 maximumFractionDigits: 2
               })}</strong></span>
               {availableNCTR < 100 && (
-                <BuyNCTRButton 
-                  variant="outline" 
+                <Button 
+                  variant="outline"
                   size="sm"
-                  className="ml-4"
-                  suggestedAmount={1000}
+                  className="ml-4 border-green-500 text-green-600 hover:bg-green-50"
+                  onClick={() => {
+                    setOpen(false);
+                    const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
+                    if (opportunitiesSection) {
+                      opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
                 >
-                  Buy More NCTR
-                </BuyNCTRButton>
+                  <Gift className="w-4 h-4 mr-2" />
+                  Earn More NCTR
+                </Button>
               )}
             </AlertDescription>
           </Alert>
@@ -273,17 +279,24 @@ const LockCommitmentModal = ({ availableNCTR, onLockCreated }: LockCommitmentMod
                       }
                     </p>
                     {numericAmount > availableNCTR && (
-                      <BuyNCTRButton 
+                      <Button 
                         variant="outline"
                         size="sm"
-                        suggestedAmount={Math.ceil((numericAmount - availableNCTR) / 100) * 100}
-                        className="text-primary border-primary"
+                        className="border-green-500 text-green-600 hover:bg-green-50"
+                        onClick={() => {
+                          setOpen(false);
+                          const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
+                          if (opportunitiesSection) {
+                            opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
                       >
-                        Buy {(numericAmount - availableNCTR).toLocaleString('en-US', {
+                        <Gift className="w-4 h-4 mr-2" />
+                        Earn {(numericAmount - availableNCTR).toLocaleString('en-US', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2
                         })} More NCTR
-                      </BuyNCTRButton>
+                      </Button>
                     )}
                   </div>
                 )}
