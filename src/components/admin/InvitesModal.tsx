@@ -9,11 +9,11 @@ import { format } from 'date-fns';
 
 interface ReferralData {
   id: string;
-  referrer_user_id: string;
-  referred_user_id: string;
+  referrer_id: string;
+  referred_id: string;
   created_at: string;
-  rewarded_at: string | null;
-  referral_code: string;
+  is_paid: boolean;
+  referral_bonus: number;
   referrer_name: string;
   referred_name: string;
 }
@@ -36,16 +36,15 @@ const InvitesModal = ({ children }: InvitesModalProps) => {
       const { data: referralsData, error: referralsError } = await supabase
         .from('referrals')
         .select('*')
-        .eq('status', 'completed')
-        .eq('reward_credited', true)
-        .order('rewarded_at', { ascending: false });
+        .eq('is_paid', true)
+        .order('created_at', { ascending: false });
 
       if (referralsError) throw referralsError;
 
       if (referralsData && referralsData.length > 0) {
         // Get safe profile names for referrers and referees using secure function
-        const referrerIds = [...new Set(referralsData.map(r => r.referrer_user_id))];
-        const referredIds = [...new Set(referralsData.map(r => r.referred_user_id))];
+        const referrerIds = [...new Set(referralsData.map(r => r.referrer_id))];
+        const referredIds = [...new Set(referralsData.map(r => r.referred_id))];
         
         // Fetch profiles using the secure function for admin use
         const referrerPromises = referrerIds.map(async (userId) => {
@@ -75,10 +74,10 @@ const InvitesModal = ({ children }: InvitesModalProps) => {
         });
 
         // Combine referrals with names (no sensitive data exposed)
-        const enrichedReferrals = referralsData.map(referral => ({
+        const enrichedReferrals: ReferralData[] = referralsData.map(referral => ({
           ...referral,
-          referrer_name: profileMap.get(referral.referrer_user_id) || 'Member',
-          referred_name: profileMap.get(referral.referred_user_id) || 'Member',
+          referrer_name: profileMap.get(referral.referrer_id) || 'Member',
+          referred_name: profileMap.get(referral.referred_id) || 'Member',
         }));
 
         setReferrals(enrichedReferrals);
@@ -125,7 +124,7 @@ const InvitesModal = ({ children }: InvitesModalProps) => {
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-sm font-medium">
-                          Referral #{referral.referral_code}
+                          Referral #{referral.id.slice(0, 8)}
                         </CardTitle>
                         <Badge variant="secondary" className="bg-green-100 text-green-700">
                           Completed
@@ -158,15 +157,6 @@ const InvitesModal = ({ children }: InvitesModalProps) => {
                               {format(new Date(referral.created_at), 'MMM dd, yyyy')}
                             </span>
                           </div>
-                          {referral.rewarded_at && (
-                            <div className="flex items-center gap-2">
-                              <Award className="w-4 h-4 text-yellow-500" />
-                              <span className="text-sm font-medium">Rewarded:</span>
-                              <span className="text-sm text-muted-foreground">
-                                {format(new Date(referral.rewarded_at), 'MMM dd, yyyy')}
-                              </span>
-                            </div>
-                          )}
                         </div>
                       </div>
                       <div className="pt-2 border-t border-border">
