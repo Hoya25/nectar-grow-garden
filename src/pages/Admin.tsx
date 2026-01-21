@@ -128,8 +128,7 @@ const Admin = () => {
       const { count: invitesCount } = await supabase
         .from('referrals')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'completed')
-        .eq('reward_credited', true);
+        .eq('is_paid', true);
 
       setStats({
         total_users: userCount || 0,

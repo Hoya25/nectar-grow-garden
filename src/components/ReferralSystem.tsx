@@ -116,7 +116,7 @@ const ReferralSystem = () => {
       const { data: referrals, error } = await supabase
         .from('referrals')
         .select('*')
-        .eq('referrer_user_id', user.id);
+        .eq('referrer_id', user.id);
 
       if (error) throw error;
 
@@ -129,8 +129,8 @@ const ReferralSystem = () => {
       if (transError) throw transError;
 
       const totalEarned = transactions?.reduce((sum, t) => sum + Number(t.nctr_amount), 0) || 0;
-      const completedReferrals = referrals?.filter(r => r.reward_credited).length || 0;
-      const pendingReferrals = referrals?.filter(r => !r.reward_credited).length || 0;
+      const completedReferrals = referrals?.filter(r => r.is_paid).length || 0;
+      const pendingReferrals = referrals?.filter(r => !r.is_paid).length || 0;
 
       setReferralStats({
         total_referrals: completedReferrals,

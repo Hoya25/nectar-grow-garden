@@ -12,15 +12,14 @@ import { useNavigate } from 'react-router-dom';
 
 interface ReferralData {
   id: string;
-  referred_user_id: string;
+  referred_id: string;
+  referrer_id: string;
   created_at: string;
-  rewarded_at: string | null;
-  referral_code: string;
+  is_paid: boolean;
+  referral_bonus: number;
   referred_name: string;
   referred_email?: string;
   join_date?: string;
-  status: string;
-  reward_credited: boolean;
 }
 
 const Referrals = () => {
@@ -59,7 +58,7 @@ const Referrals = () => {
       const { data: referralsData, error: referralsError } = await supabase
         .from('referrals')
         .select('*')
-        .eq('referrer_user_id', user.id)
+        .eq('referrer_id', user.id)
         .order('created_at', { ascending: false });
 
       if (referralsError) {
@@ -74,7 +73,7 @@ const Referrals = () => {
       }
 
       // Get secure profile data for referred users using the safe function
-      const userIds = referralsData.map(r => r.referred_user_id);
+      const userIds = referralsData.map(r => r.referred_id);
       const profilePromises = userIds.map(async (userId) => {
         const { data, error } = await supabase
           .rpc('get_safe_referral_profile', { target_user_id: userId });
@@ -89,7 +88,7 @@ const Referrals = () => {
       const profilesData = await Promise.all(profilePromises);
 
       // Combine referral and profile data (no sensitive information exposed)
-      const enrichedReferrals = referralsData.map((referral, index) => {
+      const enrichedReferrals: ReferralData[] = referralsData.map((referral, index) => {
         const profile = profilesData[index];
         return {
           ...referral,
@@ -101,7 +100,7 @@ const Referrals = () => {
 
       setReferrals(enrichedReferrals);
 
-      const completed = enrichedReferrals.filter(r => r.status === 'completed' && r.reward_credited).length;
+      const completed = enrichedReferrals.filter(r => r.is_paid).length;
       const pending = enrichedReferrals.length - completed;
       
       setStats({
@@ -258,7 +257,7 @@ const Referrals = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            {referral.status === 'completed' && referral.reward_credited ? (
+                            {referral.is_paid ? (
                             <>
                                 <Badge variant="secondary" className="bg-green-100 text-green-700 px-3 py-1">
                                   Rewarded
@@ -279,12 +278,6 @@ const Referrals = () => {
                             )}
                           </div>
                         </div>
-                        {referral.rewarded_at && (
-                          <div className="mt-4 pt-4 border-t text-sm text-muted-foreground flex items-center gap-2">
-                            <Award className="w-4 h-4" />
-                            Reward credited on {format(new Date(referral.rewarded_at), 'MMM dd, yyyy')}
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   ))}

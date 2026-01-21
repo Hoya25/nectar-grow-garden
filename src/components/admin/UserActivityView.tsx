@@ -42,12 +42,11 @@ interface NCTRLock {
 
 interface Referral {
   id: string;
-  referred_user_id: string;
-  referral_code: string;
-  status: string;
-  reward_credited: boolean;
+  referred_id: string;
+  referrer_id: string;
+  is_paid: boolean;
+  referral_bonus: number;
   created_at: string;
-  rewarded_at?: string;
 }
 
 interface Portfolio {
@@ -200,7 +199,7 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
         supabase
           .from('referrals')
           .select('*')
-          .eq('referrer_user_id', userId)
+          .eq('referrer_id', userId)
           .order('created_at', { ascending: false }),
         supabase
           .rpc('get_admin_user_portfolio', { target_user_id: userId })
@@ -262,11 +261,9 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
     }
   };
 
-  const getReferralStatusColor = (status: string, rewarded: boolean) => {
-    if (status === 'completed' && rewarded) {
+  const getReferralStatusColor = (isPaid: boolean) => {
+    if (isPaid) {
       return 'bg-green-100 text-green-700';
-    } else if (status === 'completed') {
-      return 'bg-blue-100 text-blue-700';
     }
     return 'bg-yellow-100 text-yellow-700';
   };
@@ -470,24 +467,19 @@ const UserActivityView = ({ userId }: UserActivityViewProps) => {
                     <div className="flex items-center gap-3">
                       <Users className="w-5 h-5 text-blue-500" />
                       <div>
-                        <div className="font-medium">Referral Code: {referral.referral_code}</div>
+                        <div className="font-medium">Referral #{referral.id.slice(0, 8)}</div>
                         <div className="text-sm text-muted-foreground">
                           Created: {format(new Date(referral.created_at), 'MMM dd, yyyy')}
                         </div>
-                        {referral.rewarded_at && (
-                          <div className="text-sm text-muted-foreground">
-                            Rewarded: {format(new Date(referral.rewarded_at), 'MMM dd, yyyy')}
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge className={getReferralStatusColor(referral.status, referral.reward_credited)}>
-                        {referral.status} {referral.reward_credited ? '(Rewarded)' : ''}
+                      <Badge className={getReferralStatusColor(referral.is_paid)}>
+                        {referral.is_paid ? 'Rewarded' : 'Pending'}
                       </Badge>
-                      {referral.reward_credited && (
+                      {referral.is_paid && (
                         <div className="text-sm text-green-600 mt-1">
-                          +1000 NCTR
+                          +{referral.referral_bonus} NCTR
                         </div>
                       )}
                     </div>

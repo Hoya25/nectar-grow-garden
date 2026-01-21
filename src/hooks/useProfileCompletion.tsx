@@ -19,8 +19,8 @@ interface ProfileCompletionData {
 
 interface PendingReferral {
   id: string;
-  referrer_user_id: string;
-  status: string;
+  referrer_id: string;
+  is_paid: boolean;
   created_at: string;
 }
 
@@ -49,10 +49,9 @@ export const useProfileCompletion = () => {
       // Check for pending referral rewards
       const { data: referralData } = await supabase
         .from('referrals')
-        .select('id, referrer_user_id, status, created_at')
-        .eq('referred_user_id', user.id)
-        .eq('status', 'completed')
-        .eq('reward_credited', false)
+        .select('id, referrer_id, is_paid, created_at')
+        .eq('referred_id', user.id)
+        .eq('is_paid', false)
         .maybeSingle();
 
       setPendingReferral(referralData);

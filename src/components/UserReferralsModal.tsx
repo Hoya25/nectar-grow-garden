@@ -12,15 +12,14 @@ import { toast } from '@/hooks/use-toast';
 
 interface ReferralData {
   id: string;
-  referred_user_id: string;
+  referred_id: string;
+  referrer_id: string;
   created_at: string;
-  rewarded_at: string | null;
-  referral_code: string;
+  is_paid: boolean;
+  referral_bonus: number;
   referred_name: string;
   referred_email?: string;
   join_date?: string;
-  status: string;
-  reward_credited: boolean;
 }
 
 interface UserReferralsModalProps {
@@ -61,7 +60,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
       const { data: referralsData, error: referralsError } = await supabase
         .from('referrals')
         .select('*')
-        .eq('referrer_user_id', user.id)
+        .eq('referrer_id', user.id)
         .order('created_at', { ascending: false });
 
       if (referralsError) {
@@ -76,7 +75,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
       }
 
       // Get secure profile data for referred users using the safe function
-      const userIds = referralsData.map(r => r.referred_user_id);
+      const userIds = referralsData.map(r => r.referred_id);
       const profilePromises = userIds.map(async (userId) => {
         const { data, error } = await supabase
           .rpc('get_safe_referral_profile', { target_user_id: userId });
@@ -91,7 +90,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
       const profilesData = await Promise.all(profilePromises);
 
       // Combine referral and profile data (no sensitive information exposed)
-      const enrichedReferrals = referralsData.map((referral, index) => {
+      const enrichedReferrals: ReferralData[] = referralsData.map((referral, index) => {
         const profile = profilesData[index];
         return {
           ...referral,
@@ -105,7 +104,7 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
       setReferrals(enrichedReferrals);
 
       // Calculate stats
-      const completed = enrichedReferrals.filter(r => r.status === 'completed' && r.reward_credited).length;
+      const completed = enrichedReferrals.filter(r => r.is_paid).length;
       const pending = enrichedReferrals.length - completed;
       
       setStats({
@@ -256,10 +255,10 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
                                  <Calendar className="w-3 h-3" />
                                  Joined {format(new Date(referral.join_date || referral.created_at), 'MMM dd, yyyy')}
                                </div>
-                             </div>
+                              </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {referral.status === 'completed' && referral.reward_credited ? (
+                            {referral.is_paid ? (
                               <>
                                 <Badge variant="secondary" className="bg-green-100 text-green-700">
                                   Rewarded
@@ -280,12 +279,6 @@ const UserReferralsModal = ({ children }: UserReferralsModalProps) => {
                             )}
                           </div>
                         </div>
-                        {referral.rewarded_at && (
-                          <div className="mt-2 text-xs text-muted-foreground flex items-center gap-1">
-                            <Award className="w-3 h-3" />
-                            Reward credited on {format(new Date(referral.rewarded_at), 'MMM dd, yyyy')}
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   ))}

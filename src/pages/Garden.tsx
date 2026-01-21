@@ -222,15 +222,14 @@ const Garden = () => {
       const { count: totalReferrals } = await supabase
         .from('referrals')
         .select('*', { count: 'exact', head: true })
-        .eq('referrer_user_id', user.id);
+        .eq('referrer_id', user.id);
 
       // Get successful referrals count
       const { count: successfulReferrals } = await supabase
         .from('referrals')
         .select('*', { count: 'exact', head: true })
-        .eq('referrer_user_id', user.id)
-        .eq('status', 'completed')
-        .eq('reward_credited', true);
+        .eq('referrer_id', user.id)
+        .eq('is_paid', true);
 
       setReferralStats({
         total: totalReferrals || 0,
