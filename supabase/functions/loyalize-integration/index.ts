@@ -660,7 +660,7 @@ serve(async (req) => {
 
             console.log(`💰 ${brandName} Purchase: $${purchaseAmount} × ${rewardRate} NCTR/$ = ${nctrAmount} base NCTR`)
 
-            // Credit user via the award_affiliate_nctr function (applies Wings multiplier)
+            // Credit user via the award_affiliate_nctr function (applies Crescendo multiplier)
             const { data: result, error: creditError } = await supabase.rpc(
               'award_affiliate_nctr',
               {
