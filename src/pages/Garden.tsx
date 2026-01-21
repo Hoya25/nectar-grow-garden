@@ -1026,7 +1026,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
       toast({
         title: "🎉 Daily Bonus Earned!",
-        description: `You've earned ${(result.reward_amount || 0).toFixed(2)} NCTR! (${result.multiplier || 1}x Wings multiplier)`,
+        description: `You've earned ${(result.reward_amount || 0).toFixed(2)} NCTR! (${result.multiplier || 1}x Crescendo multiplier)`,
       });
     } catch (error) {
       console.error('Error awarding daily bonus:', error);
@@ -1228,7 +1228,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <TrendingUp className="h-5 w-5 text-primary" />
-                    Wings Status
+                    Crescendo Status
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1273,7 +1273,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         />
       )}
       
-      {/* Header with Wings Status */}
+      {/* Header with Crescendo Status */}
       <header className="section-highlight backdrop-blur-sm border-b border-section-border">
         <div className="container mx-auto px-4 py-4">
           {/* Top Row: Logo and Actions */}
@@ -1363,7 +1363,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
       {/* Main Content */}
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
-        {/* Wings Status - Prominent Section */}
+        {/* Crescendo Status - Prominent Section */}
         <div className="mb-8">
           <MemberStatusBanner 
             currentStatus={portfolio?.opportunity_status || 'starter'}
@@ -1962,7 +1962,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">
                                  {userMultiplier > 1 ? (
                                    <span>
-                                     Wings <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
+                                     Crescendo <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
                                    </span>
                                  ) : 'Per friend who joins'}
                                </div>
@@ -2159,7 +2159,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                             <div className="text-xs text-muted-foreground mb-3">
                               {userMultiplier > 1 ? (
                                 <span>
-                                  Wings <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
+                                  Crescendo <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
                                 </span>
                               ) : 'Per friend who joins'}
                             </div>
@@ -2244,7 +2244,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                 <li>• Friends join using your link</li>
                 <li>• You earn {Math.round(inviteReward * userMultiplier)} NCTR {userMultiplier > 1 && (
                   <span>
-                    (<span className={`font-bold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{userMultiplier}x</span> Wings bonus)
+                    (<span className={`font-bold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{userMultiplier}x</span> Crescendo bonus)
                   </span>
                 )} & they get {inviteReward} NCTR in 360LOCK!</li>
               </ul>

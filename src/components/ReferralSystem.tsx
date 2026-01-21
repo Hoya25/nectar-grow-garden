@@ -224,7 +224,7 @@ We both earn rewards! I get ${userReward} NCTR and you get ${inviteReward} NCTR 
           <p className="text-sm text-muted-foreground mb-2">
             {userStatus.reward_multiplier > 1 ? (
               <span>
-                Wings <span className={`font-semibold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.opportunity_status}</span> bonus: <span className={`font-bold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.reward_multiplier}x</span> multiplier
+                Crescendo <span className={`font-semibold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.opportunity_status}</span> bonus: <span className={`font-bold ${getStatusTextColor(userStatus.opportunity_status)}`}>{userStatus.reward_multiplier}x</span> multiplier
               </span>
             ) : 'Most popular way to earn'}
           </p>
