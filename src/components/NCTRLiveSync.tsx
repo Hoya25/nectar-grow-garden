@@ -151,12 +151,12 @@ const NCTRLiveSync = ({ onSyncComplete }: NCTRLiveSyncProps) => {
         if (credits?.total > 0) {
           toast({
             title: "Sync Successful! 🎉",
-            description: `Credited ${credits.total.toFixed(2)} NCTR to your Wings account (${credits.available.toFixed(2)} available + ${credits.lock_360.toFixed(2)} in 360LOCK)`,
+            description: `Credited ${credits.total.toFixed(2)} NCTR to your Crescendo account (${credits.available.toFixed(2)} available + ${credits.lock_360.toFixed(2)} in 360LOCK)`,
           });
         } else {
           toast({
             title: "Sync Complete",
-            description: data.message || "Your Wings account is already up to date with NCTR Live.",
+            description: data.message || "Your Crescendo account is already up to date with NCTR Live.",
           });
         }
 
@@ -285,11 +285,11 @@ const NCTRLiveSync = ({ onSyncComplete }: NCTRLiveSyncProps) => {
               </div>
               <div className="flex items-start gap-2">
                 <ArrowUpRight className="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0" />
-                <span>We sync your token.nctr.live portfolio with Wings</span>
+                <span>We sync your token.nctr.live portfolio with Crescendo</span>
               </div>
               <div className="flex items-start gap-2">
                 <ArrowUpRight className="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0" />
-                <span>Available NCTR becomes available in Wings</span>
+                <span>Available NCTR becomes available in Crescendo</span>
               </div>
               <div className="flex items-start gap-2">
                 <ArrowUpRight className="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0" />
@@ -297,7 +297,7 @@ const NCTRLiveSync = ({ onSyncComplete }: NCTRLiveSyncProps) => {
               </div>
               <div className="flex items-start gap-2">
                 <ArrowUpRight className="w-4 h-4 mt-0.5 text-green-500 flex-shrink-0" />
-                <span>Your Wings alliance status updates automatically</span>
+                <span>Your Crescendo alliance status updates automatically</span>
               </div>
             </CardContent>
           </Card>

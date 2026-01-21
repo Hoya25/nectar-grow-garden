@@ -68,7 +68,7 @@ export const Lock360InfoTooltip: React.FC<{ className?: string; size?: number }>
 }) => {
   return (
     <InfoTooltip
-      content="360LOCK is a 360‑day commitment of your NCTR that fortifies the Alliance, making NCTR more valuable for everyone. In return, your Wings status increases, unlocking higher multipliers and access."
+      content="360LOCK is a 360‑day commitment of your NCTR that fortifies the Alliance, making NCTR more valuable for everyone. In return, your Crescendo status increases, unlocking higher multipliers and access."
       className={className}
       size={size}
     />
@@ -82,7 +82,7 @@ export const Lock90InfoTooltip: React.FC<{ className?: string; size?: number }> 
 }) => {
   return (
     <InfoTooltip
-      content="90LOCK is your default anti‑abuse safeguard. Rewards vest over 90 days to keep the game fair and the token resilient. Commit to 360LOCK to level up your Wings status."
+      content="90LOCK is your default anti‑abuse safeguard. Rewards vest over 90 days to keep the game fair and the token resilient. Commit to 360LOCK to level up your Crescendo status."
       className={className}
       size={size}
     />
