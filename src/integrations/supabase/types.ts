@@ -52,6 +52,41 @@ export type Database = {
           },
         ]
       }
+      admin_settings: {
+        Row: {
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_users: {
         Row: {
           access_level: string | null
@@ -272,6 +307,322 @@ export type Database = {
         }
         Relationships: []
       }
+      claims_packages: {
+        Row: {
+          bonus_claims: number | null
+          claims_amount: number
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_popular: boolean | null
+          name: string
+          price_usd: number
+          sort_order: number | null
+        }
+        Insert: {
+          bonus_claims?: number | null
+          claims_amount: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name: string
+          price_usd: number
+          sort_order?: number | null
+        }
+        Update: {
+          bonus_claims?: number | null
+          claims_amount?: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          name?: string
+          price_usd?: number
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      claims_purchases: {
+        Row: {
+          amount_paid: number
+          bonus_claims: number | null
+          claims_purchased: number
+          created_at: string | null
+          id: string
+          package_id: string | null
+          payment_intent_id: string | null
+          payment_method: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          bonus_claims?: number | null
+          claims_purchased: number
+          created_at?: string | null
+          id?: string
+          package_id?: string | null
+          payment_intent_id?: string | null
+          payment_method?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          bonus_claims?: number | null
+          claims_purchased?: number
+          created_at?: string | null
+          id?: string
+          package_id?: string | null
+          payment_intent_id?: string | null
+          payment_method?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claims_purchases_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "claims_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crescendo_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          reward_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reward_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reward_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crescendo_favorites_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "crescendo_rewards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crescendo_favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crescendo_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          metadata: Json | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crescendo_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crescendo_rewards: {
+        Row: {
+          claims_cost: number
+          contributor_id: string | null
+          created_at: string
+          description: string
+          featured: boolean
+          id: string
+          image_url: string | null
+          quantity_available: number | null
+          quantity_claimed: number
+          reward_data: Json | null
+          reward_type: Database["public"]["Enums"]["reward_type"]
+          status: Database["public"]["Enums"]["reward_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          claims_cost?: number
+          contributor_id?: string | null
+          created_at?: string
+          description: string
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          quantity_available?: number | null
+          quantity_claimed?: number
+          reward_data?: Json | null
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          status?: Database["public"]["Enums"]["reward_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          claims_cost?: number
+          contributor_id?: string | null
+          created_at?: string
+          description?: string
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          quantity_available?: number | null
+          quantity_claimed?: number
+          reward_data?: Json | null
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          status?: Database["public"]["Enums"]["reward_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crescendo_rewards_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crescendo_transactions: {
+        Row: {
+          claims_spent: number
+          contributor_id: string | null
+          created_at: string
+          id: string
+          member_id: string
+          metadata: Json | null
+          reward_id: string | null
+          status: Database["public"]["Enums"]["transaction_status"]
+        }
+        Insert: {
+          claims_spent: number
+          contributor_id?: string | null
+          created_at?: string
+          id?: string
+          member_id: string
+          metadata?: Json | null
+          reward_id?: string | null
+          status?: Database["public"]["Enums"]["transaction_status"]
+        }
+        Update: {
+          claims_spent?: number
+          contributor_id?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string
+          metadata?: Json | null
+          reward_id?: string | null
+          status?: Database["public"]["Enums"]["transaction_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crescendo_transactions_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crescendo_transactions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crescendo_transactions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "crescendo_rewards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cross_platform_activity_log: {
+        Row: {
+          action_data: Json | null
+          action_type: string
+          created_at: string | null
+          id: string
+          platform: string
+          user_id: string | null
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type: string
+          created_at?: string | null
+          id?: string
+          platform: string
+          user_id?: string | null
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          platform?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_platform_activity_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_checkin_streaks: {
         Row: {
           created_at: string
@@ -433,6 +784,41 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          created_at: string
+          id: string
+          page_url: string
+          user_id: string | null
+          whats_broken: string | null
+          whats_working: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          page_url: string
+          user_id?: string | null
+          whats_broken?: string | null
+          whats_working?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          page_url?: string
+          user_id?: string | null
+          whats_broken?: string | null
+          whats_working?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       independent_affiliate_links: {
         Row: {
           click_count: number | null
@@ -590,6 +976,47 @@ export type Database = {
             columns: ["module_id"]
             isOneToOne: false
             referencedRelation: "learning_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      membership_history: {
+        Row: {
+          created_at: string
+          id: string
+          locked_nctr: number
+          previous_tier_level: number | null
+          previous_tier_name: string | null
+          tier_level: number
+          tier_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          locked_nctr: number
+          previous_tier_level?: number | null
+          previous_tier_name?: string | null
+          tier_level: number
+          tier_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          locked_nctr?: number
+          previous_tier_level?: number | null
+          previous_tier_name?: string | null
+          tier_level?: number
+          tier_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -812,6 +1239,47 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          metadata: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          metadata?: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          metadata?: Json | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opportunity_status_levels: {
         Row: {
           benefits: string[] | null
@@ -988,6 +1456,53 @@ export type Database = {
         }
         Relationships: []
       }
+      purchases: {
+        Row: {
+          amount_paid: number
+          claims_amount: number
+          created_at: string
+          currency: string
+          id: string
+          package_id: string
+          package_name: string
+          status: string
+          stripe_session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          claims_amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          package_id: string
+          package_name: string
+          status?: string
+          stripe_session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          claims_amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          package_id?: string
+          package_name?: string
+          status?: string
+          stripe_session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quiz_attempts: {
         Row: {
           answers: Json | null
@@ -1080,37 +1595,422 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          referee_signup_ip: unknown
-          referral_code: string
-          referred_user_id: string
-          referrer_user_id: string
-          reward_credited: boolean
-          rewarded_at: string | null
-          status: string
+          is_paid: boolean
+          referral_bonus: number
+          referred_id: string
+          referrer_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          referee_signup_ip?: unknown
-          referral_code: string
-          referred_user_id: string
-          referrer_user_id: string
-          reward_credited?: boolean
-          rewarded_at?: string | null
-          status?: string
+          is_paid?: boolean
+          referral_bonus?: number
+          referred_id: string
+          referrer_id: string
         }
         Update: {
           created_at?: string
           id?: string
-          referee_signup_ip?: unknown
-          referral_code?: string
-          referred_user_id?: string
-          referrer_user_id?: string
-          reward_credited?: boolean
-          rewarded_at?: string | null
-          status?: string
+          is_paid?: boolean
+          referral_bonus?: number
+          referred_id?: string
+          referrer_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_shares: {
+        Row: {
+          bonus_earned: number
+          clicks: number
+          conversions: number
+          id: string
+          referral_code: string
+          reward_id: string
+          share_platform: string | null
+          shared_at: string
+          user_id: string
+        }
+        Insert: {
+          bonus_earned?: number
+          clicks?: number
+          conversions?: number
+          id?: string
+          referral_code: string
+          reward_id: string
+          share_platform?: string | null
+          shared_at?: string
+          user_id: string
+        }
+        Update: {
+          bonus_earned?: number
+          clicks?: number
+          conversions?: number
+          id?: string
+          referral_code?: string
+          reward_id?: string
+          share_platform?: string | null
+          shared_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_shares_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_shares_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_submission_changes: {
+        Row: {
+          change_summary: string | null
+          changed_fields: Json
+          created_at: string
+          id: string
+          new_version: number
+          previous_version: number
+          submission_id: string
+        }
+        Insert: {
+          change_summary?: string | null
+          changed_fields: Json
+          created_at?: string
+          id?: string
+          new_version: number
+          previous_version: number
+          submission_id: string
+        }
+        Update: {
+          change_summary?: string | null
+          changed_fields?: Json
+          created_at?: string
+          id?: string
+          new_version?: number
+          previous_version?: number
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_submission_changes_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "reward_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_submissions: {
+        Row: {
+          admin_notes: string | null
+          brand: string | null
+          category: string
+          claim_passes_required: number
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          is_latest_version: boolean
+          lock_rate: string
+          nctr_value: number
+          parent_submission_id: string | null
+          reward_type: string
+          status: string
+          stock_quantity: number | null
+          title: string
+          updated_at: string
+          user_id: string
+          version: number
+          version_notes: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          brand?: string | null
+          category: string
+          claim_passes_required?: number
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          is_latest_version?: boolean
+          lock_rate: string
+          nctr_value: number
+          parent_submission_id?: string | null
+          reward_type: string
+          status?: string
+          stock_quantity?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+          version?: number
+          version_notes?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          brand?: string | null
+          category?: string
+          claim_passes_required?: number
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_latest_version?: boolean
+          lock_rate?: string
+          nctr_value?: number
+          parent_submission_id?: string | null
+          reward_type?: string
+          status?: string
+          stock_quantity?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          version?: number
+          version_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_submissions_parent_submission_id_fkey"
+            columns: ["parent_submission_id"]
+            isOneToOne: false
+            referencedRelation: "reward_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_watchlist: {
+        Row: {
+          created_at: string
+          id: string
+          notified: boolean
+          reward_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notified?: boolean
+          reward_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notified?: boolean
+          reward_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_watchlist_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_watchlist_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_wishlists: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          reward_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reward_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reward_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_wishlists_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_wishlists_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards: {
+        Row: {
+          brand_id: string | null
+          category: string
+          cost: number
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          is_featured: boolean
+          minimum_token_balance: number | null
+          sponsor_enabled: boolean
+          sponsor_end_date: string | null
+          sponsor_link: string | null
+          sponsor_logo: string | null
+          sponsor_name: string | null
+          sponsor_start_date: string | null
+          stock_quantity: number | null
+          title: string
+          token_contract_address: string | null
+          token_gated: boolean | null
+          token_name: string | null
+          token_symbol: string | null
+          updated_at: string
+        }
+        Insert: {
+          brand_id?: string | null
+          category: string
+          cost: number
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          minimum_token_balance?: number | null
+          sponsor_enabled?: boolean
+          sponsor_end_date?: string | null
+          sponsor_link?: string | null
+          sponsor_logo?: string | null
+          sponsor_name?: string | null
+          sponsor_start_date?: string | null
+          stock_quantity?: number | null
+          title: string
+          token_contract_address?: string | null
+          token_gated?: boolean | null
+          token_name?: string | null
+          token_symbol?: string | null
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string | null
+          category?: string
+          cost?: number
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          minimum_token_balance?: number | null
+          sponsor_enabled?: boolean
+          sponsor_end_date?: string | null
+          sponsor_link?: string | null
+          sponsor_logo?: string | null
+          sponsor_name?: string | null
+          sponsor_start_date?: string | null
+          stock_quantity?: number | null
+          title?: string
+          token_contract_address?: string | null
+          token_gated?: boolean | null
+          token_name?: string | null
+          token_symbol?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards_claims: {
+        Row: {
+          claimed_at: string
+          id: string
+          reward_id: string
+          shipping_info: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          id?: string
+          reward_id: string
+          shipping_info?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          id?: string
+          reward_id?: string
+          shipping_info?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_claims_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_audit_log: {
         Row: {
@@ -1229,6 +2129,36 @@ export type Database = {
           setting_key?: string
           setting_value?: Json
           updated_at?: string
+        }
+        Relationships: []
+      }
+      sponsors: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -1408,48 +2338,75 @@ export type Database = {
       unified_profiles: {
         Row: {
           auth_user_id: string
+          available_nctr: number
           avatar_url: string | null
+          bio: string | null
+          claim_balance: number
           created_at: string | null
           crescendo_data: Json | null
           current_tier_id: string | null
           display_name: string | null
           email: string | null
           garden_data: Json | null
+          has_claimed_signup_bonus: boolean
+          has_status_access_pass: boolean
           id: string
           last_active_crescendo: string | null
           last_active_garden: string | null
+          level: number
+          locked_nctr: number
+          referral_code: string | null
+          referred_by: string | null
           tier_calculated_at: string | null
           updated_at: string | null
           wallet_address: string | null
         }
         Insert: {
           auth_user_id: string
+          available_nctr?: number
           avatar_url?: string | null
+          bio?: string | null
+          claim_balance?: number
           created_at?: string | null
           crescendo_data?: Json | null
           current_tier_id?: string | null
           display_name?: string | null
           email?: string | null
           garden_data?: Json | null
+          has_claimed_signup_bonus?: boolean
+          has_status_access_pass?: boolean
           id?: string
           last_active_crescendo?: string | null
           last_active_garden?: string | null
+          level?: number
+          locked_nctr?: number
+          referral_code?: string | null
+          referred_by?: string | null
           tier_calculated_at?: string | null
           updated_at?: string | null
           wallet_address?: string | null
         }
         Update: {
           auth_user_id?: string
+          available_nctr?: number
           avatar_url?: string | null
+          bio?: string | null
+          claim_balance?: number
           created_at?: string | null
           crescendo_data?: Json | null
           current_tier_id?: string | null
           display_name?: string | null
           email?: string | null
           garden_data?: Json | null
+          has_claimed_signup_bonus?: boolean
+          has_status_access_pass?: boolean
           id?: string
           last_active_crescendo?: string | null
           last_active_garden?: string | null
+          level?: number
+          locked_nctr?: number
+          referral_code?: string | null
+          referred_by?: string | null
           tier_calculated_at?: string | null
           updated_at?: string | null
           wallet_address?: string | null
@@ -1460,6 +2417,13 @@ export type Database = {
             columns: ["current_tier_id"]
             isOneToOne: false
             referencedRelation: "status_tiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unified_profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1748,6 +2712,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      claim_crescendo_reward: {
+        Args: { p_metadata?: Json; p_reward_id: string }
+        Returns: Json
+      }
+      claim_reward: {
+        Args: { p_reward_id: string; p_shipping_info?: Json }
+        Returns: Json
+      }
       cleanup_old_audit_logs: { Args: never; Returns: undefined }
       commit_all_nctr_to_360lock: { Args: { p_user_id: string }; Returns: Json }
       commit_available_to_360lock: {
@@ -1807,6 +2779,7 @@ export type Database = {
         Returns: Json
       }
       enhanced_price_access_control: { Args: never; Returns: boolean }
+      generate_referral_code: { Args: never; Returns: string }
       get_admin_financial_access: { Args: never; Returns: boolean }
       get_admin_financial_access_secure: { Args: never; Returns: boolean }
       get_admin_profile_summary: {
@@ -1993,6 +2966,7 @@ export type Database = {
           username: string
         }[]
       }
+      get_public_stats: { Args: never; Returns: Json }
       get_rate_limit_statistics: {
         Args: never
         Returns: {
@@ -2323,6 +3297,10 @@ export type Database = {
         }
         Returns: Json
       }
+      update_claim_status: {
+        Args: { p_claim_id: string; p_status: string }
+        Returns: Json
+      }
       update_opportunity_admin: {
         Args: { opportunity_data: Json; opportunity_id: string }
         Returns: {
@@ -2381,6 +3359,15 @@ export type Database = {
     }
     Enums: {
       app_role: "user" | "admin" | "super_admin" | "treasury_admin"
+      reward_status: "pending" | "active" | "paused" | "completed"
+      reward_type:
+        | "access_code"
+        | "discount_code"
+        | "ticket_code"
+        | "experience"
+        | "opportunity"
+        | "education"
+      transaction_status: "completed" | "failed" | "pending"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2509,6 +3496,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "admin", "super_admin", "treasury_admin"],
+      reward_status: ["pending", "active", "paused", "completed"],
+      reward_type: [
+        "access_code",
+        "discount_code",
+        "ticket_code",
+        "experience",
+        "opportunity",
+        "education",
+      ],
+      transaction_status: ["completed", "failed", "pending"],
     },
   },
 } as const
