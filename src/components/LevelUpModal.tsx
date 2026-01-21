@@ -15,7 +15,6 @@ import {
   Lock,
   ArrowRight
 } from 'lucide-react';
-import { BuyNCTRButton } from '@/components/BuyNCTRButton';
 import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface LevelUpModalProps {
@@ -198,12 +197,17 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <p className="text-sm text-amber-700">1.1x Earning Amplification • 10% Boost • 1,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
-                      <BuyNCTRButton
-                        suggestedAmount={Math.max(1, 1000 - current360NCTR)}
-                        currentStatus={currentStatus}
-                        current360Lock={current360NCTR}
-                        className="bg-amber-600 hover:bg-amber-700 text-white border-0"
-                      />
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          setOpen(false);
+                          onEarnMoreClick?.();
+                        }}
+                      >
+                        <Gift className="w-4 h-4 mr-1" />
+                        Earn {Math.max(1, 1000 - current360NCTR).toLocaleString('en-US', { maximumFractionDigits: 0 })} NCTR
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -223,12 +227,17 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <p className="text-sm text-slate-600">1.25x Earning Amplification • 25% Boost • 2,500 NCTR in 360LOCK</p>
                         </div>
                       </div>
-                      <BuyNCTRButton
-                        suggestedAmount={Math.max(1, 2500 - current360NCTR)}
-                        currentStatus={currentStatus}
-                        current360Lock={current360NCTR}
-                        className="bg-slate-500 hover:bg-slate-600 text-white border-0"
-                      />
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          setOpen(false);
+                          onEarnMoreClick?.();
+                        }}
+                      >
+                        <Gift className="w-4 h-4 mr-1" />
+                        Earn {Math.max(1, 2500 - current360NCTR).toLocaleString('en-US', { maximumFractionDigits: 0 })} NCTR
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -248,12 +257,17 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <p className="text-sm text-yellow-700">1.4x Earning Amplification • 40% Boost • 5,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
-                      <BuyNCTRButton
-                        suggestedAmount={Math.max(1, 5000 - current360NCTR)}
-                        currentStatus={currentStatus}
-                        current360Lock={current360NCTR}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white border-0"
-                      />
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          setOpen(false);
+                          onEarnMoreClick?.();
+                        }}
+                      >
+                        <Gift className="w-4 h-4 mr-1" />
+                        Earn {Math.max(1, 5000 - current360NCTR).toLocaleString('en-US', { maximumFractionDigits: 0 })} NCTR
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -273,12 +287,17 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <p className="text-sm text-slate-600">1.5x Earning Amplification • 50% Boost • 10,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
-                      <BuyNCTRButton
-                        suggestedAmount={Math.max(1, 10000 - current360NCTR)}
-                        currentStatus={currentStatus}
-                        current360Lock={current360NCTR}
-                        className="bg-slate-500 hover:bg-slate-600 text-white border-0"
-                      />
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          setOpen(false);
+                          onEarnMoreClick?.();
+                        }}
+                      >
+                        <Gift className="w-4 h-4 mr-1" />
+                        Earn {Math.max(1, 10000 - current360NCTR).toLocaleString('en-US', { maximumFractionDigits: 0 })} NCTR
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -298,12 +317,17 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <p className="text-sm text-blue-700">2.0x Earning Amplification • 100% Boost • 25,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
-                      <BuyNCTRButton
-                        suggestedAmount={Math.max(1, 25000 - current360NCTR)}
-                        currentStatus={currentStatus}
-                        current360Lock={current360NCTR}
-                        className="bg-blue-600 hover:bg-blue-700 text-white border-0"
-                      />
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          setOpen(false);
+                          onEarnMoreClick?.();
+                        }}
+                      >
+                        <Gift className="w-4 h-4 mr-1" />
+                        Earn {Math.max(1, 25000 - current360NCTR).toLocaleString('en-US', { maximumFractionDigits: 0 })} NCTR
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
