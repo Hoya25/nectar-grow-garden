@@ -789,6 +789,13 @@ export type Database = {
             referencedRelation: "public_brands"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "earning_opportunities_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       feedback: {
@@ -1382,6 +1389,13 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "public_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_campaigns_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -1993,6 +2007,13 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "public_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -2675,6 +2696,39 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      public_brands_safe: {
+        Row: {
+          category: string | null
+          description: string | null
+          featured: boolean | null
+          id: string | null
+          is_active: boolean | null
+          logo_url: string | null
+          name: string | null
+          website_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          description?: string | null
+          featured?: boolean | null
           id?: string | null
           is_active?: boolean | null
           logo_url?: string | null
@@ -3408,6 +3462,13 @@ export type Database = {
           target_user_id: string
         }
         Returns: Json
+      }
+      verify_wallet_for_auth: {
+        Args: { p_wallet_address: string }
+        Returns: {
+          auth_user_id: string
+          has_wallet: boolean
+        }[]
       }
     }
     Enums: {
