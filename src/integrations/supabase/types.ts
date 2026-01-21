@@ -782,6 +782,13 @@ export type Database = {
             referencedRelation: "brands"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "earning_opportunities_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands"
+            referencedColumns: ["id"]
+          },
         ]
       }
       feedback: {
@@ -1368,6 +1375,13 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_campaigns_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands"
             referencedColumns: ["id"]
           },
         ]
@@ -1972,6 +1986,13 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands"
             referencedColumns: ["id"]
           },
         ]
@@ -2635,7 +2656,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_brands: {
+        Row: {
+          category: string | null
+          id: string | null
+          is_active: boolean | null
+          logo_url: string | null
+          name: string | null
+          website_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_sample_brands: { Args: never; Returns: string }
