@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Trophy, TrendingUp, ChevronRight, Sparkles, Crown, Zap } from 'lucide-react';
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
-import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import { LevelUpModal } from '@/components/LevelUpModal';
 import nctrLogo from "@/assets/nctr-logo.png";
 
@@ -181,16 +180,14 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                     </Button>
                   </LevelUpModal>
                 ) : (
-                  <BuyNCTRButton 
+                  <Button 
                     size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                    suggestedAmount={2500}
-                    currentStatus={currentStatus}
-                    current360Lock={current360NCTR}
+                    className="bg-primary/50 text-primary-foreground cursor-default"
+                    disabled
                   >
-                    <Zap className="w-4 h-4 mr-1" />
-                    Level Up, Buy NCTR
-                  </BuyNCTRButton>
+                    <Crown className="w-4 h-4 mr-1" />
+                    Max Level Achieved
+                  </Button>
                 )}
               </div>
             </div>
@@ -229,16 +226,14 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                 </Button>
               </LevelUpModal>
             ) : (
-              <BuyNCTRButton 
+              <Button 
                 size="sm"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                suggestedAmount={2500}
-                currentStatus={currentStatus}
-                current360Lock={current360NCTR}
+                className="w-full bg-primary/50 text-primary-foreground cursor-default"
+                disabled
               >
-                <Zap className="w-4 h-4 mr-2" />
-                Level Up, Buy NCTR
-              </BuyNCTRButton>
+                <Crown className="w-4 h-4 mr-2" />
+                Max Level Achieved
+              </Button>
             )}
           </div>
         </CardContent>
