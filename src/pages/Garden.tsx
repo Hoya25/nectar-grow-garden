@@ -28,7 +28,7 @@ import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
-import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
+
 import { PortfolioStory } from '@/components/PortfolioStory';
 import { BaseBadge } from '@/components/BaseBadge';
 import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
@@ -1550,17 +1550,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                   </div>
                 )}
 
-                {/* Buy NCTR Button - Hidden on mobile to avoid duplication with banner button */}
-                <div className="mb-6 hidden md:flex justify-center">
-                  <BuyNCTRButton
-                    variant="default"
-                    size="lg"
-                    className="w-full md:w-auto min-w-[200px]"
-                    currentStatus={portfolio?.opportunity_status || 'starter'}
-                    current360Lock={portfolio?.lock_360_nctr || 0}
-                    onPurchaseComplete={fetchUserData}
-                  />
-                </div>
 
                 {/* Easy Button for 360LOCK Commitment */}
                 <div className="mb-6">
@@ -1584,16 +1573,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     Portfolio Details & Sync
                   </Button>
                   
-                  {/* Second Buy Button - Only show on desktop */}
-                  <div className="hidden md:block">
-                    <BuyNCTRButton
-                      variant="default"
-                      size="default"
-                      currentStatus={portfolio?.opportunity_status}
-                      current360Lock={portfolio?.lock_360_nctr || 0}
-                      onPurchaseComplete={() => fetchUserData()}
-                    />
-                  </div>
                   
                   {(portfolio?.available_nctr && portfolio.available_nctr > 0) && (
                     <Button 
