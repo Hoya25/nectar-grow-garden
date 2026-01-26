@@ -28,6 +28,7 @@ import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
+import { GardenHeroSection } from '@/components/GardenHeroSection';
 
 import { PortfolioStory } from '@/components/PortfolioStory';
 import { BaseBadge } from '@/components/BaseBadge';
@@ -36,6 +37,14 @@ import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
+interface FeaturedBrand {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  commission_rate: number;
+  loyalize_id: string;
+}
 
 
 interface Portfolio {
@@ -123,8 +132,12 @@ const Garden = () => {
   const [referralStats, setReferralStats] = useState({ total: 0, successful: 0 });
   const [dailyCheckinAvailable, setDailyCheckinAvailable] = useState(true);
   const [lastCheckinTime, setLastCheckinTime] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0); // Add refresh trigger
+  const [refreshKey, setRefreshKey] = useState(0);
   const [hasWallet, setHasWallet] = useState(false);
+  const [featuredBrands, setFeaturedBrands] = useState<FeaturedBrand[]>([]);
+  const [thisMonthEarned, setThisMonthEarned] = useState(0);
+  const [brandsShoppedCount, setBrandsShoppedCount] = useState(0);
+  const [totalBrandsCount, setTotalBrandsCount] = useState(6823);
 
 
   useEffect(() => {
@@ -569,6 +582,9 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
       // Check daily checkin availability
       await checkDailyCheckinAvailability();
+      
+      // Fetch hero section data
+      await fetchHeroData();
     } catch (error) {
       console.error('Error fetching user data:', error);
       toast({
@@ -580,6 +596,72 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
       setLoading(false);
     }
   }, [user?.id, fetchOpportunities, checkDailyCheckinAvailability, toast]);
+  
+  // Fetch data for the hero section
+  const fetchHeroData = useCallback(async () => {
+    try {
+      // Fetch featured brands (top earning, real loyalize IDs only)
+      const { data: brandsData } = await supabase
+        .from('brands')
+        .select('id, name, logo_url, commission_rate, loyalize_id')
+        .eq('is_active', true)
+        .not('loyalize_id', 'like', 'gc-%')
+        .not('loyalize_id', 'like', 'fallback%')
+        .not('loyalize_id', 'like', '%manual%')
+        .order('commission_rate', { ascending: false })
+        .limit(12);
+      
+      if (brandsData) {
+        // Filter to only include reasonable commission rates (not data errors)
+        const validBrands = brandsData.filter(b => 
+          b.commission_rate && b.commission_rate <= 1 // 100% max
+        ).slice(0, 6);
+        setFeaturedBrands(validBrands as FeaturedBrand[]);
+      }
+      
+      // Get total active brands count
+      const { count: brandsCount } = await supabase
+        .from('brands')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+      
+      if (brandsCount) {
+        setTotalBrandsCount(brandsCount);
+      }
+      
+      // Fetch this month's earnings
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      
+      const { data: monthlyData } = await supabase
+        .from('nctr_transactions')
+        .select('nctr_amount')
+        .eq('user_id', user?.id)
+        .eq('status', 'completed')
+        .gte('created_at', startOfMonth.toISOString());
+      
+      if (monthlyData) {
+        const total = monthlyData.reduce((sum, t) => sum + (t.nctr_amount || 0), 0);
+        setThisMonthEarned(total);
+      }
+      
+      // Count unique brands shopped
+      const { data: shoppedData } = await supabase
+        .from('nctr_transactions')
+        .select('partner_name')
+        .eq('user_id', user?.id)
+        .eq('earning_source', 'affiliate_purchase')
+        .eq('status', 'completed');
+      
+      if (shoppedData) {
+        const uniqueBrands = new Set(shoppedData.map(t => t.partner_name).filter(Boolean));
+        setBrandsShoppedCount(uniqueBrands.size);
+      }
+    } catch (error) {
+      console.error('Error fetching hero data:', error);
+    }
+  }, [user?.id]);
 
   // Memoize the transaction callback to prevent effect restarts
   const handleTransactionReceived = useCallback(() => {
@@ -603,6 +685,54 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  // Handler for Shop & Earn button - navigate to affiliate links page
+  const handleShopAndEarn = () => {
+    navigate('/affiliate-links');
+  };
+
+  // Handler for clicking a featured brand
+  const handleFeaturedBrandClick = async (brand: FeaturedBrand) => {
+    if (!user?.id || !brand.loyalize_id) {
+      toast({
+        title: "Error",
+        description: "Unable to process this brand. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const trackingId = `tgn_${user.id.slice(-8)}_${brand.id.slice(-8)}_${Date.now().toString(36)}`;
+      
+      // Create tracking mapping
+      await supabase
+        .from('affiliate_link_mappings')
+        .insert({
+          tracking_id: trackingId,
+          user_id: user.id,
+          brand_id: brand.id,
+        });
+      
+      // Build redirect URL
+      const finalUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${brand.loyalize_id}&user=${user.id}&tracking=${trackingId}`;
+      
+      window.open(finalUrl, '_blank');
+      
+      toast({
+        title: `✅ ${brand.name} - Tracking Active!`,
+        description: `Shop normally and earn crypto back. Your rewards will appear within 24-48 hours.`,
+        duration: 6000,
+      });
+    } catch (error) {
+      console.error('Error handling brand click:', error);
+      toast({
+        title: "Error",
+        description: "Failed to open brand link. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const formatNCTR = (amount: number) => {
@@ -1363,32 +1493,42 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
       {/* Main Content */}
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
-        {/* Crescendo Status - Prominent Section */}
+        {/* NEW HERO SECTION - Above the fold */}
+        <GardenHeroSection
+          userName={user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Member'}
+          portfolio={portfolio}
+          featuredBrands={featuredBrands}
+          totalBrands={totalBrandsCount}
+          thisMonthEarned={thisMonthEarned}
+          brandsShoppedCount={brandsShoppedCount}
+          onShopClick={handleShopAndEarn}
+          onBrandClick={handleFeaturedBrandClick}
+        />
+
+        {/* Profile Completion Banner */}
+        <div className="mb-6">
+          <ProfileCompletionBanner />
+        </div>
+
+        {/* Crescendo Status - Below hero */}
         <div className="mb-8">
           <MemberStatusBanner 
             currentStatus={portfolio?.opportunity_status || 'starter'}
             current360NCTR={parseFloat(portfolio?.lock_360_nctr?.toString() || '0')}
             availableNCTR={portfolio?.available_nctr || 0}
             onUpgradeClick={() => {
-              // Scroll to lock commitment modal or trigger it
               const lockButton = document.querySelector('[data-lock-commitment]');
               if (lockButton) {
                 (lockButton as HTMLElement).click();
               }
             }}
             onEarnMoreClick={() => {
-              // Scroll to earning opportunities
               const opportunitiesSection = document.querySelector('[data-earning-opportunities]');
               if (opportunitiesSection) {
                 opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
               }
             }}
           />
-        </div>
-
-        {/* Profile Completion Banner */}
-        <div className="mb-6">
-          <ProfileCompletionBanner />
         </div>
 
         {/* Portfolio Section - Collapsible */}
