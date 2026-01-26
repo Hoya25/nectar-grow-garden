@@ -2099,6 +2099,107 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          max_nctr_per_order: number | null
+          min_purchase_for_reward: number | null
+          nctr_per_dollar: number
+          shopify_store_url: string | null
+          store_identifier: string
+          store_name: string | null
+          updated_at: string | null
+          webhook_secret: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_nctr_per_order?: number | null
+          min_purchase_for_reward?: number | null
+          nctr_per_dollar?: number
+          shopify_store_url?: string | null
+          store_identifier?: string
+          store_name?: string | null
+          updated_at?: string | null
+          webhook_secret?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_nctr_per_order?: number | null
+          min_purchase_for_reward?: number | null
+          nctr_per_dollar?: number
+          shopify_store_url?: string | null
+          store_identifier?: string
+          store_name?: string | null
+          updated_at?: string | null
+          webhook_secret?: string | null
+        }
+        Relationships: []
+      }
+      shop_transactions: {
+        Row: {
+          created_at: string | null
+          credited_at: string | null
+          currency: string | null
+          customer_email: string
+          customer_name: string | null
+          id: string
+          nctr_earned: number
+          nctr_per_dollar_at_time: number
+          order_id: string
+          order_number: string | null
+          order_total: number
+          shopify_data: Json | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          credited_at?: string | null
+          currency?: string | null
+          customer_email: string
+          customer_name?: string | null
+          id?: string
+          nctr_earned: number
+          nctr_per_dollar_at_time: number
+          order_id: string
+          order_number?: string | null
+          order_total: number
+          shopify_data?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          credited_at?: string | null
+          currency?: string | null
+          customer_email?: string
+          customer_name?: string | null
+          id?: string
+          nctr_earned?: number
+          nctr_per_dollar_at_time?: number
+          order_id?: string
+          order_number?: string | null
+          order_total?: number
+          shopify_data?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopify_orders: {
         Row: {
           created_at: string | null
@@ -2403,9 +2504,11 @@ export type Database = {
           last_active_garden: string | null
           level: number
           locked_nctr: number
+          pending_nctr: number | null
           referral_code: string | null
           referred_by: string | null
           tier_calculated_at: string | null
+          total_nctr_earned_shop: number | null
           updated_at: string | null
           wallet_address: string | null
         }
@@ -2428,9 +2531,11 @@ export type Database = {
           last_active_garden?: string | null
           level?: number
           locked_nctr?: number
+          pending_nctr?: number | null
           referral_code?: string | null
           referred_by?: string | null
           tier_calculated_at?: string | null
+          total_nctr_earned_shop?: number | null
           updated_at?: string | null
           wallet_address?: string | null
         }
@@ -2453,9 +2558,11 @@ export type Database = {
           last_active_garden?: string | null
           level?: number
           locked_nctr?: number
+          pending_nctr?: number | null
           referral_code?: string | null
           referred_by?: string | null
           tier_calculated_at?: string | null
+          total_nctr_earned_shop?: number | null
           updated_at?: string | null
           wallet_address?: string | null
         }
@@ -3261,6 +3368,10 @@ export type Database = {
         Returns: boolean
       }
       increment: { Args: { x: number }; Returns: number }
+      increment_pending_nctr: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: undefined
+      }
       is_admin:
         | { Args: never; Returns: boolean }
         | { Args: { user_id: string }; Returns: boolean }
