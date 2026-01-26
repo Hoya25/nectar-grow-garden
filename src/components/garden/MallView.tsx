@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { MallHeader } from "./MallHeader";
 import { BrandCarousel } from "./BrandCarousel";
 import { DepartmentGrid } from "./DepartmentGrid";
+import { MobileBottomNav } from "./MobileBottomNav";
+import { MallSearchHandle } from "./MallSearch";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface Brand {
   id: string;
@@ -43,6 +44,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
   const [totalBrands, setTotalBrands] = useState(0);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [showBigBrands, setShowBigBrands] = useState(false);
+  const searchRef = useRef<MallSearchHandle>(null);
 
   // Tag-based sections
   const [madeInUsaBrands, setMadeInUsaBrands] = useState<Brand[]>([]);
@@ -225,16 +227,31 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
     }
   }, [handleShop]);
 
+  // Mobile nav handlers
+  const handleSearchClick = useCallback(() => {
+    // Scroll to top and focus search
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      searchRef.current?.focus();
+    }, 300);
+  }, []);
+
+  const handleTagsClick = useCallback(() => {
+    // Scroll to departments section
+    const deptSection = document.querySelector('[data-section="departments"]');
+    deptSection?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="garden-theme min-h-screen garden-bg flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: 'hsl(var(--garden-accent))' }} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="garden-theme min-h-screen garden-bg pb-20 md:pb-0">
       {/* Header with Search */}
       <MallHeader
         totalBrands={totalBrands}
@@ -289,7 +306,9 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
 
         {/* Departments */}
         {departments.length > 0 && (
-          <DepartmentGrid departments={departments} />
+          <div data-section="departments">
+            <DepartmentGrid departments={departments} />
+          </div>
         )}
 
         {/* Highest Earning */}
@@ -314,23 +333,23 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
 
         {/* Big Brands - Collapsible */}
         {bigBrands.length > 0 && (
-          <section className="mb-8">
+          <section className="garden-theme mb-8 garden-fade-in visible">
             <button
               onClick={() => setShowBigBrands(!showBigBrands)}
-              className="flex items-center justify-between w-full text-left mb-4 group"
+              className="garden-section-header flex items-center justify-between w-full text-left group btn-press"
             >
               <div>
-                <h2 className="text-xl font-bold text-foreground">🏢 Major Retailers</h2>
-                <p className="text-sm text-muted-foreground">National brands</p>
+                <h2 className="text-xl font-bold garden-text">🏢 Major Retailers</h2>
+                <p className="text-sm garden-text-muted mt-1">National brands</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm garden-text-muted">
                   {bigBrands.length} brands
                 </span>
                 {showBigBrands ? (
-                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                  <ChevronUp className="h-5 w-5 garden-text-muted" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  <ChevronDown className="h-5 w-5 garden-text-muted" />
                 )}
               </div>
             </button>
@@ -344,19 +363,19 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
             )}
 
             {!showBigBrands && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="flex gap-2 overflow-x-auto pb-2 garden-carousel">
                 {bigBrands.slice(0, 6).map((brand) => (
                   <div
                     key={brand.id}
-                    className="flex-shrink-0 bg-muted/50 rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer hover:bg-muted transition-colors"
+                    className="flex-shrink-0 garden-card rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer garden-card-hover btn-press"
                     onClick={() => handleShop(brand.id, brand.loyalize_id || "")}
                   >
-                    <span className="text-sm text-foreground">{brand.name}</span>
+                    <span className="text-sm garden-text">{brand.name}</span>
                   </div>
                 ))}
                 <button
                   onClick={() => setShowBigBrands(true)}
-                  className="flex-shrink-0 text-sm text-primary hover:underline px-3 py-2"
+                  className="flex-shrink-0 text-sm font-medium garden-accent hover:opacity-80 transition-opacity px-3 py-2 btn-press"
                 >
                   See All →
                 </button>
@@ -365,6 +384,12 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
           </section>
         )}
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav 
+        onSearchClick={handleSearchClick}
+        onTagsClick={handleTagsClick}
+      />
     </div>
   );
 };
