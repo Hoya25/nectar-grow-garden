@@ -80,11 +80,15 @@ interface Stats {
 }
 
 interface RateSettings {
-  default_nctr_per_dollar: number;
+  floor_rate: number;
+  multiplier: number;
+  max_rate: number;
 }
 
 const ITEMS_PER_PAGE = 50;
-const DEFAULT_NCTR_RATE = 50;
+const DEFAULT_FLOOR_RATE = 2;
+const DEFAULT_MULTIPLIER = 1000;
+const DEFAULT_MAX_RATE = 500;
 
 const AdminBrandRates = () => {
   const navigate = useNavigate();
@@ -107,9 +111,15 @@ const AdminBrandRates = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [categories, setCategories] = useState<string[]>([]);
   
-  // Default rate settings
-  const [rateSettings, setRateSettings] = useState<RateSettings>({ default_nctr_per_dollar: DEFAULT_NCTR_RATE });
-  const [editDefaultRate, setEditDefaultRate] = useState<string>(String(DEFAULT_NCTR_RATE));
+  // Hybrid rate settings
+  const [rateSettings, setRateSettings] = useState<RateSettings>({ 
+    floor_rate: DEFAULT_FLOOR_RATE, 
+    multiplier: DEFAULT_MULTIPLIER, 
+    max_rate: DEFAULT_MAX_RATE 
+  });
+  const [editFloorRate, setEditFloorRate] = useState<string>(String(DEFAULT_FLOOR_RATE));
+  const [editMultiplier, setEditMultiplier] = useState<string>(String(DEFAULT_MULTIPLIER));
+  const [editMaxRate, setEditMaxRate] = useState<string>(String(DEFAULT_MAX_RATE));
   const [savingRate, setSavingRate] = useState(false);
 
   // Edit modal state
@@ -161,8 +171,15 @@ const AdminBrandRates = () => {
 
       if (data?.value) {
         const value = data.value as unknown as RateSettings;
-        setRateSettings({ default_nctr_per_dollar: value.default_nctr_per_dollar || DEFAULT_NCTR_RATE });
-        setEditDefaultRate(String(value.default_nctr_per_dollar || DEFAULT_NCTR_RATE));
+        const settings = {
+          floor_rate: value.floor_rate || DEFAULT_FLOOR_RATE,
+          multiplier: value.multiplier || DEFAULT_MULTIPLIER,
+          max_rate: value.max_rate || DEFAULT_MAX_RATE,
+        };
+        setRateSettings(settings);
+        setEditFloorRate(String(settings.floor_rate));
+        setEditMultiplier(String(settings.multiplier));
+        setEditMaxRate(String(settings.max_rate));
       }
     } catch (error) {
       console.error("Error fetching rate settings:", error);
@@ -170,11 +187,32 @@ const AdminBrandRates = () => {
   };
 
   const saveRateSettings = async () => {
-    const defaultRate = parseFloat(editDefaultRate);
-    if (isNaN(defaultRate) || defaultRate <= 0) {
+    const floorRate = parseFloat(editFloorRate);
+    const multiplier = parseFloat(editMultiplier);
+    const maxRate = parseFloat(editMaxRate);
+
+    if (isNaN(floorRate) || floorRate < 0) {
       toast({
         title: "Invalid Value",
-        description: "Default rate must be a positive number",
+        description: "Floor rate must be a non-negative number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isNaN(multiplier) || multiplier <= 0) {
+      toast({
+        title: "Invalid Value",
+        description: "Multiplier must be a positive number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isNaN(maxRate) || maxRate <= 0) {
+      toast({
+        title: "Invalid Value",
+        description: "Max rate must be a positive number",
         variant: "destructive",
       });
       return;
@@ -182,7 +220,7 @@ const AdminBrandRates = () => {
 
     setSavingRate(true);
     try {
-      const newSettings = { default_nctr_per_dollar: defaultRate };
+      const newSettings = { floor_rate: floorRate, multiplier, max_rate: maxRate };
       
       // Check if setting exists first
       const { data: existing } = await supabase
@@ -219,17 +257,17 @@ const AdminBrandRates = () => {
       if (error) throw error;
 
       setRateSettings(newSettings);
-      await logActivity("updated_default_nctr_rate", "app_settings", "nctr_default_rate", { default_nctr_per_dollar: defaultRate });
+      await logActivity("updated_nctr_rate_settings", "app_settings", "nctr_default_rate", newSettings);
 
       toast({
-        title: "Default Rate Saved",
-        description: `Users will earn ${defaultRate} NCTR per $1 spent`,
+        title: "Rate Settings Saved",
+        description: `Hybrid formula: MAX(${floorRate}, commission × ${multiplier}), capped at ${maxRate}`,
       });
     } catch (error) {
       console.error("Error saving rate settings:", error);
       toast({
         title: "Error",
-        description: "Failed to save default rate",
+        description: "Failed to save rate settings",
         variant: "destructive",
       });
     } finally {
@@ -316,11 +354,19 @@ const AdminBrandRates = () => {
     }
   };
 
-  // Get the base rate for a brand (default or custom)
+  // Calculate the hybrid rate from commission using formula: MAX(floor, commission × multiplier), capped at max
+  const getCalculatedRate = (brand: Brand) => {
+    const commissionRate = brand.commission_rate || 0;
+    const calculated = commissionRate * rateSettings.multiplier;
+    const floored = Math.max(rateSettings.floor_rate, calculated);
+    return Math.min(floored, rateSettings.max_rate);
+  };
+
+  // Get the base rate for a brand (calculated or custom)
   const getBaseRate = (brand: Brand) => {
     return brand.use_custom_rate 
       ? (brand.nctr_per_dollar || 0)
-      : rateSettings.default_nctr_per_dollar;
+      : getCalculatedRate(brand);
   };
 
   // Calculate final NCTR rate for a brand (with promotion multiplier)
@@ -386,7 +432,7 @@ const AdminBrandRates = () => {
     }
 
     return result;
-  }, [brands, searchQuery, filter, categoryFilter, sortBy, rateSettings.default_nctr_per_dollar]);
+  }, [brands, searchQuery, filter, categoryFilter, sortBy, rateSettings]);
 
   // Pagination
   const totalPages = Math.ceil(filteredBrands.length / ITEMS_PER_PAGE);
@@ -441,9 +487,9 @@ const AdminBrandRates = () => {
     try {
       const updateData: Partial<Brand> = { use_custom_rate: useCustom };
       
-      // If switching to custom rate and no nctr_per_dollar is set, default to the default rate
+      // If switching to custom rate and no nctr_per_dollar is set, default to calculated rate
       if (useCustom && !brand.nctr_per_dollar) {
-        updateData.nctr_per_dollar = rateSettings.default_nctr_per_dollar;
+        updateData.nctr_per_dollar = getCalculatedRate(brand);
       }
 
       const { error } = await supabase
@@ -460,10 +506,10 @@ const AdminBrandRates = () => {
       await logActivity("toggled_custom_rate", "brand", brand.id, { use_custom_rate: useCustom });
 
       toast({
-        title: useCustom ? "Custom Rate Enabled" : "Using Default Rate",
+        title: useCustom ? "Custom Rate Enabled" : "Using Calculated Rate",
         description: useCustom 
           ? `${brand.name} now uses a custom rate` 
-          : `${brand.name} now uses the default rate (${rateSettings.default_nctr_per_dollar} NCTR/$1)`,
+          : `${brand.name} now uses the calculated rate`,
       });
     } catch (error) {
       console.error("Error toggling custom rate:", error);
@@ -477,8 +523,9 @@ const AdminBrandRates = () => {
 
   const openEditModal = (brand: Brand) => {
     setEditingBrand(brand);
+    const calculatedRate = getCalculatedRate(brand);
     setEditForm({
-      nctr_per_dollar: brand.use_custom_rate ? (brand.nctr_per_dollar || rateSettings.default_nctr_per_dollar) : rateSettings.default_nctr_per_dollar,
+      nctr_per_dollar: brand.use_custom_rate ? (brand.nctr_per_dollar || calculatedRate) : calculatedRate,
       featured: brand.featured,
       is_promoted: brand.is_promoted || false,
       promotion_multiplier: brand.promotion_multiplier || 1,
@@ -540,9 +587,10 @@ const AdminBrandRates = () => {
 
   // Calculate preview rate in edit modal
   const getEditPreviewRate = () => {
+    const calculatedRate = editingBrand ? getCalculatedRate(editingBrand) : 0;
     const baseRate = editForm.use_custom_rate 
       ? editForm.nctr_per_dollar 
-      : rateSettings.default_nctr_per_dollar;
+      : calculatedRate;
     const promoMultiplier = editForm.is_promoted ? editForm.promotion_multiplier : 1;
     return baseRate * promoMultiplier;
   };
@@ -577,60 +625,101 @@ const AdminBrandRates = () => {
       </header>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Default NCTR Rate Settings Card */}
+        {/* Hybrid NCTR Rate Settings Card */}
         <Card className="bg-card/80 backdrop-blur-sm border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-primary" />
-              💰 Default NCTR Rate
+              💰 NCTR Rate Settings (Hybrid)
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Default Rate Input */}
-              <div className="space-y-3">
-                <Label htmlFor="default_rate">NCTR per $1 Spent</Label>
-                <div className="flex gap-2">
+          <CardContent className="space-y-6">
+            {/* Input Row */}
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="floor_rate">Floor Rate</Label>
+                <div className="flex items-center gap-2">
                   <Input
-                    id="default_rate"
+                    id="floor_rate"
                     type="number"
                     step="1"
-                    min="1"
-                    value={editDefaultRate}
-                    onChange={(e) => setEditDefaultRate(e.target.value)}
-                    className="w-32"
+                    min="0"
+                    value={editFloorRate}
+                    onChange={(e) => setEditFloorRate(e.target.value)}
+                    className="w-24"
                   />
-                  <Button 
-                    onClick={saveRateSettings} 
-                    disabled={savingRate}
-                  >
-                    {savingRate ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Save Default Rate
-                  </Button>
+                  <span className="text-sm text-muted-foreground">NCTR/$1</span>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Users earn this amount of NCTR for every $1 they spend
-                </p>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm font-medium">
-                    Example: User spends $100 → Earns <span className="text-primary font-bold">{(parseFloat(editDefaultRate) || 0) * 100} NCTR</span>
-                  </p>
-                </div>
+                <p className="text-xs text-muted-foreground">Minimum any brand gives</p>
               </div>
 
-              {/* Margin Info */}
+              <div className="space-y-2">
+                <Label htmlFor="multiplier">Multiplier</Label>
+                <Input
+                  id="multiplier"
+                  type="number"
+                  step="100"
+                  min="1"
+                  value={editMultiplier}
+                  onChange={(e) => setEditMultiplier(e.target.value)}
+                  className="w-24"
+                />
+                <p className="text-xs text-muted-foreground">commission × this = rate</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="max_rate">Max Rate</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="max_rate"
+                    type="number"
+                    step="10"
+                    min="1"
+                    value={editMaxRate}
+                    onChange={(e) => setEditMaxRate(e.target.value)}
+                    className="w-24"
+                  />
+                  <span className="text-sm text-muted-foreground">NCTR/$1</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Cap for bad data</p>
+              </div>
+            </div>
+
+            {/* Formula and Examples */}
+            <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <div className="flex items-start gap-2 p-4 bg-muted/30 rounded-lg border border-border">
-                  <Info className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-foreground">About Your Margin</p>
-                    <p className="text-sm text-muted-foreground">
-                      Your margin varies by brand commission rate. Higher commission = higher margin for you.
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Users see the same NCTR/$1 rate for all brands (unless you set a custom override).
-                    </p>
-                  </div>
+                <p className="text-sm font-medium text-foreground">Formula:</p>
+                <div className="p-3 bg-muted/50 rounded-lg font-mono text-sm">
+                  User rate = MAX(floor, commission × multiplier), capped at max
+                </div>
+                <Button 
+                  onClick={saveRateSettings} 
+                  disabled={savingRate}
+                  className="w-full"
+                >
+                  {savingRate ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Save Settings
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-foreground">Examples with current settings:</p>
+                <div className="space-y-2 p-3 bg-muted/30 rounded-lg text-sm">
+                  {[0.02, 0.05, 0.10].map((comm) => {
+                    const floor = parseFloat(editFloorRate) || 0;
+                    const mult = parseFloat(editMultiplier) || 0;
+                    const max = parseFloat(editMaxRate) || 500;
+                    const calculated = comm * mult;
+                    const result = Math.min(Math.max(floor, calculated), max);
+                    return (
+                      <div key={comm} className="flex justify-between">
+                        <span className="text-muted-foreground">{(comm * 100).toFixed(0)}% commission →</span>
+                        <span className="font-medium">
+                          max({floor}, {calculated.toFixed(0)}) = <span className="text-primary">{result.toFixed(0)}</span> NCTR/$1
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -677,12 +766,12 @@ const AdminBrandRates = () => {
 
           <Card className="bg-card/80 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Default Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">Floor Rate</CardTitle>
               <TrendingUp className="h-4 w-4 text-accent" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-accent">
-                {rateSettings.default_nctr_per_dollar}
+                {rateSettings.floor_rate}
               </div>
             </CardContent>
           </Card>
@@ -785,7 +874,7 @@ const AdminBrandRates = () => {
                     <TableRow>
                       <TableHead className="w-[250px]">Brand</TableHead>
                       <TableHead className="text-muted-foreground">Commission %</TableHead>
-                      <TableHead className="text-muted-foreground">Default Rate</TableHead>
+                      <TableHead className="text-muted-foreground">Calculated</TableHead>
                       <TableHead>Custom</TableHead>
                       <TableHead className="text-primary">User Sees</TableHead>
                       <TableHead>Status</TableHead>
@@ -794,6 +883,7 @@ const AdminBrandRates = () => {
                   </TableHeader>
                   <TableBody>
                     {paginatedBrands.map((brand) => {
+                      const calculatedRate = getCalculatedRate(brand);
                       const finalRate = getFinalRate(brand);
                       
                       return (
@@ -814,7 +904,7 @@ const AdminBrandRates = () => {
                               : "—"}
                           </TableCell>
                           <TableCell className="text-muted-foreground">
-                            {rateSettings.default_nctr_per_dollar}
+                            {calculatedRate.toFixed(0)}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -845,7 +935,7 @@ const AdminBrandRates = () => {
                                   <button
                                     onClick={() => {
                                       setInlineEditId(brand.id);
-                                      setInlineEditValue(String(brand.nctr_per_dollar ?? rateSettings.default_nctr_per_dollar));
+                                      setInlineEditValue(String(brand.nctr_per_dollar ?? calculatedRate));
                                     }}
                                     className="text-sm text-muted-foreground hover:text-foreground hover:underline"
                                   >
@@ -982,21 +1072,40 @@ const AdminBrandRates = () => {
 
               {/* Rate Settings Section */}
               <div className="space-y-4 p-4 border rounded-lg border-border bg-muted/30">
-                <Label className="text-lg font-semibold">Rate Settings</Label>
+                <h4 className="font-medium text-foreground">Rate Settings</h4>
                 
-                {/* Use Default Rate Toggle */}
+                {/* Commission Rate (read-only) */}
+                <div className="flex justify-between items-center p-3 bg-background rounded border border-border">
+                  <span className="text-sm text-muted-foreground">Commission Rate:</span>
+                  <span className="font-medium text-muted-foreground">
+                    {editingBrand?.commission_rate != null
+                      ? `${(editingBrand.commission_rate * 100).toFixed(1)}%`
+                      : "—"}
+                  </span>
+                </div>
+
+                {/* Calculated Rate (read-only) */}
+                <div className="flex justify-between items-center p-3 bg-background rounded border border-border">
+                  <span className="text-sm text-muted-foreground">Calculated Rate:</span>
+                  <span className="font-medium text-muted-foreground">
+                    {editingBrand ? getCalculatedRate(editingBrand).toFixed(0) : 0} NCTR/$1
+                  </span>
+                </div>
+                
+                {/* Use Custom Rate Toggle */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Use Default Rate</Label>
-                    <p className="text-sm text-muted-foreground">Use the global default for this brand</p>
+                    <Label>Use Custom Rate</Label>
+                    <p className="text-sm text-muted-foreground">Override the calculated rate</p>
                   </div>
                   <Switch
-                    checked={!editForm.use_custom_rate}
+                    checked={editForm.use_custom_rate}
                     onCheckedChange={(checked) => {
+                      const calculatedRate = editingBrand ? getCalculatedRate(editingBrand) : 0;
                       setEditForm(prev => ({ 
                         ...prev, 
-                        use_custom_rate: !checked,
-                        nctr_per_dollar: !checked ? prev.nctr_per_dollar : rateSettings.default_nctr_per_dollar,
+                        use_custom_rate: checked,
+                        nctr_per_dollar: checked ? prev.nctr_per_dollar : calculatedRate,
                       }));
                     }}
                   />
@@ -1004,9 +1113,9 @@ const AdminBrandRates = () => {
 
                 {!editForm.use_custom_rate ? (
                   <div className="space-y-2 p-3 bg-background rounded border border-border">
-                    <p className="text-sm text-muted-foreground">This brand uses the default rate:</p>
+                    <p className="text-sm text-muted-foreground">This brand uses the calculated rate:</p>
                     <p className="text-lg font-semibold text-foreground">
-                      <span className="text-primary">{rateSettings.default_nctr_per_dollar}</span> NCTR/$1
+                      <span className="text-primary">{editingBrand ? getCalculatedRate(editingBrand).toFixed(0) : 0}</span> NCTR/$1
                     </p>
                   </div>
                 ) : (
