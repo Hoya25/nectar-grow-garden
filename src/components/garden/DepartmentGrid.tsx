@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useRef, useState } from "react";
 
 interface Department {
   id: string;
@@ -33,31 +33,62 @@ const DEPARTMENT_ICONS: Record<string, string> = {
 };
 
 export const DepartmentGrid = ({ departments }: DepartmentGridProps) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Intersection Observer for fade-in animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="mb-8">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold text-foreground">🏬 Shop by Department</h2>
-        <p className="text-sm text-muted-foreground">Browse by category</p>
+    <section 
+      ref={sectionRef}
+      className={`garden-theme mb-8 garden-fade-in ${isVisible ? 'visible' : ''}`}
+    >
+      <div className="garden-section-header">
+        <h2 className="text-xl font-bold garden-text">🏬 Shop by Department</h2>
+        <p className="text-sm garden-text-muted mt-1">Browse by category</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {departments.map((dept) => (
-          <Link key={dept.id} to={`/garden/category/${dept.slug}`}>
-            <Card className="hover:border-primary/50 hover:shadow-md transition-all cursor-pointer h-full">
-              <CardContent className="p-4 text-center">
-                <div className="text-3xl mb-2">
-                  {dept.icon || DEPARTMENT_ICONS[dept.slug] || '📦'}
-                </div>
-                <h3 className="font-medium text-foreground text-sm mb-1">
-                  {dept.name}
-                </h3>
-                {dept.brand_count !== undefined && (
-                  <p className="text-xs text-muted-foreground">
-                    {dept.brand_count.toLocaleString()} brands
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+        {departments.map((dept, index) => (
+          <Link 
+            key={dept.id} 
+            to={`/garden/category/${dept.slug}`}
+            style={{ 
+              animationDelay: `${index * 50}ms`,
+              opacity: isVisible ? 1 : 0,
+              transition: `opacity 0.3s ease ${index * 50}ms`
+            }}
+          >
+            <div className="garden-card rounded-xl p-4 text-center garden-card-hover h-full cursor-pointer">
+              <div className="text-3xl mb-2">
+                {dept.icon || DEPARTMENT_ICONS[dept.slug] || '📦'}
+              </div>
+              <h3 className="font-medium garden-text text-sm mb-1">
+                {dept.name}
+              </h3>
+              {dept.brand_count !== undefined && (
+                <p className="text-xs garden-text-muted">
+                  {dept.brand_count.toLocaleString()} brands
+                </p>
+              )}
+            </div>
           </Link>
         ))}
       </div>

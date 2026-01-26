@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MallBrandCard } from "./MallBrandCard";
@@ -41,6 +41,27 @@ export const BrandCarousel = ({
   onShop,
 }: BrandCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Intersection Observer for fade-in animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -53,56 +74,69 @@ export const BrandCarousel = ({
   };
 
   return (
-    <section className="mb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-bold text-foreground">{title}</h2>
-          {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {brands.length > 4 && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hidden md:flex"
-                onClick={() => scroll("left")}
+    <section 
+      ref={sectionRef}
+      className={`garden-theme mb-8 garden-fade-in ${isVisible ? 'visible' : ''}`}
+    >
+      {/* Header with bottom border */}
+      {title && (
+        <div className="garden-section-header flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold garden-text">{title}</h2>
+            {subtitle && (
+              <p className="text-sm garden-text-muted mt-1">{subtitle}</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {brands.length > 4 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 hidden md:flex garden-text-muted hover:garden-accent btn-press"
+                  onClick={() => scroll("left")}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 hidden md:flex garden-text-muted hover:garden-accent btn-press"
+                  onClick={() => scroll("right")}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+            {seeAllLink && brands.length > 0 && (
+              <Link
+                to={seeAllLink}
+                className="text-sm font-medium garden-accent hover:opacity-80 transition-opacity"
               >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hidden md:flex"
-                onClick={() => scroll("right")}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-          {seeAllLink && brands.length > 0 && (
-            <Link
-              to={seeAllLink}
-              className="text-sm text-primary hover:underline"
-            >
-              See All →
-            </Link>
-          )}
+                See All →
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Carousel */}
+      {/* Carousel with smooth scrolling */}
       {brands.length > 0 ? (
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+          className="garden-carousel flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {brands.map((brand) => (
-            <div key={brand.id} className="snap-start">
+          {brands.map((brand, index) => (
+            <div 
+              key={brand.id} 
+              className="snap-start"
+              style={{ 
+                animationDelay: `${index * 50}ms`,
+                opacity: isVisible ? 1 : 0,
+                transition: `opacity 0.3s ease ${index * 50}ms`
+              }}
+            >
               <MallBrandCard
                 {...brand}
                 onShop={onShop}
@@ -111,8 +145,8 @@ export const BrandCarousel = ({
           ))}
         </div>
       ) : (
-        <div className="bg-muted/30 border border-dashed border-border rounded-lg p-8 text-center">
-          <p className="text-muted-foreground">{emptyMessage}</p>
+        <div className="garden-card rounded-lg p-8 text-center border-dashed border-2" style={{ borderColor: 'hsl(var(--garden-border))' }}>
+          <p className="garden-text-muted">{emptyMessage}</p>
         </div>
       )}
     </section>

@@ -156,6 +156,18 @@ All colors MUST be HSL to avoid yellow bug issues.
   }
 }
 
+  /* Garden Mall Theme - Dark Forest */
+  .garden-theme {
+    --garden-bg: 120 20% 4%;                    /* #0A0F0A - deep forest black-green */
+    --garden-card: 120 14% 9%;                  /* #141A14 - dark card backgrounds */
+    --garden-accent: 75 100% 50%;               /* #BFFF00 - lime green primary */
+    --garden-accent-secondary: 168 76% 50%;     /* #2DD4BF - teal secondary */
+    --garden-text: 120 47% 96%;                 /* #F0FDF4 - soft white-green */
+    --garden-text-muted: 120 8% 45%;            /* #6B7C6B - sage gray */
+    --garden-border: 120 20% 12%;               /* #1A2A1A - subtle border */
+    --garden-glow: 75 100% 50% / 0.5;           /* Lime glow for shadows */
+  }
+
 @layer components {
   /* Button safety net - ensure no buttons are black */
   .btn-ensure-visible {
@@ -221,6 +233,95 @@ All colors MUST be HSL to avoid yellow bug issues.
   
   .neon-glow {
     box-shadow: var(--shadow-neon);
+  }
+
+  /* Garden Mall Specific Styles */
+  .garden-bg {
+    background-color: hsl(var(--garden-bg));
+  }
+
+  .garden-card {
+    background-color: hsl(var(--garden-card));
+    border: 1px solid hsl(var(--garden-border));
+  }
+
+  .garden-card-hover {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .garden-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px hsl(var(--garden-glow));
+    border-color: hsl(var(--garden-accent) / 0.5);
+  }
+
+  .garden-text {
+    color: hsl(var(--garden-text));
+  }
+
+  .garden-text-muted {
+    color: hsl(var(--garden-text-muted));
+  }
+
+  .garden-accent {
+    color: hsl(var(--garden-accent));
+  }
+
+  .garden-accent-secondary {
+    color: hsl(var(--garden-accent-secondary));
+  }
+
+  /* NCTR Rate Styling with Glow */
+  .nctr-rate {
+    color: hsl(var(--garden-accent));
+    font-weight: 700;
+    text-shadow: 0 0 10px hsl(var(--garden-glow));
+  }
+
+  /* Button press effect */
+  .btn-press:active {
+    transform: scale(0.98);
+  }
+
+  /* Section header border */
+  .garden-section-header {
+    border-bottom: 1px solid hsl(var(--garden-border));
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+
+  /* Scroll fade animation */
+  .garden-fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+
+  .garden-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Carousel smooth scrolling */
+  .garden-carousel {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile bottom nav */
+  .garden-bottom-nav {
+    background-color: hsl(var(--garden-bg));
+    border-top: 1px solid hsl(var(--garden-border));
+  }
+
+  .garden-nav-item {
+    color: hsl(var(--garden-text-muted));
+    transition: color 0.2s ease;
+  }
+
+  .garden-nav-item.active,
+  .garden-nav-item:hover {
+    color: hsl(var(--garden-accent));
   }
 }
 
