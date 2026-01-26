@@ -7,6 +7,12 @@ import { Trophy, TrendingUp, ChevronRight, Sparkles, Crown, Zap } from 'lucide-r
 import { MemberStatusShowcase } from '@/components/MemberStatusShowcase';
 import { LevelUpModal } from '@/components/LevelUpModal';
 import nctrLogo from "@/assets/nctr-logo.png";
+import { 
+  CRESCENDO_TIER_THRESHOLDS, 
+  getTierDisplay, 
+  getNextTierInfo,
+  getOrderedTierLevels 
+} from '@/lib/crescendo-tiers';
 
 interface MemberStatusBannerProps {
   currentStatus: string;
@@ -26,17 +32,9 @@ const statusColors = {
 };
 
 const getNextStatusInfo = (currentStatus: string): { status: string; required: number } => {
-  const statusLevels = [
-    { status: 'bronze', required: 1000 },
-    { status: 'silver', required: 2500 },
-    { status: 'gold', required: 5000 },
-    { status: 'platinum', required: 10000 },
-    { status: 'diamond', required: 25000 }
-  ];
-  
-  const currentIndex = statusLevels.findIndex(level => level.status === currentStatus);
-  const nextLevel = statusLevels[currentIndex + 1];
-  return nextLevel || { status: 'diamond', required: 25000 };
+  const nextTier = getNextTierInfo(currentStatus);
+  if (nextTier) return nextTier;
+  return { status: 'diamond', required: CRESCENDO_TIER_THRESHOLDS.diamond };
 };
 
 const getMultiplier = (status: string): string => {

@@ -143,7 +143,7 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
             {open && (
               <div className="p-3 space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Sync your portfolio with token.nctr.live to update your Wings status and balance
+                  Sync your portfolio with token.nctr.live to update your Crescendo Status and balance
                 </p>
                 <NCTRLiveSync onSyncComplete={() => window.location.reload()} />
               </div>

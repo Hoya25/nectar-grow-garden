@@ -8,6 +8,7 @@ import { Trophy, Star, Crown, Diamond, Award, Zap, TrendingUp, Gift } from 'luci
 import { BuyNCTRButton, BuyNCTRUpgrade } from '@/components/BuyNCTRButton';
 import { LevelUpModal } from '@/components/LevelUpModal';
 import nctrLogo from "@/assets/nctr-logo.png";
+import { getTierDisplay, getTierEmoji } from '@/lib/crescendo-tiers';
 
 interface StatusLevel {
   status_name: string;
@@ -147,7 +148,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
               </div>
               <div>
                 <h3 className={`text-xl font-bold ${currentColors.text}`}>
-                  {currentStatus?.toUpperCase()} MEMBER
+                  {getTierDisplay(currentStatus)} Status
                 </h3>
                 <p className={`text-sm ${currentColors.text}/70`}>
                   {currentStatusData?.description}
@@ -209,7 +210,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <span className="text-lg">Next: {nextStatusData.status_name?.toUpperCase()} Member</span>
+                <span className="text-lg">Next: {getTierDisplay(nextStatusData.status_name)} Status</span>
               </div>
               <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                 {nextStatusData.reward_multiplier}x Multiplier
@@ -219,7 +220,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
           <CardContent className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span>Progress to {nextStatusData.status_name?.toUpperCase()}</span>
+                <span>Progress to {getTierDisplay(nextStatusData.status_name)}</span>
                 <span className="font-semibold">
                   {formatNCTR(current360NCTR)} / {formatNCTR(nextStatusData.min_locked_nctr)} NCTR
                 </span>
@@ -231,7 +232,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
             </div>
             
             <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-4 border border-primary/20">
-              <h4 className="font-semibold text-primary mb-2">Unlock with {nextStatusData.status_name?.toUpperCase()}:</h4>
+              <h4 className="font-semibold text-primary mb-2">Unlock with {getTierDisplay(nextStatusData.status_name)}:</h4>
               <div className="grid md:grid-cols-2 gap-2 text-sm mb-3">
                 {nextStatusData.benefits?.slice(0, 4).map((benefit, index) => (
                   <div key={index} className="flex items-center space-x-2">
@@ -256,7 +257,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
                 >
                   <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                     <TrendingUp className="w-4 h-4 mr-2" />
-                    Level Up to {nextStatusData.status_name?.toUpperCase()}
+                    Level Up to {getTierDisplay(nextStatusData.status_name)}
                   </Button>
                 </LevelUpModal>
               </div>
@@ -328,7 +329,7 @@ export const MemberStatusShowcase: React.FC<MemberStatusShowcaseProps> = ({
                                 <h4 className={`font-bold text-lg ${
                                   isCurrent ? levelColors.text : isNext ? 'text-primary' : isUnlocked ? 'text-green-800' : 'text-gray-600'
                                 }`}>
-                                  {level.status_name?.toUpperCase()}
+                                  {getTierDisplay(level.status_name)}
                                 </h4>
                                 {isCurrent && (
                                   <Badge variant="secondary" className="bg-primary text-primary-foreground text-xs animate-pulse">

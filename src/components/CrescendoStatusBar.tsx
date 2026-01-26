@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, Crown, Award, Star, Gem, Diamond } from 'lucide-react';
 import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
+import { getTierDisplay, getTierEmoji } from '@/lib/crescendo-tiers';
 
 interface StatusLevel {
   status_name: string;
@@ -107,7 +108,7 @@ export const CrescendoStatusBar: React.FC<CrescendoStatusBarProps> = ({
             <div className="flex items-center space-x-2">
               <StatusIcon className="w-5 h-5 text-white" />
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30 font-bold uppercase tracking-wide text-xs">
-                {currentStatus} Crescendo
+                {getTierDisplay(currentStatus)} Status
               </Badge>
             </div>
             <div className="flex items-center space-x-1">
@@ -139,7 +140,7 @@ export const CrescendoStatusBar: React.FC<CrescendoStatusBarProps> = ({
             <div className="flex items-center space-x-2">
               <StatusIcon className="w-6 h-6 text-white" />
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30 font-bold uppercase tracking-wide">
-                {currentStatus} Crescendo
+                {getTierDisplay(currentStatus)} Status
               </Badge>
             </div>
             <div className="flex items-center space-x-1">
@@ -166,7 +167,7 @@ export const CrescendoStatusBar: React.FC<CrescendoStatusBarProps> = ({
         {/* Progress Section */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-white/80">Progress to {nextLevel ? `${nextLevel.status_name.toUpperCase()} Crescendo` : 'MAX LEVEL'}</span>
+            <span className="text-white/80">Progress to {nextLevel ? `${getTierDisplay(nextLevel.status_name)} Status` : 'MAX LEVEL'}</span>
             <span className="text-white font-medium">{Math.round(progressPercentage)}%</span>
           </div>
           

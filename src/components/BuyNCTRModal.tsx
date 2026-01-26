@@ -326,7 +326,7 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             Level Up, Buy NCTR
           </DialogTitle>
           <DialogDescription>
-            Purchase NCTR tokens that automatically lock in 360LOCK for maximum Wings status benefits
+            Purchase NCTR tokens that automatically lock in 360LOCK for maximum Crescendo Status benefits
           </DialogDescription>
         </DialogHeader>
 
@@ -472,14 +472,14 @@ export const BuyNCTRModal: React.FC<BuyNCTRModalProps> = ({
             </div>
           </div>
 
-          {/* Wings Status Impact */}
+          {/* Crescendo Status Impact */}
           {nextStatus && (
             <>
               <Separator />
               <div className="space-y-3">
                 <h4 className="font-semibold flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" />
-                  Wings Status Impact
+                  Crescendo Status Impact
                 </h4>
 
                 <div className="space-y-2">
