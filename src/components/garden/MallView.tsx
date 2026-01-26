@@ -192,7 +192,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
     fetchAllData();
   }, [fetchBrandsByTag]);
 
-  // Handle shop action - redirect to Loyalize
+  // Handle shop action - redirect to Loyalize with brand website
   const handleShop = useCallback(async (brandId: string, loyalizeId: string) => {
     if (!loyalizeId) {
       toast({
@@ -203,19 +203,36 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
     }
 
     try {
-      // Build affiliate URL
+      // Fetch brand's website_url
+      const { data: brandData, error } = await supabase
+        .from("brands")
+        .select("website_url, name")
+        .eq("id", brandId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching brand:", error);
+      }
+
+      // Build affiliate URL with website redirect
       const baseUrl = "https://www.loyalize.com/tracking/redirect";
       const params = new URLSearchParams({
         merchant_id: loyalizeId,
         ...(userId && { sub_id: userId }),
+        ...(brandData?.website_url && { url: brandData.website_url }),
       });
 
       window.open(`${baseUrl}?${params.toString()}`, "_blank");
+
+      toast({
+        title: `✓ Shopping at ${brandData?.name || 'brand'}`,
+        description: "Your earnings are being tracked",
+      });
     } catch (error) {
       console.error("Error opening shop link:", error);
       toast({
         title: "Error",
-        description: "Failed to open shopping link",
+        description: "Failed to open shopping link. Please try again.",
         variant: "destructive",
       });
     }
