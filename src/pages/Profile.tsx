@@ -461,7 +461,7 @@ const Profile = () => {
           </Card>
         </div>
 
-        {/* Wings Status Bar - Prominent Position */}
+        {/* Crescendo Status Bar - Prominent Position */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="flex-1">
