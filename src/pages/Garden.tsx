@@ -474,19 +474,33 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
   const fetchUserData = useCallback(async () => {
     try {
-      // Fetch portfolio
+      // Fetch portfolio from nctr_portfolio (for total_earned, opportunity_status, alliance_tokens)
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('nctr_portfolio')
         .select('available_nctr, pending_nctr, total_earned, opportunity_status, lock_90_nctr, lock_360_nctr, alliance_tokens')
         .eq('user_id', user?.id)
         .single();
 
+      // Also fetch from unified_profiles for available_nctr and pending_nctr
+      const { data: unifiedProfile } = await supabase
+        .from('unified_profiles')
+        .select('available_nctr, pending_nctr')
+        .eq('auth_user_id', user?.id)
+        .single();
+
       if (portfolioError && portfolioError.code !== 'PGRST116') {
         console.error('Portfolio error:', portfolioError);
       } else {
-        console.log('📊 Portfolio Data:', portfolioData);
+        // Merge data: prefer unified_profiles for available/pending, use nctr_portfolio for the rest
+        const mergedPortfolio = {
+          ...portfolioData,
+          available_nctr: unifiedProfile?.available_nctr ?? portfolioData?.available_nctr ?? 0,
+          pending_nctr: unifiedProfile?.pending_nctr ?? portfolioData?.pending_nctr ?? 0,
+        };
+        
+        console.log('📊 Portfolio Data:', mergedPortfolio);
         console.log('💎 Alliance Tokens:', portfolioData?.alliance_tokens);
-        setPortfolio(portfolioData);
+        setPortfolio(mergedPortfolio);
         
         // Fetch user's reward multiplier based on their status
         if (portfolioData?.opportunity_status) {
@@ -513,7 +527,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         setHasWallet(!!profileData.wallet_address);
       }
 
-      // Fetch lock commitments
+      // Fetch lock commitments from nctr_locks table
       const { data: locksData, error: locksError } = await supabase
         .from('nctr_locks')
         .select('*, lock_category, commitment_days')
@@ -525,6 +539,21 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         console.error('Locks error:', locksError);
       } else {
         setLocks(locksData || []);
+        
+        // Calculate 90LOCK and 360LOCK totals from nctr_locks table
+        const locked90 = (locksData || [])
+          .filter((l: any) => l.lock_type === '90LOCK')
+          .reduce((sum: number, l: any) => sum + Number(l.nctr_amount || 0), 0);
+        const locked360 = (locksData || [])
+          .filter((l: any) => l.lock_type === '360LOCK')
+          .reduce((sum: number, l: any) => sum + Number(l.nctr_amount || 0), 0);
+        
+        // Update portfolio with calculated lock amounts from nctr_locks
+        setPortfolio(prev => prev ? {
+          ...prev,
+          lock_90_nctr: locked90,
+          lock_360_nctr: locked360
+        } : null);
       }
 
       // Fetch completed opportunities - include both 'completed' and 'pending_verification' (for free trials)
