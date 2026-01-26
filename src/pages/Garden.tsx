@@ -12,7 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import { Lock360InfoTooltip, Lock90InfoTooltip } from '@/components/ui/info-tooltip';
-import { Coins, TrendingUp, Gift, Users, Power, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet, RefreshCw, BookOpen } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Coins, TrendingUp, Gift, Users, Power, ExternalLink, Copy, User, Play, Settings, Mail, MessageCircle, Share2, Check, Link, UserCheck, Wallet, RefreshCw, BookOpen, ShoppingBag, LayoutDashboard } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { AllianceTokenWalletPrompt } from '@/components/AllianceTokenWalletPrompt';
 import LockCommitmentModal from '@/components/LockCommitmentModal';
@@ -29,6 +30,7 @@ import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { GardenHeroSection } from '@/components/GardenHeroSection';
+import { MallView } from '@/components/garden/MallView';
 
 import { PortfolioStory } from '@/components/PortfolioStory';
 import { BaseBadge } from '@/components/BaseBadge';
@@ -138,7 +140,7 @@ const Garden = () => {
   const [thisMonthEarned, setThisMonthEarned] = useState(0);
   const [brandsShoppedCount, setBrandsShoppedCount] = useState(0);
   const [totalBrandsCount, setTotalBrandsCount] = useState(6823);
-
+  const [activeTab, setActiveTab] = useState<'shop' | 'dashboard'>('shop');
 
   useEffect(() => {
     if (!user) {
@@ -1491,9 +1493,41 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         </div>
       </header>
 
+      {/* Tab Navigation */}
+      <div className="sticky top-[73px] z-40 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex gap-1 py-2">
+            <Button
+              variant={activeTab === 'shop' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('shop')}
+              className="gap-2"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              Shop & Earn
+            </Button>
+            <Button
+              variant={activeTab === 'dashboard' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('dashboard')}
+              className="gap-2"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
+      {activeTab === 'shop' ? (
+        <MallView 
+          userId={user?.id} 
+          availableNctr={portfolio?.available_nctr || 0} 
+        />
+      ) : (
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
-        {/* NEW HERO SECTION - Above the fold */}
+        {/* HERO SECTION - Above the fold */}
         <GardenHeroSection
           userName={user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Member'}
           portfolio={portfolio}
@@ -1501,7 +1535,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           totalBrands={totalBrandsCount}
           thisMonthEarned={thisMonthEarned}
           brandsShoppedCount={brandsShoppedCount}
-          onShopClick={handleShopAndEarn}
+          onShopClick={() => setActiveTab('shop')}
           onBrandClick={handleFeaturedBrandClick}
         />
 
@@ -2345,6 +2379,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         </div>
 
       </main>
+      )}
 
       {/* Invite Friends Modal */}
       <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
