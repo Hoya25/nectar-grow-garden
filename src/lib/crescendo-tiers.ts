@@ -1,6 +1,7 @@
 // Crescendo Status tier thresholds (NCTR in 360LOCK)
+// These should match the values in opportunity_status_levels table
 export const CRESCENDO_TIER_THRESHOLDS = {
-  bronze: 0,       // Bronze: 0 NCTR (starter tier)
+  bronze: 0,       // Bronze: 0 NCTR (entry tier)
   silver: 1000,    // Silver: 1,000 NCTR
   gold: 2500,      // Gold: 2,500 NCTR
   platinum: 10000, // Platinum: 10,000 NCTR
