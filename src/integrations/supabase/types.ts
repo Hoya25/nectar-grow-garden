@@ -259,6 +259,33 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           category: string | null
@@ -280,6 +307,7 @@ export type Database = {
           promotion_label: string | null
           promotion_multiplier: number | null
           updated_at: string
+          use_custom_rate: boolean | null
           website_url: string | null
         }
         Insert: {
@@ -302,6 +330,7 @@ export type Database = {
           promotion_label?: string | null
           promotion_multiplier?: number | null
           updated_at?: string
+          use_custom_rate?: boolean | null
           website_url?: string | null
         }
         Update: {
@@ -324,6 +353,7 @@ export type Database = {
           promotion_label?: string | null
           promotion_multiplier?: number | null
           updated_at?: string
+          use_custom_rate?: boolean | null
           website_url?: string | null
         }
         Relationships: []
