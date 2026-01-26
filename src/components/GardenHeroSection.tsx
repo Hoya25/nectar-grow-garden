@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BrandLogo } from '@/components/ui/brand-logo';
-import { ShoppingBag, TrendingUp, Store, ExternalLink, Coins } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Store, ExternalLink, Coins, Lock, Clock, Wallet } from 'lucide-react';
+import { Lock360InfoTooltip, Lock90InfoTooltip, InfoTooltip } from '@/components/ui/info-tooltip';
+import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 
 interface Portfolio {
@@ -59,12 +61,24 @@ export const GardenHeroSection = ({
   onBrandClick,
 }: GardenHeroSectionProps) => {
   const navigate = useNavigate();
+  const { currentPrice, formatPrice, calculatePortfolioValue } = useNCTRPrice();
   
   const totalNCTR = (portfolio?.available_nctr || 0) + 
                     (portfolio?.lock_90_nctr || 0) + 
                     (portfolio?.lock_360_nctr || 0);
   
+  const totalUSD = calculatePortfolioValue(totalNCTR);
   const firstName = userName?.split(' ')[0] || 'Member';
+
+  const formatUSD = (nctrAmount: number) => {
+    const usdValue = calculatePortfolioValue(nctrAmount);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(usdValue);
+  };
 
   return (
     <div className="mb-8">
@@ -83,30 +97,80 @@ export const GardenHeroSection = ({
             <img src={nctrNLogo} alt="NCTR" className="h-12 w-12" />
             <div>
               <p className="text-3xl md:text-4xl font-bold text-primary">
-                {formatNCTR(totalNCTR)}
+                {formatNCTR(totalNCTR)} <span className="text-lg font-normal text-muted-foreground">NCTR</span>
               </p>
-              <p className="text-sm text-muted-foreground">Total NCTR Balance</p>
+              <p className="text-sm text-muted-foreground">
+                ≈ {formatUSD(totalNCTR)} @ ${formatPrice(currentPrice)}
+              </p>
             </div>
           </div>
         </div>
         
-        {/* Balance Breakdown */}
-        <div className="flex flex-wrap gap-4 text-sm mb-6">
-          <div className="flex items-center gap-2 bg-background/60 rounded-lg px-3 py-2">
-            <div className="w-2 h-2 rounded-full bg-accent"></div>
-            <span className="text-muted-foreground">Pending:</span>
-            <span className="font-semibold">{formatNCTR(portfolio?.pending_nctr || 0)} NCTR</span>
-          </div>
-          <div className="flex items-center gap-2 bg-background/60 rounded-lg px-3 py-2">
-            <div className="w-2 h-2 rounded-full bg-primary"></div>
-            <span className="text-muted-foreground">Available:</span>
-            <span className="font-semibold">{formatNCTR(portfolio?.available_nctr || 0)} NCTR</span>
-          </div>
-          <div className="flex items-center gap-2 bg-background/60 rounded-lg px-3 py-2">
-            <div className="w-2 h-2 rounded-full bg-secondary"></div>
-            <span className="text-muted-foreground">Locked:</span>
-            <span className="font-semibold">{formatNCTR((portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))} NCTR</span>
-          </div>
+        {/* Portfolio Breakdown Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {/* Available */}
+          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-medium text-emerald-700">Available</span>
+                <InfoTooltip content="Ready to spend on Crescendo rewards" size={12} />
+              </div>
+              <p className="text-lg md:text-xl font-bold text-emerald-600">
+                {formatNCTR(portfolio?.available_nctr || 0)}
+              </p>
+              <p className="text-xs text-emerald-600/70">{formatUSD(portfolio?.available_nctr || 0)}</p>
+              <p className="text-[10px] text-emerald-600/60 mt-1">Spendable</p>
+            </CardContent>
+          </Card>
+
+          {/* 90LOCK */}
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-medium text-blue-700">90LOCK</span>
+                <Lock90InfoTooltip size={12} />
+              </div>
+              <p className="text-lg md:text-xl font-bold text-blue-600">
+                {formatNCTR(portfolio?.lock_90_nctr || 0)}
+              </p>
+              <p className="text-xs text-blue-600/70">{formatUSD(portfolio?.lock_90_nctr || 0)}</p>
+              <p className="text-[10px] text-blue-600/60 mt-1">Committed</p>
+            </CardContent>
+          </Card>
+
+          {/* 360LOCK */}
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Lock className="w-4 h-4 text-purple-600" />
+                <span className="text-xs font-medium text-purple-700">360LOCK</span>
+                <Lock360InfoTooltip size={12} />
+              </div>
+              <p className="text-lg md:text-xl font-bold text-purple-600">
+                {formatNCTR(portfolio?.lock_360_nctr || 0)}
+              </p>
+              <p className="text-xs text-purple-600/70">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
+              <p className="text-[10px] text-purple-600/60 mt-1">Committed</p>
+            </CardContent>
+          </Card>
+
+          {/* Pending */}
+          <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-gray-500" />
+                <span className="text-xs font-medium text-gray-600">Pending</span>
+                <InfoTooltip content="From recent purchases, clears in 24-48 hours" size={12} />
+              </div>
+              <p className="text-lg md:text-xl font-bold text-gray-600">
+                {formatNCTR(portfolio?.pending_nctr || 0)}
+              </p>
+              <p className="text-xs text-gray-500">{formatUSD(portfolio?.pending_nctr || 0)}</p>
+              <p className="text-[10px] text-gray-500 mt-1">Processing</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Primary CTA */}
