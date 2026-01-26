@@ -268,10 +268,17 @@ export type Database = {
           featured: boolean
           id: string
           is_active: boolean
+          is_promoted: boolean | null
           logo_url: string | null
+          loyalize_commission_rate: number | null
           loyalize_id: string | null
           name: string
           nctr_per_dollar: number | null
+          nctr_rate_override: boolean | null
+          nctr_rate_updated_at: string | null
+          promotion_ends_at: string | null
+          promotion_label: string | null
+          promotion_multiplier: number | null
           updated_at: string
           website_url: string | null
         }
@@ -283,10 +290,17 @@ export type Database = {
           featured?: boolean
           id?: string
           is_active?: boolean
+          is_promoted?: boolean | null
           logo_url?: string | null
+          loyalize_commission_rate?: number | null
           loyalize_id?: string | null
           name: string
           nctr_per_dollar?: number | null
+          nctr_rate_override?: boolean | null
+          nctr_rate_updated_at?: string | null
+          promotion_ends_at?: string | null
+          promotion_label?: string | null
+          promotion_multiplier?: number | null
           updated_at?: string
           website_url?: string | null
         }
@@ -298,10 +312,17 @@ export type Database = {
           featured?: boolean
           id?: string
           is_active?: boolean
+          is_promoted?: boolean | null
           logo_url?: string | null
+          loyalize_commission_rate?: number | null
           loyalize_id?: string | null
           name?: string
           nctr_per_dollar?: number | null
+          nctr_rate_override?: boolean | null
+          nctr_rate_updated_at?: string | null
+          promotion_ends_at?: string | null
+          promotion_label?: string | null
+          promotion_multiplier?: number | null
           updated_at?: string
           website_url?: string | null
         }
@@ -780,6 +801,20 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "earning_opportunities_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "earning_opportunities_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
             referencedColumns: ["id"]
           },
           {
@@ -1382,6 +1417,20 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_campaigns_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_campaigns_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
             referencedColumns: ["id"]
           },
           {
@@ -2000,6 +2049,20 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
             referencedColumns: ["id"]
           },
           {
@@ -2784,6 +2847,132 @@ export type Database = {
       }
     }
     Views: {
+      brands_admin: {
+        Row: {
+          category: string | null
+          commission_pct: number | null
+          commission_rate: number | null
+          created_at: string | null
+          description: string | null
+          featured: boolean | null
+          id: string | null
+          is_active: boolean | null
+          is_promoted: boolean | null
+          logo_url: string | null
+          loyalize_commission_rate: number | null
+          loyalize_id: string | null
+          name: string | null
+          nctr_per_dollar: number | null
+          nctr_rate_override: boolean | null
+          nctr_rate_updated_at: string | null
+          promotion_ends_at: string | null
+          promotion_label: string | null
+          promotion_multiplier: number | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          commission_pct?: never
+          commission_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string | null
+          is_active?: boolean | null
+          is_promoted?: boolean | null
+          logo_url?: string | null
+          loyalize_commission_rate?: number | null
+          loyalize_id?: string | null
+          name?: string | null
+          nctr_per_dollar?: number | null
+          nctr_rate_override?: boolean | null
+          nctr_rate_updated_at?: string | null
+          promotion_ends_at?: string | null
+          promotion_label?: string | null
+          promotion_multiplier?: number | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          commission_pct?: never
+          commission_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string | null
+          is_active?: boolean | null
+          is_promoted?: boolean | null
+          logo_url?: string | null
+          loyalize_commission_rate?: number | null
+          loyalize_id?: string | null
+          name?: string | null
+          nctr_per_dollar?: number | null
+          nctr_rate_override?: boolean | null
+          nctr_rate_updated_at?: string | null
+          promotion_ends_at?: string | null
+          promotion_label?: string | null
+          promotion_multiplier?: number | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      brands_public: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          featured: boolean | null
+          id: string | null
+          is_active: boolean | null
+          is_currently_boosted: boolean | null
+          is_promoted: boolean | null
+          logo_url: string | null
+          loyalize_id: string | null
+          name: string | null
+          nctr_per_dollar: number | null
+          promotion_label: string | null
+          promotion_multiplier: number | null
+          website_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string | null
+          is_active?: boolean | null
+          is_currently_boosted?: never
+          is_promoted?: boolean | null
+          logo_url?: string | null
+          loyalize_id?: string | null
+          name?: string | null
+          nctr_per_dollar?: never
+          promotion_label?: string | null
+          promotion_multiplier?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string | null
+          is_active?: boolean | null
+          is_currently_boosted?: never
+          is_promoted?: boolean | null
+          logo_url?: string | null
+          loyalize_id?: string | null
+          name?: string | null
+          nctr_per_dollar?: never
+          promotion_label?: string | null
+          promotion_multiplier?: number | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       public_brands: {
         Row: {
           category: string | null
