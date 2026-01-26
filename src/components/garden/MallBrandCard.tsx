@@ -119,11 +119,11 @@ export const MallBrandCard = ({
         <div className="text-center mb-3">
           {is_promoted && promotion_multiplier && promotion_multiplier > 1 && (
             <span className="text-xs text-gray-400 line-through mr-1">
-              {baseRate.toFixed(0)}
+              {baseRate % 1 === 0 ? baseRate.toFixed(0) : baseRate.toFixed(1)}
             </span>
           )}
           <span className="text-green-600 font-bold text-lg">
-            {finalRate.toFixed(0)} NCTR
+            {finalRate % 1 === 0 ? finalRate.toFixed(0) : finalRate.toFixed(1)} NCTR
           </span>
           <span className="text-green-600 font-semibold text-sm opacity-80">/$1</span>
         </div>
