@@ -86,7 +86,7 @@ export const MemberStatusBanner: React.FC<MemberStatusBannerProps> = ({
                 <div>
                   <div className="flex items-center space-x-2">
                     <h3 className={`font-bold text-sm ${colors.text}`}>
-                      {currentStatus?.toUpperCase()} MEMBER
+                      {getTierDisplay(currentStatus)} Status
                     </h3>
                     <Badge variant="secondary" className={`text-xs ${colors.text} bg-white/30`}>
                       {multiplier} Earnings

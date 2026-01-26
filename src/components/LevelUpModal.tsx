@@ -16,6 +16,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Lock360InfoTooltip } from '@/components/ui/info-tooltip';
+import { getTierDisplay, getTierEmoji } from '@/lib/crescendo-tiers';
 
 interface LevelUpModalProps {
   currentStatus: string;
@@ -105,7 +106,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
               <CardContent className="pt-0">
                 <div className="text-center">
                   <h3 className="font-bold text-lg text-gray-700 mb-1">
-                    {currentStatus?.toUpperCase()}
+                    {getTierDisplay(currentStatus)} Status
                   </h3>
                   <div className="flex items-center justify-center space-x-2 mb-2">
                     <span className="text-sm text-gray-600">{formatNCTR(current360NCTR)}</span>
@@ -129,7 +130,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
               <CardContent className="pt-0">
                 <div className="text-center">
                   <h3 className={`font-bold text-lg ${nextColors?.text} mb-1`}>
-                    {nextStatusInfo.status?.toUpperCase()}
+                    {getTierDisplay(nextStatusInfo.status)} Status
                   </h3>
                   <div className="flex items-center justify-center space-x-2 mb-2">
                     <span className={`text-sm ${nextColors?.text}`}>
@@ -152,7 +153,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
           <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Progress to {nextStatusInfo.status?.toUpperCase()}</span>
+                <span className="text-sm font-medium">Progress to {getTierDisplay(nextStatusInfo.status)}</span>
                 <span className="text-sm font-semibold">
                   {formatNCTR(current360NCTR)} / {formatNCTR(nextStatusInfo.required)}
                 </span>
@@ -193,8 +194,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <Trophy className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-amber-800">BRONZE ALLIANCE</h4>
-                          <p className="text-sm text-amber-700">1.1x Earning Amplification • 10% Boost • 1,000 NCTR in 360LOCK</p>
+                          <h4 className="font-semibold text-amber-800">🥉 BRONZE STATUS</h4>
+                          <p className="text-sm text-amber-700">1.1x Earnings • 10% Boost • 1,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <Button
@@ -223,8 +224,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <Trophy className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-slate-700">SILVER ALLIANCE</h4>
-                          <p className="text-sm text-slate-600">1.25x Earning Amplification • 25% Boost • 2,500 NCTR in 360LOCK</p>
+                          <h4 className="font-semibold text-slate-700">🥈 SILVER STATUS</h4>
+                          <p className="text-sm text-slate-600">1.25x Earnings • 25% Boost • 2,500 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <Button
@@ -253,8 +254,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <Trophy className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-yellow-800">GOLD ALLIANCE</h4>
-                          <p className="text-sm text-yellow-700">1.4x Earning Amplification • 40% Boost • 5,000 NCTR in 360LOCK</p>
+                          <h4 className="font-semibold text-yellow-800">🥇 GOLD STATUS</h4>
+                          <p className="text-sm text-yellow-700">1.4x Earnings • 40% Boost • 5,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <Button
@@ -283,8 +284,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <Trophy className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-slate-700">PLATINUM ALLIANCE</h4>
-                          <p className="text-sm text-slate-600">1.5x Earning Amplification • 50% Boost • 10,000 NCTR in 360LOCK</p>
+                          <h4 className="font-semibold text-slate-700">💎 PLATINUM STATUS</h4>
+                          <p className="text-sm text-slate-600">1.5x Earnings • 50% Boost • 10,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <Button
@@ -304,7 +305,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
               )}
 
               {/* Diamond Level */}
-              {current360NCTR < 25000 && (
+              {current360NCTR < 50000 && (
                 <Card className="border border-blue-200 bg-gradient-to-r from-blue-50/50 to-blue-100/50">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
@@ -313,8 +314,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                           <Trophy className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-blue-800">DIAMOND ALLIANCE</h4>
-                          <p className="text-sm text-blue-700">2.0x Earning Amplification • 100% Boost • 25,000 NCTR in 360LOCK</p>
+                          <h4 className="font-semibold text-blue-800">💠 DIAMOND STATUS</h4>
+                          <p className="text-sm text-blue-700">2.0x Earnings • 100% Boost • 50,000 NCTR in 360LOCK</p>
                         </div>
                       </div>
                       <Button
@@ -326,7 +327,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
                         }}
                       >
                         <Gift className="w-4 h-4 mr-1" />
-                        Earn {Math.max(1, 25000 - current360NCTR).toLocaleString('en-US', { maximumFractionDigits: 0 })} NCTR
+                        Earn {Math.max(1, 50000 - current360NCTR).toLocaleString('en-US', { maximumFractionDigits: 0 })} NCTR
                       </Button>
                     </div>
                   </CardContent>
