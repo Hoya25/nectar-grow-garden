@@ -21,6 +21,7 @@ import { PortfolioStory } from '@/components/PortfolioStory';
 import ReferralSystem from '@/components/ReferralSystem';
 import { BaseBadge } from '@/components/BaseBadge';
 import { WithdrawalModal } from '@/components/WithdrawalModal';
+import { NCTRPortfolioBreakdown } from '@/components/NCTRPortfolioBreakdown';
 
 interface UserProfile {
   id: string;
@@ -482,6 +483,16 @@ const Profile = () => {
               onPurchaseComplete={fetchProfileData}
             />
           </div>
+        </div>
+
+        {/* NCTR Portfolio Breakdown */}
+        <div className="mb-8">
+          <NCTRPortfolioBreakdown
+            availableNctr={portfolio?.available_nctr || 0}
+            lock90Nctr={portfolio?.lock_90_nctr || 0}
+            lock360Nctr={portfolio?.lock_360_nctr || 0}
+            pendingNctr={portfolio?.pending_nctr || 0}
+          />
         </div>
 
         {/* Portfolio Story - Prominent Position */}
