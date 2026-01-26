@@ -38,6 +38,32 @@ type SortOption = "highest_nctr" | "a_z" | "newest";
 
 const BRANDS_PER_PAGE = 20;
 
+// Category keyword mappings for fuzzy matching
+const CATEGORY_MAPPINGS: Record<string, string[]> = {
+  'fashion': ['fashion', 'apparel', 'clothing', 'shoes', 'accessories'],
+  'electronics': ['electronics', 'tech', 'technology', 'computers', 'gadgets'],
+  'home': ['home', 'garden', 'furniture', 'decor', 'household'],
+  'food-drink': ['food', 'drink', 'restaurant', 'grocery', 'beverage', 'dining'],
+  'travel': ['travel', 'hotel', 'flight', 'vacation', 'booking'],
+  'beauty': ['beauty', 'cosmetics', 'skincare', 'personal care', 'makeup'],
+  'sports': ['sports', 'outdoors', 'fitness', 'athletic', 'outdoor'],
+  'entertainment': ['entertainment', 'media', 'streaming', 'gaming', 'music'],
+  'health': ['health', 'wellness', 'pharmacy', 'medical', 'vitamins'],
+  'services': ['services', 'subscription', 'software', 'saas'],
+  'gift-cards': ['gift card', 'gift cards', 'giftcard'],
+  'automotive': ['automotive', 'auto', 'car', 'vehicle'],
+  'pets': ['pet', 'pets', 'animal'],
+  'kids': ['kids', 'baby', 'children', 'toys'],
+  'office': ['office', 'business', 'supplies']
+};
+
+// Build OR filter string for category keywords
+const buildCategoryFilter = (slug: string, categoryName: string): string => {
+  const keywords = CATEGORY_MAPPINGS[slug] || [categoryName.toLowerCase()];
+  // Build filter: category.ilike.%keyword1%,category.ilike.%keyword2%,...
+  return keywords.map(k => `category.ilike.%${k}%`).join(',');
+};
+
 const GardenCategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -94,9 +120,9 @@ const GardenCategoryPage = () => {
     }
   }, []);
 
-  // Fetch brands
+  // Fetch brands with fuzzy category matching
   const fetchBrands = useCallback(async (pageNum: number, append: boolean = false) => {
-    if (!category) return;
+    if (!category || !slug) return;
 
     if (append) {
       setLoadingMore(true);
@@ -109,21 +135,27 @@ const GardenCategoryPage = () => {
       const from = pageNum * BRANDS_PER_PAGE;
       const to = from + BRANDS_PER_PAGE - 1;
 
-      // Get total count
+      // Get category keywords for matching
+      const keywords = CATEGORY_MAPPINGS[slug] || [category.name.toLowerCase()];
+      
+      // Build OR filter for all keywords
+      const orFilters = keywords.map(k => `category.ilike.%${k}%`).join(',');
+
+      // Get total count with fuzzy matching
       const { count } = await supabase
         .from("brands")
         .select("*", { count: "exact", head: true })
         .eq("is_active", true)
-        .ilike("category", `%${category.name}%`);
+        .or(orFilters);
 
       setTotalCount(count || 0);
 
-      // Get brands
+      // Get brands with fuzzy matching
       const { data, error } = await supabase
         .from("brands")
         .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label")
         .eq("is_active", true)
-        .ilike("category", `%${category.name}%`)
+        .or(orFilters)
         .order(column, { ascending })
         .range(from, to);
 
@@ -145,7 +177,7 @@ const GardenCategoryPage = () => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [category, sortBy, getOrderBy]);
+  }, [category, slug, sortBy, getOrderBy]);
 
   // Initial fetch when category is loaded
   useEffect(() => {
