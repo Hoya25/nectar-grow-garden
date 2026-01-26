@@ -40,21 +40,21 @@ const BRANDS_PER_PAGE = 20;
 
 // Category keyword mappings for fuzzy matching
 const CATEGORY_MAPPINGS: Record<string, string[]> = {
-  'fashion': ['fashion', 'apparel', 'clothing', 'shoes', 'accessories'],
-  'electronics': ['electronics', 'tech', 'technology', 'computers', 'gadgets'],
-  'home': ['home', 'garden', 'furniture', 'decor', 'household'],
-  'food-drink': ['food', 'drink', 'restaurant', 'grocery', 'beverage', 'dining'],
-  'travel': ['travel', 'hotel', 'flight', 'vacation', 'booking'],
-  'beauty': ['beauty', 'cosmetics', 'skincare', 'personal care', 'makeup'],
-  'sports': ['sports', 'outdoors', 'fitness', 'athletic', 'outdoor'],
-  'entertainment': ['entertainment', 'media', 'streaming', 'gaming', 'music'],
-  'health': ['health', 'wellness', 'pharmacy', 'medical', 'vitamins'],
-  'services': ['services', 'subscription', 'software', 'saas'],
-  'gift-cards': ['gift card', 'gift cards', 'giftcard'],
-  'automotive': ['automotive', 'auto', 'car', 'vehicle'],
-  'pets': ['pet', 'pets', 'animal'],
-  'kids': ['kids', 'baby', 'children', 'toys'],
-  'office': ['office', 'business', 'supplies']
+  'fashion': ['fashion', 'apparel', 'clothing', 'shoes', 'accessories', 'jewelry', 'watches', 'handbag', 'dress', 'mens', 'womens'],
+  'electronics': ['electronics', 'tech', 'technology', 'computers', 'gadgets', 'software', 'mobile', 'phone', 'laptop', 'audio', 'tv'],
+  'home': ['home', 'garden', 'furniture', 'decor', 'household', 'kitchen', 'bedding', 'appliances', 'bath', 'storage', 'lighting'],
+  'food-drink': ['food', 'drink', 'restaurant', 'grocery', 'beverage', 'dining', 'meal', 'coffee', 'alcohol', 'wine', 'snack', 'organic'],
+  'travel': ['travel', 'hotel', 'flight', 'vacation', 'booking', 'airline', 'cruise', 'rental', 'resort', 'tourism', 'lodging'],
+  'beauty': ['beauty', 'cosmetics', 'skincare', 'personal care', 'makeup', 'fragrance', 'hair', 'nail', 'spa', 'grooming'],
+  'sports': ['sports', 'outdoors', 'fitness', 'athletic', 'outdoor', 'exercise', 'gym', 'camping', 'hiking', 'running', 'cycling'],
+  'entertainment': ['entertainment', 'media', 'streaming', 'gaming', 'music', 'movies', 'books', 'games', 'tickets', 'concert'],
+  'health': ['health', 'wellness', 'pharmacy', 'medical', 'vitamins', 'supplements', 'healthcare', 'nutrition', 'fitness'],
+  'services': ['services', 'subscription', 'software', 'saas', 'insurance', 'financial', 'legal', 'education', 'online'],
+  'gift-cards': ['gift card', 'gift cards', 'giftcard', 'gift', 'prepaid', 'egift'],
+  'automotive': ['automotive', 'auto', 'car', 'vehicle', 'parts', 'tires', 'motor', 'truck', 'accessories'],
+  'pets': ['pet', 'pets', 'animal', 'dog', 'cat', 'bird', 'fish', 'supplies'],
+  'kids': ['kids', 'baby', 'children', 'toys', 'infant', 'toddler', 'maternity', 'nursery'],
+  'office': ['office', 'business', 'supplies', 'stationery', 'printing', 'desk', 'workplace']
 };
 
 // Build OR filter string for category keywords
