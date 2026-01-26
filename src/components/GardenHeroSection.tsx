@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import { ShoppingBag, TrendingUp, Store, ExternalLink, Coins, Lock, Clock, Wallet } from 'lucide-react';
-import { Lock360InfoTooltip, Lock90InfoTooltip, InfoTooltip } from '@/components/ui/info-tooltip';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 
@@ -36,12 +36,8 @@ interface GardenHeroSectionProps {
 }
 
 const formatNCTR = (amount: number): string => {
-  if (amount >= 1000000) {
-    return `${(amount / 1000000).toFixed(2)}M`;
-  } else if (amount >= 1000) {
-    return `${(amount / 1000).toFixed(1)}K`;
-  }
-  return amount.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  // Format with commas, no decimal places
+  return Math.floor(amount).toLocaleString('en-US', { maximumFractionDigits: 0 });
 };
 
 const formatPercent = (rate: number): string => {
@@ -114,13 +110,17 @@ export const GardenHeroSection = ({
               <div className="flex items-center gap-2 mb-2">
                 <Wallet className="w-4 h-4 text-emerald-600" />
                 <span className="text-xs font-medium text-emerald-700">Available</span>
-                <InfoTooltip content="Ready to spend on Crescendo rewards" size={12} />
+                <InfoTooltip content="Spendable on Crescendo rewards anytime" size={12} />
               </div>
               <p className="text-lg md:text-xl font-bold text-emerald-600">
                 {formatNCTR(portfolio?.available_nctr || 0)}
               </p>
-              <p className="text-xs text-emerald-600/70">{formatUSD(portfolio?.available_nctr || 0)}</p>
-              <p className="text-[10px] text-emerald-600/60 mt-1">Spendable</p>
+              <p className="text-[10px] text-emerald-600/80 mt-1">NCTR</p>
+              <p className="text-xs text-emerald-600/70 mt-1">{formatUSD(portfolio?.available_nctr || 0)}</p>
+              <p className="text-[10px] text-emerald-600/60 mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Ready to spend
+              </p>
             </CardContent>
           </Card>
 
@@ -130,13 +130,17 @@ export const GardenHeroSection = ({
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-blue-600" />
                 <span className="text-xs font-medium text-blue-700">90LOCK</span>
-                <Lock90InfoTooltip size={12} />
+                <InfoTooltip content="Committed for 90 days to earn bonus NCTR on Crescendo" size={12} />
               </div>
               <p className="text-lg md:text-xl font-bold text-blue-600">
                 {formatNCTR(portfolio?.lock_90_nctr || 0)}
               </p>
-              <p className="text-xs text-blue-600/70">{formatUSD(portfolio?.lock_90_nctr || 0)}</p>
-              <p className="text-[10px] text-blue-600/60 mt-1">Committed</p>
+              <p className="text-[10px] text-blue-600/80 mt-1">NCTR</p>
+              <p className="text-xs text-blue-600/70 mt-1">{formatUSD(portfolio?.lock_90_nctr || 0)}</p>
+              <p className="text-[10px] text-blue-600/60 mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                90-day commitment
+              </p>
             </CardContent>
           </Card>
 
@@ -146,13 +150,17 @@ export const GardenHeroSection = ({
               <div className="flex items-center gap-2 mb-2">
                 <Lock className="w-4 h-4 text-purple-600" />
                 <span className="text-xs font-medium text-purple-700">360LOCK</span>
-                <Lock360InfoTooltip size={12} />
+                <InfoTooltip content="Committed for 360 days for maximum rewards + premium perks" size={12} />
               </div>
               <p className="text-lg md:text-xl font-bold text-purple-600">
                 {formatNCTR(portfolio?.lock_360_nctr || 0)}
               </p>
-              <p className="text-xs text-purple-600/70">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
-              <p className="text-[10px] text-purple-600/60 mt-1">Committed</p>
+              <p className="text-[10px] text-purple-600/80 mt-1">NCTR</p>
+              <p className="text-xs text-purple-600/70 mt-1">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
+              <p className="text-[10px] text-purple-600/60 mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                360-day commitment
+              </p>
             </CardContent>
           </Card>
 
@@ -167,8 +175,12 @@ export const GardenHeroSection = ({
               <p className="text-lg md:text-xl font-bold text-gray-600">
                 {formatNCTR(portfolio?.pending_nctr || 0)}
               </p>
-              <p className="text-xs text-gray-500">{formatUSD(portfolio?.pending_nctr || 0)}</p>
-              <p className="text-[10px] text-gray-500 mt-1">Processing</p>
+              <p className="text-[10px] text-gray-600/80 mt-1">NCTR</p>
+              <p className="text-xs text-gray-500 mt-1">{formatUSD(portfolio?.pending_nctr || 0)}</p>
+              <p className="text-[10px] text-gray-500 mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                Processing
+              </p>
             </CardContent>
           </Card>
         </div>
