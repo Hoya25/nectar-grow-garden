@@ -606,11 +606,11 @@ const AdminBrandRates = () => {
                             <button
                               onClick={() => {
                                 setInlineEditId(brand.id);
-                                setInlineEditValue(String(brand.nctr_per_dollar || 0));
+                                setInlineEditValue(String(brand.nctr_per_dollar ?? 0));
                               }}
                               className="text-primary font-semibold hover:underline cursor-pointer"
                             >
-                              {brand.nctr_per_dollar?.toFixed(2) || "0.00"}
+                              {(brand.nctr_per_dollar ?? 0).toFixed(2)}
                             </button>
                           )}
                         </TableCell>
