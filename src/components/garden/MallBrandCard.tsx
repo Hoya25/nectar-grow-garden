@@ -76,7 +76,7 @@ export const MallBrandCard = ({
   return (
     <>
       <div 
-        className="garden-theme flex-shrink-0 w-[180px] md:w-[200px] bg-white rounded-xl p-4 border border-[hsl(220,13%,91%)] shadow-sm hover:shadow-md hover:border-[hsl(142,71%,45%)] hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer"
+        className="flex-shrink-0 w-[180px] md:w-[200px] bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md hover:border-green-500 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer"
         onClick={handleCardClick}
       >
         {/* Tag badges */}
@@ -94,7 +94,7 @@ export const MallBrandCard = ({
         </div>
 
         {/* Logo */}
-        <div className="flex justify-center mb-3">
+        <div className="flex justify-center mb-3 bg-gray-50 rounded-lg p-2">
           <BrandLogo
             src={logo_url || undefined}
             alt={name}
@@ -104,13 +104,13 @@ export const MallBrandCard = ({
         </div>
 
         {/* Brand Name */}
-        <h3 className="font-semibold text-[hsl(0,0%,10%)] text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
+        <h3 className="font-semibold text-gray-900 text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
           {name}
         </h3>
 
         {/* Category */}
         {category && (
-          <p className="text-xs text-[hsl(220,9%,46%)] text-center mb-3 truncate">
+          <p className="text-xs text-gray-500 text-center mb-3 truncate">
             {category}
           </p>
         )}
@@ -118,20 +118,20 @@ export const MallBrandCard = ({
         {/* NCTR Rate */}
         <div className="text-center mb-3">
           {is_promoted && promotion_multiplier && promotion_multiplier > 1 && (
-            <span className="text-xs text-[hsl(220,9%,46%)] line-through mr-1">
+            <span className="text-xs text-gray-400 line-through mr-1">
               {baseRate.toFixed(0)}
             </span>
           )}
-          <span className="text-[hsl(142,76%,36%)] font-bold text-lg">
+          <span className="text-green-600 font-bold text-lg">
             {finalRate.toFixed(0)} NCTR
           </span>
-          <span className="text-[hsl(142,76%,36%)] font-semibold text-sm opacity-80">/$1</span>
+          <span className="text-green-600 font-semibold text-sm opacity-80">/$1</span>
         </div>
 
         {/* Shop Button */}
         <Button 
           size="sm" 
-          className="w-full btn-press bg-[hsl(142,71%,45%)] text-white hover:bg-[hsl(142,71%,40%)] font-semibold" 
+          className="w-full btn-press bg-green-500 text-white hover:bg-green-600 font-semibold" 
           onClick={handleShopClick}
           disabled={!loyalize_id}
         >
