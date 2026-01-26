@@ -27,6 +27,7 @@ interface BrandDetailModalProps {
     promotion_multiplier?: number | null;
     promotion_label?: string | null;
     description?: string | null;
+    website_url?: string | null;
     tags?: BrandTag[];
   };
   userId?: string;
@@ -133,21 +134,36 @@ export const BrandDetailModal = ({
     setLoading(true);
 
     try {
+      // Increment click count
       if (userId) {
+        const { data: currentBrand } = await supabase
+          .from("brands")
+          .select("click_count, website_url")
+          .eq("id", brand.id)
+          .single();
+        
         await supabase.from("brands").update({
-          click_count: (await supabase
-            .from("brands")
-            .select("click_count")
-            .eq("id", brand.id)
-            .single()
-          ).data?.click_count + 1 || 1
+          click_count: (currentBrand?.click_count || 0) + 1
         }).eq("id", brand.id);
       }
 
+      // Fetch website_url if not provided in props
+      let websiteUrl = brand.website_url;
+      if (!websiteUrl) {
+        const { data: brandData } = await supabase
+          .from("brands")
+          .select("website_url")
+          .eq("id", brand.id)
+          .single();
+        websiteUrl = brandData?.website_url;
+      }
+
+      // Build affiliate URL with website redirect
       const baseUrl = "https://www.loyalize.com/tracking/redirect";
       const params = new URLSearchParams({
         merchant_id: brand.loyalize_id,
         ...(userId && { sub_id: userId }),
+        ...(websiteUrl && { url: websiteUrl }),
       });
 
       window.open(`${baseUrl}?${params.toString()}`, "_blank");
@@ -162,7 +178,7 @@ export const BrandDetailModal = ({
       console.error("Error opening shop link:", error);
       toast({
         title: "Error",
-        description: "Failed to open shopping link",
+        description: "Failed to open shopping link. Please try again.",
         variant: "destructive",
       });
     } finally {
