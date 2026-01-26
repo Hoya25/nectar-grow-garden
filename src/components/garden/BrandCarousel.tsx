@@ -29,6 +29,7 @@ interface BrandCarouselProps {
   brands: Brand[];
   emptyMessage?: string;
   seeAllLink?: string;
+  userId?: string;
   onShop?: (brandId: string, loyalizeId: string) => void;
 }
 
@@ -38,6 +39,7 @@ export const BrandCarousel = ({
   brands,
   emptyMessage = "Coming soon! We're curating this collection.",
   seeAllLink,
+  userId,
   onShop,
 }: BrandCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -139,6 +141,7 @@ export const BrandCarousel = ({
             >
               <MallBrandCard
                 {...brand}
+                userId={userId}
                 onShop={onShop}
               />
             </div>
