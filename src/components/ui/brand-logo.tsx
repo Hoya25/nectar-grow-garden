@@ -111,7 +111,7 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
   };
 
   const containerClasses = cn(
-    'flex items-center justify-center rounded bg-muted/30 overflow-hidden border border-border/20',
+    'relative flex items-center justify-center rounded bg-muted/30 overflow-hidden border border-border/20',
     sizeConfig[size].container,
     variant === 'auto' && aspectRatio && aspectRatio > 1.5 ? 'w-auto' : 'w-auto',
     className
