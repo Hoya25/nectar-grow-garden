@@ -36,9 +36,10 @@ interface Department {
 interface MallViewProps {
   userId?: string;
   availableNctr: number;
+  totalNctr?: number;
 }
 
-export const MallView = ({ userId, availableNctr }: MallViewProps) => {
+export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [totalBrands, setTotalBrands] = useState(0);
@@ -256,6 +257,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
       <MallHeader
         totalBrands={totalBrands}
         availableNctr={availableNctr}
+        totalNctr={totalNctr}
         onSearchSelect={handleSearchSelect}
       />
 
