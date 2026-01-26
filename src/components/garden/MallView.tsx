@@ -256,14 +256,14 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
   if (loading) {
     return (
-      <div className="garden-theme min-h-screen bg-[hsl(80,20%,98%)] flex items-center justify-center">
+      <div className="garden-theme min-h-screen bg-[hsl(40,20%,98%)] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-[hsl(142,71%,45%)]" />
       </div>
     );
   }
 
   return (
-    <div className="garden-theme min-h-screen bg-[hsl(80,20%,98%)] pb-20 md:pb-0">
+    <div className="garden-theme min-h-screen bg-[hsl(40,20%,98%)] pb-20 md:pb-0">
       {/* Header with Search */}
       <MallHeader
         totalBrands={totalBrands}
@@ -274,62 +274,26 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Values-Based Sections */}
-        <BrandCarousel
-          title="🇺🇸 Made in America"
-          subtitle="Support American workers and manufacturers"
-          brands={madeInUsaBrands}
-          seeAllLink="/garden/tag/made-in-usa"
-          userId={userId}
-          onShop={handleShop}
-        />
+        {/* Browse All Brands CTA */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('/garden/category/all')}
+            className="w-full bg-white border border-[hsl(220,13%,91%)] rounded-xl p-4 flex items-center justify-between hover:border-[hsl(142,71%,45%)] hover:shadow-md transition-all btn-press group"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🛍️</span>
+              <div className="text-left">
+                <h3 className="font-semibold text-[hsl(0,0%,10%)]">Browse All Brands</h3>
+                <p className="text-sm text-[hsl(220,9%,46%)]">{totalBrands.toLocaleString()} brands earning NCTR</p>
+              </div>
+            </div>
+            <span className="text-[hsl(142,71%,45%)] font-medium group-hover:translate-x-1 transition-transform">
+              Explore →
+            </span>
+          </button>
+        </div>
 
-        <BrandCarousel
-          title="🏪 Small & Independent"
-          subtitle="Privately owned businesses that put people first"
-          brands={smallBusinessBrands}
-          seeAllLink="/garden/tag/small-business"
-          userId={userId}
-          onShop={handleShop}
-        />
-
-        <BrandCarousel
-          title="✅ Buy'r Recommended"
-          subtitle="Vetted by the Buy'r community"
-          brands={buyrRecommendedBrands}
-          seeAllLink="/garden/tag/buyr-recommended"
-          userId={userId}
-          onShop={handleShop}
-        />
-
-        <BrandCarousel
-          title="🌿 Sustainable"
-          subtitle="Eco-friendly brands"
-          brands={sustainableBrands}
-          seeAllLink="/garden/tag/sustainable"
-          userId={userId}
-          onShop={handleShop}
-        />
-
-        {/* Promotions */}
-        {promotedBrands.length > 0 && (
-          <BrandCarousel
-            title="🔥 Boosted Earnings"
-            subtitle="Limited time promotions"
-            brands={promotedBrands}
-            userId={userId}
-            onShop={handleShop}
-          />
-        )}
-
-        {/* Departments */}
-        {departments.length > 0 && (
-          <div data-section="departments">
-            <DepartmentGrid departments={departments} />
-          </div>
-        )}
-
-        {/* Highest Earning */}
+        {/* Highest Earning - Show first since it has content */}
         {highestEarningBrands.length > 0 && (
           <BrandCarousel
             title="💎 Highest Earning"
@@ -346,6 +310,24 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             title="⭐ Featured Brands"
             subtitle="Hand-picked by The Garden"
             brands={featuredBrands}
+            userId={userId}
+            onShop={handleShop}
+          />
+        )}
+
+        {/* Departments - Always show */}
+        {departments.length > 0 && (
+          <div data-section="departments">
+            <DepartmentGrid departments={departments} />
+          </div>
+        )}
+
+        {/* Promotions */}
+        {promotedBrands.length > 0 && (
+          <BrandCarousel
+            title="🔥 Boosted Earnings"
+            subtitle="Limited time promotions"
+            brands={promotedBrands}
             userId={userId}
             onShop={handleShop}
           />
@@ -388,7 +370,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                 {bigBrands.slice(0, 6).map((brand) => (
                   <div
                     key={brand.id}
-                    className="flex-shrink-0 bg-white rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer border border-[hsl(220,13%,91%)] hover:border-[hsl(142,71%,45%)] hover:bg-[hsl(142,76%,97%)] transition-all btn-press"
+                    className="flex-shrink-0 bg-white rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer border border-[hsl(220,13%,91%)] hover:border-[hsl(142,71%,45%)] hover:bg-[hsl(138,76%,97%)] transition-all btn-press"
                     onClick={() => handleShop(brand.id, brand.loyalize_id || "")}
                   >
                     <span className="text-sm text-[hsl(0,0%,10%)]">{brand.name}</span>
@@ -403,6 +385,51 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
               </div>
             )}
           </section>
+        )}
+
+        {/* Tag-based sections - Only show if they have brands */}
+        {madeInUsaBrands.length > 0 && (
+          <BrandCarousel
+            title="🇺🇸 Made in America"
+            subtitle="Support American workers and manufacturers"
+            brands={madeInUsaBrands}
+            seeAllLink="/garden/tag/made-in-usa"
+            userId={userId}
+            onShop={handleShop}
+          />
+        )}
+
+        {smallBusinessBrands.length > 0 && (
+          <BrandCarousel
+            title="🏪 Small & Independent"
+            subtitle="Privately owned businesses that put people first"
+            brands={smallBusinessBrands}
+            seeAllLink="/garden/tag/small-business"
+            userId={userId}
+            onShop={handleShop}
+          />
+        )}
+
+        {buyrRecommendedBrands.length > 0 && (
+          <BrandCarousel
+            title="✅ Buy'r Recommended"
+            subtitle="Vetted by the Buy'r community"
+            brands={buyrRecommendedBrands}
+            seeAllLink="/garden/tag/buyr-recommended"
+            userId={userId}
+            onShop={handleShop}
+          />
+        )}
+
+        {sustainableBrands.length > 0 && (
+          <BrandCarousel
+            title="🌿 Sustainable"
+            subtitle="Eco-friendly brands"
+            brands={sustainableBrands}
+            seeAllLink="/garden/tag/sustainable"
+            userId={userId}
+            onShop={handleShop}
+          />
         )}
       </div>
 

@@ -77,10 +77,22 @@ const GardenCategoryPage = () => {
   const [sortBy, setSortBy] = useState<SortOption>("highest_nctr");
   const [page, setPage] = useState(0);
 
-  // Fetch category details
+  // Fetch category details (or handle "all" brands)
   useEffect(() => {
     const fetchCategory = async () => {
       if (!slug) return;
+
+      // Special case: "all" shows all brands
+      if (slug === 'all') {
+        setCategory({
+          id: 'all',
+          name: 'All Brands',
+          slug: 'all',
+          icon: '🛍️',
+          description: 'Browse all brands earning NCTR'
+        });
+        return;
+      }
 
       const { data, error } = await supabase
         .from("brand_categories")
@@ -120,7 +132,7 @@ const GardenCategoryPage = () => {
     }
   }, []);
 
-  // Fetch brands with fuzzy category matching
+  // Fetch brands with fuzzy category matching (or all brands for "all" slug)
   const fetchBrands = useCallback(async (pageNum: number, append: boolean = false) => {
     if (!category || !slug) return;
 
@@ -135,36 +147,61 @@ const GardenCategoryPage = () => {
       const from = pageNum * BRANDS_PER_PAGE;
       const to = from + BRANDS_PER_PAGE - 1;
 
-      // Get category keywords for matching
-      const keywords = CATEGORY_MAPPINGS[slug] || [category.name.toLowerCase()];
-      
-      // Build OR filter for all keywords
-      const orFilters = keywords.map(k => `category.ilike.%${k}%`).join(',');
+      // Special case: "all" shows all active brands without category filter
+      if (slug === 'all') {
+        // Get total count
+        const { count } = await supabase
+          .from("brands")
+          .select("*", { count: "exact", head: true })
+          .eq("is_active", true);
 
-      // Get total count with fuzzy matching
-      const { count } = await supabase
-        .from("brands")
-        .select("*", { count: "exact", head: true })
-        .eq("is_active", true)
-        .or(orFilters);
+        setTotalCount(count || 0);
 
-      setTotalCount(count || 0);
+        // Get brands
+        const { data, error } = await supabase
+          .from("brands")
+          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label")
+          .eq("is_active", true)
+          .order(column, { ascending })
+          .range(from, to);
 
-      // Get brands with fuzzy matching
-      const { data, error } = await supabase
-        .from("brands")
-        .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label")
-        .eq("is_active", true)
-        .or(orFilters)
-        .order(column, { ascending })
-        .range(from, to);
+        if (error) throw error;
 
-      if (error) throw error;
-
-      if (append) {
-        setBrands(prev => [...prev, ...(data || [])]);
+        if (append) {
+          setBrands(prev => [...prev, ...(data || [])]);
+        } else {
+          setBrands(data || []);
+        }
       } else {
-        setBrands(data || []);
+        // Category-specific: Use fuzzy matching
+        const keywords = CATEGORY_MAPPINGS[slug] || [category.name.toLowerCase()];
+        const orFilters = keywords.map(k => `category.ilike.%${k}%`).join(',');
+
+        // Get total count with fuzzy matching
+        const { count } = await supabase
+          .from("brands")
+          .select("*", { count: "exact", head: true })
+          .eq("is_active", true)
+          .or(orFilters);
+
+        setTotalCount(count || 0);
+
+        // Get brands with fuzzy matching
+        const { data, error } = await supabase
+          .from("brands")
+          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label")
+          .eq("is_active", true)
+          .or(orFilters)
+          .order(column, { ascending })
+          .range(from, to);
+
+        if (error) throw error;
+
+        if (append) {
+          setBrands(prev => [...prev, ...(data || [])]);
+        } else {
+          setBrands(data || []);
+        }
       }
     } catch (error) {
       console.error("Error fetching brands:", error);
