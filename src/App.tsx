@@ -14,6 +14,7 @@ import Admin from "./pages/Admin";
 import Referrals from "./pages/Referrals";
 import AffiliateLinks from "./pages/AffiliateLinks";
 import LearnAndEarn from "./pages/LearnAndEarn";
+import AdminBrandRates from "./pages/AdminBrandRates";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
@@ -68,6 +69,7 @@ const App = () => {
                 <Route path="/garden" element={<Garden />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
                 <Route path="/referrals" element={<Referrals />} />
                 <Route path="/affiliate-links" element={<AffiliateLinks />} />
                 <Route path="/learn" element={<LearnAndEarn />} />
