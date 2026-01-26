@@ -366,6 +366,25 @@ const Admin = () => {
 
           <TabsContent value="brands">
             <div className="space-y-6">
+              {/* Quick Link to Brand Rates Page */}
+              <Card className="bg-primary/5 border border-primary/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-foreground">Brand NCTR Rate Management</h3>
+                      <p className="text-sm text-muted-foreground">Control what members earn per dollar spent at each brand</p>
+                    </div>
+                    <Button 
+                      onClick={() => navigate('/admin/brand-rates')}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      <TrendingUp className="w-4 h-4 mr-2" />
+                      Manage Brand Rates
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="bg-section-highlight border border-section-border">
                 <CardHeader>
                   <CardTitle className="text-foreground">Impact.com Affiliate Network</CardTitle>
