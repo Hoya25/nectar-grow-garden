@@ -31,6 +31,7 @@ import { RewardDisplay } from '@/components/RewardDisplay';
 import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { GardenHeroSection } from '@/components/GardenHeroSection';
 import { MallView } from '@/components/garden/MallView';
+import { CrescendoStatusCard } from '@/components/CrescendoStatusCard';
 
 import { PortfolioStory } from '@/components/PortfolioStory';
 import { BaseBadge } from '@/components/BaseBadge';
@@ -1523,7 +1524,8 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
       {activeTab === 'shop' ? (
         <MallView 
           userId={user?.id} 
-          availableNctr={portfolio?.available_nctr || 0} 
+          availableNctr={portfolio?.available_nctr || 0}
+          totalNctr={parseFloat(portfolio?.lock_360_nctr?.toString() || '0') + parseFloat(portfolio?.lock_90_nctr?.toString() || '0')}
         />
       ) : (
       <main className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
@@ -1562,6 +1564,13 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                 opportunitiesSection.scrollIntoView({ behavior: 'smooth' });
               }
             }}
+          />
+        </div>
+
+        {/* Crescendo Status Card */}
+        <div className="mb-8">
+          <CrescendoStatusCard 
+            totalNctr={parseFloat(portfolio?.lock_360_nctr?.toString() || '0') + parseFloat(portfolio?.lock_90_nctr?.toString() || '0')} 
           />
         </div>
 
