@@ -267,6 +267,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
           subtitle="Support American workers and manufacturers"
           brands={madeInUsaBrands}
           seeAllLink="/garden/tag/made-in-usa"
+          userId={userId}
           onShop={handleShop}
         />
 
@@ -275,6 +276,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
           subtitle="Privately owned businesses that put people first"
           brands={smallBusinessBrands}
           seeAllLink="/garden/tag/small-business"
+          userId={userId}
           onShop={handleShop}
         />
 
@@ -283,6 +285,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
           subtitle="Vetted by the Buy'r community"
           brands={buyrRecommendedBrands}
           seeAllLink="/garden/tag/buyr-recommended"
+          userId={userId}
           onShop={handleShop}
         />
 
@@ -291,6 +294,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
           subtitle="Eco-friendly brands"
           brands={sustainableBrands}
           seeAllLink="/garden/tag/sustainable"
+          userId={userId}
           onShop={handleShop}
         />
 
@@ -300,6 +304,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
             title="🔥 Boosted Earnings"
             subtitle="Limited time promotions"
             brands={promotedBrands}
+            userId={userId}
             onShop={handleShop}
           />
         )}
@@ -317,6 +322,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
             title="💎 Highest Earning"
             subtitle="Top NCTR rates"
             brands={highestEarningBrands}
+            userId={userId}
             onShop={handleShop}
           />
         )}
@@ -327,6 +333,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
             title="⭐ Featured Brands"
             subtitle="Hand-picked by The Garden"
             brands={featuredBrands}
+            userId={userId}
             onShop={handleShop}
           />
         )}
@@ -358,6 +365,7 @@ export const MallView = ({ userId, availableNctr }: MallViewProps) => {
               <BrandCarousel
                 title=""
                 brands={bigBrands}
+                userId={userId}
                 onShop={handleShop}
               />
             )}

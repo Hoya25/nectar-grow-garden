@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { ExternalLink } from "lucide-react";
+import { BrandDetailModal } from "./BrandDetailModal";
 
 interface BrandTag {
   slug: string;
@@ -20,6 +22,8 @@ interface MallBrandCardProps {
   is_promoted?: boolean;
   promotion_multiplier?: number | null;
   promotion_label?: string | null;
+  description?: string | null;
+  userId?: string;
   onShop?: (brandId: string, loyalizeId: string) => void;
 }
 
@@ -44,81 +48,120 @@ export const MallBrandCard = ({
   is_promoted,
   promotion_multiplier,
   promotion_label,
+  description,
+  userId,
   onShop,
 }: MallBrandCardProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const baseRate = nctr_per_dollar || 0;
   const finalRate = is_promoted && promotion_multiplier 
     ? baseRate * promotion_multiplier 
     : baseRate;
 
-  const handleShop = () => {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent modal from opening if clicking on the Shop Now button
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleShopClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (loyalize_id && onShop) {
       onShop(id, loyalize_id);
     }
   };
 
   return (
-    <div className="garden-theme flex-shrink-0 w-[180px] md:w-[200px] garden-card rounded-xl p-4 garden-card-hover group">
-      {/* Tag badges */}
-      <div className="flex gap-1 mb-2 h-5 overflow-hidden">
-        {tags.slice(0, 3).map((tag) => (
-          <span key={tag.slug} className="text-xs" title={tag.name}>
-            {TAG_ICONS[tag.slug] || tag.icon || '🏷️'}
-          </span>
-        ))}
-        {is_promoted && (
-          <Badge className="text-[10px] px-1.5 py-0 h-4 bg-orange-500 text-white border-0">
-            🔥 {promotion_multiplier}X
-          </Badge>
-        )}
-      </div>
-
-      {/* Logo */}
-      <div className="flex justify-center mb-3">
-        <BrandLogo
-          src={logo_url || undefined}
-          alt={name}
-          size="lg"
-          className="group-hover:scale-105 transition-transform duration-200"
-        />
-      </div>
-
-      {/* Brand Name */}
-      <h3 className="font-semibold garden-text text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
-        {name}
-      </h3>
-
-      {/* Category */}
-      {category && (
-        <p className="text-xs garden-text-muted text-center mb-3 truncate">
-          {category}
-        </p>
-      )}
-
-      {/* NCTR Rate with Glow */}
-      <div className="text-center mb-3">
-        {is_promoted && promotion_multiplier && promotion_multiplier > 1 && (
-          <span className="text-xs garden-text-muted line-through mr-1">
-            {baseRate.toFixed(0)}
-          </span>
-        )}
-        <span className="nctr-rate text-lg">
-          {finalRate.toFixed(0)} NCTR
-        </span>
-        <span className="nctr-rate text-sm opacity-80">/$1</span>
-      </div>
-
-      {/* Shop Button */}
-      <Button 
-        size="sm" 
-        className="w-full btn-press bg-[hsl(75,100%,50%)] text-[hsl(120,20%,4%)] hover:bg-[hsl(75,100%,45%)] font-semibold" 
-        onClick={handleShop}
-        disabled={!loyalize_id}
+    <>
+      <div 
+        className="garden-theme flex-shrink-0 w-[180px] md:w-[200px] garden-card rounded-xl p-4 garden-card-hover group cursor-pointer"
+        onClick={handleCardClick}
       >
-        Shop Now
-        <ExternalLink className="h-3 w-3 ml-1" />
-      </Button>
-    </div>
+        {/* Tag badges */}
+        <div className="flex gap-1 mb-2 h-5 overflow-hidden">
+          {tags.slice(0, 3).map((tag) => (
+            <span key={tag.slug} className="text-xs" title={tag.name}>
+              {TAG_ICONS[tag.slug] || tag.icon || '🏷️'}
+            </span>
+          ))}
+          {is_promoted && (
+            <Badge className="text-[10px] px-1.5 py-0 h-4 bg-orange-500 text-white border-0">
+              🔥 {promotion_multiplier}X
+            </Badge>
+          )}
+        </div>
+
+        {/* Logo */}
+        <div className="flex justify-center mb-3">
+          <BrandLogo
+            src={logo_url || undefined}
+            alt={name}
+            size="lg"
+            className="group-hover:scale-105 transition-transform duration-200"
+          />
+        </div>
+
+        {/* Brand Name */}
+        <h3 className="font-semibold garden-text text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
+          {name}
+        </h3>
+
+        {/* Category */}
+        {category && (
+          <p className="text-xs garden-text-muted text-center mb-3 truncate">
+            {category}
+          </p>
+        )}
+
+        {/* NCTR Rate with Glow */}
+        <div className="text-center mb-3">
+          {is_promoted && promotion_multiplier && promotion_multiplier > 1 && (
+            <span className="text-xs garden-text-muted line-through mr-1">
+              {baseRate.toFixed(0)}
+            </span>
+          )}
+          <span className="nctr-rate text-lg">
+            {finalRate.toFixed(0)} NCTR
+          </span>
+          <span className="nctr-rate text-sm opacity-80">/$1</span>
+        </div>
+
+        {/* Shop Button */}
+        <Button 
+          size="sm" 
+          className="w-full btn-press bg-[hsl(75,100%,50%)] text-[hsl(120,20%,4%)] hover:bg-[hsl(75,100%,45%)] font-semibold" 
+          onClick={handleShopClick}
+          disabled={!loyalize_id}
+        >
+          Shop Now
+          <ExternalLink className="h-3 w-3 ml-1" />
+        </Button>
+      </div>
+
+      {/* Brand Detail Modal */}
+      <BrandDetailModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        brand={{
+          id,
+          name,
+          logo_url,
+          category,
+          nctr_per_dollar,
+          loyalize_id,
+          is_promoted,
+          promotion_multiplier,
+          promotion_label,
+          description,
+          tags,
+        }}
+        userId={userId}
+        onShop={onShop}
+      />
+    </>
   );
 };
 
