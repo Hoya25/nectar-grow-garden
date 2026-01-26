@@ -60,7 +60,6 @@ export const MallBrandCard = ({
     : baseRate;
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent modal from opening if clicking on the Shop Now button
     if ((e.target as HTMLElement).closest('button')) {
       return;
     }
@@ -77,7 +76,7 @@ export const MallBrandCard = ({
   return (
     <>
       <div 
-        className="garden-theme flex-shrink-0 w-[180px] md:w-[200px] garden-card rounded-xl p-4 garden-card-hover group cursor-pointer"
+        className="garden-theme flex-shrink-0 w-[180px] md:w-[200px] bg-white rounded-xl p-4 border border-[hsl(220,13%,91%)] shadow-sm hover:shadow-md hover:border-[hsl(142,71%,45%)] hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer"
         onClick={handleCardClick}
       >
         {/* Tag badges */}
@@ -105,34 +104,34 @@ export const MallBrandCard = ({
         </div>
 
         {/* Brand Name */}
-        <h3 className="font-semibold garden-text text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
+        <h3 className="font-semibold text-[hsl(0,0%,10%)] text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
           {name}
         </h3>
 
         {/* Category */}
         {category && (
-          <p className="text-xs garden-text-muted text-center mb-3 truncate">
+          <p className="text-xs text-[hsl(220,9%,46%)] text-center mb-3 truncate">
             {category}
           </p>
         )}
 
-        {/* NCTR Rate with Glow */}
+        {/* NCTR Rate */}
         <div className="text-center mb-3">
           {is_promoted && promotion_multiplier && promotion_multiplier > 1 && (
-            <span className="text-xs garden-text-muted line-through mr-1">
+            <span className="text-xs text-[hsl(220,9%,46%)] line-through mr-1">
               {baseRate.toFixed(0)}
             </span>
           )}
-          <span className="nctr-rate text-lg">
+          <span className="text-[hsl(142,76%,36%)] font-bold text-lg">
             {finalRate.toFixed(0)} NCTR
           </span>
-          <span className="nctr-rate text-sm opacity-80">/$1</span>
+          <span className="text-[hsl(142,76%,36%)] font-semibold text-sm opacity-80">/$1</span>
         </div>
 
         {/* Shop Button */}
         <Button 
           size="sm" 
-          className="w-full btn-press bg-[hsl(75,100%,50%)] text-[hsl(120,20%,4%)] hover:bg-[hsl(75,100%,45%)] font-semibold" 
+          className="w-full btn-press bg-[hsl(142,71%,45%)] text-white hover:bg-[hsl(142,71%,40%)] font-semibold" 
           onClick={handleShopClick}
           disabled={!loyalize_id}
         >

@@ -63,13 +63,11 @@ export const BrandDetailModal = ({
 
   const calculatedNctr = parseFloat(spendAmount || "0") * finalRate;
 
-  // Fetch brand tags and description if not provided
   useEffect(() => {
     const fetchBrandDetails = async () => {
       if (!isOpen) return;
 
       try {
-        // Fetch description if not provided
         if (!brand.description) {
           const { data: brandData } = await supabase
             .from("brands")
@@ -82,7 +80,6 @@ export const BrandDetailModal = ({
           }
         }
 
-        // Fetch tags if not provided
         if (!brand.tags || brand.tags.length === 0) {
           const { data: assignments } = await supabase
             .from("brand_tag_assignments")
@@ -115,7 +112,6 @@ export const BrandDetailModal = ({
     fetchBrandDetails();
   }, [isOpen, brand.id, brand.description, brand.tags]);
 
-  // Reset state when modal opens with new brand
   useEffect(() => {
     if (isOpen) {
       setSpendAmount("100");
@@ -137,7 +133,6 @@ export const BrandDetailModal = ({
     setLoading(true);
 
     try {
-      // Log click to database
       if (userId) {
         await supabase.from("brands").update({
           click_count: (await supabase
@@ -149,23 +144,19 @@ export const BrandDetailModal = ({
         }).eq("id", brand.id);
       }
 
-      // Build affiliate URL
       const baseUrl = "https://www.loyalize.com/tracking/redirect";
       const params = new URLSearchParams({
         merchant_id: brand.loyalize_id,
         ...(userId && { sub_id: userId }),
       });
 
-      // Open in new tab
       window.open(`${baseUrl}?${params.toString()}`, "_blank");
 
-      // Show success toast
       toast({
         title: `✓ Shopping at ${brand.name}`,
         description: "Your earnings are being tracked",
       });
 
-      // Close modal
       onClose();
     } catch (error) {
       console.error("Error opening shop link:", error);
@@ -188,28 +179,27 @@ export const BrandDetailModal = ({
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       
       {/* Modal */}
       <div className="fixed inset-x-0 bottom-0 z-50 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
         <div 
-          className="garden-theme w-full max-h-[85vh] md:max-h-[90vh] md:w-[500px] md:max-w-[90vw] overflow-hidden rounded-t-3xl md:rounded-2xl animate-in slide-in-from-bottom md:fade-in md:zoom-in-95 duration-300"
-          style={{ backgroundColor: 'hsl(var(--garden-card))' }}
+          className="garden-theme w-full max-h-[85vh] md:max-h-[90vh] md:w-[500px] md:max-w-[90vw] overflow-hidden rounded-t-3xl md:rounded-2xl animate-in slide-in-from-bottom md:fade-in md:zoom-in-95 duration-300 bg-white shadow-xl"
         >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 rounded-full hover:bg-white/10 transition-colors btn-press"
+            className="absolute top-4 right-4 z-10 p-2 rounded-full hover:bg-[hsl(220,14%,96%)] transition-colors btn-press"
           >
-            <X className="h-5 w-5 garden-text" />
+            <X className="h-5 w-5 text-[hsl(220,9%,46%)]" />
           </button>
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto max-h-[85vh] md:max-h-[80vh]">
             {/* Header */}
-            <div className="p-6 pb-4 text-center border-b border-[hsl(var(--garden-border))]">
+            <div className="p-6 pb-4 text-center border-b border-[hsl(220,13%,91%)]">
               <div className="flex justify-center mb-4">
                 <BrandLogo
                   src={brand.logo_url || undefined}
@@ -219,13 +209,13 @@ export const BrandDetailModal = ({
                 />
               </div>
               
-              <h2 className="text-2xl font-bold garden-text mb-2">{brand.name}</h2>
+              <h2 className="text-2xl font-bold text-[hsl(0,0%,10%)] mb-2">{brand.name}</h2>
               
               <div className="flex flex-wrap items-center justify-center gap-2">
                 {brand.category && (
                   <Badge 
                     variant="secondary" 
-                    className="bg-[hsl(var(--garden-border))] text-[hsl(var(--garden-text-muted))] border-0"
+                    className="bg-[hsl(220,14%,96%)] text-[hsl(220,9%,46%)] border-0"
                   >
                     {brand.category}
                   </Badge>
@@ -244,7 +234,7 @@ export const BrandDetailModal = ({
             </div>
 
             {/* Earning Info */}
-            <div className="p-6 border-b border-[hsl(var(--garden-border))]">
+            <div className="p-6 border-b border-[hsl(220,13%,91%)]">
               <div className="text-center mb-4">
                 {brand.is_promoted && brand.promotion_multiplier && brand.promotion_multiplier > 1 && (
                   <div className="mb-2">
@@ -256,35 +246,35 @@ export const BrandDetailModal = ({
                 
                 <div className="flex items-center justify-center gap-2">
                   {brand.is_promoted && brand.promotion_multiplier && brand.promotion_multiplier > 1 && (
-                    <span className="text-lg garden-text-muted line-through">
+                    <span className="text-lg text-[hsl(220,9%,46%)] line-through">
                       {baseRate.toFixed(0)} NCTR
                     </span>
                   )}
-                  <span className="nctr-rate text-3xl font-bold">
+                  <span className="text-[hsl(142,76%,36%)] text-3xl font-bold">
                     Earn {finalRate.toFixed(0)} NCTR/$1
                   </span>
                 </div>
               </div>
 
               {/* Earnings Calculator */}
-              <div className="garden-card rounded-xl p-4" style={{ backgroundColor: 'hsl(var(--garden-bg))' }}>
-                <label className="text-sm garden-text-muted mb-2 block">
+              <div className="bg-[hsl(142,76%,97%)] rounded-xl p-4 border border-[hsl(142,76%,90%)]">
+                <label className="text-sm text-[hsl(220,9%,46%)] mb-2 block">
                   Earnings Calculator
                 </label>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 flex-1">
-                    <span className="garden-text">Spend $</span>
+                    <span className="text-[hsl(0,0%,10%)]">Spend $</span>
                     <Input
                       type="number"
                       value={spendAmount}
                       onChange={(e) => setSpendAmount(e.target.value)}
-                      className="w-24 bg-transparent border-[hsl(var(--garden-border))] garden-text text-center"
+                      className="w-24 bg-white border-[hsl(220,13%,91%)] text-[hsl(0,0%,10%)] text-center"
                       min="0"
                     />
                   </div>
-                  <span className="garden-text-muted">→</span>
+                  <span className="text-[hsl(220,9%,46%)]">→</span>
                   <div className="flex-1 text-right">
-                    <span className="nctr-rate text-xl font-bold">
+                    <span className="text-[hsl(142,76%,36%)] text-xl font-bold">
                       {calculatedNctr.toLocaleString(undefined, { maximumFractionDigits: 0 })} NCTR
                     </span>
                   </div>
@@ -293,32 +283,32 @@ export const BrandDetailModal = ({
             </div>
 
             {/* How It Works */}
-            <div className="p-6 border-b border-[hsl(var(--garden-border))]">
-              <h3 className="text-sm font-semibold garden-text-muted uppercase tracking-wider mb-4">
+            <div className="p-6 border-b border-[hsl(220,13%,91%)]">
+              <h3 className="text-sm font-semibold text-[hsl(220,9%,46%)] uppercase tracking-wider mb-4">
                 How It Works
               </h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[hsl(var(--garden-accent))] text-[hsl(var(--garden-bg))] flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-[hsl(142,71%,45%)] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                     1
                   </div>
-                  <p className="garden-text text-sm">
+                  <p className="text-[hsl(0,0%,23%)] text-sm">
                     Click "Shop at {brand.name}" below
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[hsl(var(--garden-accent))] text-[hsl(var(--garden-bg))] flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-[hsl(142,71%,45%)] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                     2
                   </div>
-                  <p className="garden-text text-sm">
+                  <p className="text-[hsl(0,0%,23%)] text-sm">
                     Make your purchase on their site
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[hsl(var(--garden-accent))] text-[hsl(var(--garden-bg))] flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-[hsl(142,71%,45%)] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                     3
                   </div>
-                  <p className="garden-text text-sm">
+                  <p className="text-[hsl(0,0%,23%)] text-sm">
                     NCTR appears in your account within 24-48 hours
                   </p>
                 </div>
@@ -327,18 +317,18 @@ export const BrandDetailModal = ({
 
             {/* Description */}
             {description && (
-              <div className="p-6 border-b border-[hsl(var(--garden-border))]">
-                <h3 className="text-sm font-semibold garden-text-muted uppercase tracking-wider mb-3">
+              <div className="p-6 border-b border-[hsl(220,13%,91%)]">
+                <h3 className="text-sm font-semibold text-[hsl(220,9%,46%)] uppercase tracking-wider mb-3">
                   About {brand.name}
                 </h3>
-                <p className="garden-text text-sm leading-relaxed">
+                <p className="text-[hsl(0,0%,23%)] text-sm leading-relaxed">
                   {showFullDescription ? description : descriptionLines}
                   {!showFullDescription && hasMoreDescription && '...'}
                 </p>
                 {hasMoreDescription && (
                   <button
                     onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="text-sm garden-accent mt-2 hover:opacity-80 transition-opacity"
+                    className="text-sm text-[hsl(142,71%,45%)] mt-2 hover:text-[hsl(142,71%,35%)] transition-colors"
                   >
                     {showFullDescription ? 'Show less' : 'Read more'}
                   </button>
@@ -351,7 +341,7 @@ export const BrandDetailModal = ({
               <Button
                 onClick={handleShop}
                 disabled={loading || !brand.loyalize_id}
-                className="w-full h-14 text-lg font-bold bg-[hsl(var(--garden-accent))] text-[hsl(var(--garden-bg))] hover:bg-[hsl(var(--garden-accent))]/90 btn-press rounded-xl"
+                className="w-full h-14 text-lg font-bold bg-[hsl(142,71%,45%)] text-white hover:bg-[hsl(142,71%,40%)] btn-press rounded-xl"
               >
                 {loading ? (
                   <>
@@ -367,7 +357,7 @@ export const BrandDetailModal = ({
               </Button>
               
               {!brand.loyalize_id && (
-                <p className="text-center text-sm garden-text-muted mt-3">
+                <p className="text-center text-sm text-[hsl(220,9%,46%)] mt-3">
                   Shopping coming soon for this brand
                 </p>
               )}

@@ -46,7 +46,6 @@ export const BrandCarousel = ({
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Intersection Observer for fade-in animation
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -82,11 +81,11 @@ export const BrandCarousel = ({
     >
       {/* Header with bottom border */}
       {title && (
-        <div className="garden-section-header flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-[hsl(220,13%,91%)] pb-3 mb-4">
           <div>
-            <h2 className="text-xl font-bold garden-text">{title}</h2>
+            <h2 className="text-xl font-bold text-[hsl(0,0%,10%)]">{title}</h2>
             {subtitle && (
-              <p className="text-sm garden-text-muted mt-1">{subtitle}</p>
+              <p className="text-sm text-[hsl(220,9%,46%)] mt-1">{subtitle}</p>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -95,7 +94,7 @@ export const BrandCarousel = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 hidden md:flex garden-text-muted hover:garden-accent btn-press"
+                  className="h-8 w-8 hidden md:flex text-[hsl(220,9%,46%)] hover:text-[hsl(142,71%,45%)] hover:bg-[hsl(142,76%,97%)] btn-press"
                   onClick={() => scroll("left")}
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -103,7 +102,7 @@ export const BrandCarousel = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 hidden md:flex garden-text-muted hover:garden-accent btn-press"
+                  className="h-8 w-8 hidden md:flex text-[hsl(220,9%,46%)] hover:text-[hsl(142,71%,45%)] hover:bg-[hsl(142,76%,97%)] btn-press"
                   onClick={() => scroll("right")}
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -113,7 +112,7 @@ export const BrandCarousel = ({
             {seeAllLink && brands.length > 0 && (
               <Link
                 to={seeAllLink}
-                className="text-sm font-medium garden-accent hover:opacity-80 transition-opacity"
+                className="text-sm font-medium text-[hsl(142,71%,45%)] hover:text-[hsl(142,71%,35%)] transition-colors"
               >
                 See All →
               </Link>
@@ -122,7 +121,7 @@ export const BrandCarousel = ({
         </div>
       )}
 
-      {/* Carousel with smooth scrolling */}
+      {/* Carousel */}
       {brands.length > 0 ? (
         <div
           ref={scrollRef}
@@ -148,8 +147,8 @@ export const BrandCarousel = ({
           ))}
         </div>
       ) : (
-        <div className="garden-card rounded-lg p-8 text-center border-dashed border-2" style={{ borderColor: 'hsl(var(--garden-border))' }}>
-          <p className="garden-text-muted">{emptyMessage}</p>
+        <div className="bg-[hsl(220,14%,96%)] rounded-lg p-8 text-center border-dashed border-2 border-[hsl(220,13%,91%)]">
+          <p className="text-[hsl(220,9%,46%)]">{emptyMessage}</p>
         </div>
       )}
     </section>

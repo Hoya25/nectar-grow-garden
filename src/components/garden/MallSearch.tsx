@@ -34,7 +34,6 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Expose focus method to parent
     useImperativeHandle(ref, () => ({
       focus: () => {
         inputRef.current?.focus();
@@ -42,7 +41,6 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
       }
     }));
 
-    // Load recent searches from localStorage
     useEffect(() => {
       const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
       if (saved) {
@@ -54,7 +52,6 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
       }
     }, []);
 
-    // Save recent search
     const saveRecentSearch = (searchTerm: string) => {
       const updated = [
         searchTerm,
@@ -64,7 +61,6 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
       localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
     };
 
-    // Search brands
     const searchBrands = useCallback(async (searchQuery: string) => {
       if (!searchQuery.trim()) {
         setResults([]);
@@ -91,7 +87,6 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
       }
     }, []);
 
-    // Debounced search
     useEffect(() => {
       const timer = setTimeout(() => {
         if (query.length >= 2) {
@@ -104,7 +99,6 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
       return () => clearTimeout(timer);
     }, [query, searchBrands]);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
         if (
@@ -142,7 +136,7 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
       <div className="garden-theme relative w-full max-w-2xl mx-auto">
         {/* Search Input */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 garden-text-muted" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[hsl(220,9%,46%)]" />
           <Input
             ref={inputRef}
             type="text"
@@ -150,16 +144,12 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setShowDropdown(true)}
-            className="pl-12 pr-10 h-12 text-lg rounded-full garden-card garden-text border-2 focus:border-[hsl(75,100%,50%)]"
-            style={{ 
-              borderColor: 'hsl(var(--garden-border))',
-              backgroundColor: 'hsl(var(--garden-card))'
-            }}
+            className="pl-12 pr-10 h-12 text-lg rounded-full bg-white text-[hsl(0,0%,10%)] border-[hsl(220,13%,91%)] border-2 focus:border-[hsl(142,71%,45%)] focus:ring-[hsl(142,71%,45%)] placeholder:text-[hsl(220,9%,46%)]"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 garden-text-muted hover:garden-text"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[hsl(220,9%,46%)] hover:text-[hsl(0,0%,10%)]"
             >
               <X className="h-5 w-5" />
             </button>
@@ -170,11 +160,11 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
         {showDropdown && (query.length >= 2 || recentSearches.length > 0) && (
           <div
             ref={dropdownRef}
-            className="absolute top-full left-0 right-0 mt-2 garden-card rounded-xl shadow-lg z-50 overflow-hidden max-h-[400px] overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-[hsl(220,13%,91%)] z-50 overflow-hidden max-h-[400px] overflow-y-auto"
           >
             {/* Loading */}
             {loading && (
-              <div className="p-4 text-center garden-text-muted">
+              <div className="p-4 text-center text-[hsl(220,9%,46%)]">
                 Searching...
               </div>
             )}
@@ -186,7 +176,7 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
                   <button
                     key={brand.id}
                     onClick={() => handleSelect(brand)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--garden-accent)/0.1)] transition-colors text-left btn-press"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(142,76%,97%)] transition-colors text-left btn-press"
                   >
                     <BrandLogo
                       src={brand.logo_url || undefined}
@@ -194,11 +184,11 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
                       size="sm"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium garden-text truncate">
+                      <p className="font-medium text-[hsl(0,0%,10%)] truncate">
                         {brand.name}
                       </p>
                     </div>
-                    <span className="nctr-rate text-sm shrink-0">
+                    <span className="text-[hsl(142,76%,36%)] font-semibold text-sm shrink-0">
                       {(brand.nctr_per_dollar || 0).toFixed(0)} NCTR/$1
                     </span>
                   </button>
@@ -208,7 +198,7 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
 
             {/* No results */}
             {!loading && query.length >= 2 && results.length === 0 && (
-              <div className="p-4 text-center garden-text-muted">
+              <div className="p-4 text-center text-[hsl(220,9%,46%)]">
                 No brands found for "{query}"
               </div>
             )}
@@ -217,12 +207,12 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
             {!query && recentSearches.length > 0 && (
               <div className="py-2">
                 <div className="flex items-center justify-between px-4 py-2">
-                  <span className="text-xs font-medium garden-text-muted uppercase">
+                  <span className="text-xs font-medium text-[hsl(220,9%,46%)] uppercase">
                     Recent Searches
                   </span>
                   <button
                     onClick={clearRecent}
-                    className="text-xs garden-text-muted hover:garden-text"
+                    className="text-xs text-[hsl(220,9%,46%)] hover:text-[hsl(0,0%,10%)]"
                   >
                     Clear
                   </button>
@@ -231,10 +221,10 @@ export const MallSearch = forwardRef<MallSearchHandle, MallSearchProps>(
                   <button
                     key={i}
                     onClick={() => handleRecentClick(term)}
-                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-[hsl(var(--garden-accent)/0.1)] transition-colors text-left btn-press"
+                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-[hsl(142,76%,97%)] transition-colors text-left btn-press"
                   >
-                    <Clock className="h-4 w-4 garden-text-muted" />
-                    <span className="garden-text">{term}</span>
+                    <Clock className="h-4 w-4 text-[hsl(220,9%,46%)]" />
+                    <span className="text-[hsl(0,0%,10%)]">{term}</span>
                   </button>
                 ))}
               </div>

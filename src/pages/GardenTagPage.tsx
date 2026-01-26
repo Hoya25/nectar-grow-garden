@@ -222,33 +222,33 @@ const GardenTagPage = () => {
 
   if (loading && !tag) {
     return (
-      <div className="garden-theme min-h-screen garden-bg flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin garden-accent" />
+      <div className="garden-theme min-h-screen bg-[hsl(80,20%,98%)] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[hsl(142,71%,45%)]" />
       </div>
     );
   }
 
   return (
-    <div className="garden-theme min-h-screen garden-bg">
+    <div className="garden-theme min-h-screen bg-[hsl(80,20%,98%)]">
       {/* Header */}
-      <header className="sticky top-0 z-50 garden-card border-b border-[hsl(var(--garden-border))]">
+      <header className="sticky top-0 z-50 bg-white border-b border-[hsl(220,13%,91%)] shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/garden")}
-              className="p-2 rounded-lg hover:bg-[hsl(var(--garden-card-hover))] transition-colors btn-press"
+              className="p-2 rounded-lg hover:bg-[hsl(220,14%,96%)] transition-colors btn-press"
             >
-              <ArrowLeft className="h-5 w-5 garden-text" />
+              <ArrowLeft className="h-5 w-5 text-[hsl(0,0%,10%)]" />
             </button>
             
             <div className="flex items-center gap-3 flex-1">
               <span className="text-2xl">{tagIcon}</span>
               <div>
-                <h1 className="text-xl font-bold garden-text">{tag?.name}</h1>
+                <h1 className="text-xl font-bold text-[hsl(0,0%,10%)]">{tag?.name}</h1>
                 {tag?.description && (
-                  <p className="text-sm garden-text-muted line-clamp-1">{tag.description}</p>
+                  <p className="text-sm text-[hsl(220,9%,46%)] line-clamp-1">{tag.description}</p>
                 )}
-                <p className="text-sm garden-text-muted">{totalCount} brands</p>
+                <p className="text-sm text-[hsl(220,9%,46%)]">{totalCount} brands</p>
               </div>
             </div>
           </div>
@@ -256,18 +256,18 @@ const GardenTagPage = () => {
       </header>
 
       {/* Filters Bar */}
-      <div className="sticky top-[73px] z-40 garden-card border-b border-[hsl(var(--garden-border))]">
+      <div className="sticky top-[73px] z-40 bg-white border-b border-[hsl(220,13%,91%)]">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm garden-text-muted">Sort by</span>
+            <span className="text-sm text-[hsl(220,9%,46%)]">Sort by</span>
             <Select value={sortBy} onValueChange={(v) => handleSortChange(v as SortOption)}>
-              <SelectTrigger className="w-[160px] garden-card border-[hsl(var(--garden-border))] garden-text">
+              <SelectTrigger className="w-[160px] bg-white border-[hsl(220,13%,91%)] text-[hsl(0,0%,10%)]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="garden-card border-[hsl(var(--garden-border))]">
-                <SelectItem value="highest_nctr" className="garden-text">Highest NCTR</SelectItem>
-                <SelectItem value="a_z" className="garden-text">A-Z</SelectItem>
-                <SelectItem value="newest" className="garden-text">Newest</SelectItem>
+              <SelectContent className="bg-white border-[hsl(220,13%,91%)]">
+                <SelectItem value="highest_nctr" className="text-[hsl(0,0%,10%)]">Highest NCTR</SelectItem>
+                <SelectItem value="a_z" className="text-[hsl(0,0%,10%)]">A-Z</SelectItem>
+                <SelectItem value="newest" className="text-[hsl(0,0%,10%)]">Newest</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -278,11 +278,11 @@ const GardenTagPage = () => {
       <main className="max-w-6xl mx-auto px-4 py-6">
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin garden-accent" />
+            <Loader2 className="h-8 w-8 animate-spin text-[hsl(142,71%,45%)]" />
           </div>
         ) : brands.length === 0 ? (
           <div className="text-center py-12">
-            <p className="garden-text-muted">No brands found with this tag.</p>
+            <p className="text-[hsl(220,9%,46%)]">No brands found with this tag.</p>
           </div>
         ) : (
           <>
@@ -310,7 +310,7 @@ const GardenTagPage = () => {
                 <Button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="bg-[hsl(var(--garden-accent))] text-[hsl(var(--garden-bg))] hover:bg-[hsl(var(--garden-accent))]/90 btn-press"
+                  className="bg-[hsl(142,71%,45%)] text-white hover:bg-[hsl(142,71%,40%)] btn-press"
                 >
                   {loadingMore ? (
                     <>
