@@ -33,80 +33,12 @@ const RouteTracker = () => {
 
 const App = () => {
   const [showComingSoon, setShowComingSoon] = useState(false);
-  const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
-    // More comprehensive URL and referrer checking
-    const currentUrl = window.location.href;
-    const searchParams = window.location.search;
-    const urlParams = new URLSearchParams(searchParams);
-    const previewParam = urlParams.get('preview');
-    const isPreview = previewParam === 'coming-soon';
-    
-    const debugOutput = `
-=== COMING SOON DEBUG (useEffect) ===
-Current URL: ${currentUrl}
-Search params: ${searchParams}
-All URL params: ${Array.from(urlParams.entries())}
-Preview param value: "${previewParam}"
-Is preview exactly 'coming-soon': ${isPreview}
-Should show Coming Soon: ${isPreview}
-User agent: ${navigator.userAgent}
-================================
-    `;
-    
-    console.log(debugOutput);
-    setDebugInfo(debugOutput);
-    
-    // Set state based on conditions
-    if (isPreview) {
-      console.log('✅ Setting showComingSoon to true');
-      setShowComingSoon(true);
-    } else {
-      console.log('❌ Not showing Coming Soon page');
-      setShowComingSoon(false);
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPreview = urlParams.get('preview') === 'coming-soon';
+    setShowComingSoon(isPreview);
   }, []);
-
-  // Show debug info on page for easier debugging
-  if (window.location.search.includes('debug=true')) {
-    return (
-      <div style={{ padding: '20px', fontFamily: 'monospace', whiteSpace: 'pre-line' }}>
-        <h2>Debug Information</h2>
-        {debugInfo}
-        <button onClick={() => setShowComingSoon(!showComingSoon)}>
-          Toggle Coming Soon ({showComingSoon ? 'ON' : 'OFF'})
-        </button>
-        {showComingSoon && <ComingSoon />}
-      </div>
-    );
-  }
-
-  // Add test button for easy Coming Soon testing (temporary)
-  if (window.location.search.includes('test=true')) {
-    return (
-      <div style={{ padding: '20px' }}>
-        <h2>Coming Soon Test</h2>
-        <p>Click the button below to test the Coming Soon page:</p>
-        <button 
-          onClick={() => setShowComingSoon(!showComingSoon)}
-          style={{ 
-            padding: '10px 20px', 
-            fontSize: '16px', 
-            backgroundColor: '#007bff', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '4px', 
-            cursor: 'pointer',
-            marginBottom: '20px'
-          }}
-        >
-          {showComingSoon ? 'Hide Coming Soon' : 'Show Coming Soon'}
-        </button>
-        {showComingSoon && <ComingSoon />}
-      </div>
-    );
-  }
 
   // Show Coming Soon page if conditions are met
   if (showComingSoon) {
