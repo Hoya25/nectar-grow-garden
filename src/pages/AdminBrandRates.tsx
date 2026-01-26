@@ -132,18 +132,35 @@ const AdminBrandRates = () => {
 
   const fetchBrands = async () => {
     try {
-      const { data, error } = await supabase
-        .from("brands")
-        .select("id, name, logo_url, category, commission_rate, nctr_per_dollar, featured, is_active, is_promoted, promotion_multiplier, promotion_label, promotion_ends_at")
-        .eq("is_active", true)
-        .order("name");
+      // Fetch all brands using pagination to overcome the 1000 row limit
+      const PAGE_SIZE = 1000;
+      let allBrands: Brand[] = [];
+      let from = 0;
+      let hasMore = true;
 
-      if (error) throw error;
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from("brands")
+          .select("id, name, logo_url, category, commission_rate, nctr_per_dollar, featured, is_active, is_promoted, promotion_multiplier, promotion_label, promotion_ends_at")
+          .eq("is_active", true)
+          .order("name")
+          .range(from, from + PAGE_SIZE - 1);
 
-      setBrands(data || []);
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          allBrands = [...allBrands, ...data];
+          from += PAGE_SIZE;
+          hasMore = data.length === PAGE_SIZE;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      setBrands(allBrands);
       
       // Extract unique categories
-      const uniqueCategories = [...new Set(data?.map(b => b.category).filter(Boolean) as string[])].sort();
+      const uniqueCategories = [...new Set(allBrands.map(b => b.category).filter(Boolean) as string[])].sort();
       setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching brands:", error);
@@ -159,25 +176,34 @@ const AdminBrandRates = () => {
 
   const fetchStats = async () => {
     try {
-      const { data, error } = await supabase
+      // Use aggregate queries to get accurate counts without row limits
+      const [activeResult, featuredResult, promotedResult] = await Promise.all([
+        supabase.from("brands").select("*", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("brands").select("*", { count: "exact", head: true }).eq("is_active", true).eq("featured", true),
+        supabase.from("brands").select("*", { count: "exact", head: true }).eq("is_active", true).eq("is_promoted", true),
+      ]);
+
+      // Get sample for average calculation
+      const { data: sampleData } = await supabase
         .from("brands")
-        .select("is_active, featured, is_promoted, nctr_per_dollar");
-
-      if (error) throw error;
-
-      const activeBrands = data?.filter(b => b.is_active) || [];
-      const totalActive = activeBrands.length;
-      const featuredCount = activeBrands.filter(b => b.featured).length;
-      const promotedCount = activeBrands.filter(b => b.is_promoted).length;
+        .select("nctr_per_dollar")
+        .eq("is_active", true)
+        .not("nctr_per_dollar", "is", null)
+        .gt("nctr_per_dollar", 0)
+        .limit(1000);
       
-      const nctrValues = activeBrands
-        .map(b => b.nctr_per_dollar)
-        .filter((v): v is number => v !== null && v > 0);
-      const avgNctrPerDollar = nctrValues.length > 0 
-        ? nctrValues.reduce((a, b) => a + b, 0) / nctrValues.length 
-        : 0;
+      let avgNctrPerDollar = 0;
+      if (sampleData && sampleData.length > 0) {
+        const values = sampleData.map(b => b.nctr_per_dollar).filter((v): v is number => v !== null);
+        avgNctrPerDollar = values.reduce((a, b) => a + b, 0) / values.length;
+      }
 
-      setStats({ totalActive, featuredCount, promotedCount, avgNctrPerDollar });
+      setStats({
+        totalActive: activeResult.count || 0,
+        featuredCount: featuredResult.count || 0,
+        promotedCount: promotedResult.count || 0,
+        avgNctrPerDollar,
+      });
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
@@ -205,7 +231,14 @@ const AdminBrandRates = () => {
         result = result.filter(b => b.is_promoted);
         break;
       case "high-commission":
-        result = result.filter(b => (b.commission_rate || 0) > 10);
+        // Commission rates are stored in various formats - consider > 10% as high
+        // Some are stored as decimals (0.10 = 10%), some as percentages (10 = 10%)
+        result = result.filter(b => {
+          const rate = b.commission_rate || 0;
+          // If rate > 1, assume it's already a percentage; otherwise multiply by 100
+          const pct = rate > 1 ? rate : rate * 100;
+          return pct > 10;
+        });
         break;
     }
 
@@ -543,7 +576,12 @@ const AdminBrandRates = () => {
                           {brand.category || "—"}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
-                          {brand.commission_rate ? `${brand.commission_rate.toFixed(1)}%` : "—"}
+                          {brand.commission_rate ? (() => {
+                            // Handle mixed formats: if < 1, treat as decimal (multiply by 100)
+                            const rate = brand.commission_rate;
+                            const displayRate = rate > 1 ? rate : rate * 100;
+                            return `${displayRate.toFixed(1)}%`;
+                          })() : "—"}
                         </TableCell>
                         <TableCell>
                           {inlineEditId === brand.id ? (
