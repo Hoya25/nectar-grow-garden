@@ -245,14 +245,14 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
   if (loading) {
     return (
-      <div className="garden-theme min-h-screen garden-bg flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" style={{ color: 'hsl(var(--garden-accent))' }} />
+      <div className="garden-theme min-h-screen bg-[hsl(80,20%,98%)] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[hsl(142,71%,45%)]" />
       </div>
     );
   }
 
   return (
-    <div className="garden-theme min-h-screen garden-bg pb-20 md:pb-0">
+    <div className="garden-theme min-h-screen bg-[hsl(80,20%,98%)] pb-20 md:pb-0">
       {/* Header with Search */}
       <MallHeader
         totalBrands={totalBrands}
@@ -345,20 +345,20 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           <section className="garden-theme mb-8 garden-fade-in visible">
             <button
               onClick={() => setShowBigBrands(!showBigBrands)}
-              className="garden-section-header flex items-center justify-between w-full text-left group btn-press"
+              className="flex items-center justify-between w-full text-left group btn-press border-b border-[hsl(220,13%,91%)] pb-3 mb-4"
             >
               <div>
-                <h2 className="text-xl font-bold garden-text">🏢 Major Retailers</h2>
-                <p className="text-sm garden-text-muted mt-1">National brands</p>
+                <h2 className="text-xl font-bold text-[hsl(0,0%,10%)]">🏢 Major Retailers</h2>
+                <p className="text-sm text-[hsl(220,9%,46%)] mt-1">National brands</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm garden-text-muted">
+                <span className="text-sm text-[hsl(220,9%,46%)]">
                   {bigBrands.length} brands
                 </span>
                 {showBigBrands ? (
-                  <ChevronUp className="h-5 w-5 garden-text-muted" />
+                  <ChevronUp className="h-5 w-5 text-[hsl(220,9%,46%)]" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 garden-text-muted" />
+                  <ChevronDown className="h-5 w-5 text-[hsl(220,9%,46%)]" />
                 )}
               </div>
             </button>
@@ -377,15 +377,15 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                 {bigBrands.slice(0, 6).map((brand) => (
                   <div
                     key={brand.id}
-                    className="flex-shrink-0 garden-card rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer garden-card-hover btn-press"
+                    className="flex-shrink-0 bg-white rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer border border-[hsl(220,13%,91%)] hover:border-[hsl(142,71%,45%)] hover:bg-[hsl(142,76%,97%)] transition-all btn-press"
                     onClick={() => handleShop(brand.id, brand.loyalize_id || "")}
                   >
-                    <span className="text-sm garden-text">{brand.name}</span>
+                    <span className="text-sm text-[hsl(0,0%,10%)]">{brand.name}</span>
                   </div>
                 ))}
                 <button
                   onClick={() => setShowBigBrands(true)}
-                  className="flex-shrink-0 text-sm font-medium garden-accent hover:opacity-80 transition-opacity px-3 py-2 btn-press"
+                  className="flex-shrink-0 text-sm font-medium text-[hsl(142,71%,45%)] hover:text-[hsl(142,71%,35%)] transition-colors px-3 py-2 btn-press"
                 >
                   See All →
                 </button>

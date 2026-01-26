@@ -43,12 +43,16 @@ export const MobileBottomNav = ({
   ];
 
   return (
-    <nav className="garden-theme garden-bottom-nav fixed bottom-0 left-0 right-0 h-[60px] md:hidden z-50 flex items-center justify-around px-4 safe-area-inset-bottom">
+    <nav className="garden-theme fixed bottom-0 left-0 right-0 h-[60px] md:hidden z-50 flex items-center justify-around px-4 safe-area-inset-bottom bg-white border-t border-[hsl(220,13%,91%)] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
       {navItems.map((item) => (
         <button
           key={item.label}
           onClick={item.action}
-          className={`garden-nav-item flex flex-col items-center justify-center gap-0.5 py-2 px-4 btn-press ${item.active ? 'active' : ''}`}
+          className={`flex flex-col items-center justify-center gap-0.5 py-2 px-4 btn-press transition-colors ${
+            item.active 
+              ? 'text-[hsl(142,71%,45%)]' 
+              : 'text-[hsl(220,9%,46%)] hover:text-[hsl(142,71%,45%)]'
+          }`}
         >
           <item.icon className="h-5 w-5" />
           <span className="text-[10px] font-medium">{item.label}</span>
