@@ -197,30 +197,24 @@ const GardenTagPage = () => {
     }
 
     try {
-      // Fetch brand's website_url
-      const { data: brandData, error } = await supabase
+      // Generate unique tracking ID for this click
+      const trackingId = `${user?.id?.substring(0, 8) || 'anon'}_${brandId.substring(0, 8)}_${Date.now()}`;
+      
+      // Get brand name for toast
+      const { data: brandData } = await supabase
         .from("brands")
-        .select("website_url, name")
+        .select("name")
         .eq("id", brandId)
         .single();
 
-      if (error) {
-        console.error("Error fetching brand:", error);
-      }
-
-      // Build affiliate URL with website redirect
-      const baseUrl = "https://www.loyalize.com/tracking/redirect";
-      const params = new URLSearchParams({
-        merchant_id: loyalizeId,
-        ...(user?.id && { sub_id: user.id }),
-        ...(brandData?.website_url && { url: brandData.website_url }),
-      });
-
-      window.open(`${baseUrl}?${params.toString()}`, "_blank");
+      // Call Edge Function for secure redirect with tracking
+      const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeId}&user=${user?.id || ''}&tracking=${trackingId}`;
+      
+      window.open(redirectUrl, '_blank');
 
       toast({
         title: `✓ Shopping at ${brandData?.name || 'brand'}`,
-        description: "Your earnings are being tracked",
+        description: "Your NCTR earnings will be tracked automatically",
       });
     } catch (error) {
       console.error("Error opening shop link:", error);
