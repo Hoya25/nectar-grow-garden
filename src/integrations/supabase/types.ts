@@ -2489,6 +2489,75 @@ export type Database = {
         }
         Relationships: []
       }
+      shopping_clicks: {
+        Row: {
+          brand_id: string | null
+          clicked_at: string | null
+          conversion_amount: number | null
+          converted: boolean | null
+          id: string
+          loyalize_id: string | null
+          nctr_earned: number | null
+          user_id: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          clicked_at?: string | null
+          conversion_amount?: number | null
+          converted?: boolean | null
+          id?: string
+          loyalize_id?: string | null
+          nctr_earned?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          clicked_at?: string | null
+          conversion_amount?: number | null
+          converted?: boolean | null
+          id?: string
+          loyalize_id?: string | null
+          nctr_earned?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_clicks_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_clicks_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_clicks_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_clicks_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_clicks_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           created_at: string
