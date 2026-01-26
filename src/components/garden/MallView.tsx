@@ -137,13 +137,13 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             .order("promotion_multiplier", { ascending: false })
             .limit(20),
           
-          // Highest earning (exclude big brands)
+          // Highest earning (exclude big brands and capped 500 NCTR bad data)
           supabase
             .from("brands")
             .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, is_big_brand")
             .eq("is_active", true)
             .neq("is_big_brand", true)
-            .not("nctr_per_dollar", "is", null)
+            .lt("nctr_per_dollar", 500)
             .gt("nctr_per_dollar", 0)
             .order("nctr_per_dollar", { ascending: false })
             .limit(10),
