@@ -576,12 +576,9 @@ const AdminBrandRates = () => {
                           {brand.category || "—"}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
-                          {brand.commission_rate ? (() => {
-                            // Handle mixed formats: if < 1, treat as decimal (multiply by 100)
-                            const rate = brand.commission_rate;
-                            const displayRate = rate > 1 ? rate : rate * 100;
-                            return `${displayRate.toFixed(1)}%`;
-                          })() : "—"}
+                          {brand.commission_rate != null
+                            ? `${(brand.commission_rate * 100).toFixed(1)}%`
+                            : "—"}
                         </TableCell>
                         <TableCell>
                           {inlineEditId === brand.id ? (
@@ -717,7 +714,9 @@ const AdminBrandRates = () => {
               <div className="space-y-2">
                 <Label className="text-muted-foreground">Commission Rate (from Loyalize)</Label>
                 <div className="text-lg font-medium text-muted-foreground">
-                  {editingBrand.commission_rate ? `${editingBrand.commission_rate.toFixed(1)}%` : "Not set"}
+                  {editingBrand.commission_rate != null 
+                    ? `${(editingBrand.commission_rate * 100).toFixed(1)}%` 
+                    : "Not set"}
                 </div>
               </div>
 
