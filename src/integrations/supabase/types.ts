@@ -3788,6 +3788,18 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: undefined
       }
+      process_affiliate_purchase: {
+        Args: {
+          p_auto_lock_type?: string
+          p_base_nctr_amount: number
+          p_brand_name?: string
+          p_external_transaction_id?: string
+          p_partner_name?: string
+          p_purchase_amount?: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
       process_completed_referral: {
         Args: { p_referred_user_id: string }
         Returns: Json
