@@ -28,6 +28,32 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  // Force hide loading state after timeout (fallback for lazy load issues)
+  useEffect(() => {
+    if (!src || imageLoaded || imageError) return;
+    
+    const timeout = setTimeout(() => {
+      // If image still hasn't loaded after 3 seconds, assume it loaded
+      // (handles edge cases with lazy loading and cached images)
+      if (imgRef.current && imgRef.current.complete) {
+        setImageLoaded(true);
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timeout);
+  }, [src, imageLoaded, imageError]);
+
+  // Check if image is already loaded (from cache)
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      setImageLoaded(true);
+      if (variant === 'auto') {
+        const { naturalWidth, naturalHeight } = imgRef.current;
+        setAspectRatio(naturalWidth / naturalHeight);
+      }
+    }
+  }, [src, variant]);
+
   // Size configurations optimized for different logo types
   const sizeConfig = {
     xs: { 
@@ -73,6 +99,7 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
 
   const handleImageError = () => {
     setImageError(true);
+    setImageLoaded(true); // Also set loaded to true to hide the skeleton
     onError?.();
   };
 
@@ -111,7 +138,7 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
   };
 
   const containerClasses = cn(
-    'relative flex items-center justify-center rounded bg-muted/30 overflow-hidden border border-border/20',
+    'relative flex items-center justify-center rounded bg-gray-50 overflow-hidden border border-gray-100',
     sizeConfig[size].container,
     variant === 'auto' && aspectRatio && aspectRatio > 1.5 ? 'w-auto' : 'w-auto',
     className
@@ -129,7 +156,7 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
         {fallback || (
           <Building2 
             className={cn(
-              'text-muted-foreground',
+              'text-gray-400',
               size === 'xs' && 'h-3 w-3',
               size === 'sm' && 'h-4 w-4',
               size === 'md' && 'h-5 w-5',
@@ -153,14 +180,12 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
         onError={handleImageError}
         loading="lazy"
       />
-      {/* Loading placeholder */}
-      {!imageLoaded && !imageError && (
-        <div className={cn(
-          'absolute inset-0 flex items-center justify-center bg-muted/50 animate-pulse',
-        )}>
+      {/* Loading placeholder - only show if not loaded and no error */}
+      {!imageLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse">
           <Building2 
             className={cn(
-              'text-muted-foreground',
+              'text-gray-400',
               size === 'xs' && 'h-3 w-3',
               size === 'sm' && 'h-4 w-4', 
               size === 'md' && 'h-5 w-5',
