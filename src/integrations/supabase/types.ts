@@ -286,15 +286,151 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      brand_tag_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          brand_id: string | null
+          id: string
+          tag_id: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          brand_id?: string | null
+          id?: string
+          tag_id?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          brand_id?: string | null
+          id?: string
+          tag_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_tag_assignments_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_tag_assignments_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_tag_assignments_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_tag_assignments_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_tag_assignments_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_brands_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "brand_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_tags: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           category: string | null
+          click_count: number | null
           commission_rate: number | null
           created_at: string
           description: string | null
+          display_order: number | null
           featured: boolean
           id: string
           is_active: boolean
+          is_big_brand: boolean | null
           is_promoted: boolean | null
           logo_url: string | null
           loyalize_commission_rate: number | null
@@ -312,12 +448,15 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          click_count?: number | null
           commission_rate?: number | null
           created_at?: string
           description?: string | null
+          display_order?: number | null
           featured?: boolean
           id?: string
           is_active?: boolean
+          is_big_brand?: boolean | null
           is_promoted?: boolean | null
           logo_url?: string | null
           loyalize_commission_rate?: number | null
@@ -335,12 +474,15 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          click_count?: number | null
           commission_rate?: number | null
           created_at?: string
           description?: string | null
+          display_order?: number | null
           featured?: boolean
           id?: string
           is_active?: boolean
+          is_big_brand?: boolean | null
           is_promoted?: boolean | null
           logo_url?: string | null
           loyalize_commission_rate?: number | null
