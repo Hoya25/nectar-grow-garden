@@ -134,11 +134,14 @@ export const BrandDetailModal = ({
     setLoading(true);
 
     try {
+      // Generate unique tracking ID for this click
+      const trackingId = `${userId?.substring(0, 8) || 'anon'}_${brand.id.substring(0, 8)}_${Date.now()}`;
+      
       // Increment click count
       if (userId) {
         const { data: currentBrand } = await supabase
           .from("brands")
-          .select("click_count, website_url")
+          .select("click_count")
           .eq("id", brand.id)
           .single();
         
@@ -147,30 +150,14 @@ export const BrandDetailModal = ({
         }).eq("id", brand.id);
       }
 
-      // Fetch website_url if not provided in props
-      let websiteUrl = brand.website_url;
-      if (!websiteUrl) {
-        const { data: brandData } = await supabase
-          .from("brands")
-          .select("website_url")
-          .eq("id", brand.id)
-          .single();
-        websiteUrl = brandData?.website_url;
-      }
-
-      // Build affiliate URL with website redirect
-      const baseUrl = "https://www.loyalize.com/tracking/redirect";
-      const params = new URLSearchParams({
-        merchant_id: brand.loyalize_id,
-        ...(userId && { sub_id: userId }),
-        ...(websiteUrl && { url: websiteUrl }),
-      });
-
-      window.open(`${baseUrl}?${params.toString()}`, "_blank");
+      // Call Edge Function for secure redirect with tracking
+      const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${brand.loyalize_id}&user=${userId || ''}&tracking=${trackingId}`;
+      
+      window.open(redirectUrl, '_blank');
 
       toast({
         title: `✓ Shopping at ${brand.name}`,
-        description: "Your earnings are being tracked",
+        description: "Your NCTR earnings will be tracked automatically",
       });
 
       onClose();
