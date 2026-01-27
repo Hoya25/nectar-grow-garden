@@ -7,6 +7,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Security limits - configurable via environment variables
+const DAILY_WITHDRAWAL_LIMIT_NCTR = parseFloat(Deno.env.get('TREASURY_DAILY_LIMIT_NCTR') || '50000') // 50k NCTR default
+const SINGLE_WITHDRAWAL_ALERT_THRESHOLD = parseFloat(Deno.env.get('TREASURY_ALERT_THRESHOLD_NCTR') || '10000') // 10k NCTR
+
 interface WithdrawalRequest {
   id: string
   user_id: string
@@ -15,6 +19,54 @@ interface WithdrawalRequest {
   net_amount_nctr: number
   gas_fee_nctr: number
   status: string
+}
+
+// Security audit logging helper
+async function logSecurityEvent(
+  supabaseClient: any,
+  userId: string,
+  actionType: string,
+  riskLevel: 'low' | 'medium' | 'high' | 'critical',
+  resourceTable: string,
+  resourceId: string | null,
+  metadata: Record<string, any>
+) {
+  try {
+    await supabaseClient.from('security_audit_log').insert({
+      user_id: userId,
+      action_type: actionType,
+      risk_level: riskLevel,
+      resource_table: resourceTable,
+      resource_id: resourceId,
+      metadata: metadata
+    })
+  } catch (err) {
+    // Don't fail the operation if logging fails, but log to console
+    console.error('Failed to log security event:', err)
+  }
+}
+
+// Check daily withdrawal limits
+async function checkDailyWithdrawalLimit(supabaseClient: any, newAmount: number): Promise<{ allowed: boolean; dailyTotal: number; limit: number }> {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  const { data: completedToday, error } = await supabaseClient
+    .from('withdrawal_requests')
+    .select('net_amount_nctr')
+    .eq('status', 'completed')
+    .gte('processed_at', today.toISOString())
+  
+  if (error) {
+    console.error('Error checking daily limits:', error)
+    // Fail closed - if we can't check limits, don't allow
+    return { allowed: false, dailyTotal: 0, limit: DAILY_WITHDRAWAL_LIMIT_NCTR }
+  }
+  
+  const dailyTotal = (completedToday || []).reduce((sum: number, w: any) => sum + (w.net_amount_nctr || 0), 0)
+  const allowed = (dailyTotal + newAmount) <= DAILY_WITHDRAWAL_LIMIT_NCTR
+  
+  return { allowed, dailyTotal, limit: DAILY_WITHDRAWAL_LIMIT_NCTR }
 }
 
 serve(async (req) => {
@@ -128,7 +180,7 @@ serve(async (req) => {
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
         )
       }
-      return await processWithdrawal(supabaseClient, request_id)
+      return await processWithdrawal(supabaseClient, request_id, user.id)
     }
 
     if (action === 'get_pending_withdrawals') {
@@ -150,7 +202,7 @@ serve(async (req) => {
   }
 })
 
-async function processWithdrawal(supabaseClient: any, requestId: string) {
+async function processWithdrawal(supabaseClient: any, requestId: string, adminUserId: string) {
   console.log(`🏦 Processing withdrawal request: ${requestId}`)
 
   // Get withdrawal request details - security is now enforced by RLS policies
@@ -163,10 +215,45 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
 
   if (withdrawalError || !withdrawal) {
     console.error('❌ Withdrawal request not found:', withdrawalError)
+    await logSecurityEvent(supabaseClient, adminUserId, 'treasury_withdrawal_not_found', 'medium', 'withdrawal_requests', requestId, {
+      error: 'Withdrawal request not found or not pending'
+    })
     return new Response(
       JSON.stringify({ error: 'Withdrawal request not found' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
     )
+  }
+
+  // SECURITY: Check daily withdrawal limits
+  const { allowed, dailyTotal, limit } = await checkDailyWithdrawalLimit(supabaseClient, withdrawal.net_amount_nctr)
+  if (!allowed) {
+    console.error(`❌ Daily withdrawal limit exceeded: ${dailyTotal + withdrawal.net_amount_nctr} > ${limit}`)
+    await logSecurityEvent(supabaseClient, adminUserId, 'treasury_daily_limit_exceeded', 'critical', 'withdrawal_requests', requestId, {
+      requested_amount: withdrawal.net_amount_nctr,
+      daily_total: dailyTotal,
+      daily_limit: limit,
+      recipient_wallet: withdrawal.wallet_address?.substring(0, 10) + '...'
+    })
+    return new Response(
+      JSON.stringify({ 
+        error: 'Daily withdrawal limit exceeded - requires manual approval',
+        daily_total: dailyTotal,
+        daily_limit: limit 
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 429 }
+    )
+  }
+
+  // SECURITY: Log high-value transactions
+  const isHighValue = withdrawal.net_amount_nctr >= SINGLE_WITHDRAWAL_ALERT_THRESHOLD
+  if (isHighValue) {
+    await logSecurityEvent(supabaseClient, adminUserId, 'treasury_high_value_withdrawal', 'high', 'withdrawal_requests', requestId, {
+      amount: withdrawal.net_amount_nctr,
+      threshold: SINGLE_WITHDRAWAL_ALERT_THRESHOLD,
+      recipient_wallet: withdrawal.wallet_address?.substring(0, 10) + '...',
+      recipient_user_id: withdrawal.user_id?.substring(0, 8) + '...'
+    })
+    console.log(`⚠️ HIGH VALUE WITHDRAWAL: ${withdrawal.net_amount_nctr} NCTR (threshold: ${SINGLE_WITHDRAWAL_ALERT_THRESHOLD})`)
   }
 
   // Fetch user profile for logging
@@ -186,10 +273,14 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
       .update({ status: 'processing' })
       .eq('id', requestId)
 
-    // Get treasury wallet private key
+    // Get treasury wallet private key - SECURITY: Never log or expose this value
     const privateKey = Deno.env.get('TREASURY_WALLET_PRIVATE_KEY')
     if (!privateKey) {
-      throw new Error('Treasury wallet private key not configured')
+      // Generic error message - don't reveal configuration details
+      await logSecurityEvent(supabaseClient, adminUserId, 'treasury_config_error', 'critical', 'withdrawal_requests', requestId, {
+        error_type: 'missing_configuration'
+      })
+      throw new Error('Treasury configuration error - contact administrator')
     }
 
     // Set up Ethereum provider and wallet - Use Base network
@@ -214,6 +305,9 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
     // Check treasury balance
     const balance = await nctrContract.balanceOf(wallet.address)
     if (balance < amountInWei) {
+      await logSecurityEvent(supabaseClient, adminUserId, 'treasury_insufficient_balance', 'high', 'withdrawal_requests', requestId, {
+        requested_amount: withdrawal.net_amount_nctr
+      })
       throw new Error('Insufficient treasury balance')
     }
 
@@ -245,6 +339,16 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
       .eq('transaction_type', 'withdrawal')
       .eq('status', 'pending')
 
+    // SECURITY: Log successful withdrawal to audit log
+    await logSecurityEvent(supabaseClient, adminUserId, 'treasury_withdrawal_completed', isHighValue ? 'high' : 'medium', 'withdrawal_requests', requestId, {
+      amount: withdrawal.net_amount_nctr,
+      transaction_hash: tx.hash,
+      block_number: receipt.blockNumber,
+      recipient_wallet: withdrawal.wallet_address?.substring(0, 10) + '...',
+      recipient_user_id: withdrawal.user_id?.substring(0, 8) + '...',
+      processed_by: adminUserId?.substring(0, 8) + '...'
+    })
+
     console.log(`🎉 Withdrawal completed successfully for ${userName} (${withdrawal.user_id.slice(0, 8)}...)`)
 
     return new Response(
@@ -259,12 +363,26 @@ async function processWithdrawal(supabaseClient: any, requestId: string) {
   } catch (error) {
     console.error('❌ Withdrawal processing failed:', error)
 
-    // Update withdrawal as failed
+    // SECURITY: Log failed withdrawal attempt
+    await logSecurityEvent(supabaseClient, adminUserId, 'treasury_withdrawal_failed', 'high', 'withdrawal_requests', requestId, {
+      amount: withdrawal.net_amount_nctr,
+      recipient_wallet: withdrawal.wallet_address?.substring(0, 10) + '...',
+      error_type: error instanceof Error ? error.name : 'unknown'
+      // Don't log full error message which might contain sensitive info
+    })
+
+    // Update withdrawal as failed - sanitize error message
+    const safeErrorMessage = error instanceof Error 
+      ? (error.message.includes('private') || error.message.includes('key') || error.message.includes('secret')
+        ? 'Transaction processing failed'  // Sanitize any messages that might leak key info
+        : error.message)
+      : 'Unknown error occurred'
+    
     await supabaseClient
       .from('withdrawal_requests')
       .update({
         status: 'failed',
-        failure_reason: error instanceof Error ? error.message : 'Unknown error occurred'
+        failure_reason: safeErrorMessage
       })
       .eq('id', requestId)
 
