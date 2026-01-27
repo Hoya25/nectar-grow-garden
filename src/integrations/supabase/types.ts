@@ -3333,6 +3333,10 @@ export type Database = {
         Args: { required_level: string }
         Returns: boolean
       }
+      check_admin_access_with_audit: {
+        Args: { p_resource_id: string; p_resource_table: string }
+        Returns: boolean
+      }
       check_business_data_rate_limit: {
         Args: { p_table_name: string }
         Returns: boolean
@@ -3342,6 +3346,10 @@ export type Database = {
         Returns: boolean
       }
       check_price_access_rate_limit: { Args: never; Returns: boolean }
+      check_treasury_admin_with_audit: {
+        Args: { p_resource_id: string }
+        Returns: boolean
+      }
       check_user_is_admin: { Args: { check_user_id: string }; Returns: boolean }
       check_user_is_admin_secure: {
         Args: { check_user_id: string }
@@ -3813,6 +3821,15 @@ export type Database = {
       is_referral_power_user: { Args: { p_user_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       is_treasury_admin: { Args: { check_user_id: string }; Returns: boolean }
+      log_and_allow_admin_access: {
+        Args: {
+          p_action_type: string
+          p_resource_id: string
+          p_resource_table: string
+          p_risk_level?: string
+        }
+        Returns: boolean
+      }
       log_business_data_access: {
         Args: { p_action?: string; p_table_name: string }
         Returns: undefined
