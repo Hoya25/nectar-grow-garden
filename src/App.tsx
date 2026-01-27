@@ -20,6 +20,7 @@ import AdminBrandRates from "./pages/AdminBrandRates";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
+import { Userback } from "./components/Userback";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <CustomerServiceBubble />
+              <Userback />
             </WalletProvider>
           </AuthProvider>
         </BrowserRouter>
