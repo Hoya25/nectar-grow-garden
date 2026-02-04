@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { Sparkles } from "lucide-react";
 import { MallHeader } from "./MallHeader";
 import { BrandCarousel } from "./BrandCarousel";
 import { DepartmentGrid } from "./DepartmentGrid";
@@ -95,6 +96,23 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
     } catch (error) {
       console.error(`Error fetching brands for tag ${tagSlug}:`, error);
       return [];
+    }
+  }, []);
+
+  // Welcome back toast when user returns from shopping
+  useEffect(() => {
+    const lastClickTime = sessionStorage.getItem('garden_last_click_time');
+    if (lastClickTime) {
+      const timeSinceClick = Date.now() - Number(lastClickTime);
+      // If they return within 2 hours of clicking a brand
+      if (timeSinceClick < 2 * 60 * 60 * 1000) {
+        sessionStorage.removeItem('garden_last_click_time');
+        toast({
+          title: "👋 Welcome Back!",
+          description: "If you completed a purchase, your NCTR earnings will show up in your Crescendo dashboard within 24-48 hours. We'll notify you when they arrive!",
+          duration: 8000,
+        });
+      }
     }
   }, []);
 
@@ -215,11 +233,15 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       // Call Edge Function for secure redirect with tracking
       const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeId}&user=${userId || ''}&tracking=${trackingId}`;
       
+      // Save click timestamp for welcome-back toast
+      sessionStorage.setItem('garden_last_click_time', Date.now().toString());
+      
       window.open(redirectUrl, '_blank');
 
       toast({
-        title: `✓ Shopping at ${brandData?.name || 'brand'}`,
-        description: "Your NCTR earnings will be tracked automatically",
+        title: "🛒 Shopping Trip Started!",
+        description: "Complete your purchase and you'll automatically earn NCTR. Your earnings typically appear within 24-48 hours.",
+        duration: 7000,
       });
     } catch (error) {
       console.error("Error opening shop link:", error);
@@ -273,6 +295,21 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* NCTR Earning Awareness Banner */}
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl mt-0.5">✨</span>
+            <div>
+              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+                Every Purchase Builds Your Stake
+              </p>
+              <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
+                Shop the brands you already love through The Garden and automatically earn NCTR — real digital asset stakes that grow your membership and unlock exclusive benefits. You never buy NCTR. You earn it by living your life.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Browse All Brands CTA */}
         <div className="mb-6">
           <button
