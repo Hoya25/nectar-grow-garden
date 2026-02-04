@@ -108,9 +108,20 @@ export const MallBrandCard = ({
           {name}
         </h3>
 
+        {/* NCTR Earning Rate */}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 mb-2">
+          <span>✨</span>
+          <span>
+            {nctr_per_dollar && nctr_per_dollar > 0 
+              ? `Earn ${nctr_per_dollar % 1 === 0 ? nctr_per_dollar.toFixed(0) : nctr_per_dollar.toFixed(1)} NCTR per $1 spent`
+              : 'Earn NCTR on every purchase'
+            }
+          </span>
+        </div>
+
         {/* Category */}
         {category && (
-          <p className="text-xs text-gray-500 text-center mb-3 truncate">
+          <p className="text-xs text-gray-500 text-center mb-2 truncate">
             {category}
           </p>
         )}

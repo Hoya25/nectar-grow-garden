@@ -153,11 +153,15 @@ export const BrandDetailModal = ({
       // Call Edge Function for secure redirect with tracking
       const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${brand.loyalize_id}&user=${userId || ''}&tracking=${trackingId}`;
       
+      // Save click timestamp for welcome-back toast
+      sessionStorage.setItem('garden_last_click_time', Date.now().toString());
+      
       window.open(redirectUrl, '_blank');
 
       toast({
-        title: `✓ Shopping at ${brand.name}`,
-        description: "Your NCTR earnings will be tracked automatically",
+        title: "🛒 Shopping Trip Started!",
+        description: "Complete your purchase and you'll automatically earn NCTR. Your earnings typically appear within 24-48 hours.",
+        duration: 7000,
       });
 
       onClose();
