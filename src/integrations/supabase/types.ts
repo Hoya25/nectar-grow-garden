@@ -3498,6 +3498,10 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: Json
       }
+      get_admin_user_behavior: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       get_admin_user_list: {
         Args: never
         Returns: {
