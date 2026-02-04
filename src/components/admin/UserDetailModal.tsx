@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import UserActivityView from './UserActivityView';
+import UserBehaviorView from './UserBehaviorView';
 
 interface UserProfile {
   id: string;
@@ -214,10 +215,11 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
           </div>
         ) : (
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
               <TabsTrigger value="activity">Activity</TabsTrigger>
+              <TabsTrigger value="behavior">Behavior</TabsTrigger>
               <TabsTrigger value="referrals">Referrals</TabsTrigger>
             </TabsList>
 
@@ -439,6 +441,10 @@ const UserDetailModal = ({ user, isOpen, onClose }: UserDetailModalProps) => {
 
             <TabsContent value="activity">
               <UserActivityView userId={user.user_id} />
+            </TabsContent>
+
+            <TabsContent value="behavior">
+              <UserBehaviorView userId={user.user_id} />
             </TabsContent>
 
             <TabsContent value="referrals">
