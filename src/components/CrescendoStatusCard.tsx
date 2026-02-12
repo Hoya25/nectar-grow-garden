@@ -157,7 +157,7 @@ export const CrescendoStatusCard = ({ totalNctr, compact = false }: CrescendoSta
 
       {/* CTA */}
       <a
-        href="https://crescendo.nctr.live"
+        href="https://crescendo.nctr.live/dashboard"
         target="_blank"
         rel="noopener noreferrer"
         className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-lg font-semibold transition-all hover:opacity-90 btn-press"
@@ -166,9 +166,12 @@ export const CrescendoStatusCard = ({ totalNctr, compact = false }: CrescendoSta
           color: 'hsl(var(--garden-bg))' 
         }}
       >
-        View Rewards on Crescendo
+        Unlock Rewards on Crescendo
         <ChevronRight className="h-4 w-4" />
       </a>
+      <p className="text-xs garden-text-muted text-center mt-2">
+        Lock your stakes to level up your status and access exclusive rewards
+      </p>
     </div>
   );
 };
