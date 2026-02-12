@@ -143,23 +143,12 @@ const Referrals = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/garden')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Garden
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Users className="w-8 h-8 text-primary" />
-              My Invites ({stats.total})
-            </h1>
-            <p className="text-muted-foreground">Track your referrals and rewards</p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            <Users className="w-8 h-8 text-primary" />
+            My Invites ({stats.total})
+          </h1>
+          <p className="text-muted-foreground mt-1">Track your referrals and rewards</p>
         </div>
 
         {loading ? (
