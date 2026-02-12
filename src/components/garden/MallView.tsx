@@ -304,7 +304,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                 Every Purchase Builds Your Stake
               </p>
               <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
-                Shop the brands you already love through The Garden and automatically earn NCTR — real digital asset stakes that grow your membership and unlock exclusive benefits. You never buy NCTR. You earn it by living your life.
+                Shop the brands you already love through The Garden and automatically earn NCTR stakes that build your Crescendo status and unlock exclusive rewards. You never buy NCTR. You earn it by living your life.
               </p>
             </div>
           </div>
