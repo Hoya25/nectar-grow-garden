@@ -22,6 +22,7 @@ import ReferralSystem from '@/components/ReferralSystem';
 import { BaseBadge } from '@/components/BaseBadge';
 import { WithdrawalModal } from '@/components/WithdrawalModal';
 import { NCTRPortfolioBreakdown } from '@/components/NCTRPortfolioBreakdown';
+import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 
 interface UserProfile {
   id: string;
@@ -413,6 +414,11 @@ const Profile = () => {
           >
             New Action
           </Button>
+        </div>
+
+        {/* Profile Completion Banner */}
+        <div className="mb-6">
+          <ProfileCompletionBanner />
         </div>
         {/* PRIORITY: Invite Friends - Best Way to Earn NCTR */}
         <div className="mb-8">
