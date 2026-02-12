@@ -226,62 +226,64 @@ export const GardenHeroSection = ({
         </Card>
       </div>
 
-      {/* Featured Brands Section */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-xl font-bold section-heading flex items-center gap-2">
-            <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-            Top Earning Brands
-          </h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onShopClick}
-            className="text-primary hover:text-primary/80"
-          >
-            View All {totalBrands.toLocaleString()} →
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {featuredBrands.slice(0, 6).map((brand) => (
-            <Card 
-              key={brand.id}
-              className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-primary bg-background"
-              onClick={() => onBrandClick(brand)}
+      {/* Featured Brands Section - only show if there are brands */}
+      {featuredBrands.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg md:text-xl font-bold section-heading flex items-center gap-2">
+              <div className="w-1.5 h-6 bg-primary rounded-full"></div>
+              Top Earning Brands
+            </h2>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onShopClick}
+              className="text-primary hover:text-primary/80"
             >
-              <CardContent className="p-3 text-center">
-                <div className="w-full h-16 flex items-center justify-center mb-2 bg-muted/30 rounded-lg overflow-hidden">
-                  {brand.logo_url ? (
-                    <BrandLogo 
-                      src={brand.logo_url} 
-                      alt={brand.name}
-                      size="md"
-                      variant="auto"
-                    />
-                  ) : (
-                    <Store className="w-8 h-8 text-muted-foreground" />
-                  )}
-                </div>
-                <p className="text-xs font-medium truncate mb-1" title={brand.name}>
-                  {brand.name}
-                </p>
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <span className="text-sm font-bold text-primary">
-                    Earn {formatPercent(brand.commission_rate)} back
-                  </span>
-                </div>
-                <Button 
-                  size="sm" 
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  Shop Now <ExternalLink className="w-3 h-3 ml-1" />
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+              View All {totalBrands.toLocaleString()} →
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {featuredBrands.slice(0, 6).map((brand) => (
+              <Card 
+                key={brand.id}
+                className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-primary bg-background"
+                onClick={() => onBrandClick(brand)}
+              >
+                <CardContent className="p-3 text-center">
+                  <div className="w-full h-16 flex items-center justify-center mb-2 bg-muted/30 rounded-lg overflow-hidden">
+                    {brand.logo_url ? (
+                      <BrandLogo 
+                        src={brand.logo_url} 
+                        alt={brand.name}
+                        size="md"
+                        variant="auto"
+                      />
+                    ) : (
+                      <Store className="w-8 h-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <p className="text-xs font-medium truncate mb-1" title={brand.name}>
+                    {brand.name}
+                  </p>
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <span className="text-sm font-bold text-primary">
+                      Earn {formatPercent(brand.commission_rate)} back
+                    </span>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Shop Now <ExternalLink className="w-3 h-3 ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

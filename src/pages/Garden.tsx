@@ -1467,11 +1467,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           onBrandClick={handleFeaturedBrandClick}
         />
 
-        {/* Profile Completion Banner */}
-        <div className="mb-6">
-          <ProfileCompletionBanner />
-        </div>
-
         {/* Crescendo Status - Below hero */}
         <div className="mb-8">
           <MemberStatusBanner 
@@ -1493,14 +1488,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           />
         </div>
 
-        {/* Crescendo Status Card */}
-        <div className="mb-8">
-          <CrescendoStatusCard 
-            totalNctr={parseFloat(portfolio?.lock_360_nctr?.toString() || '0') + parseFloat(portfolio?.lock_90_nctr?.toString() || '0')} 
-          />
-        </div>
-
-        {/* Portfolio Section - Collapsible */}
+        {/* Stakes Overview - Collapsible */}
         <div className="mb-8">
           <Card 
             className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20 shadow-premium cursor-pointer hover:shadow-premium-hover transition-all duration-300"
@@ -1510,7 +1498,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
               <CardTitle className="text-xl section-heading flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Coins className="w-6 h-6 text-primary" />
-                  Your NCTR Portfolio
+                  Your NCTR Stakes
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="text-right">
@@ -1518,7 +1506,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                       {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {portfolioExpanded ? 'Click to collapse' : 'Click to view history'}
+                      {portfolioExpanded ? 'Tap to collapse' : 'Tap to view details'}
                     </p>
                   </div>
                   <div className={`transform transition-transform duration-300 ${portfolioExpanded ? 'rotate-180' : ''}`}>
@@ -1528,6 +1516,26 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
               </CardTitle>
             </CardHeader>
             
+            {/* Collapsed mini breakdown */}
+            {!portfolioExpanded && (
+              <CardContent className="p-6 pt-0">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center p-2 bg-card rounded-lg border border-border">
+                    <p className="text-xs text-muted-foreground mb-0.5">Available</p>
+                    <p className="text-sm font-bold text-foreground">{formatNCTR(portfolio?.available_nctr || 0)}</p>
+                  </div>
+                  <div className="text-center p-2 bg-card rounded-lg border border-border">
+                    <p className="text-xs text-muted-foreground mb-0.5">90LOCK</p>
+                    <p className="text-sm font-bold text-foreground">{formatNCTR(portfolio?.lock_90_nctr || 0)}</p>
+                  </div>
+                  <div className="text-center p-2 bg-card rounded-lg border border-border">
+                    <p className="text-xs text-muted-foreground mb-0.5">360LOCK</p>
+                    <p className="text-sm font-bold text-foreground">{formatNCTR(portfolio?.lock_360_nctr || 0)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            )}
+
             {portfolioExpanded && (
               <CardContent className="p-6 pt-0">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
@@ -1535,7 +1543,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     <CardContent className="p-4 text-center">
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <Coins className="w-5 h-5 text-blue-600" />
-                        <span className="text-sm font-medium text-muted-foreground">Available</span>
+                        <span className="text-sm font-medium text-muted-foreground">Available Stakes</span>
                       </div>
                       <p className="text-xl font-bold text-blue-600 mb-1">
                         {formatNCTR(portfolio?.available_nctr || 0)}
@@ -1586,13 +1594,13 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     <CardContent className="p-4 text-center">
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <TrendingUp className="w-5 h-5 text-green-600" />
-                        <span className="text-sm font-medium text-green-600">Total Earned</span>
+                        <span className="text-sm font-medium text-green-600">Total Earned Stakes</span>
                       </div>
                       <p className="text-xl font-bold text-green-600 mb-1">
                         {formatNCTR(portfolio?.total_earned || 0)}
                       </p>
                       <p className="text-xs text-muted-foreground">{formatUSD(portfolio?.total_earned || 0)}</p>
-                      <p className="text-xs text-green-600/80">Lifetime NCTR</p>
+                      <p className="text-xs text-green-600/80">Lifetime Stakes</p>
                     </CardContent>
                   </Card>
 
@@ -1626,12 +1634,11 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                       <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wide">
-                        Alliance Token Balances
+                        Alliance Stake Balances
                       </h4>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {Object.entries(portfolio.alliance_tokens as Record<string, any>).map(([symbol, tokenData]) => {
-                        // Handle both simple number format and object format
                         const amount = typeof tokenData === 'number' ? tokenData : (tokenData?.amount || 0);
                         const lockInfo = typeof tokenData === 'object' ? tokenData : null;
                         
@@ -1659,7 +1666,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                   </div>
                 )}
 
-
                 {/* Easy Button for 360LOCK Commitment */}
                 <div className="mb-6">
                   <BatchLockUpgrade 
@@ -1679,9 +1685,8 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     className="border-primary/50 text-primary hover:bg-primary/10"
                   >
                     <User className="w-4 h-4 mr-2" />
-                    Portfolio Details & Sync
+                    Stakes Details & Sync
                   </Button>
-                  
                   
                   {(portfolio?.available_nctr && portfolio.available_nctr > 0) && (
                     <Button 
@@ -1698,7 +1703,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                   )}
                 </div>
 
-                {/* Portfolio Story - Transaction History */}
+                {/* Stakes Story - Transaction History */}
                 <div className="mt-6">
                   <PortfolioStory userId={user?.id || ''} refreshKey={refreshKey} />
                 </div>
@@ -1707,70 +1712,12 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           </Card>
         </div>
 
-        {/* Invite Friends - Best Way to Earn NCTR */}
-        <div className="mb-8">
-          {opportunities.filter(op => op.opportunity_type === 'invite' && !completedOpportunityIds.includes(op.id)).map(opportunity => (
-            <Card key={opportunity.id} className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/30 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-xs font-semibold text-primary/70 uppercase tracking-wider mb-1">Best Way to Earn</div>
-                      <h3 className="text-lg font-bold text-primary mb-1">{opportunity.title}</h3>
-                      <div className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
-                    </div>
-                  </div>
-                  
-                  <div className="text-right ml-4">
-                    <div className="text-2xl font-bold text-primary">
-                      {formatNCTR((opportunity.nctr_reward || 1000) * userMultiplier)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">NCTR per friend</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button 
-                    className="flex-1 bg-primary hover:bg-primary-glow text-primary-foreground group-hover:scale-[1.01] transition-all"
-                    size="default"
-                  >
-                    Start Inviting →
-                  </Button>
-                  
-                  <Button 
-                    onClick={(e) => { e.stopPropagation(); copyInviteLink(); }} 
-                    variant="outline" 
-                    size="default"
-                    className="border-primary/30 hover:bg-primary/10"
-                  >
-                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Main Earning Opportunities - Front and Center */}
+        {/* Top Earning Opportunities - Above the fold */}
         <div data-earning-opportunities>
-          <div className="mb-8 sm:mb-12 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold section-heading mb-3 sm:mb-4">
-              {getSetting('earning_opportunities_banner_title') || 'Turn Your Everyday Activities Into NCTR Rewards'}
-            </h2>
-            <p className="text-base sm:text-lg section-text max-w-3xl mx-auto">
-              {getSetting('earning_opportunities_banner_subtitle') || 'Simple activities, real rewards – start earning today'}
-            </p>
-          </div>
-
-          {/* Daily Check-in Section - Premium Design */}
-          <div className="mb-8">
+          {/* Daily Check-in Section */}
+          <div className="mb-6">
             {opportunities.filter(op => op.opportunity_type === 'daily_checkin').map(opportunity => {
-              // Show different UI based on availability
               if (!dailyCheckinAvailable) {
-                // Minimized completed state
                 return (
                   <Card key={opportunity.id} className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
                     <CardContent className="p-4">
@@ -1800,7 +1747,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                 );
               }
               
-              // Full active state
               return (
                 <Card key={opportunity.id} className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 border-green-200 shadow-premium hover:shadow-premium-hover transition-all duration-500 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
                   <CardContent className="p-3 sm:p-4">
@@ -1815,7 +1761,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                     </div>
 
                     <div className="text-center py-2 mb-2">
-                      {/* Total Available Bonus */}
                       <div className="flex items-center justify-center gap-1 mb-0.5">
                         <span className="text-xl font-bold text-green-600">
                           {(() => {
@@ -1829,7 +1774,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                       </div>
                       <p className="text-xs text-green-600 mb-1">Total Available Bonus</p>
                       
-                      {/* Reward Breakdown */}
                       <div className="bg-white/50 rounded-lg p-1.5 mb-2">
                         <p className="text-[10px] font-semibold text-green-700 mb-1">Daily Reward Breakdown:</p>
                         <div className="flex flex-wrap justify-center gap-1 text-[10px]">
@@ -1854,12 +1798,11 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                       
                       <RewardDisplay opportunity={opportunity} size="md" />
                       
-                      {/* Alliance Token Bonus */}
                       {opportunity.alliance_token_enabled && opportunity.alliance_token_ratio && opportunity.alliance_token_ratio > 0 && (
                         <div className="mt-2 p-1.5 bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/30 rounded-lg">
                           <div className="text-center">
                             <h4 className="text-[10px] font-bold text-primary uppercase mb-1">
-                              Alliance Token Bonus
+                              Alliance Stake Bonus
                             </h4>
                             <div className="flex items-center justify-center gap-1 mb-0.5">
                               <span className="text-sm font-bold text-primary">
@@ -1868,7 +1811,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                               {opportunity.alliance_token_logo_url && (
                                 <img 
                                   src={opportunity.alliance_token_logo_url} 
-                                  alt={opportunity.alliance_token_name || 'Token'}
+                                  alt={opportunity.alliance_token_name || 'Stake'}
                                   className="h-3 w-3"
                                 />
                               )}
@@ -1897,381 +1840,472 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
             })}
           </div>
 
-          {/* Primary Opportunities - Respects Sort Order */}
-          <div className="mb-8 space-y-2">
-            {opportunities
-              .filter(op => 
-                ['learn_and_earn', 'shopping', 'free_trial'].includes(op.opportunity_type) && 
-                !completedOpportunityIds.includes(op.id)
-              )
-              .map((opportunity, index, array) => {
-                const isLearnAndEarn = opportunity.opportunity_type === 'learn_and_earn';
-                const prevOpp = index > 0 ? array[index - 1] : null;
-                const showLearnHeader = isLearnAndEarn && (!prevOpp || prevOpp.opportunity_type !== 'learn_and_earn');
-                const showShoppingHeader = opportunity.opportunity_type === 'shopping' && (!prevOpp || !['shopping', 'free_trial'].includes(prevOpp.opportunity_type));
-                
-                return (
-                  <>
-                    {showLearnHeader && (
-                      <h3 className="text-xl font-semibold section-heading mb-4 mt-6 flex items-center gap-2">
-                        <div className="w-2 h-6 bg-primary rounded-full"></div>
-                        📚 Learn & Earn
-                      </h3>
-                    )}
-                    {showShoppingHeader && (
-                      <h3 className="text-xl font-semibold section-heading mb-4 mt-6 flex items-center gap-2">
-                        <div className="w-2 h-6 bg-green-500 rounded-full"></div>
-                        🟢 Live Opportunities
-                      </h3>
-                    )}
+          {/* First invite opportunity (above the fold) */}
+          <div className="mb-8">
+            {opportunities.filter(op => op.opportunity_type === 'invite' && !completedOpportunityIds.includes(op.id)).slice(0, 1).map(opportunity => (
+              <Card key={opportunity.id} className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/30 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Users className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-primary/70 uppercase tracking-wider mb-1">Best Way to Earn</div>
+                        <h3 className="text-lg font-bold text-primary mb-1">{opportunity.title}</h3>
+                        <div className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
+                      </div>
+                    </div>
                     
-                    {isLearnAndEarn ? (
-                      <Card 
-                        key={opportunity.id} 
-                        className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-primary bg-gradient-to-r from-primary/5 to-transparent"
-                        onClick={() => navigate('/learn')}
-                      >
-                        <CardContent className="p-0">
-                          <div className="flex flex-col lg:flex-row">
-                            <div className="relative flex items-center justify-center lg:w-24 h-16 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
-                              {opportunity.video_url ? (
-                                <div className="relative">
-                                  <Play className="w-8 h-8 text-primary" />
-                                </div>
-                              ) : (
-                                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                                  <BookOpen className="w-4 h-4 text-primary" />
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="p-2 sm:p-3 lg:p-4 flex-1">
-                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 sm:mb-3 gap-2">
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between mb-1">
-                                    <h3 className="text-sm sm:text-base font-semibold section-heading truncate">
-                                      {opportunity.title}
-                                    </h3>
-                                    <Badge className="bg-primary text-primary-foreground font-bold ml-1 text-[10px] px-1.5 py-0.5">
-                                      LEARN
-                                    </Badge>
-                                  </div>
-                                  <div className="text-xs sm:text-sm section-text line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
-                                </div>
-                              </div>
-
-                              <div className="text-center mb-1.5 sm:mb-2">
-                                <div className="flex items-center justify-center gap-0.5 text-lg sm:text-xl font-bold text-primary mb-0.5">
-                                  <span>
-                                    {formatNCTR((opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))}
-                                  </span>
-                                  <img src={nctrLogo} alt="NCTR" className="h-12 sm:h-14 w-auto -ml-4" />
-                                </div>
-                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">
-                                  Watch, Learn & Take Quiz
-                                </div>
-                                <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
-                              </div>
-
-                              <Button 
-                                onClick={() => navigate('/learn')}
-                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-3"
-                                size="sm"
-                              >
-                                Start Learning →
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <Card
-                  key={opportunity.id} 
-                  className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-green-500 bg-gradient-to-r from-green-50/50 to-transparent"
-                  onClick={() => handleOpportunityClick(opportunity)}
-                >
-                  <CardContent className="p-0">
-                    <div className="flex flex-col lg:flex-row">
-                      <div className="relative flex items-center justify-center lg:w-24 h-16 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
-                        {opportunity.partner_logo_url ? (
-                          <BrandLogo 
-                            src={opportunity.partner_logo_url} 
-                            alt={opportunity.partner_name}
-                            size="md"
-                            variant="auto"
-                            className="p-2"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                            <Gift className="w-4 h-4 text-muted-foreground" />
-                          </div>
-                        )}
+                    <div className="text-right ml-4">
+                      <div className="text-2xl font-bold text-primary">
+                        {formatNCTR((opportunity.nctr_reward || 1000) * userMultiplier)}
                       </div>
+                      <div className="text-xs text-muted-foreground">NCTR per friend</div>
+                    </div>
+                  </div>
 
-                      <div className="p-2 sm:p-3 lg:p-4 flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 sm:mb-3 gap-2">
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-1">
-                              <h3 className="text-sm sm:text-base font-semibold section-heading truncate">
-                                {opportunity.title}
-                              </h3>
-                              <Badge className="bg-green-600 text-white font-bold ml-1 text-[10px] px-1.5 py-0.5">
-                                LIVE
-                              </Badge>
-                            </div>
-                            <div className="text-xs sm:text-sm section-text line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
-                          </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      className="flex-1 bg-primary hover:bg-primary-glow text-primary-foreground group-hover:scale-[1.01] transition-all"
+                      size="default"
+                    >
+                      Start Inviting →
+                    </Button>
+                    
+                    <Button 
+                      onClick={(e) => { e.stopPropagation(); copyInviteLink(); }} 
+                      variant="outline" 
+                      size="default"
+                      className="border-primary/30 hover:bg-primary/10"
+                    >
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* ═══ MORE WAYS TO EARN - Below the fold ═══ */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px flex-1 bg-border" />
+              <h2 className="text-lg font-semibold text-muted-foreground whitespace-nowrap">More Ways to Earn</h2>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            {/* Remaining invite opportunities */}
+            <div className="mb-6 space-y-4">
+              {opportunities.filter(op => op.opportunity_type === 'invite' && !completedOpportunityIds.includes(op.id)).slice(1).map(opportunity => (
+                <Card key={opportunity.id} className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-2 border-primary/30 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group" onClick={() => handleOpportunityClick(opportunity)}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Users className="w-5 h-5 text-primary" />
                         </div>
-
-                          <div className="text-center mb-1.5 sm:mb-2">
-                           {/* Total NCTR Earn Opportunity */}
-                            <div className="flex items-center justify-center gap-0.5 text-lg sm:text-xl font-bold text-primary mb-0.5">
-                              <span>
-                                {(() => {
-                                  if (opportunity.opportunity_type === 'invite') {
-                                    // For invite opportunities, show user's multiplied reward
-                                    const baseReward = 1000;
-                                    return formatNCTR(baseReward * userMultiplier);
-                                  } else {
-                                    // For other opportunities, show the configured reward
-                                    const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                                    const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
-                                    return formatNCTR(totalReward);
-                                  }
-                                })()}
-                              </span>
-                               <img src={nctrLogo} alt="NCTR" className="h-12 sm:h-14 w-auto -ml-4" />
-                             </div>
-                             {/* Only show "Per $1 Spent" for shopping opportunities */}
-                             {opportunity.opportunity_type === 'shopping' && (
-                               <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">Per $1 Spent</div>
-                             )}
-                             {opportunity.opportunity_type === 'invite' && (
-                               <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">
-                                 {userMultiplier > 1 ? (
-                                   <span>
-                                     Crescendo <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
-                                   </span>
-                                 ) : 'Per friend who joins'}
-                               </div>
-                             )}
-                            
-                            {/* Bounty Breakdown */}
-                            <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
-                            
-                            {/* Alliance Token Bonus */}
-                            {opportunity.alliance_token_enabled && opportunity.alliance_token_ratio && opportunity.alliance_token_ratio > 0 && opportunity.opportunity_type === 'shopping' && (
-                              <div className="mt-2 p-2 bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/30 rounded-lg">
-                                <div className="text-center">
-                                  <h4 className="text-[10px] font-bold text-primary uppercase mb-1">
-                                    Alliance Token Bonus
-                                  </h4>
-                                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                                    <span className="text-sm font-bold text-primary">
-                                      +{opportunity.alliance_token_ratio.toFixed(4)}
-                                    </span>
-                                    {opportunity.alliance_token_logo_url && (
-                                      <img 
-                                        src={opportunity.alliance_token_logo_url} 
-                                        alt={opportunity.alliance_token_name || 'Token'}
-                                        className="h-4 w-4"
-                                      />
-                                    )}
-                                    <span className="text-xs font-semibold text-primary">
-                                      {opportunity.alliance_token_symbol || opportunity.alliance_token_name}
-                                    </span>
-                                  </div>
-                                  <div className="text-[10px] text-muted-foreground mb-1">per $1 spent</div>
-                                  <div className="text-[10px] text-muted-foreground flex items-center justify-center gap-0.5">
-                                    🔒 Locked for {opportunity.alliance_token_lock_days || 90} days
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          <Button 
-                           onClick={() => handleOpportunityClick(opportunity)}
-                           className="w-full bg-green-600 hover:bg-green-700 text-white text-xs py-3"
-                           size="sm"
-                         >
-                           {opportunity.opportunity_type === 'free_trial' ? '🌐 Explore & Earn →' : '🛍️ Shop & Earn →'}
-                         </Button>
-                        {opportunity.opportunity_type === 'free_trial' && (
-                          <Button
-                            onClick={async () => {
-                              try {
-                                const { data, error } = await supabase
-                                  .from('nctr_transactions')
-                                  .insert({
-                                    user_id: user?.id,
-                                    transaction_type: 'earned',
-                                    nctr_amount: 0,
-                                    description: `Free trial completion claim: ${opportunity.partner_name || 'Partner'}`,
-                                    earning_source: 'free_trial',
-                                    status: 'pending_verification',
-                                    metadata: { opportunity_id: opportunity.id }
-                                  })
-                                  .select()
-                                  .single();
-
-                                if (error) throw error;
-
-                                toast({
-                                  title: "✅ Completion Submitted!",
-                                  description: "Admin will verify and credit your NCTR reward soon.",
-                                  duration: 5000,
-                                });
-                              } catch (error: any) {
-                                toast({
-                                  title: "⚠️ Submission Failed",
-                                  description: error.message || "Please try again or contact support.",
-                                  variant: "destructive",
-                                });
-                              }
-                            }}
-                            variant="outline"
-                            className="w-full border-2 border-primary text-primary hover:bg-primary/10 text-sm py-4 mt-2"
-                          >
-                            ✓ I Completed This Trial
-                          </Button>
-                        )}
+                        <div className="flex-1">
+                          <div className="text-xs font-semibold text-primary/70 uppercase tracking-wider mb-1">Best Way to Earn</div>
+                          <h3 className="text-lg font-bold text-primary mb-1">{opportunity.title}</h3>
+                          <div className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
+                        </div>
                       </div>
+                      
+                      <div className="text-right ml-4">
+                        <div className="text-2xl font-bold text-primary">
+                          {formatNCTR((opportunity.nctr_reward || 1000) * userMultiplier)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">NCTR per friend</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        className="flex-1 bg-primary hover:bg-primary-glow text-primary-foreground group-hover:scale-[1.01] transition-all"
+                        size="default"
+                      >
+                        Start Inviting →
+                      </Button>
+                      
+                      <Button 
+                        onClick={(e) => { e.stopPropagation(); copyInviteLink(); }} 
+                        variant="outline" 
+                        size="default"
+                        className="border-primary/30 hover:bg-primary/10"
+                      >
+                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
-                    )}
-                  </>
-                );
-              })}
-          </div>
+              ))}
+            </div>
 
-          {/* Social Media & Other Opportunities - Show uncompleted social_follow/bonus/partner, and completed free_trial */}
-          {opportunities.filter(op => {
-            const isSocialBonusPartner = ['social_follow', 'bonus', 'partner'].includes(op.opportunity_type);
-            const isCompletedFreeTrial = op.opportunity_type === 'free_trial' && completedOpportunityIds.includes(op.id);
-            return isSocialBonusPartner || isCompletedFreeTrial;
-          }).length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
-                <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
-                🔗 Social & Bonus Opportunities
-              </h3>
-              <div className="grid gap-4 md:grid-cols-2">
-                {opportunities.filter(op => {
-                  const isSocialBonusPartner = ['social_follow', 'bonus', 'partner'].includes(op.opportunity_type);
-                  const isCompletedFreeTrial = op.opportunity_type === 'free_trial' && completedOpportunityIds.includes(op.id);
-                  return isSocialBonusPartner || isCompletedFreeTrial;
-                }).map((opportunity) => {
-                  const isCompleted = completedOpportunityIds.includes(opportunity.id);
+            {/* Learn, Shopping & Free Trial Opportunities */}
+            <div className="mb-8 space-y-2">
+              {opportunities
+                .filter(op => 
+                  ['learn_and_earn', 'shopping', 'free_trial'].includes(op.opportunity_type) && 
+                  !completedOpportunityIds.includes(op.id)
+                )
+                .map((opportunity, index, array) => {
+                  const isLearnAndEarn = opportunity.opportunity_type === 'learn_and_earn';
+                  const prevOpp = index > 0 ? array[index - 1] : null;
+                  const showLearnHeader = isLearnAndEarn && (!prevOpp || prevOpp.opportunity_type !== 'learn_and_earn');
+                  const showShoppingHeader = opportunity.opportunity_type === 'shopping' && (!prevOpp || !['shopping', 'free_trial'].includes(prevOpp.opportunity_type));
                   
-                  // Show minimized completed state
-                  if (isCompleted) {
-                    return (
-                      <Card key={opportunity.id} className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                                <Check className="w-4 h-4 text-green-600" />
+                  return (
+                    <>
+                      {showLearnHeader && (
+                        <h3 className="text-xl font-semibold section-heading mb-4 mt-6 flex items-center gap-2">
+                          <div className="w-2 h-6 bg-primary rounded-full"></div>
+                          📚 Learn & Earn
+                        </h3>
+                      )}
+                      {showShoppingHeader && (
+                        <h3 className="text-xl font-semibold section-heading mb-4 mt-6 flex items-center gap-2">
+                          <div className="w-2 h-6 bg-green-500 rounded-full"></div>
+                          🟢 Live Opportunities
+                        </h3>
+                      )}
+                      
+                      {isLearnAndEarn ? (
+                        <Card 
+                          key={opportunity.id} 
+                          className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-primary bg-gradient-to-r from-primary/5 to-transparent"
+                          onClick={() => navigate('/learn')}
+                        >
+                          <CardContent className="p-0">
+                            <div className="flex flex-col lg:flex-row">
+                              <div className="relative flex items-center justify-center lg:w-24 h-16 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
+                                {opportunity.video_url ? (
+                                  <div className="relative">
+                                    <Play className="w-8 h-8 text-primary" />
+                                  </div>
+                                ) : (
+                                  <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                                    <BookOpen className="w-4 h-4 text-primary" />
+                                  </div>
+                                )}
                               </div>
-                              <div>
-                                <h4 className="text-sm font-medium text-gray-700">{opportunity.title}</h4>
-                                <p className="text-xs text-gray-500">Completed & rewarded</p>
+
+                              <div className="p-2 sm:p-3 lg:p-4 flex-1">
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 sm:mb-3 gap-2">
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <h3 className="text-sm sm:text-base font-semibold section-heading truncate">
+                                        {opportunity.title}
+                                      </h3>
+                                      <Badge className="bg-primary text-primary-foreground font-bold ml-1 text-[10px] px-1.5 py-0.5">
+                                        LEARN
+                                      </Badge>
+                                    </div>
+                                    <div className="text-xs sm:text-sm section-text line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
+                                  </div>
+                                </div>
+
+                                <div className="text-center mb-1.5 sm:mb-2">
+                                  <div className="flex items-center justify-center gap-0.5 text-lg sm:text-xl font-bold text-primary mb-0.5">
+                                    <span>
+                                      {formatNCTR((opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0))}
+                                    </span>
+                                    <img src={nctrLogo} alt="NCTR" className="h-12 sm:h-14 w-auto -ml-4" />
+                                  </div>
+                                  <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">
+                                    Watch, Learn & Take Quiz
+                                  </div>
+                                  <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} />
+                                </div>
+
+                                <Button 
+                                  onClick={() => navigate('/learn')}
+                                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-3"
+                                  size="sm"
+                                >
+                                  Start Learning →
+                                </Button>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
-                                +{formatNCTR(
-                                  (opportunity.available_nctr_reward || 0) + 
-                                  (opportunity.lock_90_nctr_reward || 0) + 
-                                  (opportunity.lock_360_nctr_reward || 0) ||
-                                  opportunity.nctr_reward || 0
-                                )} NCTR
-                              </span>
-                              <span className="text-xs text-gray-500">✓ Done</span>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <Card
+                    key={opportunity.id} 
+                    className="mb-2 cursor-pointer hover:shadow-medium transition-all duration-300 border-l-2 border-l-green-500 bg-gradient-to-r from-green-50/50 to-transparent"
+                    onClick={() => handleOpportunityClick(opportunity)}
+                  >
+                    <CardContent className="p-0">
+                      <div className="flex flex-col lg:flex-row">
+                        <div className="relative flex items-center justify-center lg:w-24 h-16 lg:h-auto bg-gradient-to-br from-white to-gray-50 rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none border-r border-gray-100">
+                          {opportunity.partner_logo_url ? (
+                            <BrandLogo 
+                              src={opportunity.partner_logo_url} 
+                              alt={opportunity.partner_name}
+                              size="md"
+                              variant="auto"
+                              className="p-2"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
+                              <Gift className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-2 sm:p-3 lg:p-4 flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 sm:mb-3 gap-2">
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <h3 className="text-sm sm:text-base font-semibold section-heading truncate">
+                                  {opportunity.title}
+                                </h3>
+                                <Badge className="bg-green-600 text-white font-bold ml-1 text-[10px] px-1.5 py-0.5">
+                                  LIVE
+                                </Badge>
+                              </div>
+                              <div className="text-xs sm:text-sm section-text line-clamp-2 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
                             </div>
                           </div>
+
+                            <div className="text-center mb-1.5 sm:mb-2">
+                             {/* Total NCTR Earn Opportunity */}
+                              <div className="flex items-center justify-center gap-0.5 text-lg sm:text-xl font-bold text-primary mb-0.5">
+                                <span>
+                                  {(() => {
+                                    if (opportunity.opportunity_type === 'invite') {
+                                      const baseReward = 1000;
+                                      return formatNCTR(baseReward * userMultiplier);
+                                    } else {
+                                      const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                                      const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.reward_per_dollar || 0);
+                                      return formatNCTR(totalReward);
+                                    }
+                                  })()}
+                                </span>
+                                 <img src={nctrLogo} alt="NCTR" className="h-12 sm:h-14 w-auto -ml-4" />
+                               </div>
+                               {opportunity.opportunity_type === 'shopping' && (
+                                 <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">Per $1 Spent</div>
+                               )}
+                               {opportunity.opportunity_type === 'invite' && (
+                                 <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">
+                                   {userMultiplier > 1 ? (
+                                     <span>
+                                       Crescendo <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
+                                     </span>
+                                   ) : 'Per friend who joins'}
+                                 </div>
+                               )}
+                              
+                              <RewardDisplay opportunity={opportunity} size="md" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
+                              
+                              {opportunity.alliance_token_enabled && opportunity.alliance_token_ratio && opportunity.alliance_token_ratio > 0 && opportunity.opportunity_type === 'shopping' && (
+                                <div className="mt-2 p-2 bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/30 rounded-lg">
+                                  <div className="text-center">
+                                    <h4 className="text-[10px] font-bold text-primary uppercase mb-1">
+                                      Alliance Stake Bonus
+                                    </h4>
+                                    <div className="flex items-center justify-center gap-1 mb-0.5">
+                                      <span className="text-sm font-bold text-primary">
+                                        +{opportunity.alliance_token_ratio.toFixed(4)}
+                                      </span>
+                                      {opportunity.alliance_token_logo_url && (
+                                        <img 
+                                          src={opportunity.alliance_token_logo_url} 
+                                          alt={opportunity.alliance_token_name || 'Stake'}
+                                          className="h-4 w-4"
+                                        />
+                                      )}
+                                      <span className="text-xs font-semibold text-primary">
+                                        {opportunity.alliance_token_symbol || opportunity.alliance_token_name}
+                                      </span>
+                                    </div>
+                                    <div className="text-[10px] text-muted-foreground mb-1">per $1 spent</div>
+                                    <div className="text-[10px] text-muted-foreground flex items-center justify-center gap-0.5">
+                                      🔒 Locked for {opportunity.alliance_token_lock_days || 90} days
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            <Button 
+                             onClick={() => handleOpportunityClick(opportunity)}
+                             className="w-full bg-green-600 hover:bg-green-700 text-white text-xs py-3"
+                             size="sm"
+                           >
+                             {opportunity.opportunity_type === 'free_trial' ? '🌐 Explore & Earn →' : '🛍️ Shop & Earn →'}
+                           </Button>
+                          {opportunity.opportunity_type === 'free_trial' && (
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  const { data, error } = await supabase
+                                    .from('nctr_transactions')
+                                    .insert({
+                                      user_id: user?.id,
+                                      transaction_type: 'earned',
+                                      nctr_amount: 0,
+                                      description: `Free trial completion claim: ${opportunity.partner_name || 'Partner'}`,
+                                      earning_source: 'free_trial',
+                                      status: 'pending_verification',
+                                      metadata: { opportunity_id: opportunity.id }
+                                    })
+                                    .select()
+                                    .single();
+
+                                  if (error) throw error;
+
+                                  toast({
+                                    title: "✅ Completion Submitted!",
+                                    description: "Admin will verify and credit your NCTR reward soon.",
+                                    duration: 5000,
+                                  });
+                                } catch (error: any) {
+                                  toast({
+                                    title: "⚠️ Submission Failed",
+                                    description: error.message || "Please try again or contact support.",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                              variant="outline"
+                              className="w-full border-2 border-primary text-primary hover:bg-primary/10 text-sm py-4 mt-2"
+                            >
+                              ✓ I Completed This Trial
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                      )}
+                    </>
+                  );
+                })}
+            </div>
+
+            {/* Social Media & Other Opportunities */}
+            {opportunities.filter(op => {
+              const isSocialBonusPartner = ['social_follow', 'bonus', 'partner'].includes(op.opportunity_type);
+              const isCompletedFreeTrial = op.opportunity_type === 'free_trial' && completedOpportunityIds.includes(op.id);
+              return isSocialBonusPartner || isCompletedFreeTrial;
+            }).length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold section-heading mb-4 flex items-center gap-2">
+                  <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
+                  🔗 Social & Bonus Opportunities
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {opportunities.filter(op => {
+                    const isSocialBonusPartner = ['social_follow', 'bonus', 'partner'].includes(op.opportunity_type);
+                    const isCompletedFreeTrial = op.opportunity_type === 'free_trial' && completedOpportunityIds.includes(op.id);
+                    return isSocialBonusPartner || isCompletedFreeTrial;
+                  }).map((opportunity) => {
+                    const isCompleted = completedOpportunityIds.includes(opportunity.id);
+                    
+                    if (isCompleted) {
+                      return (
+                        <Card key={opportunity.id} className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                  <Check className="w-4 h-4 text-green-600" />
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-medium text-gray-700">{opportunity.title}</h4>
+                                  <p className="text-xs text-gray-500">Completed & rewarded</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
+                                  +{formatNCTR(
+                                    (opportunity.available_nctr_reward || 0) + 
+                                    (opportunity.lock_90_nctr_reward || 0) + 
+                                    (opportunity.lock_360_nctr_reward || 0) ||
+                                    opportunity.nctr_reward || 0
+                                  )} NCTR
+                                </span>
+                                <span className="text-xs text-gray-500">✓ Done</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    }
+                    
+                    return (
+                      <Card 
+                        key={opportunity.id}
+                        className="cursor-pointer hover:shadow-medium transition-all duration-300 group border bg-gradient-to-br from-white to-section-highlight border-section-border hover:border-primary/30"
+                        onClick={() => handleOpportunityClick(opportunity)}
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full transition-colors bg-primary/10 group-hover:bg-primary/20">
+                                {opportunity.opportunity_type === 'social_follow' ? (
+                                  <ExternalLink className="w-6 h-6 text-primary" />
+                                ) : (
+                                  <Gift className="w-6 h-6 text-primary" />
+                                )}
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-sm mb-1 section-heading">
+                                  {opportunity.title}
+                                </h4>
+                                <div className="text-xs line-clamp-2 section-text whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="text-center mb-4">
+                            <div className="text-lg font-bold text-primary mb-2">
+                              {(() => {
+                                if (opportunity.opportunity_type === 'invite') {
+                                  const baseReward = 1000;
+                                  return formatNCTR(baseReward * userMultiplier);
+                                } else {
+                                  const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
+                                  const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
+                                  return formatNCTR(totalReward);
+                                }
+                              })()} NCTR
+                            </div>
+                            {opportunity.opportunity_type === 'shopping' && (
+                              <div className="text-xs text-muted-foreground mb-3">Per $1 Spent</div>
+                            )}
+                            {opportunity.opportunity_type === 'invite' && (
+                              <div className="text-xs text-muted-foreground mb-3">
+                                {userMultiplier > 1 ? (
+                                  <span>
+                                    Crescendo <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
+                                  </span>
+                                ) : 'Per friend who joins'}
+                              </div>
+                            )}
+                            
+                            <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
+                          </div>
+
+                          <Button 
+                            className="w-full py-3 text-sm transition-all duration-300 bg-primary hover:bg-primary-glow text-primary-foreground"
+                          >
+                            {opportunity.opportunity_type === 'social_follow' 
+                              ? 'Follow & Earn →' 
+                              : 'Complete Task →'
+                            }
+                          </Button>
                         </CardContent>
                       </Card>
                     );
-                  }
-                  
-                  // Show full active state
-                  return (
-                    <Card 
-                      key={opportunity.id}
-                      className="cursor-pointer hover:shadow-medium transition-all duration-300 group border bg-gradient-to-br from-white to-section-highlight border-section-border hover:border-primary/30"
-                      onClick={() => handleOpportunityClick(opportunity)}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full transition-colors bg-primary/10 group-hover:bg-primary/20">
-                              {opportunity.opportunity_type === 'social_follow' ? (
-                                <ExternalLink className="w-6 h-6 text-primary" />
-                              ) : (
-                                <Gift className="w-6 h-6 text-primary" />
-                              )}
-                            </div>
-                            <div>
-                              <h4 className="font-semibold text-sm mb-1 section-heading">
-                                {opportunity.title}
-                              </h4>
-                              <div className="text-xs line-clamp-2 section-text whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: opportunity.description?.replace(/\n/g, '<br>') || '' }} />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="text-center mb-4">
-                          {/* Total NCTR Earn Opportunity */}
-                          <div className="text-lg font-bold text-primary mb-2">
-                            {(() => {
-                              if (opportunity.opportunity_type === 'invite') {
-                                // For invite opportunities, show user's multiplied reward
-                                const baseReward = 1000;
-                                return formatNCTR(baseReward * userMultiplier);
-                              } else {
-                                // For other opportunities, show the configured reward
-                                const newRewardTotal = (opportunity.available_nctr_reward || 0) + (opportunity.lock_90_nctr_reward || 0) + (opportunity.lock_360_nctr_reward || 0);
-                                const totalReward = newRewardTotal > 0 ? newRewardTotal : (opportunity.nctr_reward || 0);
-                                return formatNCTR(totalReward);
-                              }
-                            })()} NCTR
-                          </div>
-                          {/* Only show "Per $1 Spent" for shopping opportunities */}
-                          {opportunity.opportunity_type === 'shopping' && (
-                            <div className="text-xs text-muted-foreground mb-3">Per $1 Spent</div>
-                          )}
-                          {opportunity.opportunity_type === 'invite' && (
-                            <div className="text-xs text-muted-foreground mb-3">
-                              {userMultiplier > 1 ? (
-                                <span>
-                                  Crescendo <span className={`font-semibold ${getStatusTextColor(portfolio?.opportunity_status || 'starter')}`}>{portfolio?.opportunity_status}</span> bonus
-                                </span>
-                              ) : 'Per friend who joins'}
-                            </div>
-                          )}
-                          
-                          {/* Bounty Breakdown */}
-                          <RewardDisplay opportunity={opportunity} size="sm" showPerDollar={false} userMultiplier={userMultiplier} userStatus={portfolio?.opportunity_status || 'starter'} />
-                        </div>
-
-                        <Button 
-                          className="w-full py-3 text-sm transition-all duration-300 bg-primary hover:bg-primary-glow text-primary-foreground"
-                        >
-                          {opportunity.opportunity_type === 'social_follow' 
-                            ? 'Follow & Earn →' 
-                            : 'Complete Task →'
-                          }
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Affiliate Links Section - Admin Only */}
           {isAdmin && (
