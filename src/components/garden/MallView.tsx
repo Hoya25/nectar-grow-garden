@@ -6,7 +6,6 @@ import { Sparkles } from "lucide-react";
 import { MallHeader } from "./MallHeader";
 import { BrandCarousel } from "./BrandCarousel";
 import { DepartmentGrid } from "./DepartmentGrid";
-import { MobileBottomNav } from "./MobileBottomNav";
 import { MallSearchHandle } from "./MallSearch";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -482,11 +481,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         )}
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav 
-        onSearchClick={handleSearchClick}
-        onTagsClick={handleTagsClick}
-      />
+      {/* Bottom nav handled by AuthenticatedLayout */}
     </div>
   );
 };
