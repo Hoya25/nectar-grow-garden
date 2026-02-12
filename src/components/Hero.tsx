@@ -24,14 +24,14 @@ const Hero = () => {
             Live and Earn
           </p>
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in-up [animation-delay:0.1s] opacity-0 [animation-fill-mode:forwards] drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)'}}>
-            Everyday Crypto for{" "}
+            Don't Buy It.{" "}
             <span className="text-yellow-300 animate-gradient-shift bg-[length:200%_200%] drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
-              Everyday People
+              Earn It. Own It.
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up [animation-delay:0.2s] opacity-0 [animation-fill-mode:forwards] drop-shadow-xl font-semibold" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)'}}>
-            Unlock Rewards by Simply Being Yourself: Turn Your Next Purchase or Friend Invite into Crypto Wins – Safe, Simple, Barrier-Free
+            You already shop, share, and create. The Garden turns all of it into NCTR stakes. Commit them. Build your Crescendo status. Unlock rewards others pay thousands for.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up [animation-delay:0.4s] opacity-0 [animation-fill-mode:forwards]">

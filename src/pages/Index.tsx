@@ -13,13 +13,13 @@ const Index = () => {
       
       {/* Earn Crypto Every Day Section */}
       <FeatureSection
-        title="Earn Crypto Effortlessly"
+        title="Shop. Earn. Unlock."
         titleColor="text-green-500"
-        subtitle="Your Daily Habits, Rewarded in The Garden"
-        description="Step into The Garden and start earning NCTR —our next-generation rewards Alliance Token—simply by being yourself every day. Turn everyday moments into real crypto wins, like:"
+        subtitle="Turn Your Everyday Purchases into Real Rewards"
+        description="Step into The Garden and start earning NCTR stakes simply by shopping with 6,000+ brands you already love. Every purchase builds your stake in the community."
         bulletPoints={[
-          "Gift Cards: Purchase Uber gift cards and other branded gift cards—get NCTR back as cashback rewards.",
-          "Inviting Friends: Share the opportunity with friends; each invite brings more NCTR your way."
+          "Shop with brands you love through The Garden and earn NCTR stakes on every purchase",
+          "Invite friends — both earn 500 NCTR stakes when they join"
         ]}
         buttonText="Enter The Garden →"
         buttonHref="/garden"
@@ -29,14 +29,14 @@ const Index = () => {
       
       <div className="text-center py-8">
         <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed section-text/90">
-          It's all de-risked for you: safe, simple, and with no cost barriers, so you can grow your portfolio regardless of how much time or money you have.
+          Safe, simple, and free to start. Earn rewards regardless of how much time or money you have.
         </p>
       </div>
       
       {/* How We're Democratizing Crypto Section */}
       <FeatureSection
-        title="How We're Democratizing Crypto"
-        description="We're breaking down the barriers that have kept crypto out of reach. No complex wallets, no technical knowledge required, no upfront investment. Just simple activities that earn you real crypto rewards."
+        title="Rewards Without the Gatekeeping"
+        description="Most rewards programs only benefit people who spend the most. The Garden rewards everyone who participates. No complex setup. No buy-in required. Just your everyday activity earning you real value."
         buttonText="Learn More →"
         buttonHref="https://substack.com/home/post/p-166993122"
         icon=""
@@ -45,8 +45,8 @@ const Index = () => {
       
       {/* Harvest NCTR Section */}
       <FeatureSection
-        title="Harvest NCTR"
-        description="Stack NCTR in your portfolio to open new opportunities across the crypto universe–like experiences, new product releases from our partners and amplified earning opportunities."
+        title="Commit. Level Up. Unlock More."
+        description="Lock your earned NCTR stakes with 360LOCK to build your Crescendo status. Higher status unlocks exclusive rewards, bigger bounty opportunities, and access that keeps growing with your commitment."
         buttonText="Learn More About NCTR →"
         buttonHref="https://substack.com/home/post/p-166993122"
         icon=""
@@ -56,7 +56,7 @@ const Index = () => {
       {/* Grow The Community Section */}
       <FeatureSection
         title="Grow The Community"
-        description="The Garden is built to grow. The more we grow the community together, the more NCTR we collect together. And the more NCTR we have, the more partners we attract with incredible benefits for members."
+        description="The Garden grows with its members. Every invite strengthens the community, attracts more brand partners, and creates more earning opportunities for everyone. Your participation builds something real."
         buttonText="Invite a Friend →"
         buttonHref="/auth"
         icon=""
@@ -69,7 +69,7 @@ const Index = () => {
             Partner With The Garden
           </h2>
           <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-            The Garden is built on Base so that we can unlock as many opportunities as possible for our members. Our community is built on loyalty so that our partners can attract and reward their biggest fans.
+            Our community is built on loyalty. Partners join The Garden to connect with engaged, committed members who actively support brands they believe in.
           </p>
           <BrandSubmissionForm>
             <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary text-primary-foreground rounded-xl shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105">

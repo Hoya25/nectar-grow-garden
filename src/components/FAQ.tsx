@@ -10,17 +10,17 @@ const FAQ = () => {
   const faqs = [
     {
       question: "What is The Garden?",
-      answer: "The Garden is a revolutionary platform that democratizes cryptocurrency by allowing you to earn NCTR tokens through everyday activities like shopping. We remove the financial barriers and risks traditionally associated with crypto investing.",
+      answer: "The Garden is a shopping rewards platform where you earn NCTR stakes by purchasing from 6,000+ brands. Your stakes build your Crescendo membership status, unlocking better rewards and exclusive opportunities. No buy-in required — just shop and earn.",
       icon: "🌱"
     },
     {
       question: "What is NCTR?",
-      answer: "NCTR (Nectar) is the primary token you earn by participating in opportunities curated in The Garden. You can stack NCTR in different commitment levels (90LOCK or 360LOCK) to unlock more opportunities and benefits across the crypto universe. Unlocked NCTR is yours to do with as you please, you can trade it for any other crypto you want, cash out or re-lock your NCTR to unlock more future earning and experiential opportunities.\n\n⚠️ OFFICIAL CONTRACT ADDRESS: 0x973104fAa7F2B11787557e85953ECA6B4e262328\n\nThis is the ONLY official NCTR token contract. Do not confuse with any other crypto tokens that may have the same name. Always verify the contract address before any transactions.",
+      answer: "NCTR is what you earn by shopping and participating in The Garden. Think of NCTR stakes like loyalty points — except they are real digital assets you own and control. Lock them with 360LOCK to build your Crescendo status and unlock better rewards. Your NCTR stays yours — it is never spent when locked, just committed for a period.\n\n⚠️ OFFICIAL CONTRACT ADDRESS: 0x973104fAa7F2B11787557e85953ECA6B4e262328\n\nThis is the ONLY official NCTR contract. Do not confuse with any other assets that may have the same name. Always verify the contract address before any transactions.",
       icon: "🌾"
     },
     {
       question: "How Does The Garden Work?",
-      answer: "Simply sign up, complete your profile, and start earning NCTR through various activities. Shop with our brand partners, invite friends, and participate in community activities. The more you engage, the more you earn, and the more opportunities unlock for you.",
+      answer: "Sign up free. Shop through The Garden with brands you already love. Every purchase earns you NCTR stakes. Commit your stakes with 360LOCK to level up your Crescendo status (Bronze through Diamond). Higher status unlocks better rewards and bigger earning opportunities. Invite friends and both earn 500 NCTR stakes.",
       icon: "⚡"
     }
   ];
@@ -89,7 +89,7 @@ const FAQ = () => {
                       <div className="pl-16 border-l-2 border-gradient-hero/20 ml-6">
                         {index === 1 ? (
                           <>
-                            <p className="mb-4">NCTR (Nectar) is the primary token you earn by participating in opportunities curated in The Garden. You can stack NCTR in different commitment levels (90LOCK or 360LOCK) to unlock more opportunities and benefits across the crypto universe. Unlocked NCTR is yours to do with as you please, you can trade it for any other crypto you want, cash out or re-lock your NCTR to unlock more future earning and experiential opportunities.</p>
+                            <p className="mb-4">NCTR is what you earn by shopping and participating in The Garden. Think of NCTR stakes like loyalty points — except they are real digital assets you own and control. Lock them with 360LOCK to build your Crescendo status and unlock better rewards. Your NCTR stays yours — it is never spent when locked, just committed for a period.</p>
                             
                             <div className="my-4 flex items-center gap-2">
                               <BaseBadge size="sm" variant="light" />
@@ -99,7 +99,7 @@ const FAQ = () => {
                               <strong>⚠️ OFFICIAL CONTRACT ADDRESS:</strong> 0x973104fAa7F2B11787557e85953ECA6B4e262328
                               <br />
                               <br />
-                              This is the ONLY official NCTR token contract. Do not confuse with any other crypto tokens that may have the same name. Always verify the contract address before any transactions.
+                              This is the ONLY official NCTR contract. Do not confuse with any other assets that may have the same name. Always verify the contract address before any transactions.
                             </p>
                           </>
                         ) : (
