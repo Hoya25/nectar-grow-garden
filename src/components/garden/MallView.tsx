@@ -109,7 +109,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         sessionStorage.removeItem('garden_last_click_time');
         toast({
           title: "👋 Welcome Back!",
-          description: "If you completed a purchase, your NCTR earnings will show up in your Crescendo dashboard within 24-48 hours. We'll notify you when they arrive!",
+          description: "If you completed a purchase, your NCTR earnings will show up in your Crescendo dashboard within 24-48 hours. We'll notify you when they arrive! Lock your earned stakes on Crescendo to unlock exclusive rewards.",
           duration: 8000,
         });
       }
@@ -240,7 +240,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
       toast({
         title: "🛒 Shopping Trip Started!",
-        description: "Complete your purchase and you'll automatically earn NCTR. Your earnings typically appear within 24-48 hours.",
+        description: "Complete your purchase and you'll automatically earn NCTR stakes. Your earnings typically appear within 24-48 hours.",
         duration: 7000,
       });
     } catch (error) {
@@ -308,6 +308,19 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Crescendo Link Strip */}
+        <div className="flex items-center justify-between mb-6 px-1">
+          <span className="text-sm text-muted-foreground">Your stakes unlock rewards on Crescendo</span>
+          <a
+            href="https://crescendo.nctr.live/rewards"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-[#9AB700] hover:text-[#C8FF00] transition-colors flex items-center gap-1"
+          >
+            See what you can unlock →
+          </a>
         </div>
 
         {/* Browse All Brands CTA */}

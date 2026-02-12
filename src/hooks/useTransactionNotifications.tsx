@@ -103,7 +103,7 @@ export const useTransactionNotifications = ({ userId, onTransactionReceived }: T
       case 'referral':
       case 'referral_signup':
         title = '🎁 Referral Reward!';
-        message = description || `You earned ${formatNCTR(nctrAmount)} NCTR from a referral!`;
+        message = (description || `You earned ${formatNCTR(nctrAmount)} NCTR from a referral!`) + ' Your referral stakes are building! Lock them on Crescendo for 3x with 360LOCK.';
         icon = Gift;
         break;
         

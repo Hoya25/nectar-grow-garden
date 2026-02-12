@@ -860,7 +860,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         
         toast({
           title: isStreakBonus ? "🔥 Streak Bonus Earned!" : "Daily Bonus Claimed! 🎉",
-          description: checkinResult.message || `You earned ${checkinResult.reward_amount?.toFixed(2)} NCTR!`,
+          description: (checkinResult.message || `You earned ${checkinResult.reward_amount?.toFixed(2)} NCTR!`) + " Visit Crescendo to lock your stakes and level up your status.",
         });
         
         // Refresh user data to show updated balance
