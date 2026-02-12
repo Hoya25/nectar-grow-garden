@@ -399,47 +399,21 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      {/* Header */}
-      <div className="border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate('/garden')}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Garden
-              </Button>
-              <h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="default"
-                onClick={() => {
-                  toast({
-                    title: "Action Triggered!",
-                    description: "Your new button is working",
-                  });
-                }}
-              >
-                New Action
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => signOut()}
-                className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-              >
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
+          <Button 
+            variant="default"
+            onClick={() => {
+              toast({
+                title: "Action Triggered!",
+                description: "Your new button is working",
+              });
+            }}
+          >
+            New Action
+          </Button>
+        </div>
         {/* PRIORITY: Invite Friends - Best Way to Earn NCTR */}
         <div className="mb-8">
           <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-2 border-primary/30 shadow-lg">

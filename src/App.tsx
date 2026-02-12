@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { WalletProvider } from "@/hooks/useWallet";
+import AuthenticatedLayout from "@/components/AuthenticatedLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Garden from "./pages/Garden";
@@ -69,15 +70,20 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/garden" element={<Garden />} />
-                <Route path="/garden/category/:slug" element={<GardenCategoryPage />} />
-                <Route path="/garden/tag/:slug" element={<GardenTagPage />} />
-                <Route path="/profile" element={<Profile />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
-                <Route path="/referrals" element={<Referrals />} />
-                <Route path="/affiliate-links" element={<AffiliateLinks />} />
-                <Route path="/learn" element={<LearnAndEarn />} />
+                
+                {/* Authenticated routes with shared navigation layout */}
+                <Route element={<AuthenticatedLayout />}>
+                  <Route path="/garden" element={<Garden />} />
+                  <Route path="/garden/category/:slug" element={<GardenCategoryPage />} />
+                  <Route path="/garden/tag/:slug" element={<GardenTagPage />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/referrals" element={<Referrals />} />
+                  <Route path="/affiliate-links" element={<AffiliateLinks />} />
+                  <Route path="/learn" element={<LearnAndEarn />} />
+                </Route>
+                
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

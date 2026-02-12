@@ -141,7 +141,18 @@ const Garden = () => {
   const [thisMonthEarned, setThisMonthEarned] = useState(0);
   const [brandsShoppedCount, setBrandsShoppedCount] = useState(0);
   const [totalBrandsCount, setTotalBrandsCount] = useState(6823);
-  const [activeTab, setActiveTab] = useState<'shop' | 'dashboard'>('shop');
+  const [activeTab, setActiveTab] = useState<'shop' | 'dashboard'>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('tab') as 'shop' | 'dashboard') || 'shop';
+  });
+
+  // Sync activeTab with URL search params
+  useEffect(() => {
+    const tab = searchParams.get('tab') as 'shop' | 'dashboard';
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user) {
@@ -1435,120 +1446,6 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
         />
       )}
       
-      {/* Header with Crescendo Status */}
-      <header className="section-highlight backdrop-blur-sm border-b border-section-border">
-        <div className="container mx-auto px-4 py-4">
-          {/* Top Row: Logo and Actions */}
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-bold nctr-text whitespace-nowrap">
-                  The Garden
-                </h1>
-                <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
-                  BETA
-                </Badge>
-              </div>
-              <img 
-                src={nctrLogo} 
-                alt="NCTR" 
-                className="h-12 sm:h-16 w-auto opacity-90"
-              />
-            </div>
-            
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate('/profile')}
-                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
-              >
-                <User className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Profile</span>
-              </Button>
-              {isAdmin && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigate('/admin')}
-                  className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
-                >
-                  <Settings className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Admin</span>
-                </Button>
-              )}
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={refreshOpportunities}
-                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
-                title="Refresh opportunity rewards"
-              >
-                <RefreshCw className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Refresh</span>
-              </Button>
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={handleSignOut}
-                className="border-primary/50 section-text hover:bg-primary/10 hover:text-primary"
-              >
-                <Power className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Sign Out</span>
-              </Button>
-            </div>
-          </div>
-          
-          {/* Bottom Row: Stats and Base Badge */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3 border border-primary/20">
-              <div>
-                <p className="text-xs text-muted-foreground">Total NCTR</p>
-                <p className="text-sm font-semibold text-section-accent">
-                  {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0))}
-                </p>
-              </div>
-              <div className="border-l border-primary/20 pl-3">
-                <p className="text-xs text-muted-foreground">Live Price</p>
-                <p className="text-sm font-semibold text-section-accent">
-                  ${formatPrice(currentPrice)}
-                </p>
-              </div>
-            </div>
-            
-            <div className="hidden sm:flex">
-              <BaseBadge size="sm" variant="light" asLink={false} />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Tab Navigation */}
-      <div className="sticky top-[73px] z-40 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="flex gap-1 py-2">
-            <Button
-              variant={activeTab === 'shop' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('shop')}
-              className="gap-2"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              Shop & Earn
-            </Button>
-            <Button
-              variant={activeTab === 'dashboard' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('dashboard')}
-              className="gap-2"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       {activeTab === 'shop' ? (
         <MallView 
