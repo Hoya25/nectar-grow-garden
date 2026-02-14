@@ -40,7 +40,7 @@ const Footer = () => {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <p className="text-background/70 text-lg">
-                  © 2025 The Garden. All rights reserved.
+                  © 2026 The Garden. All rights reserved.
                 </p>
                 
               </div>
