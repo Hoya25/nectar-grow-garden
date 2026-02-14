@@ -85,7 +85,7 @@ export const GardenHeroSection = ({
             <h1 className="text-2xl md:text-3xl font-bold section-heading mb-1">
               Welcome back, {firstName}! 👋
             </h1>
-            <p className="text-muted-foreground">Your crypto rewards are growing</p>
+            <p className="text-muted-foreground">Your rewards are growing</p>
           </div>
           
           {/* Large Balance Display */}
@@ -195,7 +195,7 @@ export const GardenHeroSection = ({
           Shop & Earn NCTR
         </Button>
         <p className="text-sm text-muted-foreground mt-2">
-          Earn crypto back at <span className="font-semibold text-primary">{totalBrands.toLocaleString()}</span> brands
+          Earn NCTR back at <span className="font-semibold text-primary">{totalBrands.toLocaleString()}</span> brands
         </p>
       </div>
 
