@@ -31,7 +31,7 @@ export const MallHeader = ({
         {/* Top Row - Title and Balance */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-[hsl(0,0%,10%)]">
-            🌱 The Garden
+            <img src={nctrLogo} alt="NCTR" className="w-6 h-6 object-contain inline-block mr-1" /> The Garden
           </h1>
           
           {/* NCTR Balance Badge with Tier */}
