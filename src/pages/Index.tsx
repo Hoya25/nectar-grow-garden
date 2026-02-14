@@ -16,10 +16,10 @@ const Index = () => {
         title="Shop. Earn. Unlock."
         titleColor="text-green-500"
         subtitle="Turn Your Everyday Purchases into Real Rewards"
-        description="Step into The Garden and start earning NCTR stakes simply by shopping with 6,000+ brands you already love. Every purchase builds your stake in the community."
+        description="Step into The Garden and start earning NCTR simply by shopping with 6,000+ brands you already love. Every purchase builds your position in the community."
         bulletPoints={[
-          "Shop with brands you love through The Garden and earn NCTR stakes on every purchase",
-          "Invite friends — both earn 500 NCTR stakes when they join"
+          "Shop with brands you love through The Garden and earn NCTR on every purchase",
+          "Invite friends — both earn 500 NCTR when they join"
         ]}
         buttonText="Enter The Garden →"
         buttonHref="/garden"
@@ -46,7 +46,7 @@ const Index = () => {
       {/* Harvest NCTR Section */}
       <FeatureSection
         title="Commit. Level Up. Unlock More."
-        description="Lock your earned NCTR stakes with 360LOCK to build your Crescendo status. Higher status unlocks exclusive rewards, bigger bounty opportunities, and access that keeps growing with your commitment."
+        description="Commit your earned NCTR with 360LOCK to build your Crescendo status. Higher status unlocks exclusive rewards, bigger earning opportunities, and access that keeps growing with your commitment."
         buttonText="Learn More About NCTR →"
         buttonHref="https://substack.com/home/post/p-166993122"
         icon=""

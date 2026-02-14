@@ -31,7 +31,7 @@ const Hero = () => {
           </h1>
           
           <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up [animation-delay:0.2s] opacity-0 [animation-fill-mode:forwards] drop-shadow-xl font-semibold" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)'}}>
-            You already shop, share, and create. The Garden turns all of it into NCTR stakes. Commit them. Build your Crescendo status. Unlock rewards others pay thousands for.
+            You already shop, share, and create. The Garden turns all of it into NCTR. Commit it. Build your Crescendo status. Unlock rewards others pay thousands for.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up [animation-delay:0.4s] opacity-0 [animation-fill-mode:forwards]">

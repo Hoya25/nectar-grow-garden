@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Menu, X, Share2, User, LogOut, Settings, ShoppingBag } from "lucide-react";
 import ReferralSystem from "@/components/ReferralSystem";
-import { BaseBadge } from "@/components/BaseBadge";
+
 
 import ProfileModal from "@/components/ProfileModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -74,10 +74,6 @@ const Header = () => {
             <span className="px-2 py-0.5 rounded text-xs font-bold bg-accent-lime text-black">BETA</span>
           </div>
           
-          {/* Built on Base Badge - Next to logo */}
-          <div className="hidden lg:flex">
-            <BaseBadge size="sm" variant="light" />
-          </div>
         </div>
         
         {/* Desktop Navigation */}

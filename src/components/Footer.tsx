@@ -30,7 +30,7 @@ const Footer = () => {
               <span className="bg-gradient-premium bg-clip-text text-transparent font-bold">
                 Project Butterfly
               </span>
-              . A blockchain initiative creating an ecosystem to harness our buying power 
+              . A community-driven initiative creating an ecosystem to harness our buying power 
               and influence to make a positive impact on our lives and the world.
             </p>
           </div>
@@ -43,8 +43,6 @@ const Footer = () => {
                   © 2025 The Garden. All rights reserved.
                 </p>
                 
-                {/* Built on Base Badge */}
-                <BaseBadge variant="dark" size="md" className="text-background" />
               </div>
               
               <div className="flex items-center gap-6">
