@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
@@ -66,8 +65,7 @@ const Header = () => {
     <header className="w-full border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-minimal">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-            <img src={nctrNLogo} alt="NCTR" className="w-8 h-8 object-contain" />
+          <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
             <span className="text-xl font-bold text-foreground hidden md:inline">The Garden</span>
             <span className="text-lg font-bold text-foreground md:hidden">The Garden</span>
             <span className="px-2 py-0.5 rounded text-xs font-bold bg-accent-lime text-black">BETA</span>
