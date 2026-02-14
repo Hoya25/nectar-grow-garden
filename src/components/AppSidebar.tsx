@@ -127,7 +127,12 @@ export function AppSidebar({ portfolio, onLockCreated }: AppSidebarProps) {
           <div className="p-4 border-b border-section-border">
           <div className="flex items-center justify-between">
             {open && (
-              <h2 className="text-lg font-semibold section-heading">Portfolio Dashboard</h2>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full border-[3px] border-accent-lime flex items-center justify-center">
+                  <span className="text-accent-lime font-black text-xs">G</span>
+                </div>
+                <span className="text-lg font-bold text-foreground">The Garden</span>
+              </div>
             )}
             <SidebarTrigger />
           </div>
