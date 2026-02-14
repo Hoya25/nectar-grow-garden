@@ -276,7 +276,7 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated, onBrandSelect }: ImpactBran
                       <>
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Commission:</span>
-                          <span className="font-medium text-crypto-gold">
+                          <span className="font-medium text-primary">
                             {campaign.CommissionRate 
                               ? `${campaign.CommissionRate}${campaign.CommissionType === 'percentage' ? '%' : ''}` 
                               : campaign.DefaultCommission?.Amount 
@@ -286,7 +286,7 @@ const ImpactBrandSearch = ({ onOpportunitiesUpdated, onBrandSelect }: ImpactBran
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Est. NCTR per $1:</span>
-                          <span className="font-medium text-crypto-gold">
+                          <span className="font-medium text-primary">
                             {(campaign.CommissionRate || campaign.DefaultCommission?.Amount)
                               ? ((campaign.CommissionRate || campaign.DefaultCommission?.Amount || 0) * 20).toFixed(0) 
                               : 'TBD'} NCTR
