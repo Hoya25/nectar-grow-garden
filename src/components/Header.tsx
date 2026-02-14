@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Menu, X, Share2, User, LogOut, Settings, ShoppingBag } from "lucide-react";
 import ReferralSystem from "@/components/ReferralSystem";
 import { BaseBadge } from "@/components/BaseBadge";
-import { Badge } from "@/components/ui/badge";
+
 import ProfileModal from "@/components/ProfileModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -65,13 +65,13 @@ const Header = () => {
     <header className="w-full border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-minimal">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          <div className="flex items-center gap-3 cursor-pointer group"
-            onClick={() => navigate('/')}>
-            <span className="text-2xl font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300 hidden md:inline">The Garden</span>
-            <span className="text-lg font-bold text-slate-600 group-hover:text-slate-700 transition-all duration-300 md:hidden">The Garden</span>
-            <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
-              BETA
-            </Badge>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+            <div className="w-9 h-9 rounded-full border-[3px] border-foreground dark:border-accent-lime flex items-center justify-center">
+              <span className="text-foreground dark:text-accent-lime font-black text-sm tracking-tight">G</span>
+            </div>
+            <span className="text-xl font-bold text-foreground hidden md:inline">The Garden</span>
+            <span className="text-lg font-bold text-foreground md:hidden">The Garden</span>
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-accent-lime text-black">BETA</span>
           </div>
           
           {/* Built on Base Badge - Next to logo */}
