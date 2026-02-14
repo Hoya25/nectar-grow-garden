@@ -54,6 +54,7 @@ All colors MUST be HSL to avoid yellow bug issues.
     --accent: 138 72% 94%;                      /* #DCFCE7 - soft green */
     --accent-foreground: 142 76% 25%;           /* #166534 - dark green */
     --accent-light: 142 69% 58%;
+    --accent-lime: 75 80% 56%;                   /* #C8FF00 - NCTR lime */
     
     /* Status colors */
     --success: 142 71% 45%;
@@ -137,6 +138,7 @@ All colors MUST be HSL to avoid yellow bug issues.
     
     --accent: 120 100% 35%;
     --accent-foreground: 240 12% 6%;
+    --accent-lime: 75 80% 56%;                   /* #C8FF00 - NCTR lime */
     
     --success: 120 100% 35%;
     --warning: 38 90% 60%;
