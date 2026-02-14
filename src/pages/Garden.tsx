@@ -34,7 +34,7 @@ import { MallView } from '@/components/garden/MallView';
 import { CrescendoStatusCard } from '@/components/CrescendoStatusCard';
 
 import { PortfolioStory } from '@/components/PortfolioStory';
-import { BaseBadge } from '@/components/BaseBadge';
+
 import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
 import nctrNLogo from "@/assets/nctr-n-yellow.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';

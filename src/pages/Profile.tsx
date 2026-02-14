@@ -19,7 +19,7 @@ import { CollapsibleDashboard } from '@/components/CollapsibleDashboard';
 import { BuyNCTRButton } from '@/components/BuyNCTRButton';
 import { PortfolioStory } from '@/components/PortfolioStory';
 import ReferralSystem from '@/components/ReferralSystem';
-import { BaseBadge } from '@/components/BaseBadge';
+
 import { WithdrawalModal } from '@/components/WithdrawalModal';
 import { NCTRPortfolioBreakdown } from '@/components/NCTRPortfolioBreakdown';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
@@ -492,7 +492,6 @@ const Profile = () => {
                     <Wallet className="h-5 w-5 text-primary" />
                     Connect Your Coinbase Wallet
                   </CardTitle>
-                  <BaseBadge size="sm" variant="light" />
                 </div>
               </CardHeader>
               <CardContent>
@@ -967,7 +966,6 @@ const Profile = () => {
                        <Wallet className="h-5 w-5 text-foreground" />
                        Coinbase Wallet
                      </CardTitle>
-                     <BaseBadge size="sm" variant="light" />
                    </div>
                   </CardHeader>
                   <CardContent>
@@ -1008,7 +1006,7 @@ const Profile = () => {
                       <Wallet className="h-4 w-4 text-muted-foreground" />
                       Wallet Management
                     </CardTitle>
-                    <BaseBadge size="sm" variant="light" />
+                    
                   </div>
                 </CardHeader>
                 <CardContent>
