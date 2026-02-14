@@ -4,23 +4,23 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BaseBadge } from "@/components/BaseBadge";
+
 
 const FAQ = () => {
   const faqs = [
     {
       question: "What is The Garden?",
-      answer: "The Garden is a shopping rewards platform where you earn NCTR stakes by purchasing from 6,000+ brands. Your stakes build your Crescendo membership status, unlocking better rewards and exclusive opportunities. No buy-in required — just shop and earn.",
+      answer: "The Garden is a shopping rewards platform where you earn NCTR by purchasing from 6,000+ brands. Your NCTR builds your Crescendo membership status, unlocking better rewards and exclusive opportunities. No buy-in required — just shop and earn.",
       icon: "🌱"
     },
     {
       question: "What is NCTR?",
-      answer: "NCTR is what you earn by shopping and participating in The Garden. Think of NCTR stakes like loyalty points — except they are real digital assets you own and control. Lock them with 360LOCK to build your Crescendo status and unlock better rewards. Your NCTR stays yours — it is never spent when locked, just committed for a period.\n\n⚠️ OFFICIAL CONTRACT ADDRESS: 0x973104fAa7F2B11787557e85953ECA6B4e262328\n\nThis is the ONLY official NCTR contract. Do not confuse with any other assets that may have the same name. Always verify the contract address before any transactions.",
+      answer: "NCTR is what you earn by shopping and participating in The Garden. Think of NCTR like loyalty points — except they are real digital assets you own and control. Commit them with 360LOCK to build your Crescendo status and unlock better rewards. Your NCTR stays yours — it is never spent when committed, just set aside for a period.\n\n⚠️ OFFICIAL CONTRACT ADDRESS: 0x973104fAa7F2B11787557e85953ECA6B4e262328\n\nThis is the ONLY official NCTR contract. Do not confuse with any other assets that may have the same name. Always verify the contract address before any transactions.",
       icon: "🌾"
     },
     {
       question: "How Does The Garden Work?",
-      answer: "Sign up free. Shop through The Garden with brands you already love. Every purchase earns you NCTR stakes. Commit your stakes with 360LOCK to level up your Crescendo status (Bronze through Diamond). Higher status unlocks better rewards and bigger earning opportunities. Invite friends and both earn 500 NCTR stakes.",
+      answer: "Sign up free. Shop through The Garden with brands you already love. Every purchase earns you NCTR. Commit your NCTR with 360LOCK to level up your Crescendo status (Bronze through Diamond). Higher status unlocks better rewards and bigger earning opportunities. Invite friends and both earn 500 NCTR.",
       icon: "⚡"
     }
   ];
@@ -89,11 +89,7 @@ const FAQ = () => {
                       <div className="pl-16 border-l-2 border-gradient-hero/20 ml-6">
                         {index === 1 ? (
                           <>
-                            <p className="mb-4">NCTR is what you earn by shopping and participating in The Garden. Think of NCTR stakes like loyalty points — except they are real digital assets you own and control. Lock them with 360LOCK to build your Crescendo status and unlock better rewards. Your NCTR stays yours — it is never spent when locked, just committed for a period.</p>
-                            
-                            <div className="my-4 flex items-center gap-2">
-                              <BaseBadge size="sm" variant="light" />
-                            </div>
+                            <p className="mb-4">NCTR is what you earn by shopping and participating in The Garden. Think of NCTR like loyalty points — except they are real digital assets you own and control. Commit them with 360LOCK to build your Crescendo status and unlock better rewards. Your NCTR stays yours — it is never spent when committed, just set aside for a period.</p>
                             
                             <p className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 rounded">
                               <strong>⚠️ OFFICIAL CONTRACT ADDRESS:</strong> 0x973104fAa7F2B11787557e85953ECA6B4e262328
