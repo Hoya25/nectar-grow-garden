@@ -765,7 +765,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
       
       toast({
         title: `✅ ${brand.name} - Tracking Active!`,
-        description: `Shop normally and earn crypto back. Your rewards will appear within 24-48 hours.`,
+        description: `Shop normally and earn NCTR back. Your rewards will appear within 24-48 hours.`,
         duration: 6000,
       });
     } catch (error) {
@@ -1364,7 +1364,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
                 Welcome to The Garden
               </h2>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Your personal crypto rewards hub. Earn NCTR tokens through everyday activities like shopping, inviting friends, and engaging with partners.
+                Your personal rewards hub. Earn NCTR on every purchase, invite, and partner activity.
               </p>
             </div>
 

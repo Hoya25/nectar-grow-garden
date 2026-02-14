@@ -39,7 +39,7 @@ const ComingSoon = () => {
             </h2>
             
             <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up [animation-delay:0.2s] opacity-0 [animation-fill-mode:forwards] drop-shadow-xl font-semibold" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 15px rgba(0,0,0,0.6)'}}>
-              We're putting the finishing touches on something amazing. Your gateway to earning everyday crypto rewards through our innovative ecosystem.
+              We're putting the finishing touches on something amazing. Your gateway to earning everyday rewards through our innovative ecosystem.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up [animation-delay:0.4s] opacity-0 [animation-fill-mode:forwards]">
@@ -56,7 +56,7 @@ const ComingSoon = () => {
             {/* Coming Soon Details */}
             <div className="mt-12 animate-fade-in-up [animation-delay:0.6s] opacity-0 [animation-fill-mode:forwards]">
               <p className="text-lg text-white/90 max-w-2xl mx-auto leading-relaxed drop-shadow-lg" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.8)'}}>
-                Thank you for your interest in The Garden. Stay tuned for the launch of everyday crypto for everyday people.
+                Thank you for your interest in The Garden. Stay tuned for the launch of everyday rewards for everyday people.
               </p>
             </div>
           </div>
