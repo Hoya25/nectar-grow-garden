@@ -1,5 +1,5 @@
 import nctrLogo from "@/assets/nctr-logo-grey-transparent.png";
-import { BaseBadge } from "@/components/BaseBadge";
+
 
 const Footer = () => {
   return (
@@ -27,9 +27,9 @@ const Footer = () => {
             {/* Premium Description */}
             <p className="text-xl text-background/90 leading-relaxed mb-12 max-w-4xl mx-auto font-medium">
               The Garden is an innovation from{" "}
-              <span className="bg-gradient-premium bg-clip-text text-transparent font-bold">
-                Project Butterfly
-              </span>
+               <span className="bg-gradient-premium bg-clip-text text-transparent font-bold">
+                 NCTR Alliance
+               </span>
               . A community-driven initiative creating an ecosystem to harness our buying power 
               and influence to make a positive impact on our lives and the world.
             </p>
@@ -40,7 +40,7 @@ const Footer = () => {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <p className="text-background/70 text-lg">
-                  © 2026 The Garden. All rights reserved.
+                  © 2026 NCTR Alliance · The Garden. All rights reserved.
                 </p>
                 
               </div>
