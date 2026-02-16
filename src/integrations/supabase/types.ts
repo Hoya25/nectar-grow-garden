@@ -3354,7 +3354,7 @@ export type Database = {
             Args: {
               p_base_nctr_amount: number
               p_brand_name?: string
-              p_earning_source?: string
+              p_earning_source: string
               p_purchase_amount?: number
               p_user_id: string
             }
