@@ -2498,7 +2498,7 @@ export type Database = {
           id: string
           loyalize_id: string | null
           nctr_earned: number | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           brand_id?: string | null
@@ -2508,7 +2508,7 @@ export type Database = {
           id?: string
           loyalize_id?: string | null
           nctr_earned?: number | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           brand_id?: string | null
@@ -2518,7 +2518,7 @@ export type Database = {
           id?: string
           loyalize_id?: string | null
           nctr_earned?: number | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
