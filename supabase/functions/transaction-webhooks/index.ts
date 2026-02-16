@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Loyalize webhook IP whitelist
+// Loyalize webhook authentication - prefer secret-based over IP whitelist
 const LOYALIZE_IP_WHITELIST = ['34.171.245.170']
 
 // Input validation schemas
@@ -72,7 +72,10 @@ serve(async (req) => {
       })
     }
 
-    // IP Whitelist check for Loyalize webhooks
+    // Authentication: check webhook secret header first, fall back to IP whitelist
+    const webhookSecret = req.headers.get('x-webhook-secret') || req.headers.get('authorization')
+    const expectedSecret = Deno.env.get('LOYALIZE_WEBHOOK_SECRET')
+    
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
                      req.headers.get('x-real-ip') ||
                      req.headers.get('cf-connecting-ip') ||
@@ -80,15 +83,30 @@ serve(async (req) => {
     
     console.log('📍 Webhook request from IP:', clientIP)
     
-    if (!LOYALIZE_IP_WHITELIST.includes(clientIP)) {
-      console.error('❌ Unauthorized IP address:', clientIP)
-      return new Response(JSON.stringify({ error: 'Unauthorized IP address' }), {
+    let authenticated = false
+    
+    // Method 1: Secret-based auth (preferred)
+    if (expectedSecret && webhookSecret) {
+      const secretValue = webhookSecret.replace('Bearer ', '')
+      if (secretValue === expectedSecret) {
+        authenticated = true
+        console.log('✅ Authenticated via webhook secret')
+      }
+    }
+    
+    // Method 2: IP whitelist (fallback)
+    if (!authenticated && LOYALIZE_IP_WHITELIST.includes(clientIP)) {
+      authenticated = true
+      console.log('✅ Authenticated via IP whitelist')
+    }
+    
+    if (!authenticated) {
+      console.error('❌ Unauthorized - IP:', clientIP, 'Secret provided:', !!webhookSecret)
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
-    
-    console.log('✅ IP whitelist check passed')
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!

@@ -2887,6 +2887,57 @@ export type Database = {
           },
         ]
       }
+      unmatched_transactions: {
+        Row: {
+          amount: number | null
+          commission: number | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          loyalize_transaction_id: string
+          matched: boolean | null
+          matched_at: string | null
+          matched_user_id: string | null
+          merchant_name: string | null
+          purchase_date: string | null
+          raw_data: Json | null
+          shopper_id: string | null
+          tracking_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          commission?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          loyalize_transaction_id: string
+          matched?: boolean | null
+          matched_at?: string | null
+          matched_user_id?: string | null
+          merchant_name?: string | null
+          purchase_date?: string | null
+          raw_data?: Json | null
+          shopper_id?: string | null
+          tracking_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          commission?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          loyalize_transaction_id?: string
+          matched?: boolean | null
+          matched_at?: string | null
+          matched_user_id?: string | null
+          merchant_name?: string | null
+          purchase_date?: string | null
+          raw_data?: Json | null
+          shopper_id?: string | null
+          tracking_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           expires_at: string | null
