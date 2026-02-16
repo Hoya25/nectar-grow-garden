@@ -229,6 +229,25 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         .eq("id", brandId)
         .single();
 
+      // Record shopping click BEFORE redirect
+      if (userId) {
+        const { error: clickError } = await supabase
+          .from("shopping_clicks")
+          .insert({
+            user_id: userId,
+            brand_id: brandId,
+            loyalize_id: loyalizeId,
+            converted: false,
+            nctr_earned: 0,
+          });
+        
+        if (clickError) {
+          console.error("❌ Failed to record shopping click:", clickError);
+        } else {
+          console.log("✅ Shopping click recorded for brand:", brandData?.name || brandId);
+        }
+      }
+
       // Call Edge Function for secure redirect with tracking
       const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeId}&user=${userId || ''}&tracking=${trackingId}`;
       
