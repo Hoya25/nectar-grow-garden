@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BrandDetailModal } from "./BrandDetailModal";
+import { WellnessCollection } from "./WellnessCollection";
 
 interface Brand {
   id: string;
@@ -420,6 +421,22 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
               })}
             </div>
           </section>
+        )}
+
+        {/* Wellness Collection */}
+        {!isSearching && (
+          <WellnessCollection
+            onShop={handleShop}
+            onBrandClick={(brand) => setSelectedBrand({
+              id: brand.id,
+              name: brand.name,
+              logo_url: brand.logo_url || null,
+              category: "Health & Wellness",
+              nctr_per_dollar: brand.nctr_per_dollar || null,
+              loyalize_id: brand.loyalize_id || null,
+              description: brand.tagline,
+            })}
+          />
         )}
 
         {/* Section Header */}
