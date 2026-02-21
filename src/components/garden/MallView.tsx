@@ -21,6 +21,7 @@ interface Brand {
   promotion_label?: string | null;
   is_big_brand?: boolean;
   featured?: boolean;
+  display_order?: number | null;
   description?: string | null;
   tags?: { slug: string; icon: string; name: string }[];
 }
@@ -102,9 +103,10 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             .limit(7000),
           supabase
             .from("brands")
-            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
+            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured, display_order")
             .eq("is_active", true)
             .eq("featured", true)
+            .order("display_order", { ascending: true })
             .order("name")
             .limit(10),
         ]);
@@ -149,11 +151,13 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
     const timer = setTimeout(async () => {
       setSearchLoading(true);
       try {
+        const term = `%${searchQuery.trim()}%`;
         const { data, error } = await supabase
           .from("brands")
-          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
+          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured, display_order")
           .eq("is_active", true)
-          .ilike("name", `%${searchQuery.trim()}%`)
+          .or(`name.ilike.${term},category.ilike.${term},description.ilike.${term}`)
+          .order("display_order", { ascending: true })
           .order("name")
           .limit(100);
         if (error) throw error;
@@ -355,40 +359,65 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
               className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
               style={{ scrollbarWidth: "none" }}
             >
-              {featuredBrands.map((brand) => (
-                <div
-                  key={brand.id}
-                  className="snap-start flex-shrink-0 w-[220px] md:w-[260px] bg-[hsl(var(--mall-card))] rounded-xl p-5 border border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))] hover:-translate-y-1 transition-all cursor-pointer group"
-                  onClick={() => setSelectedBrand(brand)}
-                >
-                  <div className="flex justify-center mb-4 bg-[hsl(0,0%,28%)] rounded-lg p-3">
-                    <BrandLogo
-                      src={brand.logo_url || undefined}
-                      alt={brand.name}
-                      size="lg"
-                      className="group-hover:scale-105 transition-transform"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-[hsl(var(--mall-text))] text-center text-sm line-clamp-2 mb-2 min-h-[2.5rem]">
-                    {brand.name}
-                  </h3>
-                  <p className="text-xs text-center font-medium text-[hsl(var(--mall-accent))] mb-3">
-                    Earn NCTR on every purchase
-                  </p>
-                  <Button
-                    size="sm"
-                    className="w-full bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)] font-semibold"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
-                    }}
-                    disabled={!brand.loyalize_id}
+              {featuredBrands.map((brand) => {
+                const isFlagship = brand.featured && brand.display_order === 1;
+                return (
+                  <div
+                    key={brand.id}
+                    className={`snap-start flex-shrink-0 rounded-xl p-5 border hover:-translate-y-1 transition-all cursor-pointer group ${
+                      isFlagship
+                        ? "w-[240px] md:w-[280px] bg-[#F5EDE3] border-[#C4946A]/40 hover:border-[#C4946A] shadow-lg"
+                        : "w-[220px] md:w-[260px] bg-[hsl(var(--mall-card))] border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))]"
+                    }`}
+                    onClick={() => setSelectedBrand(brand)}
                   >
-                    Shop Now
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-              ))}
+                    {/* Flagship Badge */}
+                    {isFlagship && (
+                      <div className="flex justify-center mb-3">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#C4946A] text-white">
+                          ✦ Inspiration Flagship
+                        </span>
+                      </div>
+                    )}
+                    <div className={`flex justify-center mb-4 rounded-lg p-3 ${
+                      isFlagship ? "bg-[#EDE4D8]" : "bg-[hsl(0,0%,28%)]"
+                    }`}>
+                      <BrandLogo
+                        src={brand.logo_url || undefined}
+                        alt={brand.name}
+                        size="lg"
+                        className="group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                    <h3 className={`font-semibold text-center text-sm line-clamp-2 mb-2 min-h-[2.5rem] ${
+                      isFlagship ? "text-[#3B2F25]" : "text-[hsl(var(--mall-text))]"
+                    }`}>
+                      {brand.name}
+                    </h3>
+                    <p className={`text-xs text-center font-medium mb-3 ${
+                      isFlagship ? "text-[#C4946A]" : "text-[hsl(var(--mall-accent))]"
+                    }`}>
+                      {isFlagship ? "Earn 3 NCTR per $1 spent" : "Earn NCTR on every purchase"}
+                    </p>
+                    <Button
+                      size="sm"
+                      className={`w-full font-semibold ${
+                        isFlagship
+                          ? "bg-[#C4946A] text-white hover:bg-[#A97D5A]"
+                          : "bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)]"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
+                      }}
+                      disabled={!brand.loyalize_id}
+                    >
+                      Shop Now
+                      <ExternalLink className="h-3 w-3 ml-1" />
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
