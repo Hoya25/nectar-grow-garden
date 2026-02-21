@@ -264,6 +264,47 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         </div>
       </div>
 
+      {/* Hero CTA Section */}
+      <div className="max-w-6xl mx-auto px-4 pt-8 pb-2">
+        <h2 className="text-3xl md:text-4xl font-bold text-[hsl(var(--mall-text))] text-center mb-6">
+          Live Your Life. Earn NCTR.
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          {/* Card 1 — Earn */}
+          <div className="bg-[hsl(var(--mall-card))] rounded-2xl border border-[hsl(var(--mall-border))] p-6 flex flex-col items-center text-center">
+            <span className="text-4xl mb-3">🛒</span>
+            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Shop &amp; Earn</h3>
+            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
+              Shop 6,000+ brands and earn NCTR on every purchase
+            </p>
+            <button
+              onClick={() => {
+                searchInputRef.current?.focus();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[hsl(var(--mall-card))] text-[hsl(var(--mall-accent))] border border-[hsl(var(--mall-accent))]/40 hover:bg-[hsl(var(--mall-accent))] hover:text-[hsl(0,0%,20%)] transition-all"
+            >
+              Browse Brands
+            </button>
+          </div>
+
+          {/* Card 2 — Status */}
+          <div className="bg-[hsl(var(--mall-card))] rounded-2xl border border-[hsl(var(--mall-border))] p-6 flex flex-col items-center text-center">
+            <span className="text-4xl mb-3">💎</span>
+            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Commit &amp; Unlock</h3>
+            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
+              Commit your NCTR for 360 days to unlock exclusive member rewards
+            </p>
+            <button
+              onClick={() => navigate('/garden?tab=dashboard')}
+              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[hsl(var(--mall-card))] text-[hsl(var(--mall-accent))] border border-[hsl(var(--mall-accent))]/40 hover:bg-[hsl(var(--mall-accent))] hover:text-[hsl(0,0%,20%)] transition-all"
+            >
+              View My Status
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Featured Brands Row */}
