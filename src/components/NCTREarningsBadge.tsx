@@ -132,6 +132,17 @@ export const NCTREarningsBadge = () => {
                 )}
               </div>
 
+              {/* Crescendo link */}
+              <a
+                href="https://crescendo.nctr.live"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-xs text-center hover:underline"
+                style={{ color: "#E2FF6D" }}
+              >
+                Higher status = more rewards in Crescendo →
+              </a>
+
               <div className="h-px" style={{ background: "#5A5A58" }} />
 
               {/* CTA */}
