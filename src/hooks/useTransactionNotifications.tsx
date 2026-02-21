@@ -10,6 +10,42 @@ interface TransactionNotificationProps {
 
 export const useTransactionNotifications = ({ userId, onTransactionReceived }: TransactionNotificationProps) => {
   const lastNotifiedTransaction = useRef<string | null>(null);
+  const lastNotifiedNotification = useRef<string | null>(null);
+
+  // Listen for referral_success notifications
+  useEffect(() => {
+    if (!userId) return;
+
+    const notifChannel = supabase
+      .channel('referral-success-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          const notif = payload.new as any;
+          if (notif.type !== 'referral_success') return;
+          if (lastNotifiedNotification.current === notif.id) return;
+          lastNotifiedNotification.current = notif.id;
+
+          toast({
+            title: "🎉 You earned NCTR!",
+            description: "Someone just joined using your invite link. Your NCTR reward is on its way.",
+            duration: 8000,
+            className: "referral-success-toast",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(notifChannel);
+    };
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) return;

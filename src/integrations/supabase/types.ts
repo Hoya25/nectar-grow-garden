@@ -1846,6 +1846,30 @@ export type Database = {
           },
         ]
       }
+      referral_milestones: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          nctr_reward: number
+          referral_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          nctr_reward?: number
+          referral_count: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          nctr_reward?: number
+          referral_count?: number
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           created_at: string
