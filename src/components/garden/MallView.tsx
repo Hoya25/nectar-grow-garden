@@ -176,9 +176,10 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       sessionStorage.setItem('garden_last_click_time', Date.now().toString());
       window.open(redirectUrl, '_blank');
       toast({
-        title: "🛒 Shopping Trip Started!",
-        description: "Complete your purchase and you'll automatically earn NCTR. Earnings appear within 24-48 hours.",
-        duration: 7000,
+        title: "🛒 Happy Shopping!",
+        description: "Your NCTR will be credited within 48 hours after your purchase is confirmed.",
+        duration: 6000,
+        className: "garden-shop-toast",
       });
     } catch (error) {
       console.error("Error opening shop link:", error);
