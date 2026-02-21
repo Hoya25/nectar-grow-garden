@@ -111,7 +111,7 @@ const KromaWellness = () => {
       {/* Cross-platform CTA */}
       <section className="max-w-3xl mx-auto px-4 pb-16">
         <a
-          href="https://crescendo.nctr.live"
+          href="https://crescend0.nctr.live"
           target="_blank"
           rel="noopener noreferrer"
           className="block rounded-2xl p-6 md:p-8 text-center transition-shadow hover:shadow-lg"
