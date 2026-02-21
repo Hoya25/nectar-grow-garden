@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { ChevronRight, Lock, Star, TrendingUp } from 'lucide-react';
 import {
   getTierForAmount,
@@ -15,7 +16,6 @@ interface TierProgressBarProps {
 }
 
 const TIER_STYLES: Record<string, { color: string; bg: string }> = {
-  starter:  { color: 'var(--color-text-muted)', bg: 'var(--color-bg-surface)' },
   bronze:   { color: 'var(--tier-bronze)',       bg: 'var(--tier-bronze-bg)' },
   silver:   { color: 'var(--tier-silver)',       bg: 'var(--tier-silver-bg)' },
   gold:     { color: 'var(--tier-gold)',         bg: 'var(--tier-gold-bg)' },
@@ -23,11 +23,35 @@ const TIER_STYLES: Record<string, { color: string; bg: string }> = {
   diamond:  { color: 'var(--tier-diamond)',     bg: 'var(--tier-diamond-bg)' },
 };
 
+function useCountUp(target: number, duration = 1200) {
+  const [display, setDisplay] = useState(target);
+  const prev = useRef(target);
+
+  useEffect(() => {
+    const from = prev.current;
+    const diff = target - from;
+    if (diff === 0) return;
+    const start = performance.now();
+    let raf: number;
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      setDisplay(Math.round(from + diff * ease));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+
+  useEffect(() => { prev.current = target; }, [target]);
+  return display;
+}
+
 const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }: TierProgressBarProps) => {
   const currentTier = getTierForAmount(balance);
   const nextTierInfo = getNextTierInfo(currentTier);
   const levels = getOrderedTierLevels();
-  const style = TIER_STYLES[currentTier] || TIER_STYLES.starter;
+  const style = TIER_STYLES[currentTier] || TIER_STYLES.bronze;
 
   const currentThreshold = CRESCENDO_TIER_THRESHOLDS[currentTier as keyof typeof CRESCENDO_TIER_THRESHOLDS] ?? 0;
   const nextThreshold = nextTierInfo
@@ -39,6 +63,15 @@ const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }:
     : 100;
 
   const remaining = nextThreshold ? nextThreshold - balance : 0;
+
+  const displayBalance = useCountUp(balance);
+  const [animatedWidth, setAnimatedWidth] = useState(0);
+  const [perksOpen, setPerksOpen] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setAnimatedWidth(progress));
+    return () => cancelAnimationFrame(raf);
+  }, [progress]);
 
   return (
     <section
@@ -72,7 +105,7 @@ const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }:
               {getTierName(currentTier)}
             </p>
             <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>
-              {balance.toLocaleString()} NCTR committed
+              {displayBalance.toLocaleString()} NCTR committed
             </p>
           </div>
         </div>
@@ -104,8 +137,8 @@ const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }:
             height: '100%',
             borderRadius: 'var(--radius-full)',
             background: `linear-gradient(90deg, ${style.color}, var(--color-accent))`,
-            width: `${progress}%`,
-            transition: 'width 0.7s cubic-bezier(.4,0,.2,1)',
+            width: `${animatedWidth}%`,
+            transition: 'width 1.5s cubic-bezier(0.4,0,0.2,1)',
           }}
         />
       </div>
@@ -176,28 +209,26 @@ const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }:
         </div>
 
         <div className="flex items-center" style={{ gap: 'var(--space-2)' }}>
-          {onViewPerks && (
-            <button
-              onClick={onViewPerks}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
-                padding: 'var(--space-2) var(--space-4)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: 'var(--text-xs)',
-                fontWeight: 'var(--weight-semibold)',
-                color: 'var(--color-text-secondary)',
-                border: '1px solid var(--color-border)',
-                background: 'transparent',
-                cursor: 'pointer',
-                transition: 'border-color var(--transition-fast)',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--color-border-medium)')}
-              onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
-            >
-              <TrendingUp style={{ width: 14, height: 14 }} />
-              View Perks
-            </button>
-          )}
+          <button
+            onClick={() => setPerksOpen((p) => !p)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
+              padding: 'var(--space-2) var(--space-4)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 'var(--weight-semibold)',
+              color: 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)',
+              background: 'transparent',
+              cursor: 'pointer',
+              transition: 'border-color var(--transition-fast)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--color-border-medium)')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
+          >
+            <TrendingUp style={{ width: 14, height: 14 }} />
+            View Perks
+          </button>
           {onLevelUp && nextTierInfo && (
             <button
               onClick={onLevelUp}
@@ -219,6 +250,22 @@ const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }:
               Level Up
               <ChevronRight style={{ width: 14, height: 14 }} />
             </button>
+          )}
+        </div>
+      </div>
+
+      {/* Perks drawer — smooth slide */}
+      <div
+        style={{
+          maxHeight: perksOpen ? '320px' : '0',
+          opacity: perksOpen ? 1 : 0,
+          overflow: 'hidden',
+          transition: 'max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease',
+        }}
+      >
+        <div style={{ padding: 'var(--space-4) 0' }}>
+          {onViewPerks && perksOpen && (
+            <div>{/* Rendered by parent via onViewPerks callback */}</div>
           )}
         </div>
       </div>
