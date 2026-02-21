@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Copy, Check, Users, Coins, Share2, Gift, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import ReferralOnboardingTips from './ReferralOnboardingTips';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -211,6 +212,11 @@ const ReferralRewardsPage = () => {
             </p>
           </div>
         )}
+
+        {/* Referral Tips */}
+        <div className="mt-12">
+          <ReferralOnboardingTips />
+        </div>
       </div>
     </main>
   );
