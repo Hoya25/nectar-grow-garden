@@ -147,7 +147,7 @@ export default function BrandTokenBountiesEditor({
       token_id: "NCTR",
       display_name: "NCTR",
       color: "#E2FF6D",
-      amount: (nctrBase + nctrOverlay) * ampMult,
+      amount: nctrBase + nctrOverlay,  // no amplifier on NCTR
     });
 
     // Impact tokens
