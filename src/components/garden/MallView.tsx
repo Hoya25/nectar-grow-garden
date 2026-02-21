@@ -9,6 +9,7 @@ import { BrandLogo } from "@/components/ui/brand-logo";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BrandDetailModal } from "./BrandDetailModal";
 import { WellnessCollection } from "./WellnessCollection";
+import { InspirationPartnersSection } from "./InspirationPartnersSection";
 
 interface Brand {
   id: string;
@@ -66,6 +67,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
   const [allBrands, setAllBrands] = useState<Brand[]>([]);
   const [featuredBrands, setFeaturedBrands] = useState<Brand[]>([]);
   const [totalBrands, setTotalBrands] = useState(0);
+  const [inspirationBrandIds, setInspirationBrandIds] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
   const [suggestionName, setSuggestionName] = useState("");
   const [submittingSuggestion, setSubmittingSuggestion] = useState(false);
@@ -115,6 +117,15 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         setTotalBrands(countRes.count || 0);
         setAllBrands(brandsRes.data || []);
         setFeaturedBrands(featuredRes.data || []);
+
+        // Fetch inspiration tag brand IDs
+        const { data: tagData } = await supabase.from("brand_tags").select("id").eq("slug", "inspiration").single();
+        if (tagData) {
+          const { data: assignments } = await supabase.from("brand_tag_assignments").select("brand_id").eq("tag_id", tagData.id);
+          if (assignments) {
+            setInspirationBrandIds(new Set(assignments.map(a => a.brand_id).filter(Boolean) as string[]));
+          }
+        }
       } catch (error) {
         console.error("Error fetching brands:", error);
       } finally {
@@ -423,6 +434,22 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           </section>
         )}
 
+        {/* INSPIRATION Partners */}
+        {!isSearching && (
+          <InspirationPartnersSection
+            onShop={handleShop}
+            onBrandClick={(brand) => setSelectedBrand({
+              id: brand.id,
+              name: brand.name,
+              logo_url: brand.logo_url || null,
+              category: brand.category,
+              nctr_per_dollar: brand.nctr_per_dollar || null,
+              loyalize_id: brand.loyalize_id || null,
+              description: brand.description,
+            })}
+          />
+        )}
+
         {/* Wellness Collection */}
         {!isSearching && (
           <WellnessCollection
@@ -460,9 +487,15 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
               {paginatedBrands.map((brand) => (
                 <div
                   key={brand.id}
-                  className="bg-[hsl(var(--mall-card))] rounded-xl p-4 border border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))] hover:-translate-y-0.5 transition-all cursor-pointer group"
+                  className="bg-[hsl(var(--mall-card))] rounded-xl p-4 border border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))] hover:-translate-y-0.5 transition-all cursor-pointer group relative"
                   onClick={() => setSelectedBrand(brand)}
                 >
+                  {/* INSPIRATION badge */}
+                  {inspirationBrandIds.has(brand.id) && (
+                    <span className="absolute bottom-14 left-3 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold z-10" style={{ background: "#E2FF6D", color: "#323232" }}>
+                      ✨ INSPIRATION
+                    </span>
+                  )}
                   {/* Logo */}
                   <div className="flex justify-center mb-3 bg-[hsl(0,0%,28%)] rounded-lg p-2 aspect-square items-center">
                     <BrandLogo
