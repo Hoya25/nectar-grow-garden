@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Garden from "./pages/Garden";
 import GardenCategoryPage from "./pages/GardenCategoryPage";
 import GardenTagPage from "./pages/GardenTagPage";
+import KromaWellness from "./pages/KromaWellness";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import Referrals from "./pages/Referrals";
@@ -78,6 +79,7 @@ const App = () => {
                   <Route path="/garden" element={<Garden />} />
                   <Route path="/garden/category/:slug" element={<GardenCategoryPage />} />
                   <Route path="/garden/tag/:slug" element={<GardenTagPage />} />
+                  <Route path="/garden/brand/kroma-wellness" element={<KromaWellness />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/referrals" element={<Referrals />} />
                   <Route path="/affiliate-links" element={<AffiliateLinks />} />
