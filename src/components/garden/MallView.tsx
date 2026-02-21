@@ -305,14 +305,31 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
       {/* Hero CTA Section */}
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-2">
-        <h2 className="text-3xl md:text-4xl font-bold text-[hsl(var(--mall-text))] text-center mb-6">
-          Live Your Life. Earn NCTR.
+        <h2
+          className="text-center mb-6 leading-tight"
+          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 'clamp(32px, 4.5vw, 52px)' }}
+        >
+          <span className="text-[hsl(var(--mall-text))] block">LIVE YOUR LIFE.</span>
+          <span className="text-[#E2FF6D] block">EARN NCTR.</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {/* Card 1 — Earn */}
-          <div className="bg-[hsl(var(--mall-card))] rounded-2xl border border-[hsl(var(--mall-border))] p-6 flex flex-col items-center text-center">
-            <span className="text-4xl mb-3">🛒</span>
-            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Shop &amp; Earn</h3>
+          {/* Card 1 — Shop & Earn */}
+          <div
+            className="relative rounded-2xl p-6 flex flex-col items-center text-center transition-all duration-200 hover:-translate-y-[2px] group"
+            style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '16px',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(226,255,109,0.22)')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+          >
+            {/* Top accent line */}
+            <div className="absolute top-0 left-4 right-4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(226,255,109,0.4), transparent)' }} />
+            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E2FF6D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </div>
+            <h3 className="mb-2 uppercase tracking-wide text-[hsl(var(--mall-text))]" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.125rem' }}>SHOP & EARN</h3>
             <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
               Shop 6,000+ brands and earn NCTR on every purchase — fueling your Crescendo status
             </p>
@@ -321,24 +338,37 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                 searchInputRef.current?.focus();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
+              className="px-6 py-2.5 rounded-lg text-sm font-bold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
             >
-              Browse Brands
+              BROWSE BRANDS →
             </button>
           </div>
 
-          {/* Card 2 — Status */}
-          <div className="bg-[hsl(var(--mall-card))] rounded-2xl border border-[hsl(var(--mall-border))] p-6 flex flex-col items-center text-center">
-            <span className="text-4xl mb-3">💎</span>
-            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Level Up Your Status</h3>
+          {/* Card 2 — Level Up Your Status */}
+          <div
+            className="relative rounded-2xl p-6 flex flex-col items-center text-center transition-all duration-200 hover:-translate-y-[2px] group"
+            style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '16px',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(226,255,109,0.22)')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+          >
+            {/* Top accent line */}
+            <div className="absolute top-0 left-4 right-4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(226,255,109,0.4), transparent)' }} />
+            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E2FF6D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <h3 className="mb-2 uppercase tracking-wide text-[hsl(var(--mall-text))]" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.125rem' }}>LEVEL UP YOUR STATUS</h3>
             <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
               Commit your NCTR in Crescendo for 360 days to activate your status tier and unlock rewards
             </p>
             <button
               onClick={() => navigate('/garden?tab=dashboard')}
-              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
+              className="px-6 py-2.5 rounded-lg text-sm font-bold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
             >
-              View My Status
+              VIEW MY STATUS →
             </button>
           </div>
         </div>
