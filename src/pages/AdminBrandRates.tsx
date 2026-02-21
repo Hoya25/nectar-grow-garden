@@ -166,21 +166,28 @@ const AdminBrandRates = () => {
   const [inlineEditId, setInlineEditId] = useState<string | null>(null);
   const [inlineEditValue, setInlineEditValue] = useState("");
 
+  const [authTimeout, setAuthTimeout] = useState(false);
+
   useEffect(() => {
-    if (!authLoading && !user) {
+    // Give auth up to 3 seconds to resolve before redirecting
+    const timer = setTimeout(() => setAuthTimeout(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!authTimeout && (authLoading || adminLoading)) return;
+    if (!user) {
       navigate("/auth");
       return;
     }
-    if (!adminLoading && !isAdmin) {
+    if (!isAdmin) {
       navigate("/garden");
       return;
     }
-    if (isAdmin) {
-      fetchBrands();
-      fetchStats();
-      fetchRateSettings();
-    }
-  }, [user, isAdmin, authLoading, adminLoading]);
+    fetchBrands();
+    fetchStats();
+    fetchRateSettings();
+  }, [user, isAdmin, authLoading, adminLoading, authTimeout]);
 
   const fetchRateSettings = async () => {
     try {

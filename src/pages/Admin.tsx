@@ -74,8 +74,8 @@ interface AdminStats {
 }
 
 const Admin = () => {
-  const { user } = useAuth();
-  const { isAdmin, adminUser, loading } = useAdmin();
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, adminUser, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
   const [stats, setStats] = useState<AdminStats>({
     total_users: 0,
@@ -86,16 +86,21 @@ const Admin = () => {
     successful_invites: 0
   });
 
+  const [authTimeout, setAuthTimeout] = useState(false);
+
   useEffect(() => {
-    if (!loading && (!user || !isAdmin)) {
+    const timer = setTimeout(() => setAuthTimeout(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!authTimeout && (authLoading || adminLoading)) return;
+    if (!user || !isAdmin) {
       navigate('/');
       return;
     }
-
-    if (isAdmin) {
-      fetchAdminStats();
-    }
-  }, [user, isAdmin, loading, navigate]);
+    fetchAdminStats();
+  }, [user, isAdmin, authLoading, adminLoading, authTimeout, navigate]);
 
   const fetchAdminStats = async () => {
     try {
@@ -143,7 +148,7 @@ const Admin = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen bg-gradient-page flex items-center justify-center">
         <div className="text-center">
