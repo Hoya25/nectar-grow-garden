@@ -14,7 +14,7 @@ const Index = () => {
       {/* Earn Crypto Every Day Section */}
       <FeatureSection
         title="Shop. Earn. Unlock."
-        titleColor="text-green-500"
+        titleColor="text-[#E2FF6D]"
         subtitle="Turn Your Everyday Purchases into Real Rewards"
         description="Step into The Garden and start earning NCTR simply by shopping with 6,000+ brands you already love. Every purchase builds your position in the community."
         bulletPoints={[
