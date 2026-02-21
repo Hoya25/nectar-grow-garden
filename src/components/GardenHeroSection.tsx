@@ -103,28 +103,29 @@ export const GardenHeroSection = ({
         </div>
         
         {/* Portfolio Breakdown Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
           {/* Available */}
-          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-sm">
+          <Card className="bg-[#323232]/5 border-[#5A5A58]/20 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Wallet className="w-4 h-4 text-emerald-600" />
-                <span className="text-xs font-medium text-emerald-700">Available</span>
+                <Wallet className="w-4 h-4 text-[#323232]" />
+                <span className="text-xs font-medium text-[#323232]">Available</span>
                 <InfoTooltip content="Spendable on Crescendo rewards anytime" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-emerald-600">
+              <p className="text-lg md:text-xl font-bold text-[#323232]">
                 {formatNCTR(portfolio?.available_nctr || 0)}
               </p>
-              <p className="text-[10px] text-emerald-600/80 mt-1">NCTR</p>
-              <p className="text-xs text-emerald-600/70 mt-1">{formatUSD(portfolio?.available_nctr || 0)}</p>
-              <p className="text-[10px] text-emerald-600/60 mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <p className="text-[10px] text-[#5A5A58] mt-1">NCTR</p>
+              <p className="text-xs text-[#5A5A58] mt-1">{formatUSD(portfolio?.available_nctr || 0)}</p>
+              <p className="text-[10px] text-[#5A5A58] mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF6D]"></span>
                 Ready to spend
               </p>
             </CardContent>
           </Card>
 
-          {/* 90LOCK */}
+          {/* 90LOCK — hidden per brand rules */}
+          {false && (
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -143,42 +144,43 @@ export const GardenHeroSection = ({
               </p>
             </CardContent>
           </Card>
+          )}
 
           {/* 360LOCK */}
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-sm">
+          <Card className="bg-[#5A5A58]/10 border-[#5A5A58]/20 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Lock className="w-4 h-4 text-purple-600" />
-                <span className="text-xs font-medium text-purple-700">360LOCK</span>
+                <Lock className="w-4 h-4 text-[#323232]" />
+                <span className="text-xs font-medium text-[#323232]">360LOCK</span>
                 <InfoTooltip content="Committed for 360 days for maximum rewards + premium perks" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-purple-600">
+              <p className="text-lg md:text-xl font-bold text-[#323232]">
                 {formatNCTR(portfolio?.lock_360_nctr || 0)}
               </p>
-              <p className="text-[10px] text-purple-600/80 mt-1">NCTR</p>
-              <p className="text-xs text-purple-600/70 mt-1">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
-              <p className="text-[10px] text-purple-600/60 mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+              <p className="text-[10px] text-[#5A5A58] mt-1">NCTR</p>
+              <p className="text-xs text-[#5A5A58] mt-1">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
+              <p className="text-[10px] text-[#5A5A58] mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF6D]"></span>
                 360-day commitment
               </p>
             </CardContent>
           </Card>
 
           {/* Pending */}
-          <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 shadow-sm">
+          <Card className="bg-[#D9D9D9]/20 border-[#D9D9D9]/40 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-medium text-gray-600">Pending</span>
+                <Clock className="w-4 h-4 text-[#5A5A58]" />
+                <span className="text-xs font-medium text-[#5A5A58]">Pending</span>
                 <InfoTooltip content="From recent purchases, clears in 24-48 hours" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-gray-600">
+              <p className="text-lg md:text-xl font-bold text-[#5A5A58]">
                 {formatNCTR(portfolio?.pending_nctr || 0)}
               </p>
-              <p className="text-[10px] text-gray-600/80 mt-1">NCTR</p>
-              <p className="text-xs text-gray-500 mt-1">{formatUSD(portfolio?.pending_nctr || 0)}</p>
-              <p className="text-[10px] text-gray-500 mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+              <p className="text-[10px] text-[#5A5A58]/80 mt-1">NCTR</p>
+              <p className="text-xs text-[#5A5A58] mt-1">{formatUSD(portfolio?.pending_nctr || 0)}</p>
+              <p className="text-[10px] text-[#5A5A58] mt-1 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D9D9D9]"></span>
                 Processing
               </p>
             </CardContent>

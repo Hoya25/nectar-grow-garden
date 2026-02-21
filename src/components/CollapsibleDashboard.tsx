@@ -136,7 +136,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
             <span>
               {formatNCTR((portfolio?.available_nctr || 0) + (portfolio?.lock_360_nctr || 0) + (portfolio?.lock_90_nctr || 0))} NCTR
             </span>
-            <span className="text-green-600 font-medium">
+            <span className="text-[#E2FF6D] font-medium">
               ${formatPrice(calculatePortfolioValue(
                 (portfolio?.available_nctr || 0) + (portfolio?.lock_90_nctr || 0) + (portfolio?.lock_360_nctr || 0)
               ))}
@@ -203,7 +203,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
                     <p className="text-xs text-muted-foreground">Ready to commit</p>
-                    <p className="text-xs text-green-600 font-medium">
+                    <p className="text-xs text-[#E2FF6D] font-medium">
                       ${formatPrice(calculatePortfolioValue(portfolio?.available_nctr || 0))}
                     </p>
                   </div>
@@ -225,6 +225,8 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
           </CardContent>
         </Card>
 
+        {/* 90LOCK — hidden per brand rules */}
+        {false && (
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 shadow-soft border border-blue-200">
           <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
@@ -263,6 +265,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
             </div>
           </CardContent>
         </Card>
+        )}
 
         <Card className="bg-gradient-to-br from-primary/10 to-primary/20 shadow-soft border border-primary/30">
           <CardContent className="p-2 sm:p-3">
@@ -315,7 +318,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
                     <p className="text-xs text-muted-foreground">Lifetime</p>
-                    <p className="text-xs text-green-600 font-medium">
+                    <p className="text-xs text-[#E2FF6D] font-medium">
                       ${formatPrice(calculatePortfolioValue(portfolio?.total_earned || 0))}
                     </p>
                   </div>
