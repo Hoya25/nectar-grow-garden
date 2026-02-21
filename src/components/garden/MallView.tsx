@@ -323,8 +323,8 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           >
             {/* Top accent line */}
             <div className="absolute top-0 left-4 right-4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(226,255,109,0.4), transparent)' }} />
-            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E2FF6D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)', border: '1px solid rgba(226,255,109,0.15)' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(226,255,109,0.85)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             </div>
             <h3 className="mb-2 uppercase tracking-wide text-[hsl(var(--mall-text))]" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.125rem' }}>SHOP & EARN</h3>
             <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
@@ -354,8 +354,8 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           >
             {/* Top accent line */}
             <div className="absolute top-0 left-4 right-4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(226,255,109,0.4), transparent)' }} />
-            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E2FF6D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)', border: '1px solid rgba(226,255,109,0.15)' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(226,255,109,0.85)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
             <h3 className="mb-2 uppercase tracking-wide text-[hsl(var(--mall-text))]" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.125rem' }}>LEVEL UP YOUR STATUS</h3>
             <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
