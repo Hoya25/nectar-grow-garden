@@ -8,6 +8,15 @@ export const CRESCENDO_TIER_THRESHOLDS = {
   diamond: 50000   // Diamond: 50,000 NCTR
 } as const;
 
+// Perks per tier
+export const CRESCENDO_TIER_PERKS: Record<string, string[]> = {
+  bronze: ['Access to Garden marketplace', 'Daily check-in rewards', 'Community membership'],
+  silver: ['2× reward multiplier', 'Early access to new brands', 'Priority support'],
+  gold: ['3× reward multiplier', 'Exclusive partner deals', 'Monthly bonus NCTR'],
+  platinum: ['5× reward multiplier', 'VIP brand partnerships', 'Governance voting rights'],
+  diamond: ['10× reward multiplier', 'Diamond-exclusive rewards', 'Direct partner access', 'Custom opportunities'],
+};
+
 // Tier display names with emojis
 export const CRESCENDO_TIER_DISPLAY = {
   starter: { name: 'Starter', emoji: '🌱', icon: 'TrendingUp' },
