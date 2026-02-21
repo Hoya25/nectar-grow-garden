@@ -99,7 +99,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
             .eq("is_active", true)
             .order("name")
-            .limit(2000),
+            .limit(7000),
           supabase
             .from("brands")
             .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
@@ -283,7 +283,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                 searchInputRef.current?.focus();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[hsl(var(--mall-card))] text-[hsl(var(--mall-accent))] border border-[hsl(var(--mall-accent))]/40 hover:bg-[hsl(var(--mall-accent))] hover:text-[hsl(0,0%,20%)] transition-all"
+              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
             >
               Browse Brands
             </button>
@@ -298,7 +298,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             </p>
             <button
               onClick={() => navigate('/garden?tab=dashboard')}
-              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[hsl(var(--mall-card))] text-[hsl(var(--mall-accent))] border border-[hsl(var(--mall-accent))]/40 hover:bg-[hsl(var(--mall-accent))] hover:text-[hsl(0,0%,20%)] transition-all"
+              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
             >
               View My Status
             </button>

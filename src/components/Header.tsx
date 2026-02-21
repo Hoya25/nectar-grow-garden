@@ -67,9 +67,12 @@ const Header = () => {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-            <span className="text-xl font-bold text-foreground hidden md:inline">The Garden</span>
-            <span className="text-lg font-bold text-foreground md:hidden">The Garden</span>
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-accent-lime text-black">BETA</span>
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-[#E2FF6D] mr-2 flex-shrink-0">
+              <span className="text-lg font-black text-[#323232] leading-none">N</span>
+            </span>
+            <span className="text-xl font-bold text-white hidden md:inline">The Garden</span>
+            <span className="text-lg font-bold text-white md:hidden">The Garden</span>
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#E2FF6D] text-[#323232] ml-2">BETA</span>
           </div>
           
         </div>
