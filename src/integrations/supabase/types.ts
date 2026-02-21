@@ -4059,6 +4059,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      lookup_wallet_profile: {
+        Args: { p_wallet_address: string }
+        Returns: {
+          v_email: string
+          v_user_id: string
+        }[]
+      }
       make_user_admin_by_email: {
         Args: { admin_role?: string; user_email: string }
         Returns: string
