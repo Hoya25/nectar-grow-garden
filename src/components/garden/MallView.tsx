@@ -304,43 +304,225 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       </div>
 
       {/* Hero CTA Section */}
-      <div className="max-w-6xl mx-auto px-4 pt-8 pb-2">
-        <h2 className="text-3xl md:text-4xl font-bold text-[hsl(var(--mall-text))] text-center mb-6">
-          Live Your Life. Earn NCTR.
+      <div style={{ padding: 'clamp(2rem,4vw,3rem) 0 clamp(1.5rem,3vw,2.5rem)' }}>
+        <h2 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(32px,4.5vw,52px)',
+          fontWeight: 900,
+          lineHeight: 0.95,
+          letterSpacing: '-0.02em',
+          textTransform: 'uppercase',
+          color: '#fff',
+          textAlign: 'center',
+          marginBottom: 'clamp(1.5rem,3vw,2.5rem)',
+        }}>
+          Live Your Life.<br />
+          <span style={{ color: 'var(--color-accent)', filter: 'drop-shadow(0 0 18px rgba(226,255,109,0.35))' }}>
+            Earn NCTR.
+          </span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {/* Card 1 — Earn */}
-          <div className="bg-[hsl(var(--mall-card))] rounded-2xl border border-[hsl(var(--mall-border))] p-6 flex flex-col items-center text-center">
-            <span className="text-4xl mb-3">🛒</span>
-            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Shop &amp; Earn</h3>
-            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '1rem',
+          maxWidth: '860px',
+          margin: '0 auto',
+        }}>
+
+          {/* Card 1 — Shop & Earn */}
+          <div style={{
+            position: 'relative',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '16px',
+            padding: 'clamp(1.5rem,3vw,2rem)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: '0.75rem',
+            overflow: 'hidden',
+            transition: 'border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease',
+            cursor: 'default',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLDivElement;
+            el.style.borderColor = 'rgba(226,255,109,0.22)';
+            el.style.transform = 'translateY(-2px)';
+            el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.35)';
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLDivElement;
+            el.style.borderColor = 'rgba(255,255,255,0.08)';
+            el.style.transform = 'translateY(0)';
+            el.style.boxShadow = 'none';
+          }}
+          >
+            {/* Top accent line */}
+            <div style={{
+              position: 'absolute', top: 0, left: '20%', right: '20%',
+              height: '1px',
+              background: 'linear-gradient(to right, transparent, rgba(226,255,109,0.4), transparent)',
+            }} />
+
+            {/* Icon */}
+            <div style={{
+              width: '48px', height: '48px', borderRadius: '12px',
+              background: 'rgba(226,255,109,0.08)',
+              border: '1px solid rgba(226,255,109,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 5h12" 
+                  stroke="rgba(226,255,109,0.85)" strokeWidth="1.6" 
+                  strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="9" cy="20" r="1" fill="rgba(226,255,109,0.85)"/>
+                <circle cx="17" cy="20" r="1" fill="rgba(226,255,109,0.85)"/>
+              </svg>
+            </div>
+
+            <h3 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(20px,2.5vw,26px)',
+              fontWeight: 900,
+              lineHeight: 1,
+              letterSpacing: '-0.01em',
+              textTransform: 'uppercase',
+              color: '#fff',
+              margin: 0,
+            }}>Shop &amp; Earn</h3>
+
+            <p style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '14px',
+              lineHeight: 1.6,
+              color: 'rgba(217,217,217,0.55)',
+              margin: 0,
+              maxWidth: '280px',
+            }}>
               Shop 6,000+ brands and earn NCTR on every purchase — fueling your Crescendo status
             </p>
+
             <button
               onClick={() => {
                 searchInputRef.current?.focus();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
+              style={{
+                marginTop: '0.5rem',
+                height: '40px', padding: '0 24px',
+                background: 'var(--color-accent)',
+                color: 'var(--color-text-on-accent)',
+                fontFamily: 'var(--font-body)',
+                fontSize: '12px', fontWeight: 700,
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+                border: 'none', borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                transition: 'background 150ms ease, transform 150ms ease',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-hover)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
             >
-              Browse Brands
+              Browse Brands →
             </button>
           </div>
 
-          {/* Card 2 — Status */}
-          <div className="bg-[hsl(var(--mall-card))] rounded-2xl border border-[hsl(var(--mall-border))] p-6 flex flex-col items-center text-center">
-            <span className="text-4xl mb-3">💎</span>
-            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Level Up Your Status</h3>
-            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
+          {/* Card 2 — Level Up */}
+          <div style={{
+            position: 'relative',
+            background: 'rgba(226,255,109,0.03)',
+            border: '1px solid rgba(226,255,109,0.1)',
+            borderRadius: '16px',
+            padding: 'clamp(1.5rem,3vw,2rem)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: '0.75rem',
+            overflow: 'hidden',
+            transition: 'border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease',
+            cursor: 'default',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLDivElement;
+            el.style.borderColor = 'rgba(226,255,109,0.3)';
+            el.style.transform = 'translateY(-2px)';
+            el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.35), 0 0 40px rgba(226,255,109,0.06)';
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLDivElement;
+            el.style.borderColor = 'rgba(226,255,109,0.1)';
+            el.style.transform = 'translateY(0)';
+            el.style.boxShadow = 'none';
+          }}
+          >
+            {/* Top accent line */}
+            <div style={{
+              position: 'absolute', top: 0, left: '20%', right: '20%',
+              height: '1px',
+              background: 'linear-gradient(to right, transparent, rgba(226,255,109,0.55), transparent)',
+            }} />
+
+            {/* Icon */}
+            <div style={{
+              width: '48px', height: '48px', borderRadius: '12px',
+              background: 'rgba(226,255,109,0.1)',
+              border: '1px solid rgba(226,255,109,0.22)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <path d="M11 3l2.5 5 5.5.8-4 3.9.9 5.5L11 15.5 6.1 18.2l.9-5.5L3 8.8l5.5-.8L11 3z" 
+                  stroke="rgba(226,255,109,0.9)" strokeWidth="1.6" 
+                  strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+
+            <h3 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(20px,2.5vw,26px)',
+              fontWeight: 900,
+              lineHeight: 1,
+              letterSpacing: '-0.01em',
+              textTransform: 'uppercase',
+              color: '#fff',
+              margin: 0,
+            }}>Level Up Your Status</h3>
+
+            <p style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '14px',
+              lineHeight: 1.6,
+              color: 'rgba(217,217,217,0.55)',
+              margin: 0,
+              maxWidth: '280px',
+            }}>
               Commit your NCTR in Crescendo for 360 days to activate your status tier and unlock rewards
             </p>
+
             <button
               onClick={() => navigate('/garden?tab=dashboard')}
-              className="px-6 py-2.5 rounded-lg text-sm font-semibold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
+              style={{
+                marginTop: '0.5rem',
+                height: '40px', padding: '0 24px',
+                background: 'var(--color-accent)',
+                color: 'var(--color-text-on-accent)',
+                fontFamily: 'var(--font-body)',
+                fontSize: '12px', fontWeight: 700,
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+                border: 'none', borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                transition: 'background 150ms ease, transform 150ms ease',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-hover)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
             >
-              View My Status
+              View My Status →
             </button>
           </div>
+
         </div>
       </div>
 
