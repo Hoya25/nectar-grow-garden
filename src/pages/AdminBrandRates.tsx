@@ -55,7 +55,6 @@ import {
   DollarSign,
   Info,
 } from "lucide-react";
-import BrandTokenBountiesEditor from "@/components/admin/BrandTokenBountiesEditor";
 
 interface Brand {
   id: string;
@@ -71,21 +70,6 @@ interface Brand {
   promotion_label: string | null;
   promotion_ends_at: string | null;
   use_custom_rate: boolean | null;
-  nctr_overlay_enabled: boolean | null;
-  nctr_overlay_rate: number | null;
-  amplifier_enabled: boolean | null;
-  amplifier_multiplier: number | null;
-}
-
-interface TokenBounty {
-  id?: string;
-  brand_id: string;
-  token_id: string;
-  base_rate: number;
-  is_active: boolean;
-  is_shopper_selectable: boolean;
-  is_admin_locked: boolean;
-  amplifier_override: number | null;
 }
 
 interface Stats {
@@ -152,42 +136,25 @@ const AdminBrandRates = () => {
   });
   const [saving, setSaving] = useState(false);
 
-  // Token bounty state for edit modal
-  const [editBounties, setEditBounties] = useState<TokenBounty[]>([]);
-  const [editOverlay, setEditOverlay] = useState({
-    nctr_overlay_enabled: true,
-    nctr_overlay_rate: 1.0,
-    amplifier_enabled: false,
-    amplifier_multiplier: 1.25,
-  });
-  const [calcSpend, setCalcSpend] = useState(50);
-
   // Inline edit state
   const [inlineEditId, setInlineEditId] = useState<string | null>(null);
   const [inlineEditValue, setInlineEditValue] = useState("");
 
-  const [authTimeout, setAuthTimeout] = useState(false);
-
   useEffect(() => {
-    // Give auth up to 3 seconds to resolve before redirecting
-    const timer = setTimeout(() => setAuthTimeout(true), 3000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!authTimeout && (authLoading || adminLoading)) return;
-    if (!user) {
+    if (!authLoading && !user) {
       navigate("/auth");
       return;
     }
-    if (!isAdmin) {
+    if (!adminLoading && !isAdmin) {
       navigate("/garden");
       return;
     }
-    fetchBrands();
-    fetchStats();
-    fetchRateSettings();
-  }, [user, isAdmin, authLoading, adminLoading, authTimeout]);
+    if (isAdmin) {
+      fetchBrands();
+      fetchStats();
+      fetchRateSettings();
+    }
+  }, [user, isAdmin, authLoading, adminLoading]);
 
   const fetchRateSettings = async () => {
     try {
@@ -319,7 +286,7 @@ const AdminBrandRates = () => {
       while (hasMore) {
         const { data, error } = await supabase
           .from("brands")
-          .select("id, name, logo_url, category, commission_rate, nctr_per_dollar, featured, is_active, is_promoted, promotion_multiplier, promotion_label, promotion_ends_at, use_custom_rate, nctr_overlay_enabled, nctr_overlay_rate, amplifier_enabled, amplifier_multiplier")
+          .select("id, name, logo_url, category, commission_rate, nctr_per_dollar, featured, is_active, is_promoted, promotion_multiplier, promotion_label, promotion_ends_at, use_custom_rate")
           .eq("is_active", true)
           .order("name")
           .range(from, from + PAGE_SIZE - 1);
@@ -554,7 +521,7 @@ const AdminBrandRates = () => {
     }
   };
 
-  const openEditModal = async (brand: Brand) => {
+  const openEditModal = (brand: Brand) => {
     setEditingBrand(brand);
     const calculatedRate = getCalculatedRate(brand);
     setEditForm({
@@ -566,27 +533,7 @@ const AdminBrandRates = () => {
       promotion_ends_at: brand.promotion_ends_at?.split("T")[0] || "",
       use_custom_rate: brand.use_custom_rate || false,
     });
-    setEditOverlay({
-      nctr_overlay_enabled: brand.nctr_overlay_enabled ?? true,
-      nctr_overlay_rate: brand.nctr_overlay_rate ?? 1.0,
-      amplifier_enabled: brand.amplifier_enabled ?? false,
-      amplifier_multiplier: brand.amplifier_multiplier ?? 1.25,
-    });
-    setCalcSpend(50);
     setEditModalOpen(true);
-
-    // Fetch existing bounties for this brand
-    try {
-      const { data, error } = await supabase
-        .from("brand_token_bounties")
-        .select("*")
-        .eq("brand_id", brand.id);
-      if (error) throw error;
-      setEditBounties((data as TokenBounty[]) || []);
-    } catch (e) {
-      console.error("Error fetching bounties:", e);
-      setEditBounties([]);
-    }
   };
 
   const handleSaveEdit = async () => {
@@ -604,10 +551,6 @@ const AdminBrandRates = () => {
         promotion_ends_at: editForm.is_promoted && editForm.promotion_ends_at 
           ? new Date(editForm.promotion_ends_at).toISOString() 
           : null,
-        nctr_overlay_enabled: editOverlay.nctr_overlay_enabled,
-        nctr_overlay_rate: editOverlay.nctr_overlay_rate,
-        amplifier_enabled: editOverlay.amplifier_enabled,
-        amplifier_multiplier: editOverlay.amplifier_multiplier,
       };
 
       const { error } = await supabase
@@ -616,37 +559,6 @@ const AdminBrandRates = () => {
         .eq("id", editingBrand.id);
 
       if (error) throw error;
-
-      // Upsert token bounties
-      const bountiesToSave = editBounties.filter((b) => b.is_active || b.id);
-      for (const bounty of bountiesToSave) {
-        if (bounty.id) {
-          // Update existing
-          await supabase
-            .from("brand_token_bounties")
-            .update({
-              base_rate: bounty.base_rate,
-              is_active: bounty.is_active,
-              is_shopper_selectable: bounty.is_shopper_selectable,
-              is_admin_locked: bounty.is_admin_locked,
-              amplifier_override: bounty.amplifier_override,
-            })
-            .eq("id", bounty.id);
-        } else if (bounty.is_active) {
-          // Insert new
-          await supabase
-            .from("brand_token_bounties")
-            .insert({
-              brand_id: editingBrand.id,
-              token_id: bounty.token_id,
-              base_rate: bounty.base_rate,
-              is_active: bounty.is_active,
-              is_shopper_selectable: bounty.is_shopper_selectable,
-              is_admin_locked: bounty.is_admin_locked,
-              amplifier_override: bounty.amplifier_override,
-            });
-        }
-      }
 
       setBrands(prev => prev.map(b => 
         b.id === editingBrand.id ? { ...b, ...updateData } : b
@@ -1130,7 +1042,7 @@ const AdminBrandRates = () => {
 
       {/* Edit Modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               {editingBrand && (
@@ -1316,18 +1228,21 @@ const AdminBrandRates = () => {
                 </div>
               )}
 
-              {/* Token Bounties, Overlay, Amplifier, Calculator */}
-              <BrandTokenBountiesEditor
-                brandId={editingBrand.id}
-                brandName={editingBrand.name}
-                nctrRate={getEditPreviewRate()}
-                overlay={editOverlay}
-                onOverlayChange={setEditOverlay}
-                bounties={editBounties}
-                onBountiesChange={setEditBounties}
-                calcSpend={calcSpend}
-                onCalcSpendChange={setCalcSpend}
-              />
+              {/* Preview Calculation */}
+              <Card className="bg-muted/50">
+                <CardContent className="p-4">
+                  <p className="text-sm text-muted-foreground mb-2">Preview: Member earns on $100 purchase</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {(getEditPreviewRate() * 100).toFixed(2)} NCTR
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Final rate: {getEditPreviewRate().toFixed(2)} NCTR/$1
+                    {editForm.is_promoted && editForm.promotion_multiplier > 1 && (
+                      <span className="ml-1">({editForm.promotion_multiplier}x promotion applied)</span>
+                    )}
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           )}
 

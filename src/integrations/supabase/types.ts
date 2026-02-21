@@ -419,92 +419,8 @@ export type Database = {
         }
         Relationships: []
       }
-      brand_token_bounties: {
-        Row: {
-          amplifier_override: number | null
-          base_rate: number
-          brand_id: string | null
-          created_at: string
-          id: string
-          is_active: boolean
-          is_admin_locked: boolean
-          is_shopper_selectable: boolean
-          token_id: string
-          updated_at: string
-        }
-        Insert: {
-          amplifier_override?: number | null
-          base_rate?: number
-          brand_id?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          is_admin_locked?: boolean
-          is_shopper_selectable?: boolean
-          token_id: string
-          updated_at?: string
-        }
-        Update: {
-          amplifier_override?: number | null
-          base_rate?: number
-          brand_id?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          is_admin_locked?: boolean
-          is_shopper_selectable?: boolean
-          token_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "brand_token_bounties_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brands"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_token_bounties_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brands_admin"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_token_bounties_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brands_public"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_token_bounties_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "public_brands"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_token_bounties_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "public_brands_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brand_token_bounties_token_id_fkey"
-            columns: ["token_id"]
-            isOneToOne: false
-            referencedRelation: "token_definitions"
-            referencedColumns: ["token_id"]
-          },
-        ]
-      }
       brands: {
         Row: {
-          amplifier_enabled: boolean | null
-          amplifier_multiplier: number | null
           category: string | null
           click_count: number | null
           commission_rate: number | null
@@ -520,8 +436,6 @@ export type Database = {
           loyalize_commission_rate: number | null
           loyalize_id: string | null
           name: string
-          nctr_overlay_enabled: boolean | null
-          nctr_overlay_rate: number | null
           nctr_per_dollar: number | null
           nctr_rate_override: boolean | null
           nctr_rate_updated_at: string | null
@@ -533,8 +447,6 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
-          amplifier_enabled?: boolean | null
-          amplifier_multiplier?: number | null
           category?: string | null
           click_count?: number | null
           commission_rate?: number | null
@@ -550,8 +462,6 @@ export type Database = {
           loyalize_commission_rate?: number | null
           loyalize_id?: string | null
           name: string
-          nctr_overlay_enabled?: boolean | null
-          nctr_overlay_rate?: number | null
           nctr_per_dollar?: number | null
           nctr_rate_override?: boolean | null
           nctr_rate_updated_at?: string | null
@@ -563,8 +473,6 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
-          amplifier_enabled?: boolean | null
-          amplifier_multiplier?: number | null
           category?: string | null
           click_count?: number | null
           commission_rate?: number | null
@@ -580,8 +488,6 @@ export type Database = {
           loyalize_commission_rate?: number | null
           loyalize_id?: string | null
           name?: string
-          nctr_overlay_enabled?: boolean | null
-          nctr_overlay_rate?: number | null
           nctr_per_dollar?: number | null
           nctr_rate_override?: boolean | null
           nctr_rate_updated_at?: string | null
@@ -2778,39 +2684,6 @@ export type Database = {
         }
         Relationships: []
       }
-      token_definitions: {
-        Row: {
-          color: string
-          display_name: string
-          glow_color: string | null
-          impact_engine: string | null
-          is_active: boolean
-          is_impact_token: boolean
-          sort_order: number
-          token_id: string
-        }
-        Insert: {
-          color: string
-          display_name: string
-          glow_color?: string | null
-          impact_engine?: string | null
-          is_active?: boolean
-          is_impact_token?: boolean
-          sort_order?: number
-          token_id: string
-        }
-        Update: {
-          color?: string
-          display_name?: string
-          glow_color?: string | null
-          impact_engine?: string | null
-          is_active?: boolean
-          is_impact_token?: boolean
-          sort_order?: number
-          token_id?: string
-        }
-        Relationships: []
-      }
       treasury_admin_roles: {
         Row: {
           access_reason: string | null
@@ -4058,13 +3931,6 @@ export type Database = {
           p_risk_level?: string
         }
         Returns: undefined
-      }
-      lookup_wallet_profile: {
-        Args: { p_wallet_address: string }
-        Returns: {
-          v_email: string
-          v_user_id: string
-        }[]
       }
       make_user_admin_by_email: {
         Args: { admin_role?: string; user_email: string }

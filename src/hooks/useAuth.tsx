@@ -186,18 +186,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const deterministicPassword = `Wa11et${hashHex.slice(0, 26)}9X`;
 
       // First, check if this wallet is already linked to an existing user
-      // Uses secure RPC function that only returns email + user_id (no PII exposed)
       console.log('🔍 Checking if wallet is linked to existing account...');
-      const { data: rpcData, error: profileError } = await supabase
-        .rpc('lookup_wallet_profile', { p_wallet_address: walletAddress });
+      const { data: existingProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('email, user_id')
+        .ilike('wallet_address', walletAddress) // Case-insensitive match
+        .maybeSingle();
 
-      const existingProfile = rpcData && rpcData.length > 0
-        ? { email: rpcData[0].v_email, user_id: rpcData[0].v_user_id }
-        : null;
+      console.log('🔍 Profile lookup result:', { existingProfile, profileError });
 
-      console.log('🔍 Profile lookup result:', { existingProfile: existingProfile ? 'found' : 'not found', profileError });
-
-      if (profileError) {
+      if (profileError && profileError.code !== 'PGRST116') {
         console.error('❌ Error checking for existing profile:', profileError);
       }
 
