@@ -28,26 +28,19 @@ export const MallHeader = ({
   return (
     <div className="garden-theme bg-white border-b border-[hsl(220,13%,91%)] pb-6 pt-4 px-4 shadow-sm">
       <div className="max-w-6xl mx-auto">
-        {/* Top Row - Title and Balance */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-[hsl(0,0%,10%)]">
-            <img src={nctrLogo} alt="NCTR" className="w-6 h-6 object-contain inline-block mr-1" /> The Garden
-          </h1>
-          
-          {/* NCTR Balance Badge with Tier */}
-          <div className="flex items-center gap-2">
-            <Badge 
-              className="px-3 py-1.5 text-sm font-semibold border-0 bg-[hsl(142,71%,45%)] text-white"
-            >
-              <img src={nctrLogo} alt="NCTR" className="h-4 w-4 mr-1.5" />
-              <span>
-                {availableNctr.toLocaleString(undefined, { maximumFractionDigits: 0 })} NCTR
-              </span>
-              <span className="ml-2 text-base" title={`${tierName} Status`}>
-                {tierEmoji}
-              </span>
-            </Badge>
-          </div>
+        {/* NCTR Balance Badge with Tier */}
+        <div className="flex items-center justify-end mb-4">
+          <Badge 
+            className="px-3 py-1.5 text-sm font-semibold border-0 bg-[hsl(142,71%,45%)] text-white"
+          >
+            <img src={nctrLogo} alt="NCTR" className="h-4 w-4 mr-1.5" />
+            <span>
+              {availableNctr.toLocaleString(undefined, { maximumFractionDigits: 0 })} NCTR
+            </span>
+            <span className="ml-2 text-base" title={`${tierName} Status`}>
+              {tierEmoji}
+            </span>
+          </Badge>
         </div>
 
         {/* Search Bar */}
