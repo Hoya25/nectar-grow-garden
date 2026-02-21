@@ -42,6 +42,7 @@ const TAG_ICONS: Record<string, string> = {
   'woman-owned': '👩‍💼',
   'black-owned': '✊🏿',
   'veteran-owned': '🎖️',
+  'woman-founded': '👩‍💼',
 };
 
 export const BrandDetailModal = ({
