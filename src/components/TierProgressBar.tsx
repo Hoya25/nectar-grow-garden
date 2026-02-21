@@ -6,6 +6,7 @@ import {
   getNextTierInfo,
   getOrderedTierLevels,
   CRESCENDO_TIER_THRESHOLDS,
+  CRESCENDO_TIER_PERKS,
 } from '@/lib/crescendo-tiers';
 
 interface TierProgressBarProps {
@@ -268,9 +269,12 @@ const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }:
         }}
       >
         <div style={{ padding: 'var(--space-4) 0' }}>
-          {onViewPerks && perksOpen && (
-            <div>{/* Rendered by parent via onViewPerks callback */}</div>
-          )}
+          {(CRESCENDO_TIER_PERKS[currentTier] || []).map((perk: string, i: number) => (
+            <div key={i} className="flex items-center" style={{ gap: 'var(--space-3)', padding: 'var(--space-2) 0', borderTop: i > 0 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+              <span style={{ width: 6, height: 6, borderRadius: 'var(--radius-full)', background: style.color }} />
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>{perk}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
