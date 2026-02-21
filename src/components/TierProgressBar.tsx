@@ -210,7 +210,11 @@ const TierProgressBar = ({ balance, lockedBalance = 0, onLevelUp, onViewPerks }:
 
         <div className="flex items-center" style={{ gap: 'var(--space-2)' }}>
           <button
-            onClick={() => setPerksOpen((p) => !p)}
+            onClick={() => {
+              const next = !perksOpen;
+              setPerksOpen(next);
+              if (next && onViewPerks) onViewPerks();
+            }}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)',
               padding: 'var(--space-2) var(--space-4)',
