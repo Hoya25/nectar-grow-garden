@@ -34,6 +34,7 @@ import { MallView } from '@/components/garden/MallView';
 import { CrescendoStatusCard } from '@/components/CrescendoStatusCard';
 import { GardenOnboardingModal } from '@/components/GardenOnboardingModal';
 import { MilestoneProgress } from '@/components/MilestoneProgress';
+import { NCTREarningsHistory } from '@/components/NCTREarningsHistory';
 
 import { PortfolioStory } from '@/components/PortfolioStory';
 
@@ -1501,9 +1502,10 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
           />
         </div>
 
-        {/* Invite Milestone Progress */}
-        <div className="mb-8">
+        {/* Invite Milestone Progress + Earnings History */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <MilestoneProgress />
+          <NCTREarningsHistory />
         </div>
 
         {/* Stakes Overview - Collapsible */}
