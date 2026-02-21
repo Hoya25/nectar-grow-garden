@@ -84,7 +84,7 @@ const AuthenticatedLayout = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop Top Navigation Bar */}
-      <header className="sticky top-0 z-50 h-14 bg-card border-b border-border backdrop-blur-sm bg-card/95">
+      <header className="sticky top-0 z-50 h-14 bg-white border-b border-[#E5E7EB] backdrop-blur-sm">
         <div className="container mx-auto px-4 h-full flex items-center justify-between">
           {/* Left: Logo */}
           <button
