@@ -22,7 +22,7 @@ import AdminBrandRates from "./pages/AdminBrandRates";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
-import StickyNavbar from '@/components/StickyNavbar';
+
 import { Userback } from "./components/Userback";
 
 const queryClient = new QueryClient();
@@ -69,8 +69,6 @@ const App = () => {
           <RouteTracker />
           <AuthProvider>
             <WalletProvider>
-              <>
-              <StickyNavbar platform="garden" />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
@@ -92,7 +90,6 @@ const App = () => {
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              </>
               <CustomerServiceBubble />
               <Userback />
             </WalletProvider>
