@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import nctrNLogo from '@/assets/nctr-n-yellow.png';
+import nctrLogo from '@/assets/nctr-logo.svg';
 import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
@@ -91,9 +91,7 @@ const AuthenticatedLayout = () => {
             onClick={() => navigate('/garden')}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#E2FF6D] flex-shrink-0">
-              <span className="text-sm font-black text-[#323232] leading-none">N</span>
-            </span>
+            <img src={nctrLogo} alt="NCTR" className="h-8 w-8" />
             <span className="text-lg font-bold text-white">The Garden</span>
             <Badge variant="secondary" className="text-[10px] font-semibold px-1.5 py-0 bg-[#E2FF6D] text-[#323232] border-[#E2FF6D]/20">
               BETA

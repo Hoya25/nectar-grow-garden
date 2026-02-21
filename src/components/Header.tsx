@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Menu, X, Share2, User, LogOut, Settings, ShoppingBag } from "lucide-react";
 import ReferralSystem from "@/components/ReferralSystem";
+import nctrLogo from "@/assets/nctr-logo.svg";
 import { NCTREarningsBadge } from "@/components/NCTREarningsBadge";
 
 
@@ -67,9 +68,7 @@ const Header = () => {
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('/')}>
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-[#E2FF6D] mr-2 flex-shrink-0">
-              <span className="text-lg font-black text-[#323232] leading-none">N</span>
-            </span>
+            <img src={nctrLogo} alt="NCTR" className="h-8 w-8" />
             <span className="text-xl font-bold text-white hidden md:inline">The Garden</span>
             <span className="text-lg font-bold text-white md:hidden">The Garden</span>
             <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#E2FF6D] text-[#323232] ml-2">BETA</span>
