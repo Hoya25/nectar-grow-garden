@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, Copy, Check, MessageCircle, Mail, Share2, Trophy, Lightbulb, MapPin, Megaphone, Target } from 'lucide-react';
+import { ChevronDown, Copy, Check, MessageCircle, Trophy, Lightbulb, MapPin, Megaphone, Target } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const messageTemplates = [
@@ -63,74 +63,157 @@ const ReferralOnboardingTips = () => {
   };
 
   return (
-    <section className="w-full max-w-2xl mx-auto space-y-3">
-      <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
-        <Trophy className="w-5 h-5 text-[hsl(var(--nctr-accent))]" />
+    <section
+      className="w-full mx-auto animate-fade-in"
+      style={{ maxWidth: 'var(--content-narrow)' }}
+    >
+      <h2
+        className="flex items-center gap-2 mb-4"
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-xl)',
+          fontWeight: 'var(--weight-bold)',
+          color: 'var(--color-text-primary)',
+          letterSpacing: 'var(--tracking-tight)',
+        }}
+      >
+        <Trophy className="w-5 h-5" style={{ color: 'var(--color-accent)' }} />
         Referral Tips
       </h2>
 
-      {sections.map((s, i) => {
-        const isOpen = openIndex === i;
-        const Icon = s.icon;
-        return (
-          <div
-            key={i}
-            className="rounded-xl border border-[hsl(var(--nctr-mid))]/15 bg-[hsl(var(--nctr-mid))]/5 overflow-hidden transition-colors duration-200 hover:border-[hsl(var(--nctr-accent))]/20"
-          >
-            <button
-              onClick={() => toggle(i)}
-              className="w-full flex items-center gap-3 px-5 py-4 text-left"
-            >
-              <Icon className="w-5 h-5 shrink-0 text-[hsl(var(--nctr-accent))]" />
-              <span className="flex-1 font-semibold text-sm text-white">{s.title}</span>
-              <ChevronDown
-                className={`w-4 h-4 text-[hsl(var(--nctr-light))]/40 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-
+      <div className="flex flex-col" style={{ gap: 'var(--space-3)' }}>
+        {sections.map((s, i) => {
+          const isOpen = openIndex === i;
+          const Icon = s.icon;
+          return (
             <div
-              className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+              key={i}
+              className="overflow-hidden"
+              style={{
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-bg-raised)',
+                transition: `border-color var(--transition-fast), box-shadow var(--transition-fast)`,
+                ...(isOpen ? { borderColor: 'var(--color-border-medium)' } : {}),
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(226,255,109,0.2)')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = isOpen ? 'var(--color-border-medium)' : 'var(--color-border)')}
             >
-              <div className="overflow-hidden">
-                <div className="px-5 pb-5 pt-1 space-y-2">
-                  {s.hint && (
-                    <p className="text-xs text-[hsl(var(--nctr-light))]/50 mb-2">{s.hint}</p>
-                  )}
+              <button
+                onClick={() => toggle(i)}
+                className="w-full flex items-center gap-3 text-left"
+                style={{ padding: `var(--space-4) var(--space-5)` }}
+              >
+                <Icon className="w-5 h-5 shrink-0" style={{ color: 'var(--color-accent)' }} />
+                <span
+                  className="flex-1"
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--weight-semibold)',
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  {s.title}
+                </span>
+                <ChevronDown
+                  className="w-4 h-4 shrink-0"
+                  style={{
+                    color: 'var(--color-text-muted)',
+                    transition: `transform var(--transition-fast)`,
+                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
+                  }}
+                />
+              </button>
 
-                  {s.items?.map((item, j) => (
-                    <div
-                      key={j}
-                      className="flex items-start gap-3 text-sm text-[hsl(var(--nctr-light))]/70"
-                    >
-                      <span className="mt-1 w-1.5 h-1.5 rounded-full bg-[hsl(var(--nctr-accent))] shrink-0" />
-                      {item}
-                    </div>
-                  ))}
-
-                  {s.templates &&
-                    messageTemplates.map((tmpl, j) => (
-                      <button
-                        key={j}
-                        onClick={() => copyTemplate(tmpl, j)}
-                        className="w-full flex items-start gap-3 rounded-lg p-3 text-left text-sm bg-[hsl(var(--nctr-mid))]/10 border border-[hsl(var(--nctr-mid))]/10 hover:border-[hsl(var(--nctr-accent))]/30 transition-all duration-200 group"
+              <div
+                className="grid"
+                style={{
+                  transition: `grid-template-rows var(--transition-standard), opacity var(--transition-standard)`,
+                  gridTemplateRows: isOpen ? '1fr' : '0fr',
+                  opacity: isOpen ? 1 : 0,
+                }}
+              >
+                <div className="overflow-hidden">
+                  <div
+                    className="flex flex-col"
+                    style={{ padding: `var(--space-1) var(--space-5) var(--space-5)`, gap: 'var(--space-2)' }}
+                  >
+                    {s.hint && (
+                      <p
+                        style={{
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--color-text-muted)',
+                          marginBottom: 'var(--space-2)',
+                        }}
                       >
-                        <MessageCircle className="w-4 h-4 mt-0.5 shrink-0 text-[hsl(var(--nctr-accent))]/60 group-hover:text-[hsl(var(--nctr-accent))]" />
-                        <span className="flex-1 text-[hsl(var(--nctr-light))]/70 group-hover:text-[hsl(var(--nctr-light))]">
-                          {tmpl}
-                        </span>
-                        {copiedIdx === j ? (
-                          <Check className="w-4 h-4 shrink-0 text-[hsl(var(--nctr-accent))]" />
-                        ) : (
-                          <Copy className="w-4 h-4 shrink-0 text-[hsl(var(--nctr-light))]/30 group-hover:text-[hsl(var(--nctr-light))]/60" />
-                        )}
-                      </button>
+                        {s.hint}
+                      </p>
+                    )}
+
+                    {s.items?.map((item, j) => (
+                      <div
+                        key={j}
+                        className="flex items-start"
+                        style={{
+                          gap: 'var(--space-3)',
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--color-text-secondary)',
+                        }}
+                      >
+                        <span
+                          className="shrink-0"
+                          style={{
+                            marginTop: '0.4em',
+                            width: 6,
+                            height: 6,
+                            borderRadius: 'var(--radius-full)',
+                            background: 'var(--color-accent)',
+                          }}
+                        />
+                        {item}
+                      </div>
                     ))}
+
+                    {s.templates &&
+                      messageTemplates.map((tmpl, j) => (
+                        <button
+                          key={j}
+                          onClick={() => copyTemplate(tmpl, j)}
+                          className="w-full flex items-start text-left group"
+                          style={{
+                            gap: 'var(--space-3)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: 'var(--space-3)',
+                            fontSize: 'var(--text-sm)',
+                            background: 'var(--color-bg-surface)',
+                            border: '1px solid var(--color-border)',
+                            transition: `border-color var(--transition-fast)`,
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(226,255,109,0.3)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
+                        >
+                          <MessageCircle
+                            className="w-4 h-4 shrink-0"
+                            style={{ marginTop: 2, color: 'var(--color-accent)', opacity: 0.6 }}
+                          />
+                          <span className="flex-1" style={{ color: 'var(--color-text-secondary)' }}>
+                            {tmpl}
+                          </span>
+                          {copiedIdx === j ? (
+                            <Check className="w-4 h-4 shrink-0" style={{ color: 'var(--color-accent)' }} />
+                          ) : (
+                            <Copy className="w-4 h-4 shrink-0" style={{ color: 'var(--color-text-muted)' }} />
+                          )}
+                        </button>
+                      ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </section>
   );
 };
