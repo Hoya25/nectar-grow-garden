@@ -177,7 +177,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       window.open(redirectUrl, '_blank');
       toast({
         title: "🛒 Happy Shopping!",
-        description: "Your NCTR will be credited within 48 hours after your purchase is confirmed.",
+        description: "Your NCTR will be credited within 48 hours. More NCTR = higher Crescendo status = better rewards.",
         duration: 6000,
         className: "garden-shop-toast",
       });
@@ -276,7 +276,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             <span className="text-4xl mb-3">🛒</span>
             <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Shop &amp; Earn</h3>
             <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
-              Shop 6,000+ brands and earn NCTR on every purchase
+              Shop 6,000+ brands and earn NCTR on every purchase — fueling your Crescendo status
             </p>
             <button
               onClick={() => {
@@ -292,9 +292,9 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           {/* Card 2 — Status */}
           <div className="bg-[hsl(var(--mall-card))] rounded-2xl border border-[hsl(var(--mall-border))] p-6 flex flex-col items-center text-center">
             <span className="text-4xl mb-3">💎</span>
-            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Commit &amp; Unlock</h3>
+            <h3 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-2">Level Up Your Status</h3>
             <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
-              Commit your NCTR for 360 days to unlock exclusive member rewards
+              Commit your NCTR in Crescendo for 360 days to activate your status tier and unlock rewards
             </p>
             <button
               onClick={() => navigate('/garden?tab=dashboard')}
