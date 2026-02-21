@@ -32,6 +32,7 @@ import BatchLockUpgrade from '@/components/BatchLockUpgrade';
 import { GardenHeroSection } from '@/components/GardenHeroSection';
 import { MallView } from '@/components/garden/MallView';
 import { CrescendoStatusCard } from '@/components/CrescendoStatusCard';
+import { GardenOnboardingModal } from '@/components/GardenOnboardingModal';
 
 import { PortfolioStory } from '@/components/PortfolioStory';
 
@@ -145,6 +146,14 @@ const Garden = () => {
     const params = new URLSearchParams(window.location.search);
     return (params.get('tab') as 'shop' | 'dashboard') || 'shop';
   });
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Show onboarding for new users on first login
+  useEffect(() => {
+    if (user && !localStorage.getItem("garden_onboarded")) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
 
   // Sync activeTab with URL search params
   useEffect(() => {
@@ -1437,6 +1446,9 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
   return (
     <div className="min-h-screen bg-gradient-page">
+      {showOnboarding && (
+        <GardenOnboardingModal onComplete={() => setShowOnboarding(false)} />
+      )}
       {/* Alliance Token Wallet Prompt */}
       {user?.id && (
         <AllianceTokenWalletPrompt 
