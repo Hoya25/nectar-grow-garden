@@ -259,9 +259,6 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       {/* Header */}
       <div className="bg-[hsl(0,0%,16%)] border-b border-[hsl(var(--mall-border))] pt-4 pb-6 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl md:text-3xl font-bold text-[hsl(var(--mall-text))] mb-5">
-            🌱 The Garden
-          </h1>
 
           {/* Search Bar */}
           <div className="relative mb-4">
@@ -380,7 +377,10 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         {!isSearching && featuredBrands.length > 0 && (
           <section className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-[hsl(var(--mall-text))]">⭐ Featured Brands</h2>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                <div style={{width:'3px',height:'22px',background:'#E2FF6D',borderRadius:'999px'}}/>
+                <h2 style={{fontFamily:'var(--font-display)',fontSize:'clamp(18px,2.2vw,24px)',fontWeight:900,letterSpacing:'-0.01em',textTransform:'uppercase',color:'#fff',margin:0}}>Featured Brands</h2>
+              </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => scrollFeatured("left")}
@@ -498,9 +498,10 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
         {/* Section Header */}
         {!isSearching && allBrands.length > 0 && (
-          <h2 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-4">
-            🛍️ All Brands
-          </h2>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'1rem'}}>
+            <div style={{width:'3px',height:'22px',background:'#E2FF6D',borderRadius:'999px'}}/>
+            <h2 style={{fontFamily:'var(--font-display)',fontSize:'clamp(18px,2.2vw,24px)',fontWeight:900,letterSpacing:'-0.01em',textTransform:'uppercase',color:'#fff',margin:0}}>All Brands</h2>
+          </div>
         )}
 
         {/* Results Count */}

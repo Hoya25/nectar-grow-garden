@@ -67,7 +67,10 @@ export const InspirationPartnersSection = ({ onShop, onBrandClick }: Inspiration
   return (
     <section className="mb-8">
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-xl font-bold text-[hsl(var(--mall-text))]">✨ INSPIRATION Partners</h2>
+        <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+          <div style={{width:'3px',height:'22px',background:'#E2FF6D',borderRadius:'999px'}}/>
+          <h2 style={{fontFamily:'var(--font-display)',fontSize:'clamp(18px,2.2vw,24px)',fontWeight:900,letterSpacing:'-0.01em',textTransform:'uppercase',color:'#fff',margin:0}}>INSPIRATION Partners</h2>
+        </div>
         <div className="flex items-center gap-1">
           <button onClick={() => scroll("left")} className="p-1.5 rounded-full text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-accent))] hover:bg-[hsl(0,0%,25%)] transition-colors hidden md:block">
             <ChevronLeft className="h-5 w-5" />
