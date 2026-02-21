@@ -10,11 +10,36 @@ export const CRESCENDO_TIER_THRESHOLDS = {
 
 // Perks per tier
 export const CRESCENDO_TIER_PERKS: Record<string, string[]> = {
-  bronze: ['Access to Garden marketplace', 'Daily check-in rewards', 'Community membership'],
-  silver: ['2× reward multiplier', 'Early access to new brands', 'Priority support'],
-  gold: ['3× reward multiplier', 'Exclusive partner deals', 'Monthly bonus NCTR'],
-  platinum: ['5× reward multiplier', 'VIP brand partnerships', 'Governance voting rights'],
-  diamond: ['10× reward multiplier', 'Diamond-exclusive rewards', 'Direct partner access', 'Custom opportunities'],
+  bronze: [
+    'Bronze rewards catalog access',
+    'NCTR earning on every purchase',
+    'Alliance member newsletter',
+    'Partner brand early notifications',
+  ],
+  silver: [
+    'Everything in Bronze',
+    'Early access to new partner brands',
+    '2× NCTR on select partners',
+    'Silver-exclusive reward drops',
+  ],
+  gold: [
+    'Everything in Silver',
+    'Exclusive Gold reward drops',
+    'Priority member support',
+    'Quarterly Gold member event access',
+  ],
+  platinum: [
+    'Everything in Gold',
+    'VIP brand partner experiences',
+    'Dedicated account access',
+    'Platinum-only product drops',
+  ],
+  diamond: [
+    'Everything in Platinum',
+    'Founding Diamond member status',
+    'Exclusive Diamond drops',
+    'Direct founder access & input',
+  ],
 };
 
 // Tier display names with emojis
