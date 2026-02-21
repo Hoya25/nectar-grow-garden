@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Menu, X, Share2, User, LogOut, Settings, ShoppingBag } from "lucide-react";
 import ReferralSystem from "@/components/ReferralSystem";
+import { NCTREarningsBadge } from "@/components/NCTREarningsBadge";
 
 
 import ProfileModal from "@/components/ProfileModal";
@@ -72,9 +73,11 @@ const Header = () => {
           </div>
           
         </div>
-        
+
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center gap-4">
+          <NCTREarningsBadge />
+          <nav className="flex items-center space-x-8">
           {!user ? (
             <>
               <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
@@ -189,10 +192,12 @@ const Header = () => {
               </Button>
             </>
           )}
-        </nav>
+          </nav>
+        </div>
 
-        {/* Mobile: Hamburger */}
-        <div className="md:hidden" ref={menuRef}>
+        {/* Mobile: Badge + Hamburger */}
+        <div className="md:hidden flex items-center gap-2" ref={menuRef}>
+          <NCTREarningsBadge />
           <Button
             variant="ghost"
             size="icon"
@@ -201,6 +206,8 @@ const Header = () => {
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
+
+
 
           {/* Mobile slide-down panel */}
           <div
