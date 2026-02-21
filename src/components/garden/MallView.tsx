@@ -134,25 +134,47 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       });
     }
 
-    // Search filter (name + category)
-    if (searchQuery.trim().length >= 2) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (b) =>
-          b.name.toLowerCase().includes(q) ||
-          (b.category || "").toLowerCase().includes(q)
-      );
-    }
-
     return filtered;
-  }, [allBrands, activeCategory, searchQuery]);
+  }, [allBrands, activeCategory]);
+
+  // Live Supabase search results
+  const [searchResults, setSearchResults] = useState<Brand[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("brands")
+          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
+          .eq("is_active", true)
+          .ilike("name", `%${searchQuery.trim()}%`)
+          .order("name")
+          .limit(100);
+        if (error) throw error;
+        setSearchResults(data || []);
+      } catch (err) {
+        console.error("Search error:", err);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const displayBrands = searchQuery.trim().length >= 2 ? searchResults : filteredBrands;
 
   const paginatedBrands = useMemo(
-    () => filteredBrands.slice(0, page * PAGE_SIZE),
-    [filteredBrands, page]
+    () => displayBrands.slice(0, page * PAGE_SIZE),
+    [displayBrands, page]
   );
 
-  const hasMore = paginatedBrands.length < filteredBrands.length;
+  const hasMore = paginatedBrands.length < displayBrands.length;
 
   // Reset page when filters change
   useEffect(() => {
@@ -214,7 +236,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
   }
 
   const isSearching = searchQuery.trim().length >= 2 || activeCategory !== "all";
-  const noResults = isSearching && filteredBrands.length === 0;
+  const noResults = isSearching && displayBrands.length === 0;
 
   return (
     <div className="garden-mall-dark min-h-screen bg-[hsl(var(--mall-bg))] pb-20 md:pb-0">
@@ -379,9 +401,9 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         )}
 
         {/* Results Count */}
-        {isSearching && filteredBrands.length > 0 && (
+        {isSearching && displayBrands.length > 0 && (
           <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-4">
-            {filteredBrands.length} brand{filteredBrands.length !== 1 ? "s" : ""} found
+            {searchQuery.trim().length >= 2 && searchLoading ? "Searching..." : `${displayBrands.length} brand${displayBrands.length !== 1 ? "s" : ""} found`}
           </p>
         )}
 

@@ -37,7 +37,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up [animation-delay:0.4s] opacity-0 [animation-fill-mode:forwards]">
             <Button 
               size="lg" 
-              className="bg-white border-2 border-primary text-foreground hover:bg-section-highlight transition-all duration-500 hover:scale-105 text-lg px-8 py-6 shadow-large group relative overflow-hidden"
+              className="bg-[#E2FF6D] text-[#323232] font-bold hover:opacity-90 transition-all duration-500 hover:scale-105 text-lg px-8 py-6 shadow-large group relative overflow-hidden"
               onClick={() => navigate('/garden')}
             >
               <span className="relative z-10">Enter The Garden →</span>
