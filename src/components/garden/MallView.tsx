@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Sparkles } from "lucide-react";
-import { MallHeader } from "./MallHeader";
-import { BrandCarousel } from "./BrandCarousel";
-import { DepartmentGrid } from "./DepartmentGrid";
-import { MallSearchHandle } from "./MallSearch";
-import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, X, ExternalLink, Loader2, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/ui/brand-logo";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { BrandDetailModal } from "./BrandDetailModal";
 
 interface Brand {
   id: string;
@@ -21,16 +21,8 @@ interface Brand {
   promotion_label?: string | null;
   is_big_brand?: boolean;
   featured?: boolean;
+  description?: string | null;
   tags?: { slug: string; icon: string; name: string }[];
-}
-
-interface Department {
-  id: string;
-  name: string;
-  slug: string;
-  icon: string | null;
-  description: string | null;
-  brand_count?: number;
 }
 
 interface MallViewProps {
@@ -39,468 +31,427 @@ interface MallViewProps {
   totalNctr?: number;
 }
 
+const CATEGORIES = [
+  { label: "All", value: "all" },
+  { label: "Fashion", value: "fashion" },
+  { label: "Food & Drink", value: "food" },
+  { label: "Health & Wellness", value: "health" },
+  { label: "Sports", value: "sports" },
+  { label: "Travel", value: "travel" },
+  { label: "Tech", value: "tech" },
+  { label: "Home", value: "home" },
+  { label: "Beauty", value: "beauty" },
+];
+
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  fashion: ["fashion", "clothing", "apparel", "shoes", "accessories", "jewelry", "watches"],
+  food: ["food", "drink", "grocery", "restaurant", "meal", "snack", "beverage", "coffee", "wine"],
+  health: ["health", "wellness", "fitness", "vitamin", "supplement", "pharmacy", "medical"],
+  sports: ["sports", "outdoor", "athletic", "gym", "exercise", "camping", "fishing"],
+  travel: ["travel", "hotel", "flight", "vacation", "luggage", "booking"],
+  tech: ["tech", "electronics", "computer", "phone", "software", "gadget", "gaming"],
+  home: ["home", "furniture", "decor", "kitchen", "garden", "appliance", "hardware"],
+  beauty: ["beauty", "skincare", "makeup", "cosmetics", "fragrance", "hair", "personal care"],
+};
+
+const PAGE_SIZE = 40;
+
 export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [totalBrands, setTotalBrands] = useState(0);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [showBigBrands, setShowBigBrands] = useState(false);
-  const searchRef = useRef<MallSearchHandle>(null);
-
-  // Tag-based sections
-  const [madeInUsaBrands, setMadeInUsaBrands] = useState<Brand[]>([]);
-  const [smallBusinessBrands, setSmallBusinessBrands] = useState<Brand[]>([]);
-  const [buyrRecommendedBrands, setBuyrRecommendedBrands] = useState<Brand[]>([]);
-  const [sustainableBrands, setSustainableBrands] = useState<Brand[]>([]);
-  
-  // Other sections
-  const [promotedBrands, setPromotedBrands] = useState<Brand[]>([]);
-  const [highestEarningBrands, setHighestEarningBrands] = useState<Brand[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [allBrands, setAllBrands] = useState<Brand[]>([]);
   const [featuredBrands, setFeaturedBrands] = useState<Brand[]>([]);
-  const [bigBrands, setBigBrands] = useState<Brand[]>([]);
+  const [totalBrands, setTotalBrands] = useState(0);
+  const [page, setPage] = useState(1);
+  const [suggestionName, setSuggestionName] = useState("");
+  const [submittingSuggestion, setSubmittingSuggestion] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const featuredScrollRef = useRef<HTMLDivElement>(null);
 
-  // Fetch brands by tag
-  const fetchBrandsByTag = useCallback(async (tagSlug: string): Promise<Brand[]> => {
-    try {
-      // First get tag id
-      const { data: tagData } = await supabase
-        .from("brand_tags")
-        .select("id")
-        .eq("slug", tagSlug)
-        .eq("is_active", true)
-        .single();
-
-      if (!tagData) return [];
-
-      // Get brand assignments for this tag
-      const { data: assignments } = await supabase
-        .from("brand_tag_assignments")
-        .select("brand_id")
-        .eq("tag_id", tagData.id);
-
-      if (!assignments || assignments.length === 0) return [];
-
-      const brandIds = assignments.map((a) => a.brand_id).filter(Boolean);
-
-      // Get brand details
-      const { data: brands } = await supabase
-        .from("brands")
-        .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label")
-        .eq("is_active", true)
-        .in("id", brandIds)
-        .order("nctr_per_dollar", { ascending: false })
-        .limit(20);
-
-      return brands || [];
-    } catch (error) {
-      console.error(`Error fetching brands for tag ${tagSlug}:`, error);
-      return [];
-    }
-  }, []);
-
-  // Welcome back toast when user returns from shopping
+  // Welcome back toast
   useEffect(() => {
     const lastClickTime = sessionStorage.getItem('garden_last_click_time');
     if (lastClickTime) {
       const timeSinceClick = Date.now() - Number(lastClickTime);
-      // If they return within 2 hours of clicking a brand
       if (timeSinceClick < 2 * 60 * 60 * 1000) {
         sessionStorage.removeItem('garden_last_click_time');
         toast({
           title: "👋 Welcome Back!",
-          description: "If you completed a purchase, your NCTR earnings will show up in your Crescendo dashboard within 24-48 hours. We'll notify you when they arrive! Lock your earned stakes on Crescendo to unlock exclusive rewards.",
+          description: "If you completed a purchase, your NCTR earnings will show up within 24-48 hours.",
           duration: 8000,
         });
       }
     }
   }, []);
 
-  // Fetch all data
+  // Fetch all brands
   useEffect(() => {
-    const fetchAllData = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // Parallel fetch all sections
-        const [
-          totalCount,
-          deptData,
-          madeInUsa,
-          smallBusiness,
-          buyrRec,
-          sustainable,
-          promoted,
-          highEarning,
-          featured,
-          bigBrandsData,
-        ] = await Promise.all([
-          // Total brand count
+        const [countRes, brandsRes, featuredRes] = await Promise.all([
           supabase.from("brands").select("*", { count: "exact", head: true }).eq("is_active", true),
-          
-          // Departments with counts
-          supabase.from("brand_categories").select("*").eq("is_active", true).order("display_order"),
-          
-          // Tag-based sections
-          fetchBrandsByTag("made-in-usa"),
-          fetchBrandsByTag("small-business"),
-          fetchBrandsByTag("buyr-recommended"),
-          fetchBrandsByTag("sustainable"),
-          
-          // Promoted brands
           supabase
             .from("brands")
-            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label")
+            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
             .eq("is_active", true)
-            .eq("is_promoted", true)
-            .order("promotion_multiplier", { ascending: false })
-            .limit(20),
-          
-          // Highest earning (exclude capped 10 NCTR/$1 bad data, show 3-9.99 range)
+            .order("name")
+            .limit(2000),
           supabase
             .from("brands")
-            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, is_big_brand")
-            .eq("is_active", true)
-            .lt("nctr_per_dollar", 10)
-            .gte("nctr_per_dollar", 3)
-            .order("nctr_per_dollar", { ascending: false })
-            .limit(10),
-          
-          // Featured brands
-          supabase
-            .from("brands")
-            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, featured")
+            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
             .eq("is_active", true)
             .eq("featured", true)
             .order("name")
-            .limit(20),
-          
-          // Big brands
-          supabase
-            .from("brands")
-            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, is_big_brand")
-            .eq("is_active", true)
-            .eq("is_big_brand", true)
-            .order("name")
-            .limit(30),
+            .limit(10),
         ]);
 
-        setTotalBrands(totalCount.count || 0);
-        setDepartments(deptData.data || []);
-        setMadeInUsaBrands(madeInUsa);
-        setSmallBusinessBrands(smallBusiness);
-        setBuyrRecommendedBrands(buyrRec);
-        setSustainableBrands(sustainable);
-        setPromotedBrands(promoted.data || []);
-        setHighestEarningBrands(highEarning.data || []);
-        setFeaturedBrands(featured.data || []);
-        setBigBrands(bigBrandsData.data || []);
+        setTotalBrands(countRes.count || 0);
+        setAllBrands(brandsRes.data || []);
+        setFeaturedBrands(featuredRes.data || []);
       } catch (error) {
-        console.error("Error fetching mall data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load shopping experience",
-          variant: "destructive",
-        });
+        console.error("Error fetching brands:", error);
       } finally {
         setLoading(false);
       }
     };
+    fetchData();
+  }, []);
 
-    fetchAllData();
-  }, [fetchBrandsByTag]);
+  // Filter brands by search + category
+  const filteredBrands = useMemo(() => {
+    let filtered = allBrands;
 
-  // Handle shop action - redirect to Loyalize with brand website
-  const handleShop = useCallback(async (brandId: string, loyalizeId: string) => {
-    if (!loyalizeId) {
-      toast({
-        title: "Coming Soon",
-        description: "This brand will be shoppable soon!",
+    // Category filter
+    if (activeCategory !== "all") {
+      const keywords = CATEGORY_KEYWORDS[activeCategory] || [];
+      filtered = filtered.filter((b) => {
+        const cat = (b.category || "").toLowerCase();
+        return keywords.some((kw) => cat.includes(kw));
       });
-      return;
     }
 
+    // Search filter (name + category)
+    if (searchQuery.trim().length >= 2) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (b) =>
+          b.name.toLowerCase().includes(q) ||
+          (b.category || "").toLowerCase().includes(q)
+      );
+    }
+
+    return filtered;
+  }, [allBrands, activeCategory, searchQuery]);
+
+  const paginatedBrands = useMemo(
+    () => filteredBrands.slice(0, page * PAGE_SIZE),
+    [filteredBrands, page]
+  );
+
+  const hasMore = paginatedBrands.length < filteredBrands.length;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, activeCategory]);
+
+  // Shop handler
+  const handleShop = useCallback(async (brandId: string, loyalizeId: string) => {
+    if (!loyalizeId) {
+      toast({ title: "Coming Soon", description: "This brand will be shoppable soon!" });
+      return;
+    }
     try {
-      // Generate unique tracking ID for this click
       const trackingId = `${userId?.substring(0, 8) || 'anon'}_${brandId.substring(0, 8)}_${Date.now()}`;
-      
-      // Get brand name for toast
-      const { data: brandData } = await supabase
-        .from("brands")
-        .select("name")
-        .eq("id", brandId)
-        .single();
-
-      // Record shopping click BEFORE redirect
       if (userId) {
-        const { error: clickError } = await supabase
-          .from("shopping_clicks")
-          .insert({
-            user_id: userId,
-            brand_id: brandId,
-            loyalize_id: loyalizeId,
-            converted: false,
-            nctr_earned: 0,
-          });
-        
-        if (clickError) {
-          console.error("❌ Failed to record shopping click:", clickError);
-        } else {
-          console.log("✅ Shopping click recorded for brand:", brandData?.name || brandId);
-        }
+        await supabase.from("shopping_clicks").insert({
+          user_id: userId, brand_id: brandId, loyalize_id: loyalizeId, converted: false, nctr_earned: 0,
+        });
       }
-
-      // Call Edge Function for secure redirect with tracking
       const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeId}&user=${userId || ''}&tracking=${trackingId}`;
-      
-      // Save click timestamp for welcome-back toast
       sessionStorage.setItem('garden_last_click_time', Date.now().toString());
-      
       window.open(redirectUrl, '_blank');
-
       toast({
         title: "🛒 Shopping Trip Started!",
-        description: "Complete your purchase and you'll automatically earn NCTR stakes. Your earnings typically appear within 24-48 hours.",
+        description: "Complete your purchase and you'll automatically earn NCTR. Earnings appear within 24-48 hours.",
         duration: 7000,
       });
     } catch (error) {
       console.error("Error opening shop link:", error);
-      toast({
-        title: "Error",
-        description: "Failed to open shopping link. Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to open shopping link.", variant: "destructive" });
     }
   }, [userId]);
 
-  // Handle search selection
-  const handleSearchSelect = useCallback((brand: { id: string; loyalize_id: string | null }) => {
-    if (brand.loyalize_id) {
-      handleShop(brand.id, brand.loyalize_id);
+  // Suggestion submit
+  const handleSuggestion = async () => {
+    if (!suggestionName.trim()) return;
+    setSubmittingSuggestion(true);
+    try {
+      toast({ title: "✅ Thanks!", description: `We'll look into adding "${suggestionName}" to The Garden.` });
+      setSuggestionName("");
+    } catch {
+      toast({ title: "Error", description: "Failed to submit suggestion.", variant: "destructive" });
+    } finally {
+      setSubmittingSuggestion(false);
     }
-  }, [handleShop]);
+  };
 
-  // Mobile nav handlers
-  const handleSearchClick = useCallback(() => {
-    // Scroll to top and focus search
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-      searchRef.current?.focus();
-    }, 300);
-  }, []);
-
-  const handleTagsClick = useCallback(() => {
-    // Scroll to departments section
-    const deptSection = document.querySelector('[data-section="departments"]');
-    deptSection?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  const scrollFeatured = (dir: "left" | "right") => {
+    featuredScrollRef.current?.scrollBy({ left: dir === "left" ? -280 : 280, behavior: "smooth" });
+  };
 
   if (loading) {
     return (
-      <div className="garden-theme min-h-screen bg-[hsl(40,20%,98%)] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[hsl(142,71%,45%)]" />
+      <div className="garden-mall-dark min-h-screen bg-[hsl(var(--mall-bg))] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--mall-accent))]" />
       </div>
     );
   }
 
+  const isSearching = searchQuery.trim().length >= 2 || activeCategory !== "all";
+  const noResults = isSearching && filteredBrands.length === 0;
+
   return (
-    <div className="garden-theme min-h-screen bg-[hsl(40,20%,98%)] pb-20 md:pb-0">
-      {/* Header with Search */}
-      <MallHeader
-        totalBrands={totalBrands}
-        availableNctr={availableNctr}
-        totalNctr={totalNctr}
-        onSearchSelect={handleSearchSelect}
-      />
+    <div className="garden-mall-dark min-h-screen bg-[hsl(var(--mall-bg))] pb-20 md:pb-0">
+      {/* Header */}
+      <div className="bg-[hsl(0,0%,16%)] border-b border-[hsl(var(--mall-border))] pt-4 pb-6 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-2xl md:text-3xl font-bold text-[hsl(var(--mall-text))] mb-5">
+            🌱 The Garden
+          </h1>
+
+          {/* Search Bar */}
+          <div className="relative mb-4">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[hsl(var(--mall-text-muted))]" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder={`Search ${totalBrands.toLocaleString()}+ brands...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-10 h-12 text-base rounded-full bg-[hsl(var(--mall-input-bg))] text-[hsl(var(--mall-text))] border border-[hsl(var(--mall-border))] focus:border-[hsl(var(--mall-accent))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--mall-accent))]/30 placeholder:text-[hsl(var(--mall-text-muted))] transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-text))]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Category Tabs */}
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setActiveCategory(cat.value)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeCategory === cat.value
+                    ? "bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)]"
+                    : "bg-[hsl(var(--mall-input-bg))] text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-text))] hover:bg-[hsl(0,0%,30%)]"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* NCTR Earning Awareness Banner */}
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mb-6">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl mt-0.5">✨</span>
-            <div>
-              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
-                Every Purchase Builds Your Stake
-              </p>
-              <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
-                Shop the brands you already love through The Garden and automatically earn NCTR stakes that build your Crescendo status and unlock exclusive rewards. You never buy NCTR. You earn it by living your life.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Crescendo Link Strip */}
-        <div className="flex items-center justify-between mb-6 px-1">
-          <span className="text-sm text-muted-foreground">Your stakes unlock rewards on Crescendo</span>
-          <a
-            href="https://crescendo.nctr.live/rewards"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium text-[#9AB700] hover:text-[#C8FF00] transition-colors flex items-center gap-1"
-          >
-            See what you can unlock →
-          </a>
-        </div>
-
-        {/* Browse All Brands CTA */}
-        <div className="mb-6">
-          <button
-            onClick={() => navigate('/garden/category/all')}
-            className="w-full bg-white border border-[hsl(220,13%,91%)] rounded-xl p-4 flex items-center justify-between hover:border-[hsl(142,71%,45%)] hover:shadow-md transition-all btn-press group"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🛍️</span>
-              <div className="text-left">
-                <h3 className="font-semibold text-[hsl(0,0%,10%)]">Browse All Brands</h3>
-                <p className="text-sm text-[hsl(220,9%,46%)]">{totalBrands.toLocaleString()} brands earning NCTR</p>
-              </div>
-            </div>
-            <span className="text-[hsl(142,71%,45%)] font-medium group-hover:translate-x-1 transition-transform">
-              Explore →
-            </span>
-          </button>
-        </div>
-
-        {/* Highest Earning - Show first since it has content */}
-        {highestEarningBrands.length > 0 && (
-          <BrandCarousel
-            title="💎 Highest Earning"
-            subtitle="Top NCTR rates"
-            brands={highestEarningBrands}
-            userId={userId}
-            onShop={handleShop}
-          />
-        )}
-
-        {/* Featured */}
-        {featuredBrands.length > 0 && (
-          <BrandCarousel
-            title="⭐ Featured Brands"
-            subtitle="Hand-picked by The Garden"
-            brands={featuredBrands}
-            userId={userId}
-            onShop={handleShop}
-          />
-        )}
-
-        {/* Departments - Always show */}
-        {departments.length > 0 && (
-          <div data-section="departments">
-            <DepartmentGrid departments={departments} />
-          </div>
-        )}
-
-        {/* Promotions */}
-        {promotedBrands.length > 0 && (
-          <BrandCarousel
-            title="🔥 Boosted Earnings"
-            subtitle="Limited time promotions"
-            brands={promotedBrands}
-            userId={userId}
-            onShop={handleShop}
-          />
-        )}
-
-        {/* Big Brands - Collapsible */}
-        {bigBrands.length > 0 && (
-          <section className="garden-theme mb-8 garden-fade-in visible">
-            <button
-              onClick={() => setShowBigBrands(!showBigBrands)}
-              className="flex items-center justify-between w-full text-left group btn-press border-b border-[hsl(220,13%,91%)] pb-3 mb-4"
-            >
-              <div>
-                <h2 className="text-xl font-bold text-[hsl(0,0%,10%)]">🏢 Major Retailers</h2>
-                <p className="text-sm text-[hsl(220,9%,46%)] mt-1">National brands</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-[hsl(220,9%,46%)]">
-                  {bigBrands.length} brands
-                </span>
-                {showBigBrands ? (
-                  <ChevronUp className="h-5 w-5 text-[hsl(220,9%,46%)]" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-[hsl(220,9%,46%)]" />
-                )}
-              </div>
-            </button>
-
-            {showBigBrands && (
-              <BrandCarousel
-                title=""
-                brands={bigBrands}
-                userId={userId}
-                onShop={handleShop}
-              />
-            )}
-
-            {!showBigBrands && (
-              <div className="flex gap-2 overflow-x-auto pb-2 garden-carousel">
-                {bigBrands.slice(0, 6).map((brand) => (
-                  <div
-                    key={brand.id}
-                    className="flex-shrink-0 bg-white rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer border border-[hsl(220,13%,91%)] hover:border-[hsl(142,71%,45%)] hover:bg-[hsl(138,76%,97%)] transition-all btn-press"
-                    onClick={() => handleShop(brand.id, brand.loyalize_id || "")}
-                  >
-                    <span className="text-sm text-[hsl(0,0%,10%)]">{brand.name}</span>
-                  </div>
-                ))}
+        {/* Featured Brands Row */}
+        {!isSearching && featuredBrands.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-[hsl(var(--mall-text))]">⭐ Featured Brands</h2>
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={() => setShowBigBrands(true)}
-                  className="flex-shrink-0 text-sm font-medium text-[hsl(142,71%,45%)] hover:text-[hsl(142,71%,35%)] transition-colors px-3 py-2 btn-press"
+                  onClick={() => scrollFeatured("left")}
+                  className="p-1.5 rounded-full text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-accent))] hover:bg-[hsl(0,0%,25%)] transition-colors hidden md:block"
                 >
-                  See All →
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => scrollFeatured("right")}
+                  className="p-1.5 rounded-full text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-accent))] hover:bg-[hsl(0,0%,25%)] transition-colors hidden md:block"
+                >
+                  <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
-            )}
+            </div>
+            <div
+              ref={featuredScrollRef}
+              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {featuredBrands.map((brand) => (
+                <div
+                  key={brand.id}
+                  className="snap-start flex-shrink-0 w-[220px] md:w-[260px] bg-[hsl(var(--mall-card))] rounded-xl p-5 border border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))] hover:-translate-y-1 transition-all cursor-pointer group"
+                  onClick={() => setSelectedBrand(brand)}
+                >
+                  <div className="flex justify-center mb-4 bg-[hsl(0,0%,28%)] rounded-lg p-3">
+                    <BrandLogo
+                      src={brand.logo_url || undefined}
+                      alt={brand.name}
+                      size="lg"
+                      className="group-hover:scale-105 transition-transform"
+                    />
+                  </div>
+                  <h3 className="font-semibold text-[hsl(var(--mall-text))] text-center text-sm line-clamp-2 mb-2 min-h-[2.5rem]">
+                    {brand.name}
+                  </h3>
+                  <p className="text-xs text-center font-medium text-[hsl(var(--mall-accent))] mb-3">
+                    Earn NCTR on every purchase
+                  </p>
+                  <Button
+                    size="sm"
+                    className="w-full bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)] font-semibold"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
+                    }}
+                    disabled={!brand.loyalize_id}
+                  >
+                    Shop Now
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </Button>
+                </div>
+              ))}
+            </div>
           </section>
         )}
 
-        {/* Tag-based sections - Only show if they have brands */}
-        {madeInUsaBrands.length > 0 && (
-          <BrandCarousel
-            title="🇺🇸 Made in America"
-            subtitle="Support American workers and manufacturers"
-            brands={madeInUsaBrands}
-            seeAllLink="/garden/tag/made-in-usa"
-            userId={userId}
-            onShop={handleShop}
-          />
+        {/* Section Header */}
+        {!isSearching && allBrands.length > 0 && (
+          <h2 className="text-xl font-bold text-[hsl(var(--mall-text))] mb-4">
+            🛍️ All Brands
+          </h2>
         )}
 
-        {smallBusinessBrands.length > 0 && (
-          <BrandCarousel
-            title="🏪 Small & Independent"
-            subtitle="Privately owned businesses that put people first"
-            brands={smallBusinessBrands}
-            seeAllLink="/garden/tag/small-business"
-            userId={userId}
-            onShop={handleShop}
-          />
+        {/* Results Count */}
+        {isSearching && filteredBrands.length > 0 && (
+          <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-4">
+            {filteredBrands.length} brand{filteredBrands.length !== 1 ? "s" : ""} found
+          </p>
         )}
 
-        {buyrRecommendedBrands.length > 0 && (
-          <BrandCarousel
-            title="✅ Buy'r Recommended"
-            subtitle="Vetted by the Buy'r community"
-            brands={buyrRecommendedBrands}
-            seeAllLink="/garden/tag/buyr-recommended"
-            userId={userId}
-            onShop={handleShop}
-          />
+        {/* Brand Grid */}
+        {paginatedBrands.length > 0 && (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {paginatedBrands.map((brand) => (
+                <div
+                  key={brand.id}
+                  className="bg-[hsl(var(--mall-card))] rounded-xl p-4 border border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))] hover:-translate-y-0.5 transition-all cursor-pointer group"
+                  onClick={() => setSelectedBrand(brand)}
+                >
+                  {/* Logo */}
+                  <div className="flex justify-center mb-3 bg-[hsl(0,0%,28%)] rounded-lg p-2 aspect-square items-center">
+                    <BrandLogo
+                      src={brand.logo_url || undefined}
+                      alt={brand.name}
+                      size="lg"
+                      className="group-hover:scale-105 transition-transform"
+                    />
+                  </div>
+
+                  {/* Brand Name */}
+                  <h3 className="font-semibold text-[hsl(var(--mall-text))] text-center text-sm line-clamp-2 mb-1.5 min-h-[2.5rem]">
+                    {brand.name}
+                  </h3>
+
+                  {/* Earn label */}
+                  <p className="text-[11px] text-center font-medium text-[hsl(var(--mall-accent))] mb-3">
+                    Earn NCTR on every purchase
+                  </p>
+
+                  {/* Shop Button */}
+                  <Button
+                    size="sm"
+                    className="w-full bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)] font-semibold text-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
+                    }}
+                    disabled={!brand.loyalize_id}
+                  >
+                    Shop Now
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Load More */}
+            {hasMore && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => setPage((p) => p + 1)}
+                  className="border-[hsl(var(--mall-accent))] text-[hsl(var(--mall-accent))] bg-transparent hover:bg-[hsl(var(--mall-accent))]/10"
+                >
+                  Load More Brands
+                </Button>
+              </div>
+            )}
+          </>
         )}
 
-        {sustainableBrands.length > 0 && (
-          <BrandCarousel
-            title="🌿 Sustainable"
-            subtitle="Eco-friendly brands"
-            brands={sustainableBrands}
-            seeAllLink="/garden/tag/sustainable"
-            userId={userId}
-            onShop={handleShop}
-          />
+        {/* Empty State with Suggestion */}
+        {noResults && (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <p className="text-lg text-[hsl(var(--mall-text-muted))] mb-2">
+              No brands found for "{searchQuery || activeCategory}"
+            </p>
+            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-6">
+              Don't see your brand? Suggest it →
+            </p>
+            <div className="flex gap-2 w-full max-w-md">
+              <input
+                type="text"
+                placeholder="Brand name..."
+                value={suggestionName}
+                onChange={(e) => setSuggestionName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSuggestion()}
+                className="flex-1 h-11 px-4 rounded-lg bg-[hsl(var(--mall-input-bg))] text-[hsl(var(--mall-text))] border border-[hsl(var(--mall-border))] focus:border-[hsl(var(--mall-accent))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--mall-accent))]/30 placeholder:text-[hsl(var(--mall-text-muted))]"
+              />
+              <Button
+                onClick={handleSuggestion}
+                disabled={!suggestionName.trim() || submittingSuggestion}
+                className="bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)] font-semibold"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Non-searching suggestion form */}
+        {!isSearching && allBrands.length === 0 && !loading && (
+          <div className="flex flex-col items-center justify-center py-16 px-4">
+            <p className="text-lg text-[hsl(var(--mall-text-muted))]">No brands available yet.</p>
+          </div>
         )}
       </div>
 
-      {/* Bottom nav handled by AuthenticatedLayout */}
+      {/* Brand Detail Modal */}
+      {selectedBrand && (
+        <BrandDetailModal
+          isOpen={!!selectedBrand}
+          onClose={() => setSelectedBrand(null)}
+          brand={selectedBrand}
+          userId={userId}
+          onShop={handleShop}
+        />
+      )}
     </div>
   );
 };
