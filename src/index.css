@@ -196,6 +196,16 @@ All colors MUST be HSL to avoid yellow bug issues.
     color: hsl(0, 0%, 70%) !important;
   }
 
+  /* Referral success toast */
+  .referral-success-toast {
+    background: hsl(0, 0%, 20%) !important;
+    border-left: 4px solid hsl(75, 100%, 71%) !important;
+    color: white !important;
+  }
+  .referral-success-toast [data-description] {
+    color: hsl(0, 0%, 70%) !important;
+  }
+
 @layer components {
   /* Button safety net - ensure no buttons are black */
   .btn-ensure-visible {

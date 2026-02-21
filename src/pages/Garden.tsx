@@ -33,6 +33,7 @@ import { GardenHeroSection } from '@/components/GardenHeroSection';
 import { MallView } from '@/components/garden/MallView';
 import { CrescendoStatusCard } from '@/components/CrescendoStatusCard';
 import { GardenOnboardingModal } from '@/components/GardenOnboardingModal';
+import { MilestoneProgress } from '@/components/MilestoneProgress';
 
 import { PortfolioStory } from '@/components/PortfolioStory';
 
@@ -1498,6 +1499,11 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
               }
             }}
           />
+        </div>
+
+        {/* Invite Milestone Progress */}
+        <div className="mb-8">
+          <MilestoneProgress />
         </div>
 
         {/* Stakes Overview - Collapsible */}
