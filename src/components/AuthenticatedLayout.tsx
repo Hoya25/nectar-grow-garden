@@ -91,9 +91,11 @@ const AuthenticatedLayout = () => {
             onClick={() => navigate('/garden')}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <img src={nctrNLogo} alt="NCTR" className="w-7 h-7 object-contain" />
-            <span className="text-lg font-bold text-foreground">The Garden</span>
-            <Badge variant="secondary" className="text-[10px] font-semibold px-1.5 py-0 bg-primary/10 text-primary border-primary/20">
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#E2FF6D] flex-shrink-0">
+              <span className="text-sm font-black text-[#323232] leading-none">N</span>
+            </span>
+            <span className="text-lg font-bold text-white">The Garden</span>
+            <Badge variant="secondary" className="text-[10px] font-semibold px-1.5 py-0 bg-[#E2FF6D] text-[#323232] border-[#E2FF6D]/20">
               BETA
             </Badge>
           </button>
