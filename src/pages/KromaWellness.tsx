@@ -108,6 +108,24 @@ const KromaWellness = () => {
         </div>
       </section>
 
+      {/* Cross-platform CTA */}
+      <section className="max-w-3xl mx-auto px-4 pb-16">
+        <a
+          href="https://crescendo.nctr.live"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-2xl p-6 md:p-8 text-center transition-shadow hover:shadow-lg"
+          style={{ background: "#323232" }}
+        >
+          <p className="text-base md:text-lg font-semibold text-white mb-2">
+            Earn INSPIRATION when you shop Kroma
+          </p>
+          <p className="text-sm font-medium" style={{ color: "#E2FF6D" }}>
+            Unlock Kroma rewards on Crescendo →
+          </p>
+        </a>
+      </section>
+
       {/* Bottom */}
       <section className="py-12" style={{ background: "#F5EDE3" }}>
         <div className="max-w-3xl mx-auto px-4 text-center">

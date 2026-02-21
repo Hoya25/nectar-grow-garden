@@ -35,6 +35,19 @@ const Footer = () => {
             </p>
           </div>
           
+          {/* Crescendo Cross-link */}
+          <div className="text-center mb-12">
+            <a
+              href="https://crescendo.nctr.live"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all hover:scale-105"
+              style={{ background: "#E2FF6D", color: "#323232" }}
+            >
+              Unlock rewards with your earned NCTR → Visit Crescendo
+            </a>
+          </div>
+
           {/* Premium Footer Bottom */}
           <div className="border-t border-background/20 pt-12">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
