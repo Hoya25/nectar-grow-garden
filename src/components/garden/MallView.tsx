@@ -600,7 +600,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                 {paginatedBrands.map((brand) => (
                   <div
                     key={brand.id}
-                    className="rounded-xl p-2.5 border border-[#3A3A3A] hover:border-[#E2FF6D]/50 hover:-translate-y-0.5 transition-all cursor-pointer group relative"
+                    className="rounded-xl overflow-hidden border border-[#3A3A3A] hover:border-[#E2FF6D]/50 hover:-translate-y-0.5 transition-all cursor-pointer group relative flex flex-col"
                     style={{ background: "#2A2A2A" }}
                     onClick={() => setSelectedBrand(brand)}
                   >
@@ -611,45 +611,51 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                       </span>
                     )}
 
-                    {/* Logo */}
-                    <div className="flex justify-center mb-2 rounded-lg items-center overflow-hidden p-3" style={{ background: "#FFFFFF", aspectRatio: "3/2", borderRadius: "8px" }}>
-                      <img
-                        src={brand.logo_url || undefined}
-                        alt={brand.name}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform p-2"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                      <span className="hidden text-[#323232] font-bold text-xs text-center px-2">{brand.name}</span>
+                    {/* Logo — seamless white top area */}
+                    <div className="flex items-center justify-center bg-white px-4" style={{ minHeight: "100px", maxHeight: "100px" }}>
+                      {brand.logo_url ? (
+                        <img
+                          src={brand.logo_url}
+                          alt={brand.name}
+                          className="object-contain group-hover:scale-105 transition-transform"
+                          style={{ maxHeight: "60px", maxWidth: "80%" }}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <span className={`${brand.logo_url ? 'hidden' : ''} text-[#555] font-semibold text-xs text-center px-2`}>{brand.name}</span>
                     </div>
 
-                    {/* Brand Name */}
-                    <h3 className="text-white text-center line-clamp-2 mb-1 min-h-[2.25rem]" style={{ fontSize: "15px", fontWeight: 700 }}>
-                      {brand.name}
-                    </h3>
+                    {/* Info area */}
+                    <div className="px-2.5 pb-2.5 pt-2 flex flex-col flex-1">
+                      {/* Brand Name */}
+                      <h3 className="text-white text-center line-clamp-2 mb-1 min-h-[2.25rem]" style={{ fontSize: "15px", fontWeight: 700 }}>
+                        {brand.name}
+                      </h3>
 
-                    {/* Earn label */}
-                    <p className="text-center font-medium mb-2.5" style={{ color: "#E2FF6D", fontSize: "13px" }}>
-                      {brand.nctr_per_dollar && brand.nctr_per_dollar > 0
-                        ? `Earn ${brand.nctr_per_dollar % 1 === 0 ? brand.nctr_per_dollar.toFixed(0) : brand.nctr_per_dollar.toFixed(1)} NCTR/$1`
-                        : "Earn NCTR"}
-                    </p>
+                      {/* Earn label */}
+                      <p className="text-center font-medium mb-2" style={{ color: "#E2FF6D", fontSize: "13px" }}>
+                        {brand.nctr_per_dollar && brand.nctr_per_dollar > 0
+                          ? `Earn ${brand.nctr_per_dollar % 1 === 0 ? brand.nctr_per_dollar.toFixed(0) : brand.nctr_per_dollar.toFixed(1)} NCTR/$1`
+                          : "Earn NCTR"}
+                      </p>
 
-                    {/* Shop Button — lime outline */}
-                    <Button
-                      size="sm"
-                      className="w-full text-xs font-semibold bg-transparent border border-[#E2FF6D] text-[#E2FF6D] hover:bg-[#E2FF6D] hover:text-[#1A1A1A] transition-colors shadow-none"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
-                      }}
-                      disabled={!brand.loyalize_id}
-                    >
-                      Shop Now
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </Button>
+                      {/* Shop Button — lime outline */}
+                      <Button
+                        size="sm"
+                        className="w-full text-xs font-semibold bg-transparent border border-[#E2FF6D] text-[#E2FF6D] hover:bg-[#E2FF6D] hover:text-[#1A1A1A] transition-colors shadow-none h-8 mt-auto"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
+                        }}
+                        disabled={!brand.loyalize_id}
+                      >
+                        Shop Now
+                        <ExternalLink className="h-3 w-3 ml-1" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
