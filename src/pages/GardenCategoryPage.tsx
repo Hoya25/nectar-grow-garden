@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import SEOHead from "@/components/SEOHead";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -289,7 +290,11 @@ const GardenCategoryPage = () => {
 
   return (
     <div className="garden-theme min-h-screen bg-[hsl(80,20%,98%)]">
-      {/* Header */}
+      <SEOHead
+        title={`${category?.name || 'Category'} | The Garden`}
+        description={`Shop ${category?.name || ''} brands and earn NCTR on every purchase.`}
+        canonicalPath={`/garden/category/${slug}`}
+      />
       <header className="sticky top-0 z-50 bg-white border-b border-[hsl(220,13%,91%)] shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">

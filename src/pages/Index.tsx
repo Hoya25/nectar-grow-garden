@@ -4,10 +4,35 @@ import FeatureSection from "@/components/FeatureSection";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import { BrandSubmissionForm } from "@/components/BrandSubmissionForm";
+import SEOHead from "@/components/SEOHead";
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "The Garden by NCTR Alliance",
+    "url": "https://nectar-grow-garden.lovable.app",
+    "logo": "https://nectar-grow-garden.lovable.app/nctr-n-dark.svg",
+    "sameAs": ["https://twitter.com/NCTRAlliance"]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "The Garden",
+    "url": "https://nectar-grow-garden.lovable.app",
+    "description": "Turn everyday purchases into real rewards. Shop 6,800+ brands and earn NCTR with every purchase."
+  }
+];
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="The Garden | Shop 6,800+ Brands, Earn NCTR"
+        description="Turn everyday purchases into real rewards. Shop 6,800+ brands and earn NCTR with every purchase."
+        canonicalPath="/"
+        jsonLd={jsonLd}
+      />
       <Header />
       <Hero />
       

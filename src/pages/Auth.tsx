@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SEOHead from '@/components/SEOHead';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -124,6 +125,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-page flex items-center justify-center p-4">
+      <SEOHead title="Sign In | The Garden" description="Sign in or create your account to start earning NCTR on every purchase." canonicalPath="/auth" />
       <div className="w-full max-w-md space-y-6">
         <WalletConnection />
         

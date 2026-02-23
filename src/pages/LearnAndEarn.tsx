@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SEOHead from "@/components/SEOHead";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -161,7 +162,7 @@ export default function LearnAndEarn() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
+      <SEOHead title="Learn & Earn | The Garden" description="Complete learning modules and earn NCTR rewards." canonicalPath="/learn" />
       <div className="bg-gradient-to-r from-primary/20 via-primary/10 to-background border-b">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-3xl">
