@@ -108,7 +108,10 @@ export const MallBrandCard = ({
               onError={() => setImgError(true)}
             />
           ) : (
-            <span className="text-[#555] font-semibold text-sm text-center leading-tight px-2">
+          <span
+              className="text-[#555] font-semibold text-center leading-tight break-words px-2"
+              style={{ fontSize: name.length > 15 ? '13px' : '16px' }}
+            >
               {name}
             </span>
           )}
