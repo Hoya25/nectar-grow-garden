@@ -92,7 +92,7 @@ export const GardenHeroSection = ({
           <div className="flex items-center gap-3 bg-background/80 backdrop-blur-sm rounded-xl px-6 py-4 border border-primary/30 shadow-lg">
             <img src={nctrNLogo} alt="NCTR" className="h-12 w-12" />
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-primary">
+              <p className="text-3xl md:text-4xl font-bold text-nctr-lime">
                 {formatNCTR(totalNCTR)} <span className="text-lg font-normal text-muted-foreground">NCTR</span>
               </p>
               <p className="text-sm text-muted-foreground">
@@ -112,7 +112,7 @@ export const GardenHeroSection = ({
                 <span className="text-xs font-medium text-[#323232]">Available</span>
                 <InfoTooltip content="Spendable on Crescendo rewards anytime" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-[#323232]">
+              <p className="text-lg md:text-xl font-bold text-nctr-lime">
                 {formatNCTR(portfolio?.available_nctr || 0)}
               </p>
               <p className="text-[10px] text-[#5A5A58] mt-1">NCTR</p>
@@ -154,7 +154,7 @@ export const GardenHeroSection = ({
                 <span className="text-xs font-medium text-[#323232]">360LOCK</span>
                 <InfoTooltip content="Committed for 360 days for maximum rewards + premium perks" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-[#323232]">
+              <p className="text-lg md:text-xl font-bold text-nctr-lime">
                 {formatNCTR(portfolio?.lock_360_nctr || 0)}
               </p>
               <p className="text-[10px] text-[#5A5A58] mt-1">NCTR</p>
@@ -174,7 +174,7 @@ export const GardenHeroSection = ({
                 <span className="text-xs font-medium text-[#5A5A58]">Pending</span>
                 <InfoTooltip content="From recent purchases, clears in 24-48 hours" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-[#5A5A58]">
+              <p className="text-lg md:text-xl font-bold text-nctr-lime/70">
                 {formatNCTR(portfolio?.pending_nctr || 0)}
               </p>
               <p className="text-[10px] text-[#5A5A58]/80 mt-1">NCTR</p>
@@ -206,7 +206,7 @@ export const GardenHeroSection = ({
         <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
           <CardContent className="p-4 text-center">
             <TrendingUp className="w-5 h-5 mx-auto mb-1 text-primary" />
-            <p className="text-xl md:text-2xl font-bold text-primary">{formatNCTR(portfolio?.total_earned || 0)}</p>
+            <p className="text-xl md:text-2xl font-bold text-nctr-lime">{formatNCTR(portfolio?.total_earned || 0)}</p>
             <p className="text-xs text-muted-foreground">Lifetime Earned</p>
           </CardContent>
         </Card>
@@ -214,7 +214,7 @@ export const GardenHeroSection = ({
         <Card className="bg-gradient-to-br from-secondary/30 to-secondary/50 border-secondary/30">
           <CardContent className="p-4 text-center">
             <Coins className="w-5 h-5 mx-auto mb-1 text-secondary-foreground" />
-            <p className="text-xl md:text-2xl font-bold text-secondary-foreground">{formatNCTR(thisMonthEarned)}</p>
+            <p className="text-xl md:text-2xl font-bold text-nctr-lime">{formatNCTR(thisMonthEarned)}</p>
             <p className="text-xs text-muted-foreground">This Month</p>
           </CardContent>
         </Card>
