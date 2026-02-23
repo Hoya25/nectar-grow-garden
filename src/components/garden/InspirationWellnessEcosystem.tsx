@@ -14,6 +14,7 @@ interface WellnessBrand {
   description: string | null;
   featured?: boolean;
   display_order?: number | null;
+  website_url?: string | null;
 }
 
 interface InspirationWellnessEcosystemProps {
@@ -32,36 +33,49 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
 
   useEffect(() => {
     const fetchBrands = async () => {
-      // Get inspiration tag ID
+      // Get INSPIRATION-tagged brand IDs
       const { data: tagData } = await supabase
         .from("brand_tags")
         .select("id")
         .eq("slug", "inspiration")
         .single();
 
-      if (!tagData) return;
+      let taggedBrandIds: string[] = [];
+      if (tagData) {
+        const { data: assignments } = await supabase
+          .from("brand_tag_assignments")
+          .select("brand_id")
+          .eq("tag_id", tagData.id);
+        taggedBrandIds = (assignments || []).map((a) => a.brand_id).filter(Boolean) as string[];
+      }
 
-      const { data: assignments } = await supabase
-        .from("brand_tag_assignments")
-        .select("brand_id")
-        .eq("tag_id", tagData.id);
-
-      if (!assignments?.length) return;
-
-      const brandIds = assignments.map((a) => a.brand_id).filter(Boolean) as string[];
-
-      const { data: brandsData } = await supabase
+      // Also get wellness-category brands
+      const { data: wellnessBrands } = await supabase
         .from("brands")
-        .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, description, featured, display_order")
-        .in("id", brandIds)
+        .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, description, featured, display_order, website_url")
         .eq("is_active", true)
-        .order("display_order", { ascending: true })
-        .order("name");
+        .or("category.ilike.%wellness%,category.ilike.%health%");
 
-      if (!brandsData) return;
+      // Get tagged brands that may not match the category filter
+      let taggedBrands: typeof wellnessBrands = [];
+      if (taggedBrandIds.length > 0) {
+        const { data } = await supabase
+          .from("brands")
+          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, description, featured, display_order, website_url")
+          .in("id", taggedBrandIds)
+          .eq("is_active", true);
+        taggedBrands = data || [];
+      }
+
+      // Merge and deduplicate
+      const allBrands = [...(wellnessBrands || []), ...(taggedBrands || [])];
+      const uniqueMap = new Map(allBrands.map((b) => [b.id, b]));
+      const brandsData = Array.from(uniqueMap.values()).sort((a, b) => (a.display_order || 0) - (b.display_order || 0) || a.name.localeCompare(b.name));
+
+      if (!brandsData.length) return;
 
       // Separate Kroma (flagship) from others
-      const kroma = brandsData.find((b) => b.featured && b.display_order === 1);
+      const kroma = brandsData.find((b) => b.name.toLowerCase().includes("kroma"));
       const others = brandsData.filter((b) => b.id !== kroma?.id);
 
       setKromaBrand(kroma || null);
