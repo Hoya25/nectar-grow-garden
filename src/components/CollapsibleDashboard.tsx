@@ -197,7 +197,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                     className="h-8 sm:h-12 w-auto opacity-70"
                   />
                 </div>
-                <p className="text-lg sm:text-xl font-bold text-section-accent mb-1">
+                <p className="text-lg sm:text-xl font-bold text-nctr-lime mb-1">
                   {formatNCTR(portfolio?.available_nctr || 0)}
                 </p>
                 <div className="flex items-center justify-between">
@@ -283,7 +283,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                     className="h-8 sm:h-12 w-auto opacity-90"
                   />
                 </div>
-                <p className="text-base sm:text-lg font-bold text-primary mb-1">
+                <p className="text-base sm:text-lg font-bold text-nctr-lime mb-1">
                   {formatNCTR(portfolio?.lock_360_nctr || 0)}
                 </p>
                 <div className="flex items-center justify-between">
@@ -312,7 +312,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                     className="h-8 sm:h-12 w-auto opacity-70"
                   />
                 </div>
-                <p className="text-lg sm:text-xl font-bold text-section-accent mb-1">
+                <p className="text-lg sm:text-xl font-bold text-nctr-lime mb-1">
                   {formatNCTR(portfolio?.total_earned || 0)}
                 </p>
                 <div className="flex items-center justify-between">
@@ -341,7 +341,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 className="h-12 sm:h-16 w-auto"
               />
             </div>
-            <p className="text-xl sm:text-2xl font-bold text-section-accent mb-1">${formatPrice(currentPrice)}</p>
+            <p className="text-xl sm:text-2xl font-bold text-nctr-lime mb-1">${formatPrice(currentPrice)}</p>
             <p className={`text-xs sm:text-sm mb-2 ${getChangeColor(priceChange24h)}`}>
               {formatChange(priceChange24h)} (24h)
             </p>

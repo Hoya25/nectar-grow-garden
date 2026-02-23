@@ -50,6 +50,9 @@ export default {
           light: "hsl(var(--accent-light))",
           lime: "hsl(var(--accent-lime))",
         },
+        "nctr-lime": {
+          DEFAULT: "hsl(var(--nctr-lime))",
+        },
         // Section-specific colors for light sections with subtle accents
         section: {
           bg: "hsl(var(--section-bg))",

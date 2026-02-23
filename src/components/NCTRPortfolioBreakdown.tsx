@@ -58,7 +58,7 @@ export const NCTRPortfolioBreakdown = ({
         <div className="flex items-center gap-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl px-4 py-3 border border-primary/20 mb-4">
           <img src={nctrNLogo} alt="NCTR" className="h-10 w-10" />
           <div>
-            <p className="text-2xl md:text-3xl font-bold text-primary">
+            <p className="text-2xl md:text-3xl font-bold text-nctr-lime">
               {formatNCTR(totalNCTR)} <span className="text-sm font-normal text-muted-foreground">NCTR</span>
             </p>
             <p className="text-xs text-muted-foreground">
@@ -76,7 +76,7 @@ export const NCTRPortfolioBreakdown = ({
               <span className="text-xs font-medium text-[#323232]">Available</span>
               <InfoTooltip content="Spendable on Crescendo rewards anytime" size={12} />
             </div>
-            <p className="text-lg font-bold text-[#323232]">
+            <p className="text-lg font-bold text-nctr-lime">
               {formatNCTR(availableNctr)}
             </p>
             <p className="text-[10px] text-[#5A5A58]">NCTR</p>
@@ -114,7 +114,7 @@ export const NCTRPortfolioBreakdown = ({
               <span className="text-xs font-medium text-[#323232]">360LOCK</span>
               <InfoTooltip content="Committed for 360 days for maximum rewards + premium perks" size={12} />
             </div>
-            <p className="text-lg font-bold text-[#323232]">
+            <p className="text-lg font-bold text-nctr-lime">
               {formatNCTR(lock360Nctr)}
             </p>
             <p className="text-[10px] text-[#5A5A58]">NCTR</p>
