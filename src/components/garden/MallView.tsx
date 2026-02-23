@@ -612,12 +612,11 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                     )}
 
                     {/* Logo */}
-                    <div className="flex justify-center mb-2 rounded-lg items-center" style={{ background: "#FFFFFF", height: "120px" }}>
+                    <div className="flex justify-center mb-2 rounded-lg items-center overflow-hidden p-3" style={{ background: "#FFFFFF", aspectRatio: "3/2", borderRadius: "8px" }}>
                       <img
                         src={brand.logo_url || undefined}
                         alt={brand.name}
-                        className="object-contain group-hover:scale-105 transition-transform"
-                        style={{ maxWidth: "70%", maxHeight: "80px" }}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform p-2"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                           (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
