@@ -56,6 +56,9 @@ All colors MUST be HSL to avoid yellow bug issues.
     --accent-light: 142 69% 58%;
     --accent-lime: 75 100% 71%;                  /* #E2FF6D - NCTR lime */
     --nctr-lime: 75 100% 71%;                    /* #E2FF6D - NCTR token color */
+    --charcoal: 0 0% 20%;                        /* #323232 */
+    --mid-grey: 0 0% 35%;                        /* #5A5A58 */
+    --light-grey: 0 0% 85%;                      /* #D9D9D9 */
     
     /* Status colors */
     --success: 142 71% 45%;
