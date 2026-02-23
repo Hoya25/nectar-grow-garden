@@ -596,38 +596,43 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           {/* Brand Grid */}
           {paginatedBrands.length > 0 && (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {paginatedBrands.map((brand) => (
                   <div
                     key={brand.id}
-                    className="rounded-xl p-3.5 border border-[#3A3A3A] hover:border-[#E2FF6D]/50 hover:-translate-y-0.5 transition-all cursor-pointer group relative"
+                    className="rounded-xl p-2.5 border border-[#3A3A3A] hover:border-[#E2FF6D]/50 hover:-translate-y-0.5 transition-all cursor-pointer group relative"
                     style={{ background: "#2A2A2A" }}
                     onClick={() => setSelectedBrand(brand)}
                   >
                     {/* INSPIRATION icon */}
                     {inspirationBrandIds.has(brand.id) && (
-                      <span className="absolute top-2.5 right-2.5 text-sm z-10" title="INSPIRATION Partner">
+                      <span className="absolute top-2 right-2 text-sm z-10" title="INSPIRATION Partner">
                         🌿
                       </span>
                     )}
 
                     {/* Logo */}
-                    <div className="flex justify-center mb-3 rounded-lg p-2.5 aspect-square items-center" style={{ background: "#3A3A3A" }}>
-                      <BrandLogo
+                    <div className="flex justify-center mb-2 rounded-lg items-center" style={{ background: "#FFFFFF", height: "120px" }}>
+                      <img
                         src={brand.logo_url || undefined}
                         alt={brand.name}
-                        size="lg"
-                        className="group-hover:scale-105 transition-transform"
+                        className="object-contain group-hover:scale-105 transition-transform"
+                        style={{ maxWidth: "70%", maxHeight: "80px" }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                        }}
                       />
+                      <span className="hidden text-[#323232] font-bold text-xs text-center px-2">{brand.name}</span>
                     </div>
 
                     {/* Brand Name */}
-                    <h3 className="text-white text-center text-sm font-semibold line-clamp-2 mb-1.5 min-h-[2.5rem]">
+                    <h3 className="text-white text-center line-clamp-2 mb-1 min-h-[2.25rem]" style={{ fontSize: "15px", fontWeight: 700 }}>
                       {brand.name}
                     </h3>
 
                     {/* Earn label */}
-                    <p className="text-xs text-center font-medium mb-3" style={{ color: "#E2FF6D" }}>
+                    <p className="text-center font-medium mb-2.5" style={{ color: "#E2FF6D", fontSize: "13px" }}>
                       {brand.nctr_per_dollar && brand.nctr_per_dollar > 0
                         ? `Earn ${brand.nctr_per_dollar % 1 === 0 ? brand.nctr_per_dollar.toFixed(0) : brand.nctr_per_dollar.toFixed(1)} NCTR/$1`
                         : "Earn NCTR"}
