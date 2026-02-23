@@ -388,93 +388,104 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           />
         )}
 
-        {/* Featured Brands Row */}
+        {/* Featured Brands — Shop & Earn */}
         {!isSearching && featuredBrands.length > 0 && (
           <section className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                <div style={{width:'3px',height:'22px',background:'#E2FF6D',borderRadius:'999px'}}/>
-                <h2 style={{fontFamily:'var(--font-display)',fontSize:'clamp(18px,2.2vw,24px)',fontWeight:900,letterSpacing:'-0.01em',textTransform:'uppercase',color:'#fff',margin:0}}>Featured Brands</h2>
+            <div className="flex items-center justify-between mb-1">
+              <div>
+                <h2
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "clamp(18px, 2.2vw, 24px)",
+                    fontWeight: 900,
+                    letterSpacing: "-0.01em",
+                    textTransform: "uppercase",
+                    color: "#fff",
+                    margin: 0,
+                  }}
+                >
+                  6,800+ Brands — Shop & Earn
+                </h2>
+                <p className="text-sm text-[hsl(var(--mall-text-muted))] mt-1">
+                  Every purchase earns NCTR toward your Crescendo status
+                </p>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => scrollFeatured("left")}
-                  className="p-1.5 rounded-full text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-accent))] hover:bg-[hsl(0,0%,25%)] transition-colors hidden md:block"
+                  className="p-1.5 rounded-full text-[#999] hover:text-[#666] hover:bg-white/10 transition-colors hidden md:block"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => scrollFeatured("right")}
-                  className="p-1.5 rounded-full text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-accent))] hover:bg-[hsl(0,0%,25%)] transition-colors hidden md:block"
+                  className="p-1.5 rounded-full text-[#999] hover:text-[#666] hover:bg-white/10 transition-colors hidden md:block"
                 >
                   <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
             </div>
+
             <div
               ref={featuredScrollRef}
-              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+              className="flex gap-4 overflow-x-auto pb-4 pt-4 scrollbar-hide snap-x snap-mandatory"
               style={{ scrollbarWidth: "none" }}
             >
-              {featuredBrands.map((brand) => {
-                const isFlagship = brand.featured && brand.display_order === 1;
-                return (
-                  <div
-                    key={brand.id}
-                    className={`snap-start flex-shrink-0 rounded-xl p-5 border hover:-translate-y-1 transition-all cursor-pointer group ${
-                      isFlagship
-                        ? "w-[240px] md:w-[280px] bg-[#F5EDE3] border-[#C4946A]/40 hover:border-[#C4946A] shadow-lg"
-                        : "w-[220px] md:w-[260px] bg-[hsl(var(--mall-card))] border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))]"
-                    }`}
-                    onClick={() => setSelectedBrand(brand)}
-                  >
-                    {/* Flagship Badge */}
-                    {isFlagship && (
-                      <div className="flex justify-center mb-3">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#C4946A] text-white">
-                          ✦ Inspiration Flagship
-                        </span>
-                      </div>
-                    )}
-                    <div className={`flex justify-center mb-4 rounded-lg p-3 ${
-                      isFlagship ? "bg-[#EDE4D8]" : "bg-[hsl(0,0%,28%)]"
-                    }`}>
-                      <BrandLogo
-                        src={brand.logo_url || undefined}
-                        alt={brand.name}
-                        size="lg"
-                        className="group-hover:scale-105 transition-transform"
-                      />
+              {featuredBrands.map((brand) => (
+                <div
+                  key={brand.id}
+                  className="snap-start flex-shrink-0 w-[calc(50%-8px)] md:w-[calc(25%-12px)] rounded-xl p-4 bg-white border border-[#E5E5E5] transition-all cursor-pointer group hover:-translate-y-0.5"
+                  style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)")}
+                  onClick={() => setSelectedBrand(brand)}
+                >
+                  {/* Category tag */}
+                  {brand.category && (
+                    <div className="mb-2">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#F0F0F0] text-[#666]">
+                        {brand.category}
+                      </span>
                     </div>
-                    <h3 className={`font-semibold text-center text-sm line-clamp-2 mb-2 min-h-[2.5rem] ${
-                      isFlagship ? "text-[#3B2F25]" : "text-[hsl(var(--mall-text))]"
-                    }`}>
-                      {brand.name}
-                    </h3>
-                    <p className={`text-xs text-center font-medium mb-3 ${
-                      isFlagship ? "text-[#C4946A]" : "text-[hsl(var(--mall-accent))]"
-                    }`}>
-                      {isFlagship ? "Earn 3 NCTR per $1 spent" : "Earn NCTR on every purchase"}
-                    </p>
-                    <Button
-                      size="sm"
-                      className={`w-full font-semibold ${
-                        isFlagship
-                          ? "bg-[#C4946A] text-white hover:bg-[#A97D5A]"
-                          : "bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)]"
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
-                      }}
-                      disabled={!brand.loyalize_id}
-                    >
-                      Shop Now
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </Button>
+                  )}
+
+                  {/* Logo */}
+                  <div className="flex justify-center mb-3 bg-[#F5F5F5] rounded-lg p-3 aspect-square items-center">
+                    <BrandLogo
+                      src={brand.logo_url || undefined}
+                      alt={brand.name}
+                      size="lg"
+                      className="group-hover:scale-105 transition-transform"
+                    />
                   </div>
-                );
-              })}
+
+                  {/* Brand Name */}
+                  <h3 className="text-[#1A1A1A] text-center text-[15px] font-semibold line-clamp-2 mb-1.5 min-h-[2.5rem]">
+                    {brand.name}
+                  </h3>
+
+                  {/* Earn rate */}
+                  <p className="text-[13px] text-center font-medium text-[#2D6A2E] mb-3">
+                    {brand.nctr_per_dollar && brand.nctr_per_dollar > 0
+                      ? `Earn ${brand.nctr_per_dollar % 1 === 0 ? brand.nctr_per_dollar.toFixed(0) : brand.nctr_per_dollar.toFixed(1)} NCTR/$1`
+                      : "Earn NCTR on every purchase"}
+                  </p>
+
+                  {/* Shop Button — outlined */}
+                  <Button
+                    size="sm"
+                    className="w-full text-xs font-semibold bg-transparent border border-[#323232] text-[#323232] hover:bg-[#323232] hover:text-white transition-colors shadow-none"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
+                    }}
+                    disabled={!brand.loyalize_id}
+                  >
+                    Shop Now
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </section>
         )}
