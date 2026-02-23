@@ -33,46 +33,34 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
 
   useEffect(() => {
     const fetchBrands = async () => {
-      // Get INSPIRATION-tagged brand IDs
+      // Get INSPIRATION tag
       const { data: tagData } = await supabase
         .from("brand_tags")
         .select("id")
         .eq("slug", "inspiration")
         .single();
 
-      let taggedBrandIds: string[] = [];
-      if (tagData) {
-        const { data: assignments } = await supabase
-          .from("brand_tag_assignments")
-          .select("brand_id")
-          .eq("tag_id", tagData.id);
-        taggedBrandIds = (assignments || []).map((a) => a.brand_id).filter(Boolean) as string[];
-      }
+      if (!tagData) return;
 
-      // Also get wellness-category brands
-      const { data: wellnessBrands } = await supabase
+      // Get ONLY brands deliberately tagged as INSPIRATION
+      const { data: assignments } = await supabase
+        .from("brand_tag_assignments")
+        .select("brand_id")
+        .eq("tag_id", tagData.id);
+
+      if (!assignments?.length) return;
+
+      const brandIds = assignments.map((a) => a.brand_id).filter(Boolean) as string[];
+
+      const { data: brandsData } = await supabase
         .from("brands")
         .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, description, featured, display_order, website_url")
+        .in("id", brandIds)
         .eq("is_active", true)
-        .or("category.ilike.%wellness%,category.ilike.%health%");
+        .order("display_order", { ascending: true })
+        .order("name");
 
-      // Get tagged brands that may not match the category filter
-      let taggedBrands: typeof wellnessBrands = [];
-      if (taggedBrandIds.length > 0) {
-        const { data } = await supabase
-          .from("brands")
-          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, description, featured, display_order, website_url")
-          .in("id", taggedBrandIds)
-          .eq("is_active", true);
-        taggedBrands = data || [];
-      }
-
-      // Merge and deduplicate
-      const allBrands = [...(wellnessBrands || []), ...(taggedBrands || [])];
-      const uniqueMap = new Map(allBrands.map((b) => [b.id, b]));
-      const brandsData = Array.from(uniqueMap.values()).sort((a, b) => (a.display_order || 0) - (b.display_order || 0) || a.name.localeCompare(b.name));
-
-      if (!brandsData.length) return;
+      if (!brandsData?.length) return;
 
       // Separate Kroma (flagship) from others
       const kroma = brandsData.find((b) => b.name.toLowerCase().includes("kroma"));
