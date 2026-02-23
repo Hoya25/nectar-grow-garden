@@ -521,10 +521,10 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                   className="bg-[hsl(var(--mall-card))] rounded-xl p-4 border border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))] hover:-translate-y-0.5 transition-all cursor-pointer group relative"
                   onClick={() => setSelectedBrand(brand)}
                 >
-                  {/* INSPIRATION badge */}
+                  {/* INSPIRATION badge — warm pill */}
                   {inspirationBrandIds.has(brand.id) && (
-                    <span className="absolute bottom-14 left-3 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold z-10" style={{ background: "#E2FF6D", color: "#323232" }}>
-                      ✨ INSPIRATION
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold z-10" style={{ background: "#F5EDE3", color: "#C4946A" }}>
+                      🌿 INSPIRATION
                     </span>
                   )}
                   {/* Logo */}
@@ -543,8 +543,8 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                   </h3>
 
                   {/* Earn label */}
-                  <p className="text-[11px] text-center font-medium text-[hsl(var(--mall-accent))] mb-3">
-                    Earn NCTR on every purchase
+                  <p className="text-[11px] text-center font-medium mb-3" style={inspirationBrandIds.has(brand.id) ? { color: "#C4946A" } : {}}>
+                    {inspirationBrandIds.has(brand.id) ? "This purchase earns INSPIRATION rewards" : <span className="text-[hsl(var(--mall-accent))]">Earn NCTR on every purchase</span>}
                   </p>
 
                   {/* Shop Button */}
