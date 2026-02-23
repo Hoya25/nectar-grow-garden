@@ -21,6 +21,7 @@ import LearnAndEarn from "./pages/LearnAndEarn";
 import AdminBrandRates from "./pages/AdminBrandRates";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
+import FAQPage from "./pages/FAQPage";
 import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
 import { Userback } from "./components/Userback";
 
@@ -86,6 +87,7 @@ const App = () => {
                   <Route path="/learn" element={<LearnAndEarn />} />
                 </Route>
                 
+                <Route path="/faq" element={<FAQPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
