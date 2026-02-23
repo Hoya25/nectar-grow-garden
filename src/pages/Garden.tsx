@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import SEOHead from '@/components/SEOHead';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useWallet } from '@/hooks/useWallet';
@@ -1448,6 +1449,7 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
 
   return (
     <div className="min-h-screen bg-gradient-page">
+      <SEOHead title="My Garden | Shop & Earn NCTR" description="Browse 6,800+ brands, earn NCTR on every purchase, and track your rewards dashboard." canonicalPath="/garden" />
       {showOnboarding && (
         <GardenOnboardingModal onComplete={() => setShowOnboarding(false)} />
       )}

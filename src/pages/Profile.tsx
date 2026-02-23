@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import SEOHead from '@/components/SEOHead';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -415,6 +416,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+      <SEOHead title="My Profile | The Garden" description="Manage your Garden profile, wallet, and NCTR portfolio." canonicalPath="/profile" />
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
