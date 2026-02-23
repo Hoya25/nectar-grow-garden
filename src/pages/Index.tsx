@@ -27,7 +27,7 @@ const Index = () => {
       />
       
       {/* Bridge text — light */}
-      <div className="text-center py-12 bg-white">
+      <div className="text-center py-8 bg-white">
         <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed text-[#5A5A58]">
           Safe, simple, and free to start. Earn rewards regardless of how much time or money you have.
         </p>
@@ -63,8 +63,11 @@ const Index = () => {
         darkSection={false}
       />
       
+      {/* Divider */}
+      <div className="bg-white"><div className="container mx-auto max-w-4xl"><div className="h-px bg-[#D9D9D9]" /></div></div>
+
       {/* Partner With The Garden — DARK section */}
-      <div className="py-16 px-4 bg-[#323232]">
+      <div className="py-12 md:py-20 px-4 bg-[#323232]">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-[#E2FF6D]">
             Partner With The Garden

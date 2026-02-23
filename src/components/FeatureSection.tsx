@@ -43,7 +43,7 @@ const FeatureSection = ({
   // Dark section: charcoal bg, white/lime text, lime highlights
   if (darkSection) {
     return (
-      <section className="py-24 md:py-32 relative overflow-hidden bg-[#323232]">
+      <section className="py-12 md:py-20 relative overflow-hidden bg-[#323232]">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="relative group">
@@ -109,7 +109,7 @@ const FeatureSection = ({
 
   // Light section: white bg, charcoal text, mid-grey body, NO lime
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-white">
+    <section className="py-12 md:py-20 relative overflow-hidden bg-white">
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="relative group">
