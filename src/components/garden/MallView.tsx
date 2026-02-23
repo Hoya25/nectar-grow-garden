@@ -10,6 +10,33 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BrandDetailModal } from "./BrandDetailModal";
 import { InspirationWellnessEcosystem } from "./InspirationWellnessEcosystem";
 
+const CATEGORY_LABELS: Record<string, string> = {
+  "sports-outdoors": "Sports & Outdoors",
+  "gifts-flowers": "Gifts",
+  "computers-electronics-software": "Electronics",
+  "clothing-apparel-shoes": "Fashion",
+  "clothing-footwear-accessories": "Fashion",
+  "food-drink": "Food & Drink",
+  "health-beauty": "Health & Beauty",
+  "home-garden": "Home & Garden",
+  "travel": "Travel",
+  "entertainment": "Entertainment",
+  "education": "Education",
+  "financial": "Finance",
+  "services": "Services",
+  "automotive": "Auto",
+  "babies-kids": "Kids",
+  "arts-crafts": "Crafts",
+  "pets": "Pets",
+  "business": "Business",
+  "web": "Software",
+};
+
+const formatCategory = (slug: string): string => {
+  if (CATEGORY_LABELS[slug]) return CATEGORY_LABELS[slug];
+  return slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+};
+
 interface Brand {
   id: string;
   name: string;
@@ -458,17 +485,13 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                   onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)")}
                   onClick={() => setSelectedBrand(brand)}
                 >
-                  {/* Category tag */}
-                  {brand.category && (
-                    <div className="mb-2">
-                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#F0F0F0] text-[#666]">
-                        {brand.category}
-                      </span>
-                    </div>
-                  )}
-
                   {/* Logo */}
-                  <div className="flex justify-center mb-3 bg-[#F5F5F5] rounded-lg p-3 aspect-square items-center">
+                  <div className="relative flex justify-center mb-3 bg-[#F5F5F5] rounded-lg p-3 aspect-square items-center">
+                    {brand.category && (
+                      <span className="absolute top-2 left-2 inline-block px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#F0F0F0] text-[#5A5A58] z-10">
+                        {formatCategory(brand.category)}
+                      </span>
+                    )}
                     <BrandLogo
                       src={brand.logo_url || undefined}
                       alt={brand.name}
