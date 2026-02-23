@@ -157,11 +157,11 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
               </div>
 
               {/* Hero product image */}
-              <div className="flex justify-center mb-4 bg-[#F5EDE3]/60 rounded-lg p-3">
+              <div className="mb-4 rounded-lg overflow-hidden" style={{ aspectRatio: "4/3", borderRadius: "8px" }}>
                 <img
                   src={KROMA_HERO}
                   alt="Kroma 5-Day Reset Kit"
-                  className="h-36 object-contain group-hover:scale-105 transition-transform"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
               </div>
 
@@ -223,14 +223,13 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
                 onClick={() => !isComingSoon && onBrandClick(brand)}
               >
                 {/* Logo or brand name */}
-                <div className="flex justify-center mb-3 bg-[#F5EDE3]/60 rounded-lg p-3 aspect-square items-center">
+                <div className="flex justify-center mb-3 bg-[#F5EDE3]/60 items-center overflow-hidden p-3" style={{ aspectRatio: "3/2", borderRadius: "8px" }}>
                   {brand.logo_url ? (
                     <img
                       src={brand.logo_url}
                       alt={brand.name}
-                      className="max-h-16 max-w-full object-contain group-hover:scale-105 transition-transform"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform p-2"
                       onError={(e) => {
-                        // Hide broken image, show name fallback
                         (e.target as HTMLImageElement).style.display = "none";
                         const parent = (e.target as HTMLImageElement).parentElement;
                         if (parent) {

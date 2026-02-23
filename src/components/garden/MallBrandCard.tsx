@@ -95,14 +95,22 @@ export const MallBrandCard = ({
         </div>
 
         {/* Logo */}
-        <div className="flex justify-center mb-3 bg-gray-50 rounded-lg p-2">
+        <div className="flex justify-center mb-2 bg-gray-50 items-center overflow-hidden p-3" style={{ aspectRatio: "3/2", borderRadius: "8px" }}>
           <BrandLogo
             src={logo_url || undefined}
             alt={name}
             size="lg"
-            className="group-hover:scale-105 transition-transform duration-200"
+            variant="wide"
+            className="w-full h-full group-hover:scale-105 transition-transform duration-200"
           />
         </div>
+
+        {/* Category tag */}
+        {category && (
+          <p className="text-[10px] text-gray-400 text-center mb-1 truncate uppercase tracking-wider font-medium">
+            {category}
+          </p>
+        )}
 
         {/* Brand Name */}
         <h3 className="font-semibold text-gray-900 text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
@@ -120,12 +128,6 @@ export const MallBrandCard = ({
           </span>
         </div>
 
-        {/* Category */}
-        {category && (
-          <p className="text-xs text-gray-500 text-center mb-2 truncate">
-            {category}
-          </p>
-        )}
 
         {/* NCTR Rate */}
         <div className="text-center mb-3">
