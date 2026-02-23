@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.auto-confirm-wallet]
 verify_jwt = false
+
+[functions.upload-kroma-images]
+verify_jwt = true
