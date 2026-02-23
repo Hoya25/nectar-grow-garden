@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import FeatureSection from "@/components/FeatureSection";
+import { FeaturedBrandShowcase } from "@/components/FeaturedBrandShowcase";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import { BrandSubmissionForm } from "@/components/BrandSubmissionForm";
@@ -90,6 +91,9 @@ const Index = () => {
       
       {/* Divider */}
       <div className="bg-white"><div className="container mx-auto max-w-4xl"><div className="h-px bg-[#D9D9D9]" /></div></div>
+
+      {/* Featured Brand — Kroma Wellness */}
+      <FeaturedBrandShowcase />
 
       {/* Partner With The Garden — DARK section */}
       <div className="py-12 md:py-20 px-4 bg-[#323232]">

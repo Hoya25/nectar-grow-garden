@@ -81,6 +81,7 @@ const App = () => {
                   <Route path="/garden/category/:slug" element={<GardenCategoryPage />} />
                   <Route path="/garden/tag/:slug" element={<GardenTagPage />} />
                   <Route path="/garden/brand/kroma-wellness" element={<KromaWellness />} />
+                  <Route path="/brands/kroma-wellness" element={<KromaWellness />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/referrals" element={<Referrals />} />
                   <Route path="/affiliate-links" element={<AffiliateLinks />} />
