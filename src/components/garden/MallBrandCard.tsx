@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BrandLogo } from "@/components/ui/brand-logo";
 import { ExternalLink } from "lucide-react";
 import { BrandDetailModal } from "./BrandDetailModal";
 
@@ -54,6 +53,7 @@ export const MallBrandCard = ({
   onShop,
 }: MallBrandCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const baseRate = nctr_per_dollar || 0;
   const finalRate = is_promoted && promotion_multiplier 
@@ -77,81 +77,88 @@ export const MallBrandCard = ({
   return (
     <>
       <div 
-        className="flex-shrink-0 w-[180px] md:w-[200px] bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md hover:border-green-500 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer"
+        className="flex-shrink-0 w-[180px] md:w-[200px] bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md hover:border-green-500 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer flex flex-col"
         onClick={handleCardClick}
+        style={{ maxHeight: "260px" }}
       >
-        {/* Tag badges */}
-        <div className="flex gap-1 mb-2 h-5 overflow-hidden">
-          {tags.slice(0, 3).map((tag) => (
-            <span key={tag.slug} className="text-xs" title={tag.name}>
-              {TAG_ICONS[tag.slug] || tag.icon || '🏷️'}
-            </span>
-          ))}
-          {is_promoted && (
-            <Badge className="text-[10px] px-1.5 py-0 h-4 bg-orange-500 text-white border-0">
-              🔥 {promotion_multiplier}X
-            </Badge>
-          )}
-        </div>
-
-        {/* Logo */}
-        <div className="flex justify-center mb-2 bg-gray-50 items-center overflow-hidden p-3" style={{ aspectRatio: "3/2", borderRadius: "8px" }}>
-          <BrandLogo
-            src={logo_url || undefined}
-            alt={name}
-            size="lg"
-            variant="wide"
-            className="w-full h-full group-hover:scale-105 transition-transform duration-200"
-          />
-        </div>
-
-        {/* Category tag */}
-        {category && (
-          <p className="text-[10px] text-gray-400 text-center mb-1 truncate uppercase tracking-wider font-medium">
-            {category}
-          </p>
+        {/* Tag badges — absolute top-left */}
+        {(tags.length > 0 || is_promoted) && (
+          <div className="flex gap-1 px-3 pt-2 h-5 overflow-hidden">
+            {tags.slice(0, 3).map((tag) => (
+              <span key={tag.slug} className="text-xs" title={tag.name}>
+                {TAG_ICONS[tag.slug] || tag.icon || '🏷️'}
+              </span>
+            ))}
+            {is_promoted && (
+              <Badge className="text-[10px] px-1.5 py-0 h-4 bg-orange-500 text-white border-0">
+                🔥 {promotion_multiplier}X
+              </Badge>
+            )}
+          </div>
         )}
 
-        {/* Brand Name */}
-        <h3 className="font-semibold text-gray-900 text-center text-sm line-clamp-2 mb-1 min-h-[2.5rem]">
-          {name}
-        </h3>
-
-        {/* NCTR Earning Rate */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 mb-2">
-          <span>✨</span>
-          <span>
-            {nctr_per_dollar && nctr_per_dollar > 0 
-              ? `Earn ${nctr_per_dollar % 1 === 0 ? nctr_per_dollar.toFixed(0) : nctr_per_dollar.toFixed(1)} NCTR per $1 spent`
-              : 'Earn NCTR on every purchase'
-            }
-          </span>
-        </div>
-
-
-        {/* NCTR Rate */}
-        <div className="text-center mb-3">
-          {is_promoted && promotion_multiplier && promotion_multiplier > 1 && (
-            <span className="text-xs text-gray-400 line-through mr-1">
-              {baseRate % 1 === 0 ? baseRate.toFixed(0) : baseRate.toFixed(1)}
+        {/* Logo area — seamless white top, no inner container */}
+        <div className="flex items-center justify-center bg-white px-4" style={{ minHeight: "100px", maxHeight: "100px" }}>
+          {logo_url && !imgError ? (
+            <img
+              src={logo_url}
+              alt={name}
+              className="object-contain group-hover:scale-105 transition-transform"
+              style={{ maxHeight: "60px", maxWidth: "80%" }}
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <span className="text-[#555] font-semibold text-sm text-center leading-tight px-2">
+              {name}
             </span>
           )}
-          <span className="text-green-600 font-bold text-lg">
-            {finalRate % 1 === 0 ? finalRate.toFixed(0) : finalRate.toFixed(1)} NCTR
-          </span>
-          <span className="text-green-600 font-semibold text-sm opacity-80">/$1</span>
         </div>
 
-        {/* Shop Button */}
-        <Button 
-          size="sm" 
-          className="w-full btn-press bg-green-500 text-white hover:bg-green-600 font-semibold" 
-          onClick={handleShopClick}
-          disabled={!loyalize_id}
-        >
-          Shop Now
-          <ExternalLink className="h-3 w-3 ml-1" />
-        </Button>
+        {/* Info area */}
+        <div className="px-3 pb-3 pt-1 flex flex-col flex-1 justify-between">
+          {/* Brand Name */}
+          <h3 className="font-bold text-gray-900 text-center text-sm line-clamp-2 mb-0.5 min-h-[2rem]">
+            {name}
+          </h3>
+
+          {/* Category + Earn Rate inline */}
+          <div className="flex items-center justify-center gap-1.5 text-xs mb-1.5">
+            {category && (
+              <span className="text-gray-400 truncate max-w-[60px]">{category}</span>
+            )}
+            {category && nctr_per_dollar && nctr_per_dollar > 0 && (
+              <span className="text-gray-300">·</span>
+            )}
+            <span className="text-emerald-600 font-medium">
+              {nctr_per_dollar && nctr_per_dollar > 0
+                ? `${nctr_per_dollar % 1 === 0 ? nctr_per_dollar.toFixed(0) : nctr_per_dollar.toFixed(1)} NCTR/$1`
+                : 'Earn NCTR'}
+            </span>
+          </div>
+
+          {/* Promoted rate callout */}
+          {is_promoted && promotion_multiplier && promotion_multiplier > 1 && (
+            <div className="text-center mb-1">
+              <span className="text-xs text-gray-400 line-through mr-1">
+                {baseRate % 1 === 0 ? baseRate.toFixed(0) : baseRate.toFixed(1)}
+              </span>
+              <span className="text-green-600 font-bold text-sm">
+                {finalRate % 1 === 0 ? finalRate.toFixed(0) : finalRate.toFixed(1)} NCTR/$1
+              </span>
+            </div>
+          )}
+
+          {/* Shop Button */}
+          <Button 
+            size="sm" 
+            className="w-full btn-press bg-green-500 text-white hover:bg-green-600 font-semibold text-xs h-8" 
+            onClick={handleShopClick}
+            disabled={!loyalize_id}
+          >
+            Shop Now
+            <ExternalLink className="h-3 w-3 ml-1" />
+          </Button>
+        </div>
       </div>
 
       {/* Brand Detail Modal */}

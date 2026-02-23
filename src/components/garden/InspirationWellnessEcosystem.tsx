@@ -156,8 +156,8 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
                 />
               </div>
 
-              {/* Hero product image */}
-              <div className="mb-4 rounded-lg overflow-hidden" style={{ aspectRatio: "4/3", borderRadius: "8px" }}>
+              {/* Hero product image — edge-to-edge cover */}
+              <div className="mb-4 overflow-hidden rounded-lg" style={{ aspectRatio: "4/3" }}>
                 <img
                   src={KROMA_HERO}
                   alt="Kroma 5-Day Reset Kit"
@@ -215,20 +215,21 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
             return (
               <div
                 key={brand.id}
-                className={`snap-start flex-shrink-0 w-[200px] md:w-[230px] rounded-xl p-4 border bg-white transition-all cursor-pointer group ${
+                className={`snap-start flex-shrink-0 w-[200px] md:w-[230px] rounded-xl overflow-hidden border bg-white transition-all cursor-pointer group flex flex-col ${
                   isComingSoon
                     ? "opacity-60 border-[#E8DFD3]"
                     : "border-[#E8DFD3] hover:border-[#C4946A]/60 hover:-translate-y-1 shadow-sm"
                 }`}
                 onClick={() => !isComingSoon && onBrandClick(brand)}
               >
-                {/* Logo or brand name */}
-                <div className="flex justify-center mb-3 bg-[#F5EDE3]/60 items-center overflow-hidden p-3" style={{ aspectRatio: "3/2", borderRadius: "8px" }}>
+                {/* Logo area — seamless top, no inner container */}
+                <div className="flex items-center justify-center bg-[#F5EDE3]/60 px-4" style={{ minHeight: "100px", maxHeight: "100px" }}>
                   {brand.logo_url ? (
                     <img
                       src={brand.logo_url}
                       alt={brand.name}
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform p-2"
+                      className="object-contain group-hover:scale-105 transition-transform"
+                      style={{ maxHeight: "60px", maxWidth: "80%" }}
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = "none";
                         const parent = (e.target as HTMLImageElement).parentElement;
@@ -246,6 +247,9 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
                     </span>
                   )}
                 </div>
+
+                {/* Info area */}
+                <div className="px-4 pb-4 pt-2 flex flex-col flex-1">
 
                 {/* Name */}
                 <h3 className="font-semibold text-[#3B2F25] text-center text-sm line-clamp-1 mb-1">
@@ -296,6 +300,7 @@ export const InspirationWellnessEcosystem = ({ onShop, onBrandClick }: Inspirati
                     <ExternalLink className="h-3 w-3 ml-1" />
                   </Button>
                 )}
+                </div>
               </div>
             );
           })}
