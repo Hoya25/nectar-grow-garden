@@ -71,7 +71,7 @@ const Header = () => {
             <img src={nctrLogoCharcoal} alt="NCTR" className="h-8 w-8" />
             <span className="text-xl font-bold text-[#323232] hidden md:inline">The Garden</span>
             <span className="text-lg font-bold text-[#323232] md:hidden">The Garden</span>
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-[#E2FF6D] text-[#323232] ml-2">BETA</span>
+            <span className="px-1.5 py-px rounded text-[10px] font-semibold bg-[#E2FF6D] text-[#323232] ml-1.5 leading-tight">BETA</span>
           </div>
           
         </div>
