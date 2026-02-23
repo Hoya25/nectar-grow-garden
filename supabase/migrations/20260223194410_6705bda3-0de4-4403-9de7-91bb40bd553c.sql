@@ -1,0 +1,1 @@
+UPDATE brands SET logo_url = 'https://yhwcaodofmbusjurawhp.supabase.co/storage/v1/object/public/reward-images/kroma/kroma-logo.webp' WHERE id = '637ae486-2ee7-4574-88cd-876771c59404';
