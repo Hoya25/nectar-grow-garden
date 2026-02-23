@@ -79,23 +79,23 @@ export const GardenHeroSection = ({
   return (
     <div className="mb-8">
       {/* Welcome + Balance Section */}
-      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 mb-6 border border-primary/20">
+      <div className="bg-[#323232] rounded-2xl p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold section-heading mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
               Welcome back, {firstName}! 👋
             </h1>
-            <p className="text-muted-foreground">Your rewards are growing</p>
+            <p className="text-[#D9D9D9]">Your rewards are growing</p>
           </div>
           
           {/* Large Balance Display */}
-          <div className="flex items-center gap-3 bg-background/80 backdrop-blur-sm rounded-xl px-6 py-4 border border-primary/30 shadow-lg">
+          <div className="flex items-center gap-3 bg-[#5A5A58]/50 backdrop-blur-sm rounded-xl px-6 py-4 shadow-lg">
             <img src={nctrNLogo} alt="NCTR" className="h-12 w-12" />
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-nctr-lime">
-                {formatNCTR(totalNCTR)} <span className="text-lg font-normal text-muted-foreground">NCTR</span>
+              <p className="text-3xl md:text-4xl font-bold text-[#E2FF6D]">
+                {formatNCTR(totalNCTR)} <span className="text-lg font-normal text-[#D9D9D9]">NCTR</span>
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[#D9D9D9]">
                 ≈ {formatUSD(totalNCTR)} @ ${formatPrice(currentPrice)}
               </p>
             </div>
@@ -105,19 +105,19 @@ export const GardenHeroSection = ({
         {/* Portfolio Breakdown Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
           {/* Available */}
-          <Card className="bg-[#323232]/5 border-[#5A5A58]/20 shadow-sm">
+          <Card className="bg-[#5A5A58]/30 border-[#5A5A58]/50 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Wallet className="w-4 h-4 text-[#323232]" />
-                <span className="text-xs font-medium text-[#323232]">Available</span>
+                <Wallet className="w-4 h-4 text-[#D9D9D9]" />
+                <span className="text-xs font-medium text-[#D9D9D9]">Available</span>
                 <InfoTooltip content="Spendable on Crescendo rewards anytime" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-nctr-lime">
+              <p className="text-lg md:text-xl font-bold text-[#E2FF6D]">
                 {formatNCTR(portfolio?.available_nctr || 0)}
               </p>
-              <p className="text-[10px] text-[#5A5A58] mt-1">NCTR</p>
-              <p className="text-xs text-[#5A5A58] mt-1">{formatUSD(portfolio?.available_nctr || 0)}</p>
-              <p className="text-[10px] text-[#5A5A58] mt-1 flex items-center gap-1">
+              <p className="text-[10px] text-[#D9D9D9]/80 mt-1">NCTR</p>
+              <p className="text-xs text-[#D9D9D9]/70 mt-1">{formatUSD(portfolio?.available_nctr || 0)}</p>
+              <p className="text-[10px] text-[#D9D9D9]/60 mt-1 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF6D]"></span>
                 Ready to spend
               </p>
@@ -147,19 +147,19 @@ export const GardenHeroSection = ({
           )}
 
           {/* 360LOCK */}
-          <Card className="bg-[#5A5A58]/10 border-[#5A5A58]/20 shadow-sm">
+          <Card className="bg-[#5A5A58]/30 border-[#5A5A58]/50 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Lock className="w-4 h-4 text-[#323232]" />
-                <span className="text-xs font-medium text-[#323232]">360LOCK</span>
+                <Lock className="w-4 h-4 text-[#D9D9D9]" />
+                <span className="text-xs font-medium text-[#D9D9D9]">360LOCK</span>
                 <InfoTooltip content="Committed for 360 days for maximum rewards + premium perks" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-nctr-lime">
+              <p className="text-lg md:text-xl font-bold text-[#E2FF6D]">
                 {formatNCTR(portfolio?.lock_360_nctr || 0)}
               </p>
-              <p className="text-[10px] text-[#5A5A58] mt-1">NCTR</p>
-              <p className="text-xs text-[#5A5A58] mt-1">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
-              <p className="text-[10px] text-[#5A5A58] mt-1 flex items-center gap-1">
+              <p className="text-[10px] text-[#D9D9D9]/80 mt-1">NCTR</p>
+              <p className="text-xs text-[#D9D9D9]/70 mt-1">{formatUSD(portfolio?.lock_360_nctr || 0)}</p>
+              <p className="text-[10px] text-[#D9D9D9]/60 mt-1 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E2FF6D]"></span>
                 360-day commitment
               </p>
@@ -167,19 +167,19 @@ export const GardenHeroSection = ({
           </Card>
 
           {/* Pending */}
-          <Card className="bg-[#D9D9D9]/20 border-[#D9D9D9]/40 shadow-sm">
+          <Card className="bg-[#5A5A58]/20 border-[#5A5A58]/40 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-[#5A5A58]" />
-                <span className="text-xs font-medium text-[#5A5A58]">Pending</span>
+                <Clock className="w-4 h-4 text-[#D9D9D9]/70" />
+                <span className="text-xs font-medium text-[#D9D9D9]/70">Pending</span>
                 <InfoTooltip content="From recent purchases, clears in 24-48 hours" size={12} />
               </div>
-              <p className="text-lg md:text-xl font-bold text-nctr-lime/70">
+              <p className="text-lg md:text-xl font-bold text-[#E2FF6D]/60">
                 {formatNCTR(portfolio?.pending_nctr || 0)}
               </p>
-              <p className="text-[10px] text-[#5A5A58]/80 mt-1">NCTR</p>
-              <p className="text-xs text-[#5A5A58] mt-1">{formatUSD(portfolio?.pending_nctr || 0)}</p>
-              <p className="text-[10px] text-[#5A5A58] mt-1 flex items-center gap-1">
+              <p className="text-[10px] text-[#D9D9D9]/60 mt-1">NCTR</p>
+              <p className="text-xs text-[#D9D9D9]/60 mt-1">{formatUSD(portfolio?.pending_nctr || 0)}</p>
+              <p className="text-[10px] text-[#D9D9D9]/50 mt-1 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#D9D9D9]"></span>
                 Processing
               </p>
@@ -191,39 +191,39 @@ export const GardenHeroSection = ({
         <Button 
           onClick={onShopClick}
           size="lg"
-          className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-6 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+          className="w-full md:w-auto bg-[#E2FF6D] hover:bg-[#E2FF6D]/90 text-[#323232] font-bold text-lg py-6 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
         >
           <ShoppingBag className="w-5 h-5 mr-2" />
           Shop & Earn NCTR
         </Button>
-        <p className="text-sm text-muted-foreground mt-2">
-          Earn NCTR back at <span className="font-semibold text-primary">{totalBrands.toLocaleString()}</span> brands
+        <p className="text-sm text-[#D9D9D9] mt-2">
+          Earn NCTR back at <span className="font-semibold text-[#E2FF6D]">{totalBrands.toLocaleString()}</span> brands
         </p>
       </div>
 
-      {/* Quick Stats Row */}
+      {/* Quick Stats Row — dark pills with lime numbers */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+        <Card className="bg-[#323232] border-[#5A5A58]/50">
           <CardContent className="p-4 text-center">
-            <TrendingUp className="w-5 h-5 mx-auto mb-1 text-primary" />
-            <p className="text-xl md:text-2xl font-bold text-nctr-lime">{formatNCTR(portfolio?.total_earned || 0)}</p>
-            <p className="text-xs text-muted-foreground">Lifetime Earned</p>
+            <TrendingUp className="w-5 h-5 mx-auto mb-1 text-[#D9D9D9]" />
+            <p className="text-xl md:text-2xl font-bold text-[#E2FF6D]">{formatNCTR(portfolio?.total_earned || 0)}</p>
+            <p className="text-xs text-[#D9D9D9]">Lifetime Earned</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-secondary/30 to-secondary/50 border-secondary/30">
+        <Card className="bg-[#323232] border-[#5A5A58]/50">
           <CardContent className="p-4 text-center">
-            <Coins className="w-5 h-5 mx-auto mb-1 text-secondary-foreground" />
-            <p className="text-xl md:text-2xl font-bold text-nctr-lime">{formatNCTR(thisMonthEarned)}</p>
-            <p className="text-xs text-muted-foreground">This Month</p>
+            <Coins className="w-5 h-5 mx-auto mb-1 text-[#D9D9D9]" />
+            <p className="text-xl md:text-2xl font-bold text-[#E2FF6D]">{formatNCTR(thisMonthEarned)}</p>
+            <p className="text-xs text-[#D9D9D9]">This Month</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-accent/30 to-accent/50 border-accent/30">
+        <Card className="bg-[#323232] border-[#5A5A58]/50">
           <CardContent className="p-4 text-center">
-            <Store className="w-5 h-5 mx-auto mb-1 text-accent-foreground" />
-            <p className="text-xl md:text-2xl font-bold text-accent-foreground">{brandsShoppedCount}</p>
-            <p className="text-xs text-muted-foreground">Brands Shopped</p>
+            <Store className="w-5 h-5 mx-auto mb-1 text-[#D9D9D9]" />
+            <p className="text-xl md:text-2xl font-bold text-white">{brandsShoppedCount}</p>
+            <p className="text-xs text-[#D9D9D9]">Brands Shopped</p>
           </CardContent>
         </Card>
       </div>

@@ -185,24 +185,24 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
 
       {/* Portfolio Overview Cards - Mobile Optimized */}
       <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3 lg:space-y-0">
-        <Card className="bg-white shadow-soft border border-section-border/30 col-span-2 sm:col-span-1 lg:col-span-1">
+        <Card className="bg-[#323232] shadow-soft border border-[#5A5A58]/50 col-span-2 sm:col-span-1 lg:col-span-1">
           <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1 sm:mb-2">
-                  <p className="text-xs sm:text-sm text-section-text/70 font-medium">Available</p>
+                  <p className="text-xs sm:text-sm text-[#D9D9D9] font-medium">Available</p>
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
                     className="h-8 sm:h-12 w-auto opacity-70"
                   />
                 </div>
-                <p className="text-lg sm:text-xl font-bold text-nctr-lime mb-1">
+                <p className="text-lg sm:text-xl font-bold text-[#E2FF6D] mb-1">
                   {formatNCTR(portfolio?.available_nctr || 0)}
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <p className="text-xs text-muted-foreground">Ready to commit</p>
+                    <p className="text-xs text-[#D9D9D9]/70">Ready to commit</p>
                     <p className="text-xs text-[#E2FF6D] font-medium">
                       ${formatPrice(calculatePortfolioValue(portfolio?.available_nctr || 0))}
                     </p>
@@ -220,7 +220,7 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                   )}
                 </div>
               </div>
-              <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-foreground/60 ml-2" />
+              <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-[#D9D9D9]/60 ml-2" />
             </div>
           </CardContent>
         </Card>
@@ -267,15 +267,15 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
         </Card>
         )}
 
-        <Card className="bg-gradient-to-br from-primary/10 to-primary/20 shadow-soft border border-primary/30">
+        <Card className="bg-[#323232] shadow-soft border border-[#5A5A58]/50">
           <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1 sm:mb-2">
                   <div className="flex items-center space-x-1 sm:space-x-2">
-                    <span className="text-xs sm:text-sm font-bold text-primary">360</span>
-                    <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-                    <span className="text-xs font-bold text-primary">LOCK</span>
+                    <span className="text-xs sm:text-sm font-bold text-[#E2FF6D]">360</span>
+                    <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-[#E2FF6D]" />
+                    <span className="text-xs font-bold text-[#E2FF6D]">LOCK</span>
                   </div>
                   <img 
                     src={nctrLogo} 
@@ -283,57 +283,57 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                     className="h-8 sm:h-12 w-auto opacity-90"
                   />
                 </div>
-                <p className="text-base sm:text-lg font-bold text-nctr-lime mb-1">
+                <p className="text-base sm:text-lg font-bold text-[#E2FF6D] mb-1">
                   {formatNCTR(portfolio?.lock_360_nctr || 0)}
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <p className="text-xs text-primary/80">Alliance</p>
-                    <p className="text-xs text-primary font-medium">
+                    <p className="text-xs text-[#D9D9D9]/70">Alliance</p>
+                    <p className="text-xs text-[#E2FF6D] font-medium">
                       ${formatPrice(calculatePortfolioValue(portfolio?.lock_360_nctr || 0))}
                     </p>
                   </div>
                 </div>
               </div>
-              <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-primary ml-2" />
+              <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-[#D9D9D9]/60 ml-2" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-soft border border-section-border/30">
+        <Card className="bg-[#323232] shadow-soft border border-[#5A5A58]/50">
           <CardContent className="p-2 sm:p-3">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1 sm:mb-2">
-                  <p className="text-xs sm:text-sm text-section-text/70 font-medium">Total Earned</p>
+                  <p className="text-xs sm:text-sm text-[#D9D9D9] font-medium">Total Earned</p>
                   <img 
                     src={nctrLogo} 
                     alt="NCTR" 
                     className="h-8 sm:h-12 w-auto opacity-70"
                   />
                 </div>
-                <p className="text-lg sm:text-xl font-bold text-nctr-lime mb-1">
+                <p className="text-lg sm:text-xl font-bold text-[#E2FF6D] mb-1">
                   {formatNCTR(portfolio?.total_earned || 0)}
                 </p>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <p className="text-xs text-muted-foreground">Lifetime</p>
+                    <p className="text-xs text-[#D9D9D9]/70">Lifetime</p>
                     <p className="text-xs text-[#E2FF6D] font-medium">
                       ${formatPrice(calculatePortfolioValue(portfolio?.total_earned || 0))}
                     </p>
                   </div>
                 </div>
               </div>
-              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-success/60 ml-2" />
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-[#D9D9D9]/60 ml-2" />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* NCTR Price Info & Total Portfolio Value - Mobile Compact */}
-      <Card className="bg-white shadow-medium border border-section-border">
+      <Card className="bg-[#323232] shadow-medium border border-[#5A5A58]/50">
         <CardContent className="p-3 sm:p-4">
-          <div className="text-center text-foreground">
+          <div className="text-center">
             <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-2 sm:mb-3">
               <img 
                 src={nctrLogo} 
@@ -341,22 +341,22 @@ export const CollapsibleDashboard: React.FC<CollapsibleDashboardProps> = ({
                 className="h-12 sm:h-16 w-auto"
               />
             </div>
-            <p className="text-xl sm:text-2xl font-bold text-nctr-lime mb-1">${formatPrice(currentPrice)}</p>
+            <p className="text-xl sm:text-2xl font-bold text-[#E2FF6D] mb-1">${formatPrice(currentPrice)}</p>
             <p className={`text-xs sm:text-sm mb-2 ${getChangeColor(priceChange24h)}`}>
               {formatChange(priceChange24h)} (24h)
             </p>
             
             {/* Total Portfolio Value */}
-            <div className="mt-3 pt-3 border-t border-section-border">
-              <p className="text-xs text-muted-foreground mb-1">Total Portfolio Value</p>
-              <p className="text-lg font-bold text-primary">
+            <div className="mt-3 pt-3 border-t border-[#5A5A58]">
+              <p className="text-xs text-[#D9D9D9]/70 mb-1">Total Portfolio Value</p>
+              <p className="text-lg font-bold text-[#E2FF6D]">
                 {formatUSD(
                   (portfolio?.available_nctr || 0) + 
                   (portfolio?.lock_90_nctr || 0) + 
                   (portfolio?.lock_360_nctr || 0)
                 )}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-[#D9D9D9]">
                 {formatNCTR(
                   (portfolio?.available_nctr || 0) + 
                   (portfolio?.lock_90_nctr || 0) + 

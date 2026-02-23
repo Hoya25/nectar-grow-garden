@@ -11,10 +11,9 @@ const Index = () => {
       <Header />
       <Hero />
       
-      {/* Earn Crypto Every Day Section */}
+      {/* Shop. Earn. Unlock. — DARK section, lime highlights */}
       <FeatureSection
         title="Shop. Earn. Unlock."
-        titleColor="text-[#E2FF6D]"
         subtitle="Turn Your Everyday Purchases into Real Rewards"
         description="Step into The Garden and start earning NCTR simply by shopping with 6,000+ brands you already love. Every purchase builds your position in the community."
         bulletPoints={[
@@ -24,11 +23,12 @@ const Index = () => {
         buttonText="Enter The Garden →"
         buttonHref="/garden"
         icon=""
-        simple={true}
+        darkSection={true}
       />
       
-      <div className="text-center py-8">
-        <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed section-text/90">
+      {/* Bridge text — light */}
+      <div className="text-center py-12 bg-white">
+        <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed text-[#5A5A58]">
           Safe, simple, and free to start. Earn rewards regardless of how much time or money you have.
         </p>
       </div>
@@ -40,39 +40,40 @@ const Index = () => {
         buttonText="Learn More →"
         buttonHref="https://substack.com/home/post/p-166993122"
         icon=""
-        gradient={true}
+        darkSection={false}
       />
       
-      {/* Harvest NCTR Section */}
+      {/* Commit. Level Up. — DARK section */}
       <FeatureSection
         title="Commit. Level Up. Unlock More."
         description="Commit your earned NCTR with 360LOCK to build your Crescendo status. Higher status unlocks exclusive rewards, bigger earning opportunities, and access that keeps growing with your commitment."
         buttonText="Learn More About NCTR →"
         buttonHref="https://substack.com/home/post/p-166993122"
         icon=""
-        gradient={true}
+        darkSection={true}
       />
       
-      {/* Grow The Community Section */}
+      {/* Grow The Community — LIGHT section */}
       <FeatureSection
         title="Grow The Community"
         description="The Garden grows with its members. Every invite strengthens the community, attracts more brand partners, and creates more earning opportunities for everyone. Your participation builds something real."
         buttonText="Invite a Friend →"
         buttonHref="/auth"
         icon=""
+        darkSection={false}
       />
       
-      {/* Partner With The Garden Section */}
-      <div className="py-16 px-4">
+      {/* Partner With The Garden — DARK section */}
+      <div className="py-16 px-4 bg-[#323232]">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-premium bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-[#E2FF6D]">
             Partner With The Garden
           </h2>
-          <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          <p className="text-lg text-[#D9D9D9] mb-8 leading-relaxed">
             Our community is built on loyalty. Partners join The Garden to connect with engaged, committed members who actively support brands they believe in.
           </p>
           <BrandSubmissionForm>
-            <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold bg-gradient-to-r from-primary via-primary-glow to-primary text-primary-foreground rounded-xl shadow-soft hover:shadow-glow transition-all duration-500 hover:scale-105">
+            <button className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold bg-[#E2FF6D] text-[#323232] rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105">
               Explore Partnership Opportunities →
             </button>
           </BrandSubmissionForm>

@@ -53,6 +53,15 @@ export default {
         "nctr-lime": {
           DEFAULT: "hsl(var(--nctr-lime))",
         },
+        charcoal: {
+          DEFAULT: "hsl(var(--charcoal))",
+        },
+        "mid-grey": {
+          DEFAULT: "hsl(var(--mid-grey))",
+        },
+        "light-grey": {
+          DEFAULT: "hsl(var(--light-grey))",
+        },
         // Section-specific colors for light sections with subtle accents
         section: {
           bg: "hsl(var(--section-bg))",

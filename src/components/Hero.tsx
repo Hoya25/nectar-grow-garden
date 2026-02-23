@@ -25,7 +25,7 @@ const Hero = () => {
           </p>
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in-up [animation-delay:0.1s] opacity-0 [animation-fill-mode:forwards] drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)'}}>
             Don't Buy It.{" "}
-            <span className="text-yellow-300 animate-gradient-shift bg-[length:200%_200%] drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
+            <span className="text-[#E2FF6D] drop-shadow-2xl" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
               Earn It. Own It.
             </span>
           </h1>
