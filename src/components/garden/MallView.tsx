@@ -5,7 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import { Search, X, ExternalLink, Loader2, ChevronLeft, ChevronRight, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { BrandLogo } from "@/components/ui/brand-logo";
+
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BrandDetailModal } from "./BrandDetailModal";
 import { InspirationWellnessEcosystem } from "./InspirationWellnessEcosystem";
@@ -486,19 +486,36 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                   onClick={() => setSelectedBrand(brand)}
                 >
                   {/* Logo */}
-                  <div className="relative flex justify-center mb-3 bg-[#F5F5F5] rounded-lg p-3 aspect-square items-center">
-                    {brand.category && (
-                      <span className="absolute top-2 left-2 inline-block px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#F0F0F0] text-[#5A5A58] z-10">
-                        {formatCategory(brand.category)}
-                      </span>
-                    )}
-                    <BrandLogo
-                      src={brand.logo_url || undefined}
-                      alt={brand.name}
-                      size="lg"
-                      className="group-hover:scale-105 transition-transform"
-                    />
+                  <div className="flex items-center justify-center bg-white px-4 mb-3 rounded-lg" style={{ minHeight: "100px", maxHeight: "100px" }}>
+                    {brand.logo_url ? (
+                      <img
+                        src={brand.logo_url}
+                        alt={brand.name}
+                        className="object-contain group-hover:scale-105 transition-transform"
+                        style={{ maxHeight: "60px", maxWidth: "80%" }}
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.style.display = 'none';
+                          const fallback = img.parentElement?.querySelector('[data-fallback]') as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <span
+                      data-fallback
+                      className="text-[#333] font-semibold text-center leading-tight break-words items-center justify-center"
+                      style={{ display: brand.logo_url ? 'none' : 'flex', fontSize: brand.name.length > 15 ? '13px' : '16px' }}
+                    >
+                      {brand.name}
+                    </span>
                   </div>
+
+                  {/* Category tag */}
+                  {brand.category && (
+                    <p className="text-[11px] text-center text-[#999] uppercase tracking-wide mb-1">
+                      {formatCategory(brand.category)}
+                    </p>
+                  )}
 
                   {/* Brand Name */}
                   <h3 className="text-[#1A1A1A] text-center text-[15px] font-semibold line-clamp-2 mb-1.5 min-h-[2.5rem]">
@@ -620,12 +637,20 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
                           className="object-contain group-hover:scale-105 transition-transform"
                           style={{ maxHeight: "60px", maxWidth: "80%" }}
                           onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                            const img = e.target as HTMLImageElement;
+                            img.style.display = 'none';
+                            const fallback = img.parentElement?.querySelector('[data-fallback]') as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
                           }}
                         />
                       ) : null}
-                      <span className={`${brand.logo_url ? 'hidden' : ''} text-[#555] font-semibold text-xs text-center px-2`}>{brand.name}</span>
+                      <span
+                        data-fallback
+                        className="text-[#555] font-semibold text-center leading-tight break-words items-center justify-center px-2"
+                        style={{ display: brand.logo_url ? 'none' : 'flex', fontSize: brand.name.length > 15 ? '13px' : '16px' }}
+                      >
+                        {brand.name}
+                      </span>
                     </div>
 
                     {/* Info area */}
