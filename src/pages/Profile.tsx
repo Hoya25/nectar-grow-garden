@@ -24,6 +24,10 @@ import { WithdrawalModal } from '@/components/WithdrawalModal';
 import { NCTRPortfolioBreakdown } from '@/components/NCTRPortfolioBreakdown';
 import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 
+interface UnifiedHandle {
+  handle: string | null;
+}
+
 interface UserProfile {
   id: string;
   user_id: string;
@@ -95,6 +99,7 @@ const Profile = () => {
   });
   const [refreshKey, setRefreshKey] = useState(0);
   const [withdrawalModalOpen, setWithdrawalModalOpen] = useState(false);
+  const [userHandle, setUserHandle] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -116,6 +121,16 @@ const Profile = () => {
       return;
     }
     fetchProfileData();
+    // Fetch handle from unified_profiles
+    const fetchHandle = async () => {
+      const { data } = await supabase
+        .from('unified_profiles')
+        .select('handle')
+        .eq('auth_user_id', user.id)
+        .maybeSingle();
+      setUserHandle((data as any)?.handle ?? null);
+    };
+    fetchHandle();
   }, [user, navigate]);
 
   const fetchProfileData = async () => {
@@ -563,6 +578,18 @@ const Profile = () => {
                     <h3 className="text-lg font-semibold">
                       {profile?.full_name || profile?.username || 'Anonymous User'}
                     </h3>
+                    {userHandle ? (
+                      <p className="text-sm font-medium text-primary">@{userHandle}</p>
+                    ) : (
+                      <a
+                        href="https://crescendo.nctr.live/profile"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                      >
+                        Claim your @handle on Crescendo <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       Member since {profile?.created_at ? formatDate(profile.created_at) : 'Unknown'}
                     </p>

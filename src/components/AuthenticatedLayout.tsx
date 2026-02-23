@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import nctrLogo from '@/assets/nctr-logo.svg';
 import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useNCTRPrice } from '@/hooks/useNCTRPrice';
 import { useAdmin } from '@/hooks/useAdmin';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -42,8 +43,23 @@ const AuthenticatedLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userHandle, setUserHandle] = useState<string | null>(null);
 
   const searchParams = new URLSearchParams(location.search);
+
+  // Fetch handle from unified_profiles
+  useEffect(() => {
+    if (!user) return;
+    const fetchHandle = async () => {
+      const { data } = await supabase
+        .from('unified_profiles')
+        .select('handle')
+        .eq('auth_user_id', user.id)
+        .maybeSingle();
+      setUserHandle((data as any)?.handle ?? null);
+    };
+    fetchHandle();
+  }, [user]);
   const currentTab = searchParams.get('tab') || 'shop';
 
   const handleSignOut = async () => {
@@ -148,13 +164,18 @@ const AuthenticatedLayout = () => {
               </Button>
             )}
 
-            {/* Profile avatar */}
+            {/* Profile avatar + handle */}
             <button
               onClick={() => navigate('/profile')}
-              className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-sm font-semibold text-primary hover:bg-primary/20 transition-colors"
+              className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
               title="Profile"
             >
-              {userInitial}
+              <span className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-sm font-semibold text-primary">
+                {userInitial}
+              </span>
+              {userHandle && (
+                <span className="text-sm font-medium text-[hsl(var(--charcoal))]">@{userHandle}</span>
+              )}
             </button>
 
             {/* Sign out */}

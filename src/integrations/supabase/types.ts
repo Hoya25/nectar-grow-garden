@@ -2952,6 +2952,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           garden_data: Json | null
+          handle: string | null
           has_claimed_signup_bonus: boolean
           has_status_access_pass: boolean
           id: string
@@ -2979,6 +2980,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           garden_data?: Json | null
+          handle?: string | null
           has_claimed_signup_bonus?: boolean
           has_status_access_pass?: boolean
           id?: string
@@ -3006,6 +3008,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           garden_data?: Json | null
+          handle?: string | null
           has_claimed_signup_bonus?: boolean
           has_status_access_pass?: boolean
           id?: string
