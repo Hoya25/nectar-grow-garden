@@ -33,6 +33,19 @@ interface MallViewProps {
   totalNctr?: number;
 }
 
+const ALL_BRANDS_CATEGORIES = [
+  { label: "All", value: "all" },
+  { label: "Wellness 🌿", value: "wellness" },
+  { label: "Fashion", value: "fashion" },
+  { label: "Travel", value: "travel" },
+  { label: "Food & Drink", value: "food" },
+  { label: "Tech", value: "tech" },
+  { label: "Home", value: "home" },
+  { label: "Fitness", value: "fitness" },
+  { label: "Beauty", value: "beauty" },
+  { label: "Gift Cards", value: "giftcards" },
+];
+
 const CATEGORIES = [
   { label: "All", value: "all" },
   { label: "Fashion", value: "fashion" },
@@ -54,6 +67,8 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
   tech: ["tech", "electronics", "computer", "phone", "software", "gadget", "gaming"],
   home: ["home", "furniture", "decor", "kitchen", "garden", "appliance", "hardware"],
   beauty: ["beauty", "skincare", "makeup", "cosmetics", "fragrance", "hair", "personal care"],
+  fitness: ["fitness", "gym", "exercise", "athletic", "sports", "yoga", "training"],
+  giftcards: ["gift card", "gift cards", "egift", "e-gift"],
 };
 
 const PAGE_SIZE = 40;
@@ -139,7 +154,10 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
     let filtered = allBrands;
 
     // Category filter
-    if (activeCategory !== "all") {
+    if (activeCategory === "wellness") {
+      // Special: filter by inspiration tag IDs
+      filtered = filtered.filter((b) => inspirationBrandIds.has(b.id));
+    } else if (activeCategory !== "all") {
       const keywords = CATEGORY_KEYWORDS[activeCategory] || [];
       filtered = filtered.filter((b) => {
         const cat = (b.category || "").toLowerCase();
@@ -148,7 +166,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
     }
 
     return filtered;
-  }, [allBrands, activeCategory]);
+  }, [allBrands, activeCategory, inspirationBrandIds]);
 
   // Live Supabase search results
   const [searchResults, setSearchResults] = useState<Brand[]>([]);
@@ -491,124 +509,174 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         )}
 
 
-        {/* Section Header */}
-        {!isSearching && allBrands.length > 0 && (
-          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'1rem'}}>
-            <div style={{width:'3px',height:'22px',background:'#E2FF6D',borderRadius:'999px'}}/>
-            <h2 style={{fontFamily:'var(--font-display)',fontSize:'clamp(18px,2.2vw,24px)',fontWeight:900,letterSpacing:'-0.01em',textTransform:'uppercase',color:'#fff',margin:0}}>All Brands</h2>
+        {/* All Brands Section */}
+        <section className="mb-8">
+          {/* Header */}
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(18px, 2.2vw, 24px)",
+              fontWeight: 900,
+              letterSpacing: "-0.01em",
+              textTransform: "uppercase",
+              color: "#fff",
+              margin: 0,
+            }}
+          >
+            All Brands
+          </h2>
+
+          {/* Inline Search */}
+          <div className="relative mt-3 mb-3">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#777]" />
+            <input
+              type="text"
+              placeholder={`Search ${totalBrands.toLocaleString()}+ brands...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-9 h-10 text-sm rounded-full bg-[#2A2A2A] text-white border border-[#444] focus:border-[#E2FF6D] focus:outline-none focus:ring-2 focus:ring-[#E2FF6D]/20 placeholder:text-[#777] transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#777] hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
-        )}
 
-        {/* Results Count */}
-        {isSearching && displayBrands.length > 0 && (
-          <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-4">
-            {searchQuery.trim().length >= 2 && searchLoading ? "Searching..." : `${displayBrands.length} brand${displayBrands.length !== 1 ? "s" : ""} found`}
-          </p>
-        )}
+          {/* Category Filter Pills */}
+          <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+            {ALL_BRANDS_CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setActiveCategory(cat.value)}
+                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  activeCategory === cat.value
+                    ? "bg-[#323232] text-white"
+                    : "bg-[#2A2A2A] text-[#999] hover:text-white hover:bg-[#333]"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
 
-        {/* Brand Grid */}
-        {paginatedBrands.length > 0 && (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-              {paginatedBrands.map((brand) => (
-                <div
-                  key={brand.id}
-                  className="bg-[hsl(var(--mall-card))] rounded-xl p-4 border border-[hsl(var(--mall-border))] hover:border-[hsl(var(--mall-accent))] hover:-translate-y-0.5 transition-all cursor-pointer group relative"
-                  onClick={() => setSelectedBrand(brand)}
-                >
-                  {/* INSPIRATION badge — warm pill */}
-                  {inspirationBrandIds.has(brand.id) && (
-                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold z-10" style={{ background: "#F5EDE3", color: "#C4946A" }}>
-                      🌿 INSPIRATION
-                    </span>
-                  )}
-                  {/* Logo */}
-                  <div className="flex justify-center mb-3 bg-[hsl(0,0%,28%)] rounded-lg p-2 aspect-square items-center">
-                    <BrandLogo
-                      src={brand.logo_url || undefined}
-                      alt={brand.name}
-                      size="lg"
-                      className="group-hover:scale-105 transition-transform"
-                    />
-                  </div>
+          {/* Results Count */}
+          {isSearching && displayBrands.length > 0 && (
+            <p className="text-xs text-[#777] mb-3">
+              {searchQuery.trim().length >= 2 && searchLoading ? "Searching..." : `${displayBrands.length} brand${displayBrands.length !== 1 ? "s" : ""} found`}
+            </p>
+          )}
 
-                  {/* Brand Name */}
-                  <h3 className="font-semibold text-[hsl(var(--mall-text))] text-center text-sm line-clamp-2 mb-1.5 min-h-[2.5rem]">
-                    {brand.name}
-                  </h3>
-
-                  {/* Earn label */}
-                  <p className="text-[11px] text-center font-medium mb-3" style={inspirationBrandIds.has(brand.id) ? { color: "#C4946A" } : {}}>
-                    {inspirationBrandIds.has(brand.id) ? "This purchase earns INSPIRATION rewards" : <span className="text-[hsl(var(--mall-accent))]">Earn NCTR on every purchase</span>}
-                  </p>
-
-                  {/* Shop Button */}
-                  <Button
-                    size="sm"
-                    className="w-full bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)] font-semibold text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
-                    }}
-                    disabled={!brand.loyalize_id}
+          {/* Brand Grid */}
+          {paginatedBrands.length > 0 && (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {paginatedBrands.map((brand) => (
+                  <div
+                    key={brand.id}
+                    className="rounded-xl p-3.5 border border-[#3A3A3A] hover:border-[#E2FF6D]/50 hover:-translate-y-0.5 transition-all cursor-pointer group relative"
+                    style={{ background: "#2A2A2A" }}
+                    onClick={() => setSelectedBrand(brand)}
                   >
-                    Shop Now
-                    <ExternalLink className="h-3 w-3 ml-1" />
+                    {/* INSPIRATION icon */}
+                    {inspirationBrandIds.has(brand.id) && (
+                      <span className="absolute top-2.5 right-2.5 text-sm z-10" title="INSPIRATION Partner">
+                        🌿
+                      </span>
+                    )}
+
+                    {/* Logo */}
+                    <div className="flex justify-center mb-3 rounded-lg p-2.5 aspect-square items-center" style={{ background: "#3A3A3A" }}>
+                      <BrandLogo
+                        src={brand.logo_url || undefined}
+                        alt={brand.name}
+                        size="lg"
+                        className="group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+
+                    {/* Brand Name */}
+                    <h3 className="text-white text-center text-sm font-semibold line-clamp-2 mb-1.5 min-h-[2.5rem]">
+                      {brand.name}
+                    </h3>
+
+                    {/* Earn label */}
+                    <p className="text-xs text-center font-medium mb-3" style={{ color: "#E2FF6D" }}>
+                      {brand.nctr_per_dollar && brand.nctr_per_dollar > 0
+                        ? `Earn ${brand.nctr_per_dollar % 1 === 0 ? brand.nctr_per_dollar.toFixed(0) : brand.nctr_per_dollar.toFixed(1)} NCTR/$1`
+                        : "Earn NCTR"}
+                    </p>
+
+                    {/* Shop Button — lime outline */}
+                    <Button
+                      size="sm"
+                      className="w-full text-xs font-semibold bg-transparent border border-[#E2FF6D] text-[#E2FF6D] hover:bg-[#E2FF6D] hover:text-[#1A1A1A] transition-colors shadow-none"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
+                      }}
+                      disabled={!brand.loyalize_id}
+                    >
+                      Shop Now
+                      <ExternalLink className="h-3 w-3 ml-1" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Load More */}
+              {hasMore && (
+                <div className="flex justify-center mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage((p) => p + 1)}
+                    className="border-[#E2FF6D]/40 text-[#E2FF6D] bg-transparent hover:bg-[#E2FF6D]/10 text-sm"
+                  >
+                    Load More Brands
                   </Button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
+          )}
 
-            {/* Load More */}
-            {hasMore && (
-              <div className="flex justify-center mt-6">
+          {/* Empty State */}
+          {noResults && (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <p className="text-lg text-[#999] mb-2">
+                No brands found for "{searchQuery || activeCategory}"
+              </p>
+              <p className="text-sm text-[#777] mb-6">
+                Don't see your brand? Suggest it →
+              </p>
+              <div className="flex gap-2 w-full max-w-md">
+                <input
+                  type="text"
+                  placeholder="Brand name..."
+                  value={suggestionName}
+                  onChange={(e) => setSuggestionName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSuggestion()}
+                  className="flex-1 h-11 px-4 rounded-lg bg-[#2A2A2A] text-white border border-[#444] focus:border-[#E2FF6D] focus:outline-none focus:ring-2 focus:ring-[#E2FF6D]/20 placeholder:text-[#777]"
+                />
                 <Button
-                  variant="outline"
-                  onClick={() => setPage((p) => p + 1)}
-                  className="border-[hsl(var(--mall-accent))] text-[hsl(var(--mall-accent))] bg-transparent hover:bg-[hsl(var(--mall-accent))]/10"
+                  onClick={handleSuggestion}
+                  disabled={!suggestionName.trim() || submittingSuggestion}
+                  className="bg-[#E2FF6D] text-[#1A1A1A] hover:bg-[#d4f059] font-semibold"
                 >
-                  Load More Brands
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
-            )}
-          </>
-        )}
-
-        {/* Empty State with Suggestion */}
-        {noResults && (
-          <div className="flex flex-col items-center justify-center py-16 px-4">
-            <p className="text-lg text-[hsl(var(--mall-text-muted))] mb-2">
-              No brands found for "{searchQuery || activeCategory}"
-            </p>
-            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-6">
-              Don't see your brand? Suggest it →
-            </p>
-            <div className="flex gap-2 w-full max-w-md">
-              <input
-                type="text"
-                placeholder="Brand name..."
-                value={suggestionName}
-                onChange={(e) => setSuggestionName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSuggestion()}
-                className="flex-1 h-11 px-4 rounded-lg bg-[hsl(var(--mall-input-bg))] text-[hsl(var(--mall-text))] border border-[hsl(var(--mall-border))] focus:border-[hsl(var(--mall-accent))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--mall-accent))]/30 placeholder:text-[hsl(var(--mall-text-muted))]"
-              />
-              <Button
-                onClick={handleSuggestion}
-                disabled={!suggestionName.trim() || submittingSuggestion}
-                className="bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)] hover:bg-[hsl(75,100%,65%)] font-semibold"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Non-searching suggestion form */}
-        {!isSearching && allBrands.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center py-16 px-4">
-            <p className="text-lg text-[hsl(var(--mall-text-muted))]">No brands available yet.</p>
-          </div>
-        )}
+          {!isSearching && allBrands.length === 0 && !loading && (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <p className="text-lg text-[#777]">No brands available yet.</p>
+            </div>
+          )}
+        </section>
       </div>
 
       {/* Brand Detail Modal */}
