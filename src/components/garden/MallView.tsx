@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BrandDetailModal } from "./BrandDetailModal";
-import { WellnessCollection } from "./WellnessCollection";
-import { InspirationPartnersSection } from "./InspirationPartnersSection";
+import { InspirationWellnessEcosystem } from "./InspirationWellnessEcosystem";
 
 interface Brand {
   id: string;
@@ -373,6 +372,22 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* INSPIRATION — Wellness Ecosystem (unified section) */}
+        {!isSearching && (
+          <InspirationWellnessEcosystem
+            onShop={handleShop}
+            onBrandClick={(brand) => setSelectedBrand({
+              id: brand.id,
+              name: brand.name,
+              logo_url: brand.logo_url || null,
+              category: brand.category,
+              nctr_per_dollar: brand.nctr_per_dollar || null,
+              loyalize_id: brand.loyalize_id || null,
+              description: brand.description,
+            })}
+          />
+        )}
+
         {/* Featured Brands Row */}
         {!isSearching && featuredBrands.length > 0 && (
           <section className="mb-8">
@@ -464,64 +479,6 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           </section>
         )}
 
-        {/* INSPIRATION Partners */}
-        {!isSearching && (
-          <InspirationPartnersSection
-            onShop={handleShop}
-            onBrandClick={(brand) => setSelectedBrand({
-              id: brand.id,
-              name: brand.name,
-              logo_url: brand.logo_url || null,
-              category: brand.category,
-              nctr_per_dollar: brand.nctr_per_dollar || null,
-              loyalize_id: brand.loyalize_id || null,
-              description: brand.description,
-            })}
-          />
-        )}
-
-        {/* Crescendo Cross-Link Banner */}
-        {!isSearching && (
-          <a
-            href="https://crescendo.nctr.live/rewards"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block mb-8 rounded-2xl p-6 md:p-8 transition-all hover:shadow-lg hover:scale-[1.005]"
-            style={{ background: "#323232" }}
-          >
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <p className="text-base md:text-lg font-semibold text-white mb-1">
-                  Earning INSPIRATION? Unlock premium wellness rewards on Crescendo
-                </p>
-                <p className="text-sm text-[#D9D9D9]">
-                  Commit your NCTR to access exclusive Kroma products and more
-                </p>
-              </div>
-              <button
-                className="flex-shrink-0 px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
-                style={{ background: "#E2FF6D", color: "#323232" }}
-              >
-                Explore Crescendo Rewards →
-              </button>
-            </div>
-          </a>
-        )}
-
-        {!isSearching && (
-          <WellnessCollection
-            onShop={handleShop}
-            onBrandClick={(brand) => setSelectedBrand({
-              id: brand.id,
-              name: brand.name,
-              logo_url: brand.logo_url || null,
-              category: "Health & Wellness",
-              nctr_per_dollar: brand.nctr_per_dollar || null,
-              loyalize_id: brand.loyalize_id || null,
-              description: brand.tagline,
-            })}
-          />
-        )}
 
         {/* Section Header */}
         {!isSearching && allBrands.length > 0 && (
