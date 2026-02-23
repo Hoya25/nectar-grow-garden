@@ -190,23 +190,28 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
     imageLoaded ? 'opacity-100' : 'opacity-0'
   );
 
-  // Render fallback with initials
+  // Render fallback with clean brand name text
   const renderFallback = () => {
     if (fallback) return fallback;
-    
-    const initials = getInitials(alt);
-    const bgColor = getColorFromName(alt);
     
     return (
       <div 
         className={cn(
-          'flex items-center justify-center text-white font-bold rounded',
-          bgColor,
+          'flex items-center justify-center rounded px-1.5',
+          'bg-[hsl(0,0%,96%)]',
           sizeConfig[size].square,
-          sizeConfig[size].text
         )}
       >
-        {initials}
+        <span className={cn(
+          'text-[hsl(0,0%,15%)] font-semibold leading-tight text-center truncate',
+          size === 'xs' && 'text-[7px]',
+          size === 'sm' && 'text-[8px]',
+          size === 'md' && 'text-[9px]',
+          size === 'lg' && 'text-[10px]',
+          size === 'xl' && 'text-xs',
+        )}>
+          {alt}
+        </span>
       </div>
     );
   };
