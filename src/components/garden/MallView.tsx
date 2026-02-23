@@ -480,7 +480,34 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           />
         )}
 
-        {/* Wellness Collection */}
+        {/* Crescendo Cross-Link Banner */}
+        {!isSearching && (
+          <a
+            href="https://crescendo.nctr.live/rewards"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block mb-8 rounded-2xl p-6 md:p-8 transition-all hover:shadow-lg hover:scale-[1.005]"
+            style={{ background: "#323232" }}
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <p className="text-base md:text-lg font-semibold text-white mb-1">
+                  Earning INSPIRATION? Unlock premium wellness rewards on Crescendo
+                </p>
+                <p className="text-sm text-[#D9D9D9]">
+                  Commit your NCTR to access exclusive Kroma products and more
+                </p>
+              </div>
+              <button
+                className="flex-shrink-0 px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
+                style={{ background: "#E2FF6D", color: "#323232" }}
+              >
+                Explore Crescendo Rewards →
+              </button>
+            </div>
+          </a>
+        )}
+
         {!isSearching && (
           <WellnessCollection
             onShop={handleShop}
