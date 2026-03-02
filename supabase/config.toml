@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.upload-kroma-images]
 verify_jwt = true
+
+[functions.mcp]
+verify_jwt = false
