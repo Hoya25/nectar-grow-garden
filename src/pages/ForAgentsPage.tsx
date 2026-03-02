@@ -92,9 +92,12 @@ const mcpTools = [
   { name: "check_tier_requirements", desc: "Check tier progression path. See which tiers are unlocked at a given NCTR balance and what's needed to reach the next level.", params: ["current_balance", "target_tier"] },
   { name: "get_active_promotions", desc: "Get current limited-time promotions and bonus earning opportunities.", params: [] },
   { name: "get_onboarding_link", desc: "Generate a join link for new members. Supports referral tracking.", params: ["referral_code"] },
+  { name: "get_commerce_categories", desc: "Get the list of commerce verticals available in The Garden's brand partner network.", params: [] },
 ];
 
-const curlExample = `curl -X POST https://yhwcaodofmbusjurawhp.supabase.co/functions/v1/mcp/rpc \\
+const MCP_URL = "https://rndivcsonsojgelzewkb.supabase.co/functions/v1/mcp/rpc";
+
+const curlExample = `curl -X POST ${MCP_URL} \\
   -H "Content-Type: application/json" \\
   -H "Accept: application/json, text/event-stream" \\
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'`;
@@ -175,7 +178,7 @@ const ForAgentsPage = () => {
           <div className="space-y-3 mb-8">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#5A5A58" }}>Server URL</p>
-              <CodeBlock>{"https://yhwcaodofmbusjurawhp.supabase.co/functions/v1/mcp/rpc"}</CodeBlock>
+              <CodeBlock>{MCP_URL}</CodeBlock>
             </div>
             <div className="flex gap-6 text-sm" style={{ fontFamily: "DM Sans, sans-serif" }}>
               <div><span style={{ color: "#5A5A58" }}>Transport:</span> <span style={{ color: "#D9D9D9" }}>SSE (Server-Sent Events)</span></div>
