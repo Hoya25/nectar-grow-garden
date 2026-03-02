@@ -40,6 +40,53 @@ const tools = [
   { name: "get_impact_engines", desc: "Discover all 6 Impact Engine communities" },
 ];
 
+const ucpManifest = `{
+  "ucp": {
+    "version": "2026-01-11",
+    "services": {
+      "dev.ucp.shopping": {
+        "version": "2026-01-11",
+        "spec": "https://ucp.dev/specification/overview",
+        "rest": {
+          "schema": "https://thegarden.nctr.live/api/ucp/openapi.json",
+          "endpoint": "https://thegarden.nctr.live/api/ucp/v1"
+        }
+      }
+    },
+    "capabilities": [
+      {
+        "name": "dev.ucp.shopping.checkout",
+        "version": "2026-01-11",
+        "spec": "https://ucp.dev/specification/checkout",
+        "schema": "https://ucp.dev/schemas/shopping/checkout.json"
+      },
+      {
+        "name": "com.nctr.loyalty.rewards",
+        "version": "2026-03-01",
+        "extends": "dev.ucp.shopping.checkout",
+        "description": "NCTR participation economy rewards — earn NCTR tokens on every commerce transaction routed through The Garden's 6,000+ brand partner network."
+      }
+    ]
+  },
+  "loyalty": {
+    "provider": "NCTR Alliance",
+    "program": "Crescendo",
+    "currency": "NCTR",
+    "earn_model": "commission_share",
+    "avg_commission_rate": 0.05,
+    "tiers": [
+      { "name": "Bronze", "threshold": 0, "multiplier": 1.0 },
+      { "name": "Silver", "multiplier": 1.25 },
+      { "name": "Gold", "multiplier": 1.5 },
+      { "name": "Platinum", "multiplier": 2.0 },
+      { "name": "Diamond", "multiplier": 2.5 }
+    ],
+    "commitment": { "mechanism": "360LOCK", "duration_days": 360 },
+    "brand_partners": { "count": 6000, "discovery_endpoint": "https://thegarden.nctr.live/api/brands" },
+    "enrollment": { "url": "https://crescendo.nctr.live", "agent_api": "https://thegarden.nctr.live/api/enroll" }
+  }
+}`;
+
 const links = [
   { url: "https://nctr.live", label: "nctr.live", desc: "NCTR Alliance" },
   { url: "https://thegarden.nctr.live", label: "thegarden.nctr.live", desc: "The Garden" },
@@ -80,6 +127,16 @@ const ForAgentsPage = () => (
 
         <Card title="Quick Start">
           <CodeBlock>{`curl -X POST https://yhwcaodofmbusjurawhp.supabase.co/functions/v1/mcp/rpc \\\n  -H "Content-Type: application/json" \\\n  -H "Accept: application/json, text/event-stream" \\\n  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_bounties","arguments":{}}}'`}</CodeBlock>
+        </Card>
+
+        <Card title="UCP Manifest">
+          <p className="mb-3 text-sm" style={{ color: "#D9D9D9" }}>
+            Universal Commerce Protocol config available at{" "}
+            <a href="/.well-known/ucp.json" target="_blank" rel="noopener noreferrer" className="font-mono hover:underline" style={{ color: "#E2FF6D" }}>
+              /.well-known/ucp.json
+            </a>
+          </p>
+          <CodeBlock>{ucpManifest}</CodeBlock>
         </Card>
 
         <Card title="Ecosystem Links">
