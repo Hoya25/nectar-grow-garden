@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Copy, ArrowRight, Mail, Search, ShoppingBag, TrendingUp } from "lucide-react";
+import { Check, Copy, ArrowRight, Search, ShoppingBag, TrendingUp } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
 
 const CodeBlock = ({ children }: { children: string }) => {
@@ -86,9 +86,20 @@ const steps = [
   { icon: TrendingUp, label: "Earn", desc: "Every transaction earns NCTR. Crescendo tier progression multiplies earning power over time." },
 ];
 
+const mcpTools = [
+  { name: "search_bounties", desc: "Search and filter NCTR earning opportunities. Filter by category, amount, keyword, or repeatable status.", params: ["category", "min_amount", "max_amount", "keyword", "repeatable_only"] },
+  { name: "get_earning_rates", desc: "Get Crescendo tier multipliers and calculate tier-adjusted earnings for any bounty.", params: ["tier", "bounty_id"] },
+  { name: "check_tier_requirements", desc: "Check tier progression path. See which tiers are unlocked at a given NCTR balance and what's needed to reach the next level.", params: ["current_balance", "target_tier"] },
+  { name: "get_active_promotions", desc: "Get current limited-time promotions and bonus earning opportunities.", params: [] },
+  { name: "get_onboarding_link", desc: "Generate a join link for new members. Supports referral tracking.", params: ["referral_code"] },
+];
+
+const curlExample = `curl -X POST https://yhwcaodofmbusjurawhp.supabase.co/functions/v1/mcp/rpc \\
+  -H "Content-Type: application/json" \\
+  -H "Accept: application/json, text/event-stream" \\
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'`;
+
 const ForAgentsPage = () => {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
 
   return (
     <div style={{ background: "#121212", minHeight: "100vh" }}>
@@ -147,51 +158,55 @@ const ForAgentsPage = () => {
           <CodeBlock>{ucpManifest}</CodeBlock>
         </section>
 
-        {/* ── MCP Server — Coming Soon ── */}
+        {/* ── MCP Server — Live ── */}
         <section className="py-14 border-b" style={{ borderColor: "#2A2A2A" }}>
           <div className="flex items-center gap-3 mb-4">
             <h2 className="text-2xl font-bold" style={{ color: "#FFFFFF", fontFamily: "Georgia, serif" }}>
-              MCP Integration
+              MCP Server
             </h2>
-            <span className="text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: "#2A2A2A", color: "#E2FF6D" }}>
-              Coming Soon
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: "#1E1E1E", border: "1px solid #2A2A2A", color: "#E2FF6D" }}>
+              <span className="w-2 h-2 rounded-full inline-block" style={{ background: "#4ADE80" }} /> Live
             </span>
           </div>
-          <p className="text-sm leading-relaxed mb-8 max-w-2xl" style={{ color: "#D9D9D9", fontFamily: "DM Sans, sans-serif" }}>
-            We're building an MCP server so Claude, Perplexity Comet, and any MCP-compatible agent can connect to The Garden as a native tool. Sign up to be notified when it launches.
+          <p className="text-sm leading-relaxed mb-6 max-w-2xl" style={{ color: "#D9D9D9", fontFamily: "DM Sans, sans-serif" }}>
+            Connect any MCP-compatible agent (Claude, Perplexity Comet, OpenClaw) to The Garden's commerce infrastructure.
           </p>
-          {submitted ? (
-            <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#E2FF6D" }}>
-              <Check size={16} /> You're on the list. We'll be in touch.
+
+          <div className="space-y-3 mb-8">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#5A5A58" }}>Server URL</p>
+              <CodeBlock>{"https://yhwcaodofmbusjurawhp.supabase.co/functions/v1/mcp/rpc"}</CodeBlock>
             </div>
-          ) : (
-            <form
-              onSubmit={(e) => { e.preventDefault(); if (email) setSubmitted(true); }}
-              className="flex gap-3 max-w-md"
-            >
-              <div className="flex-1 relative">
-                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#5A5A58" }} />
-                <input
-                  type="email"
-                  required
-                  placeholder="you@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg text-sm outline-none transition-colors"
-                  style={{ background: "#1E1E1E", border: "1px solid #2A2A2A", color: "#FFFFFF", fontFamily: "DM Sans, sans-serif" }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = "#E2FF6D"}
-                  onBlur={(e) => e.currentTarget.style.borderColor = "#2A2A2A"}
-                />
+            <div className="flex gap-6 text-sm" style={{ fontFamily: "DM Sans, sans-serif" }}>
+              <div><span style={{ color: "#5A5A58" }}>Transport:</span> <span style={{ color: "#D9D9D9" }}>SSE (Server-Sent Events)</span></div>
+              <div><span style={{ color: "#5A5A58" }}>Required Header:</span> <code className="font-mono px-2 py-0.5 rounded" style={{ background: "#2A2A2A", color: "#E2FF6D" }}>Accept: application/json, text/event-stream</code></div>
+            </div>
+          </div>
+
+          {/* Available Tools */}
+          <h3 className="text-lg font-bold mb-4" style={{ color: "#FFFFFF", fontFamily: "Georgia, serif" }}>Available Tools</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {mcpTools.map((tool) => (
+              <div key={tool.name} className="rounded-xl p-5" style={{ background: "#1E1E1E", border: "1px solid #2A2A2A" }}>
+                <code className="text-sm font-mono font-semibold" style={{ color: "#E2FF6D" }}>{tool.name}</code>
+                <p className="text-sm mt-2 leading-relaxed" style={{ color: "#D9D9D9", fontFamily: "DM Sans, sans-serif" }}>{tool.desc}</p>
+                {tool.params.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {tool.params.map((p) => (
+                      <span key={p} className="text-xs font-mono px-2 py-0.5 rounded" style={{ background: "#2A2A2A", color: "#5A5A58" }}>{p}</span>
+                    ))}
+                  </div>
+                )}
+                {tool.params.length === 0 && (
+                  <p className="text-xs mt-3 font-mono" style={{ color: "#5A5A58" }}>no parameters</p>
+                )}
               </div>
-              <button
-                type="submit"
-                className="px-5 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
-                style={{ background: "#E2FF6D", color: "#121212", fontFamily: "DM Sans, sans-serif" }}
-              >
-                Notify Me
-              </button>
-            </form>
-          )}
+            ))}
+          </div>
+
+          {/* Quick Start */}
+          <h3 className="text-lg font-bold mb-4" style={{ color: "#FFFFFF", fontFamily: "Georgia, serif" }}>Quick Start</h3>
+          <CodeBlock>{curlExample}</CodeBlock>
         </section>
 
         {/* ── Earning Structure ── */}
