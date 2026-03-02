@@ -10,18 +10,27 @@ import SEOHead from "@/components/SEOHead";
 const jsonLd = [
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "The Garden by NCTR Alliance",
-    "url": "https://nectar-grow-garden.lovable.app",
-    "logo": "https://nectar-grow-garden.lovable.app/nctr-n-dark.svg",
-    "sameAs": ["https://twitter.com/NCTRAlliance"]
-  },
-  {
-    "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "The Garden",
-    "url": "https://nectar-grow-garden.lovable.app",
-    "description": "Turn everyday purchases into real rewards. Shop 6,800+ brands and earn NCTR with every purchase."
+    "name": "The Garden by NCTR Alliance",
+    "url": "https://thegarden.nctr.live",
+    "description": "Commerce gateway with 6,000+ brand partners. Earn NCTR through everyday shopping. Live and Earn.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://thegarden.nctr.live/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "offers": {
+      "@type": "AggregateOffer",
+      "description": "6,000+ brand partners across major retail categories",
+      "offerCount": 6000,
+      "category": ["Shopping", "Sports & Outdoor", "Entertainment", "Home & Services", "Health & Wellness"]
+    },
+    "memberOf": {
+      "@type": "LoyaltyProgram",
+      "name": "Crescendo by NCTR Alliance",
+      "url": "https://crescendo.nctr.live",
+      "description": "Tiered participation economy. Earn NCTR on every transaction. Commit via 360LOCK. Progress through Bronze, Silver, Gold, Platinum, Diamond tiers with increasing earning multipliers."
+    }
   }
 ];
 
