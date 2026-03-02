@@ -2744,6 +2744,7 @@ export type Database = {
           is_active: boolean | null
           max_nctr_360_locked: number | null
           min_nctr_360_locked: number
+          reward_multiplier: number
           sort_order: number
           tier_name: string
           updated_at: string | null
@@ -2758,6 +2759,7 @@ export type Database = {
           is_active?: boolean | null
           max_nctr_360_locked?: number | null
           min_nctr_360_locked?: number
+          reward_multiplier?: number
           sort_order?: number
           tier_name: string
           updated_at?: string | null
@@ -2772,6 +2774,7 @@ export type Database = {
           is_active?: boolean | null
           max_nctr_360_locked?: number | null
           min_nctr_360_locked?: number
+          reward_multiplier?: number
           sort_order?: number
           tier_name?: string
           updated_at?: string | null
