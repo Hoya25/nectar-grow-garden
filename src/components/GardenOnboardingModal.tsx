@@ -35,7 +35,7 @@ export const GardenOnboardingModal = ({ onComplete }: GardenOnboardingModalProps
   const current = STEPS[step];
 
   const finish = () => {
-    localStorage.setItem("garden_onboarded", "true");
+    localStorage.setItem("garden_welcome_seen", "true");
     onComplete();
   };
 
@@ -55,14 +55,22 @@ export const GardenOnboardingModal = ({ onComplete }: GardenOnboardingModalProps
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center">
-      {/* Overlay — not dismissible */}
-      <div className="absolute inset-0 bg-black/70" />
+      {/* Overlay — click to dismiss */}
+      <div className="absolute inset-0 bg-black/70" onClick={finish} />
 
       {/* Modal */}
       <div
         className="relative z-10 w-full h-full md:h-auto md:max-w-[480px] md:rounded-2xl flex flex-col overflow-hidden"
         style={{ background: "#323232" }}
       >
+        {/* Close button */}
+        <button
+          onClick={finish}
+          className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white text-lg leading-none"
+          aria-label="Close"
+        >
+          ✕
+        </button>
         <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-10 text-center">
           {/* Icon */}
           {current.icon && (

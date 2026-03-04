@@ -149,11 +149,13 @@ const Garden = () => {
     const params = new URLSearchParams(window.location.search);
     return (params.get('tab') as 'shop' | 'dashboard') || 'shop';
   });
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !!user && !localStorage.getItem("garden_welcome_seen");
+  });
 
-  // Show onboarding for new users on first login
+  // Re-check when user logs in (e.g. auth state arrives async)
   useEffect(() => {
-    if (user && !localStorage.getItem("garden_onboarded")) {
+    if (user && !localStorage.getItem("garden_welcome_seen")) {
       setShowOnboarding(true);
     }
   }, [user]);
