@@ -149,13 +149,15 @@ const Garden = () => {
     const params = new URLSearchParams(window.location.search);
     return (params.get('tab') as 'shop' | 'dashboard') || 'shop';
   });
+  const hasSeenWelcome = () => !!localStorage.getItem("garden_welcome_seen") || !!localStorage.getItem("garden_onboarded");
+
   const [showOnboarding, setShowOnboarding] = useState(() => {
-    return !!user && !localStorage.getItem("garden_welcome_seen");
+    return !!user && !hasSeenWelcome();
   });
 
   // Re-check when user logs in (e.g. auth state arrives async)
   useEffect(() => {
-    if (user && !localStorage.getItem("garden_welcome_seen")) {
+    if (user && !hasSeenWelcome()) {
       setShowOnboarding(true);
     }
   }, [user]);
