@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { WalletProvider } from "@/hooks/useWallet";
 import AuthenticatedLayout from "@/components/AuthenticatedLayout";
@@ -29,6 +29,9 @@ import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
 import { Userback } from "./components/Userback";
 
 const queryClient = new QueryClient();
+
+// Redirect /dashboard to /garden?tab=dashboard
+const DashboardRedirect = () => <Navigate to="/garden?tab=dashboard" replace />;
 
 // Component to track route changes and update body attribute
 const RouteTracker = () => {
@@ -77,16 +80,19 @@ const App = () => {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<Admin />} />
                 
+                {/* Public routes that work with or without auth */}
+                <Route path="/garden" element={<Garden />} />
+                <Route path="/garden/category/:slug" element={<GardenCategoryPage />} />
+                <Route path="/garden/tag/:slug" element={<GardenTagPage />} />
+                <Route path="/garden/brand/kroma-wellness" element={<KromaWellness />} />
+                <Route path="/brands/kroma-wellness" element={<KromaWellness />} />
+                <Route path="/dashboard" element={<DashboardRedirect />} />
+                
                 {/* Authenticated routes with shared navigation layout */}
                 <Route element={<AuthenticatedLayout />}>
                   <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
                   <Route path="/admin/brand-audit" element={<AdminBrandAudit />} />
                   <Route path="/admin/brand-priority" element={<AdminBrandPriority />} />
-                  <Route path="/garden" element={<Garden />} />
-                  <Route path="/garden/category/:slug" element={<GardenCategoryPage />} />
-                  <Route path="/garden/tag/:slug" element={<GardenTagPage />} />
-                  <Route path="/garden/brand/kroma-wellness" element={<KromaWellness />} />
-                  <Route path="/brands/kroma-wellness" element={<KromaWellness />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/referrals" element={<Referrals />} />
                   <Route path="/affiliate-links" element={<AffiliateLinks />} />

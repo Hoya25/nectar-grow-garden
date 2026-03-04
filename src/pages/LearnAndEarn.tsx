@@ -53,6 +53,8 @@ export default function LearnAndEarn() {
   useEffect(() => {
     if (user) {
       loadModules();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
@@ -155,6 +157,40 @@ export default function LearnAndEarn() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading learning modules...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-12 text-center max-w-md">
+          <BookOpen className="h-16 w-16 text-primary mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Learn & Earn</h2>
+          <p className="text-muted-foreground mb-6">
+            Sign in to access learning modules and earn NCTR rewards.
+          </p>
+          <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            Sign In to Start Learning
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  if (modules.length === 0 && Object.keys(progress).length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SEOHead title="Learn & Earn | The Garden" description="Complete learning modules and earn NCTR rewards." canonicalPath="/learn" />
+        <div className="container mx-auto px-4 py-16 flex items-center justify-center">
+          <Card className="p-12 text-center max-w-md">
+            <BookOpen className="h-16 w-16 text-primary mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Coming Soon</h2>
+            <p className="text-muted-foreground">
+              Learning modules are being prepared. Check back soon to start earning NCTR through education!
+            </p>
+          </Card>
         </div>
       </div>
     );
