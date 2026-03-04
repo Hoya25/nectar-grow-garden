@@ -317,12 +317,11 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
   return (
     <div className="garden-mall-dark min-h-screen bg-[hsl(var(--mall-bg))] pb-20 md:pb-0">
-      {/* Header */}
-      <div className="bg-[hsl(0,0%,16%)] border-b border-[hsl(var(--mall-border))] pt-4 pb-6 px-4">
+      {/* Sticky Header: Search + Category Pills */}
+      <div className="sticky top-14 z-40 bg-[hsl(0,0%,16%)] border-b border-[hsl(var(--mall-border))] pt-3 pb-3 px-4">
         <div className="max-w-6xl mx-auto">
-
           {/* Search Bar */}
-          <div className="relative mb-4">
+          <div className="relative mb-3">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[hsl(var(--mall-text-muted))]" />
             <input
               ref={searchInputRef}
@@ -330,7 +329,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
               placeholder={`Search ${totalBrands.toLocaleString()}+ brands...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-10 h-12 text-base rounded-full bg-[hsl(var(--mall-input-bg))] text-[hsl(var(--mall-text))] border border-[hsl(var(--mall-border))] focus:border-[hsl(var(--mall-accent))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--mall-accent))]/30 placeholder:text-[hsl(var(--mall-text-muted))] transition-all"
+              className="w-full pl-12 pr-10 h-11 text-base rounded-full bg-[hsl(var(--mall-input-bg))] text-[hsl(var(--mall-text))] border border-[hsl(var(--mall-border))] focus:border-[hsl(var(--mall-accent))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--mall-accent))]/30 placeholder:text-[hsl(var(--mall-text-muted))] transition-all"
             />
             {searchQuery && (
               <button
@@ -342,13 +341,13 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             )}
           </div>
 
-          {/* Category Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+          {/* Category Pills */}
+          <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.value}
                 onClick={() => setActiveCategory(cat.value)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                   activeCategory === cat.value
                     ? "bg-[hsl(var(--mall-accent))] text-[hsl(0,0%,20%)]"
                     : "bg-[hsl(var(--mall-input-bg))] text-[hsl(var(--mall-text-muted))] hover:text-[hsl(var(--mall-text))] hover:bg-[hsl(0,0%,30%)]"
@@ -361,75 +360,134 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         </div>
       </div>
 
-      {/* Hero CTA Section — hidden during search */}
-      {!isSearching && <div className="max-w-6xl mx-auto px-4 pt-8 pb-2">
-        <h2
-          className="text-center mb-6 leading-tight"
-          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 'clamp(32px, 4.5vw, 52px)' }}
-        >
-          <span className="text-[hsl(var(--mall-text))] block">LIVE YOUR LIFE.</span>
-          <span className="text-[#E2FF6D] block">EARN NCTR.</span>
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {/* Card 1 — Shop & Earn */}
-          <div
-            className="relative rounded-2xl p-6 flex flex-col items-center text-center transition-all duration-200 hover:-translate-y-[2px] group"
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '16px',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(226,255,109,0.22)')}
-            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
-          >
-            {/* Top accent line */}
-            <div className="absolute top-0 left-4 right-4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(226,255,109,0.4), transparent)' }} />
-            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)', border: '1px solid rgba(226,255,109,0.15)' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(226,255,109,0.85)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      {/* Compact Hero + Trending Brands — hidden during search */}
+      {!isSearching && (
+        <div className="max-w-6xl mx-auto px-4 pt-5 pb-2">
+          {/* Compact hero text */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2
+                className="leading-none"
+                style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 'clamp(22px, 3vw, 32px)' }}
+              >
+                <span className="text-[hsl(var(--mall-text))]">LIVE YOUR LIFE. </span>
+                <span className="text-[#E2FF6D]">EARN NCTR.</span>
+              </h2>
+              <p className="text-sm text-[hsl(var(--mall-text-muted))] mt-1">
+                Shop {totalBrands.toLocaleString()}+ brands. Every purchase earns NCTR toward your Crescendo status.
+              </p>
             </div>
-            <h3 className="mb-2 uppercase tracking-wide text-[hsl(var(--mall-text))]" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.125rem' }}>SHOP & EARN</h3>
-            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
-              Shop 6,000+ brands and earn NCTR on every purchase — fueling your Crescendo status
-            </p>
-            <button
-              onClick={() => {
-                allBrandsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="px-6 py-2.5 rounded-lg text-sm font-bold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
-            >
-              BROWSE BRANDS →
-            </button>
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={() => allBrandsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="px-4 py-2 rounded-lg text-xs font-bold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
+              >
+                BROWSE ALL →
+              </button>
+              <button
+                onClick={() => navigate('/garden?tab=dashboard')}
+                className="px-4 py-2 rounded-lg text-xs font-bold border border-[#E2FF6D] text-[#E2FF6D] bg-transparent hover:bg-[#E2FF6D]/10 transition-all"
+              >
+                MY STATUS
+              </button>
+            </div>
           </div>
 
-          {/* Card 2 — Level Up Your Status */}
-          <div
-            className="relative rounded-2xl p-6 flex flex-col items-center text-center transition-all duration-200 hover:-translate-y-[2px] group"
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '16px',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(226,255,109,0.22)')}
-            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
-          >
-            {/* Top accent line */}
-            <div className="absolute top-0 left-4 right-4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(226,255,109,0.4), transparent)' }} />
-            <div className="mb-3 flex items-center justify-center" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(226,255,109,0.08)', border: '1px solid rgba(226,255,109,0.15)' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(226,255,109,0.85)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <h3 className="mb-2 uppercase tracking-wide text-[hsl(var(--mall-text))]" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.125rem' }}>LEVEL UP YOUR STATUS</h3>
-            <p className="text-sm text-[hsl(var(--mall-text-muted))] mb-5 leading-relaxed">
-              Commit your NCTR in Crescendo for 360 days to activate your status tier and unlock rewards
-            </p>
+          {/* Trending Brands Row */}
+          {featuredBrands.length > 0 && (
+            <section className="mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">🔥</span>
+                  <h3
+                    className="text-[hsl(var(--mall-text))] uppercase tracking-wide"
+                    style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: '0.875rem', letterSpacing: '0.05em' }}
+                  >
+                    Popular This Week
+                  </h3>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => scrollFeatured("left")}
+                    className="p-1 rounded-full text-[#777] hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => scrollFeatured("right")}
+                    className="p-1 rounded-full text-[#777] hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div
+                ref={featuredScrollRef}
+                className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide snap-x snap-mandatory"
+                style={{ scrollbarWidth: "none" }}
+              >
+                {featuredBrands.map((brand) => (
+                  <div
+                    key={brand.id}
+                    className="snap-start flex-shrink-0 w-[140px] md:w-[160px] rounded-xl overflow-hidden border border-[#3A3A3A] hover:border-[#E2FF6D]/50 hover:-translate-y-0.5 transition-all cursor-pointer group"
+                    style={{ background: "#2A2A2A" }}
+                    onClick={() => setSelectedBrand(brand)}
+                  >
+                    {/* Logo */}
+                    <div className="flex items-center justify-center bg-white px-3" style={{ height: "72px" }}>
+                      {brand.logo_url ? (
+                        <img
+                          src={brand.logo_url}
+                          alt={brand.name}
+                          className="object-contain group-hover:scale-105 transition-transform"
+                          style={{ maxHeight: "44px", maxWidth: "85%" }}
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.style.display = 'none';
+                            const fallback = img.parentElement?.querySelector('[data-fallback]') as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <span
+                        data-fallback
+                        className="text-[#555] font-semibold text-center leading-tight break-words items-center justify-center px-1"
+                        style={{ display: brand.logo_url ? 'none' : 'flex', fontSize: '12px' }}
+                      >
+                        {brand.name}
+                      </span>
+                    </div>
+                    {/* Info */}
+                    <div className="px-2 py-2 text-center">
+                      <h4 className="text-white text-xs font-semibold line-clamp-1 mb-0.5">{brand.name}</h4>
+                      <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E2FF6D]/15 text-[#E2FF6D]">
+                        EARN NCTR
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Mobile-only action buttons */}
+          <div className="flex md:hidden gap-2 mb-2">
+            <button
+              onClick={() => allBrandsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="flex-1 py-2.5 rounded-lg text-xs font-bold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
+            >
+              BROWSE ALL BRANDS →
+            </button>
             <button
               onClick={() => navigate('/garden?tab=dashboard')}
-              className="px-6 py-2.5 rounded-lg text-sm font-bold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
+              className="py-2.5 px-4 rounded-lg text-xs font-bold border border-[#E2FF6D] text-[#E2FF6D] bg-transparent hover:bg-[#E2FF6D]/10 transition-all"
             >
-              VIEW MY STATUS →
+              MY STATUS
             </button>
           </div>
         </div>
-      </div>}
+      )}
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
@@ -449,120 +507,6 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           />
         )}
 
-        {/* Featured Brands — Shop & Earn */}
-        {!isSearching && featuredBrands.length > 0 && (
-          <section className="mb-8">
-            <div className="flex items-center justify-between mb-1">
-              <div>
-                <h2
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "clamp(18px, 2.2vw, 24px)",
-                    fontWeight: 900,
-                    letterSpacing: "-0.01em",
-                    textTransform: "uppercase",
-                    color: "#fff",
-                    margin: 0,
-                  }}
-                >
-                  6,800+ Brands — Shop & Earn
-                </h2>
-                <p className="text-sm text-[hsl(var(--mall-text-muted))] mt-1">
-                  Every purchase earns NCTR toward your Crescendo status
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => scrollFeatured("left")}
-                  className="p-1.5 rounded-full text-[#999] hover:text-[#666] hover:bg-white/10 transition-colors hidden md:block"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => scrollFeatured("right")}
-                  className="p-1.5 rounded-full text-[#999] hover:text-[#666] hover:bg-white/10 transition-colors hidden md:block"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            <div
-              ref={featuredScrollRef}
-              className="flex gap-4 overflow-x-auto pb-4 pt-4 scrollbar-hide snap-x snap-mandatory"
-              style={{ scrollbarWidth: "none" }}
-            >
-              {featuredBrands.map((brand) => (
-                <div
-                  key={brand.id}
-                  className="snap-start flex-shrink-0 w-[calc(50%-8px)] md:w-[calc(25%-12px)] rounded-xl p-4 bg-white border border-[#E5E5E5] transition-all cursor-pointer group hover:-translate-y-0.5"
-                  style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)")}
-                  onClick={() => setSelectedBrand(brand)}
-                >
-                  {/* Logo */}
-                  <div className="flex items-center justify-center bg-white px-4 mb-3 rounded-lg" style={{ minHeight: "100px", maxHeight: "100px" }}>
-                    {brand.logo_url ? (
-                      <img
-                        src={brand.logo_url}
-                        alt={brand.name}
-                        className="object-contain group-hover:scale-105 transition-transform"
-                        style={{ maxHeight: "60px", maxWidth: "80%" }}
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          img.style.display = 'none';
-                          const fallback = img.parentElement?.querySelector('[data-fallback]') as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <span
-                      data-fallback
-                      className="text-[#333] font-semibold text-center leading-tight break-words items-center justify-center"
-                      style={{ display: brand.logo_url ? 'none' : 'flex', fontSize: brand.name.length > 15 ? '13px' : '16px' }}
-                    >
-                      {brand.name}
-                    </span>
-                  </div>
-
-                  {/* Category tag */}
-                  {brand.category && (
-                    <p className="text-[11px] text-center text-[#999] uppercase tracking-wide mb-1">
-                      {formatCategory(brand.category)}
-                    </p>
-                  )}
-
-                  {/* Brand Name */}
-                  <h3 className="text-[#1A1A1A] text-center text-[15px] font-semibold line-clamp-2 mb-1.5 min-h-[2.5rem]">
-                    {brand.name}
-                  </h3>
-
-                  {/* Earn rate */}
-                  <p className="text-[13px] text-center font-medium text-[#2D6A2E] mb-3">
-                    {brand.nctr_per_dollar && brand.nctr_per_dollar > 0
-                      ? `Earn ${brand.nctr_per_dollar % 1 === 0 ? brand.nctr_per_dollar.toFixed(0) : brand.nctr_per_dollar.toFixed(1)} NCTR/$1`
-                      : "Earn NCTR on every purchase"}
-                  </p>
-
-                  {/* Shop Button — outlined */}
-                  <Button
-                    size="sm"
-                    className="w-full text-xs font-semibold bg-transparent border border-[#323232] text-[#323232] hover:bg-[#323232] hover:text-white transition-colors shadow-none"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (brand.loyalize_id) handleShop(brand.id, brand.loyalize_id);
-                    }}
-                    disabled={!brand.loyalize_id}
-                  >
-                    Shop Now
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
 
         {/* All Brands Section */}
