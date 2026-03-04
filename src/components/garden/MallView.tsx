@@ -274,6 +274,13 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
   // Shop handler
   const handleShop = useCallback(async (brandId: string, loyalizeId: string) => {
+    if (!userId) {
+      // Store intent and redirect to auth
+      sessionStorage.setItem('authRedirect', '/garden');
+      navigate('/auth');
+      toast({ title: "Sign in to shop", description: "Create a free account to start earning NCTR on your purchases." });
+      return;
+    }
     if (!loyalizeId) {
       toast({ title: "Coming Soon", description: "This brand will be shoppable soon!" });
       return;

@@ -46,6 +46,8 @@ const Referrals = () => {
   useEffect(() => {
     if (user?.id) {
       fetchUserReferrals();
+    } else {
+      setLoading(false);
     }
   }, [user?.id]);
 
@@ -158,6 +160,17 @@ const Referrals = () => {
               <p>Loading your referrals...</p>
             </div>
           </div>
+        ) : !user ? (
+          <Card>
+            <CardContent className="text-center py-16">
+              <Users className="w-16 h-16 mx-auto mb-6 opacity-50" />
+              <h3 className="text-lg font-semibold mb-2">Sign in to see your invites</h3>
+              <p className="text-muted-foreground mb-4">Track your referrals and earn NCTR rewards.</p>
+              <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                Sign In
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-8">
             {/* Referral Code Section */}

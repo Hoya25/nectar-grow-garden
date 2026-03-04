@@ -1345,108 +1345,65 @@ I earn ${userReward} NCTR and you get ${inviteReward} NCTR in 360LOCK when you s
     );
   }
 
-  // Show landing page for unauthenticated users
+  // Show public brand browsing for unauthenticated users
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-page">
-        <header className="section-highlight backdrop-blur-sm border-b border-section-border">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold nctr-text">The Garden</h1>
-                <Badge variant="secondary" className="text-xs font-semibold px-2 py-0.5 bg-primary/10 text-primary border-primary/20">
-                  BETA
-                </Badge>
-              </div>
+        <SEOHead title="The Garden | Shop & Earn NCTR" description="Browse 6,800+ brands and earn NCTR on every purchase. Discover wellness brands, everyday favorites, and more." canonicalPath="/garden" />
+        {/* Public header */}
+        <header className="sticky top-0 z-50 h-14 bg-white border-b border-[#E5E7EB] backdrop-blur-sm">
+          <div className="container mx-auto px-4 h-full flex items-center justify-between">
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 bg-transparent hover:opacity-80 transition-opacity"
+            >
+              <svg className="h-8 w-8" viewBox="0 0 434 434" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="217" cy="217" r="200" stroke="#323232" strokeWidth="16" fill="none"/>
+                <path d="M130.444 309.52C128.745 309.52 127.279 308.902 126.044 307.667C124.809 306.432 124.191 304.965 124.191 303.267V209.485C124.191 207.787 124.809 206.32 126.044 205.085C127.279 203.85 128.745 203.233 130.444 203.233H161.473C163.325 203.233 164.483 202.461 164.946 200.917C165.101 200.609 165.178 200.145 165.178 199.528C165.178 198.447 164.869 197.598 164.252 196.981C159.62 192.504 154.603 187.564 149.2 182.161C143.797 176.603 138.548 171.355 133.454 166.415L126.044 158.773C124.809 157.538 124.191 156.072 124.191 154.373V130.523C124.191 128.825 124.809 127.358 126.044 126.123C127.279 124.888 128.745 124.271 130.444 124.271H154.294C155.992 124.271 157.459 124.888 158.694 126.123L256.876 224.073C257.648 224.845 258.497 225.231 259.423 225.231C260.504 225.231 261.353 224.845 261.97 224.073C262.742 223.302 263.128 222.452 263.128 221.526V187.254C263.128 185.556 263.039 177.682 263.039 177.682C263.039 177.682 262.719 174.55 264.676 172.629C266.455 170.778 268.468 170.565 269.373 170.565H301.897C306.063 170.565 309.44 173.942 309.44 178.109V185.332V224.305C309.44 226.003 308.823 227.47 307.588 228.705C306.353 229.94 304.886 230.557 303.188 230.557H272.159C270.307 230.557 269.149 231.329 268.686 232.873C268.531 233.181 268.454 233.645 268.454 234.262C268.454 235.343 268.763 236.192 269.38 236.809C274.012 241.286 279.029 246.303 284.432 251.861C289.835 257.264 295.084 262.435 300.178 267.375L307.588 275.017C308.823 276.252 309.44 277.718 309.44 279.417V303.267C309.44 304.965 308.823 306.432 307.588 307.667C306.353 308.902 304.886 309.52 303.188 309.52H279.337C277.639 309.52 276.173 308.902 274.938 307.667L176.756 209.717C175.984 208.945 175.135 208.559 174.209 208.559C173.128 208.559 172.202 208.945 171.43 209.717C170.812 210.488 170.504 211.338 170.504 212.264V303.267C170.504 304.965 169.886 306.432 168.651 307.667C167.416 308.902 165.95 309.52 164.252 309.52H130.444Z" fill="#323232"/>
+              </svg>
+              <span className="text-lg font-bold text-[#323232]">The Garden</span>
+              <Badge variant="secondary" className="text-[10px] font-semibold px-1.5 py-0 bg-[#E2FF6D] text-[#323232] border-[#E2FF6D]/20">
+                BETA
+              </Badge>
+            </button>
+            <div className="flex items-center gap-3">
               <Button
+                variant="outline"
                 onClick={() => navigate('/auth')}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="text-sm"
               >
                 Sign In
+              </Button>
+              <Button
+                onClick={() => navigate('/auth')}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm"
+              >
+                Sign Up Free
               </Button>
             </div>
           </div>
         </header>
 
-        <main className="container mx-auto p-6 max-w-4xl">
-          <div className="text-center py-12">
-            <div className="mb-8">
-              <img 
-                src={nctrLogo} 
-                alt="NCTR Logo" 
-                className="h-20 mx-auto mb-6 opacity-90"
-              />
-              <h2 className="text-4xl font-bold mb-4 nctr-text">
-                Welcome to The Garden
-              </h2>
-              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Your personal rewards hub. Earn NCTR on every purchase, invite, and partner activity.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Gift className="h-5 w-5 text-primary" />
-                    Earn Rewards
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Earn NCTR by shopping with NCTR Alliance brand partners.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Users className="h-5 w-5 text-primary" />
-                    Build Your Alliance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Invite friends and grow together. Both earn rewards after completing profile and making their first purchase
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    Crescendo Status
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Lock NCTR to unlock higher status tiers and amplify all your earnings
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button
-                size="lg"
-                onClick={() => navigate('/auth')}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg"
-              >
-                Enter The Garden →
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/')}
-                className="border-primary/50 text-primary hover:bg-primary/10 px-8 py-6 text-lg"
-              >
-                ← Back to Home
-              </Button>
-            </div>
+        {/* Sign-up CTA banner */}
+        <div className="bg-gradient-to-r from-primary/15 via-primary/10 to-primary/5 border-b border-primary/20">
+          <div className="container mx-auto px-4 py-3 flex items-center justify-center gap-3 text-sm">
+            <span className="text-foreground font-medium">🌱 Sign up to start earning NCTR on every purchase</span>
+            <Button
+              size="sm"
+              onClick={() => navigate('/auth')}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground h-7 px-3 text-xs"
+            >
+              Get Started
+            </Button>
           </div>
-        </main>
+        </div>
+
+        {/* Public MallView - browsing only */}
+        <MallView 
+          userId={undefined}
+          availableNctr={0}
+          totalNctr={0}
+        />
       </div>
     );
   }
