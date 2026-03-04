@@ -511,6 +511,7 @@ export type Database = {
           created_at: string
           description: string | null
           display_order: number | null
+          display_priority: string
           featured: boolean
           id: string
           is_active: boolean
@@ -541,6 +542,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number | null
+          display_priority?: string
           featured?: boolean
           id?: string
           is_active?: boolean
@@ -571,6 +573,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number | null
+          display_priority?: string
           featured?: boolean
           id?: string
           is_active?: boolean
