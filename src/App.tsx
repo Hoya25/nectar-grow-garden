@@ -20,6 +20,7 @@ import AffiliateLinks from "./pages/AffiliateLinks";
 import LearnAndEarn from "./pages/LearnAndEarn";
 import AdminBrandRates from "./pages/AdminBrandRates";
 import AdminBrandAudit from "./pages/AdminBrandAudit";
+import AdminBrandPriority from "./pages/AdminBrandPriority";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 import FAQPage from "./pages/FAQPage";
@@ -77,6 +78,7 @@ const App = () => {
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
                 <Route path="/admin/brand-audit" element={<AdminBrandAudit />} />
+                <Route path="/admin/brand-priority" element={<AdminBrandPriority />} />
                 
                 {/* Authenticated routes with shared navigation layout */}
                 <Route element={<AuthenticatedLayout />}>

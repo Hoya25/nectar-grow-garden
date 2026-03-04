@@ -51,6 +51,7 @@ interface Brand {
   featured?: boolean;
   display_order?: number | null;
   description?: string | null;
+  display_priority?: string;
   tags?: { slug: string; icon: string; name: string }[];
 }
 
@@ -142,18 +143,18 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           supabase.from("brands").select("*", { count: "exact", head: true }).eq("is_active", true),
           supabase
             .from("brands")
-            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured")
+            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured, display_priority")
             .eq("is_active", true)
             .order("name")
             .limit(7000),
           supabase
             .from("brands")
-            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured, display_order")
+            .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured, display_order, display_priority")
             .eq("is_active", true)
-            .eq("featured", true)
+            .in("display_priority", ["flagship", "featured"])
             .order("display_order", { ascending: true })
             .order("name")
-            .limit(10),
+            .limit(20),
         ]);
 
         setTotalBrands(countRes.count || 0);
@@ -181,9 +182,13 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
   const filteredBrands = useMemo(() => {
     let filtered = allBrands;
 
+    // In default "all" view, exclude search_only brands
+    if (activeCategory === "all" && searchQuery.trim().length < 2) {
+      filtered = filtered.filter((b) => b.display_priority !== 'search_only');
+    }
+
     // Category filter
     if (activeCategory === "wellness") {
-      // Special: filter by inspiration tag IDs
       filtered = filtered.filter((b) => inspirationBrandIds.has(b.id));
     } else if (activeCategory !== "all") {
       const keywords = CATEGORY_KEYWORDS[activeCategory] || [];
@@ -193,8 +198,17 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       });
     }
 
+    // Sort: flagship first, then featured, then standard, then search_only
+    const priorityOrder: Record<string, number> = { flagship: 0, featured: 1, standard: 2, search_only: 3 };
+    filtered.sort((a, b) => {
+      const pa = priorityOrder[a.display_priority || 'standard'] ?? 2;
+      const pb = priorityOrder[b.display_priority || 'standard'] ?? 2;
+      if (pa !== pb) return pa - pb;
+      return a.name.localeCompare(b.name);
+    });
+
     return filtered;
-  }, [allBrands, activeCategory, inspirationBrandIds]);
+  }, [allBrands, activeCategory, inspirationBrandIds, searchQuery]);
 
   // Live Supabase search results
   const [searchResults, setSearchResults] = useState<Brand[]>([]);
@@ -211,7 +225,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         const term = `%${searchQuery.trim()}%`;
         const { data, error } = await supabase
           .from("brands")
-          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured, display_order")
+          .select("id, name, logo_url, category, nctr_per_dollar, loyalize_id, is_promoted, promotion_multiplier, promotion_label, description, featured, display_order, display_priority")
           .eq("is_active", true)
           .or(`name.ilike.${term},category.ilike.${term},description.ilike.${term}`)
           .order("display_order", { ascending: true })
