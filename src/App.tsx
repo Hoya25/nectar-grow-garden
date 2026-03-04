@@ -76,12 +76,12 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
-                <Route path="/admin/brand-audit" element={<AdminBrandAudit />} />
-                <Route path="/admin/brand-priority" element={<AdminBrandPriority />} />
                 
                 {/* Authenticated routes with shared navigation layout */}
                 <Route element={<AuthenticatedLayout />}>
+                  <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
+                  <Route path="/admin/brand-audit" element={<AdminBrandAudit />} />
+                  <Route path="/admin/brand-priority" element={<AdminBrandPriority />} />
                   <Route path="/garden" element={<Garden />} />
                   <Route path="/garden/category/:slug" element={<GardenCategoryPage />} />
                   <Route path="/garden/tag/:slug" element={<GardenTagPage />} />
