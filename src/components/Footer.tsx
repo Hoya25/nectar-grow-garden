@@ -59,6 +59,11 @@ const Footer = () => {
               </div>
             </div>
           </div>
+
+          {/* Legal disclaimer */}
+          <p className="text-center mt-8" style={{ fontSize: '11px', color: '#5A5A58' }}>
+            NCTR is a utility token used within the NCTR Alliance commerce network. Not an investment product. Not a security.
+          </p>
         </div>
       </div>
     </footer>
