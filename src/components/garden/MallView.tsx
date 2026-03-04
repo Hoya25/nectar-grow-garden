@@ -115,6 +115,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const featuredScrollRef = useRef<HTMLDivElement>(null);
+  const allBrandsRef = useRef<HTMLElement>(null);
 
   // Welcome back toast
   useEffect(() => {
@@ -236,10 +237,26 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
   const hasMore = paginatedBrands.length < displayBrands.length;
 
-  // Reset page when filters change
+  // Reset page when filters change; scroll to results when category selected
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, activeCategory]);
+    if (activeCategory !== "all") {
+      // Small delay to let filtered results render, then scroll
+      setTimeout(() => {
+        allBrandsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [activeCategory]);
+
+  // Scroll to results when user types a search query
+  useEffect(() => {
+    setPage(1);
+    if (searchQuery.trim().length >= 2) {
+      setTimeout(() => {
+        allBrandsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 400); // wait for debounced search
+    }
+  }, [searchQuery]);
 
   // Shop handler
   const handleShop = useCallback(async (brandId: string, loyalizeId: string) => {
@@ -344,8 +361,8 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
         </div>
       </div>
 
-      {/* Hero CTA Section */}
-      <div className="max-w-6xl mx-auto px-4 pt-8 pb-2">
+      {/* Hero CTA Section — hidden during search */}
+      {!isSearching && <div className="max-w-6xl mx-auto px-4 pt-8 pb-2">
         <h2
           className="text-center mb-6 leading-tight"
           style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 'clamp(32px, 4.5vw, 52px)' }}
@@ -376,8 +393,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             </p>
             <button
               onClick={() => {
-                searchInputRef.current?.focus();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                allBrandsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
               className="px-6 py-2.5 rounded-lg text-sm font-bold bg-[#E2FF6D] text-[#323232] hover:opacity-90 transition-all"
             >
@@ -413,7 +429,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             </button>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
@@ -550,7 +566,7 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
 
 
         {/* All Brands Section */}
-        <section className="mb-8">
+        <section ref={allBrandsRef} className="mb-8 scroll-mt-4">
           {/* Header */}
           <h2
             style={{
@@ -610,8 +626,24 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
             </p>
           )}
 
+          {/* Search Loading Skeleton */}
+          {searchLoading && searchQuery.trim().length >= 2 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="rounded-xl overflow-hidden border border-[#3A3A3A] animate-pulse" style={{ background: "#2A2A2A" }}>
+                  <div className="bg-[#3A3A3A] h-[100px]" />
+                  <div className="px-3 py-3 space-y-2">
+                    <div className="h-4 bg-[#3A3A3A] rounded w-3/4 mx-auto" />
+                    <div className="h-3 bg-[#3A3A3A] rounded w-1/2 mx-auto" />
+                    <div className="h-8 bg-[#3A3A3A] rounded w-full mt-2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Brand Grid */}
-          {paginatedBrands.length > 0 && (
+          {!searchLoading && paginatedBrands.length > 0 && (
             <>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {paginatedBrands.map((brand) => (
@@ -701,13 +733,13 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
           )}
 
           {/* Empty State */}
-          {noResults && (
+          {noResults && !searchLoading && (
             <div className="flex flex-col items-center justify-center py-16 px-4">
               <p className="text-lg text-[#999] mb-2">
-                No brands found for "{searchQuery || activeCategory}"
+                No brands found for "{searchQuery || formatCategory(activeCategory)}". Try a different name or browse by category.
               </p>
               <p className="text-sm text-[#777] mb-6">
-                Don't see your brand? Suggest it →
+                Don't see your brand? Suggest it below:
               </p>
               <div className="flex gap-2 w-full max-w-md">
                 <input
