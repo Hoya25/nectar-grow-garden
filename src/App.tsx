@@ -79,6 +79,9 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
+                <Route path="/admin/brand-audit" element={<AdminBrandAudit />} />
+                <Route path="/admin/brand-priority" element={<AdminBrandPriority />} />
                 
                 {/* Public routes that work with or without auth */}
                 <Route path="/garden" element={<Garden />} />
@@ -90,9 +93,6 @@ const App = () => {
                 
                 {/* Authenticated routes with shared navigation layout */}
                 <Route element={<AuthenticatedLayout />}>
-                  <Route path="/admin/brand-rates" element={<AdminBrandRates />} />
-                  <Route path="/admin/brand-audit" element={<AdminBrandAudit />} />
-                  <Route path="/admin/brand-priority" element={<AdminBrandPriority />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/referrals" element={<Referrals />} />
                   <Route path="/affiliate-links" element={<AffiliateLinks />} />
