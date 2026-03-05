@@ -1298,6 +1298,27 @@ export type Database = {
           },
         ]
       }
+      mcp_rate_limit_log: {
+        Row: {
+          hit_at: string
+          id: string
+          ip_address: string
+          tool_name: string
+        }
+        Insert: {
+          hit_at?: string
+          id?: string
+          ip_address: string
+          tool_name: string
+        }
+        Update: {
+          hit_at?: string
+          id?: string
+          ip_address?: string
+          tool_name?: string
+        }
+        Relationships: []
+      }
       membership_history: {
         Row: {
           created_at: string
