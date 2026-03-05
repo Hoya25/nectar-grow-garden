@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 import FAQPage from "./pages/FAQPage";
 import ForAgentsPage from "./pages/ForAgentsPage";
+import About from "./pages/About";
 import { CustomerServiceBubble } from "./components/CustomerServiceBubble";
 import { Userback } from "./components/Userback";
 
@@ -100,6 +101,7 @@ const App = () => {
                 </Route>
                 
                 <Route path="/faq" element={<FAQPage />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/for-agents" element={<ForAgentsPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
