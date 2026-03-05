@@ -44,6 +44,9 @@ const Footer = () => {
               </p>
               
               <div className="flex items-center gap-6">
+                <a href="/about" className="text-[#D9D9D9] hover:text-[#E2FF6D] hover:scale-110 transition-all duration-300">
+                  About
+                </a>
                 <a href="/faq" className="text-[#D9D9D9] hover:text-[#E2FF6D] hover:scale-110 transition-all duration-300">
                   FAQ
                 </a>
