@@ -8,7 +8,7 @@ interface SEOHeadProps {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const SITE_URL = "https://nectar-grow-garden.lovable.app";
+const SITE_URL = "https://thegarden.nctr.live";
 const DEFAULT_OG_IMAGE = "/og-image.png";
 
 const SEOHead = ({
