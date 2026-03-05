@@ -14,6 +14,67 @@ function getSupabase() {
   return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 }
 
+// ── Rate limiting ────────────────────────────────────────────────
+const RATE_LIMITS: Record<string, number> = {
+  search_bounties: 60,
+  get_active_promotions: 60,
+  get_onboarding_link: 20,
+  check_tier_requirements: 30,
+  get_earning_rates: 60,
+  get_impact_engines: 30,
+  get_commerce_categories: 60,
+};
+
+// In-memory sliding window: key = "ip:tool" → timestamps[]
+const callLog: Map<string, number[]> = new Map();
+const WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(ip: string, toolName: string): boolean {
+  const limit = RATE_LIMITS[toolName];
+  if (!limit) return true; // no limit configured → allow
+
+  const key = `${ip}:${toolName}`;
+  const now = Date.now();
+  const cutoff = now - WINDOW_MS;
+
+  let timestamps = callLog.get(key);
+  if (timestamps) {
+    timestamps = timestamps.filter((t) => t > cutoff);
+  } else {
+    timestamps = [];
+  }
+
+  if (timestamps.length >= limit) {
+    callLog.set(key, timestamps);
+    return false; // exceeded
+  }
+
+  timestamps.push(now);
+  callLog.set(key, timestamps);
+  return true; // allowed
+}
+
+// Fire-and-forget abuse log to Supabase
+function logAbuse(ip: string, toolName: string) {
+  try {
+    const sb = getSupabase();
+    sb.from("mcp_rate_limit_log")
+      .insert({ ip_address: ip, tool_name: toolName, hit_at: new Date().toISOString() })
+      .then(() => {});
+  } catch (_) {
+    // non-critical — don't block the response
+  }
+}
+
+function getClientIp(c: { req: { header: (name: string) => string | undefined } }): string {
+  return (
+    c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
+    c.req.header("x-real-ip") ||
+    c.req.header("cf-connecting-ip") ||
+    "unknown"
+  );
+}
+
 // ── Commerce categories (generic, no branded engine names) ───────
 const COMMERCE_CATEGORIES = [
   { name: "Powersports & Motorsports", slug: "powersports-motorsports" },
@@ -236,7 +297,7 @@ async function callTool(name: string, args: Record<string, unknown>) {
 }
 
 // ── JSON-RPC router ──────────────────────────────────────────────
-async function handleJsonRpc(body: { method: string; params?: Record<string, unknown>; id?: unknown }) {
+async function handleJsonRpc(body: { method: string; params?: Record<string, unknown>; id?: unknown }, ip: string) {
   const { method, params, id } = body;
 
   if (method === "initialize") {
@@ -244,7 +305,7 @@ async function handleJsonRpc(body: { method: string; params?: Record<string, unk
       jsonrpc: "2.0", id,
       result: {
         protocolVersion: "2024-11-05",
-        serverInfo: { name: "nctr-garden-mcp", version: "2.0.0" },
+        serverInfo: { name: "nctr-garden-mcp", version: "2.1.0" },
         capabilities: { tools: { listChanged: false } },
       },
     };
@@ -261,6 +322,17 @@ async function handleJsonRpc(body: { method: string; params?: Record<string, unk
   if (method === "tools/call") {
     const toolName = (params as Record<string, unknown>)?.name as string;
     const toolArgs = ((params as Record<string, unknown>)?.arguments ?? {}) as Record<string, unknown>;
+
+    // Rate limit check
+    if (!checkRateLimit(ip, toolName)) {
+      logAbuse(ip, toolName);
+      console.warn(`[RATE_LIMIT] IP=${ip} tool=${toolName} ts=${new Date().toISOString()}`);
+      return {
+        jsonrpc: "2.0", id,
+        error: { code: 429, message: "Rate limit exceeded. Cache results for 1 hour minimum." },
+      };
+    }
+
     try {
       const result = await callTool(toolName, toolArgs);
       return { jsonrpc: "2.0", id, result };
@@ -278,18 +350,23 @@ const app = new Hono();
 app.options("/*", () => new Response(null, { headers: corsHeaders }));
 
 app.post("/*", async (c) => {
+  const ip = getClientIp(c);
+
   try {
     const body = await c.req.json();
 
     if (Array.isArray(body)) {
       const results = await Promise.all(
-        body.map((req: { method: string; params?: Record<string, unknown>; id?: unknown }) => handleJsonRpc(req))
+        body.map((req: { method: string; params?: Record<string, unknown>; id?: unknown }) => handleJsonRpc(req, ip))
       );
-      return c.json(results, 200, corsHeaders);
+      // If any result hit 429 at the JSON-RPC level, return HTTP 429
+      const has429 = results.some((r: Record<string, unknown>) => (r.error as Record<string, unknown>)?.code === 429);
+      return c.json(results, has429 ? 429 : 200, corsHeaders);
     }
 
-    const result = await handleJsonRpc(body);
-    return c.json(result, 200, corsHeaders);
+    const result = await handleJsonRpc(body, ip);
+    const status = (result.error as Record<string, unknown> | undefined)?.code === 429 ? 429 : 200;
+    return c.json(result, status, corsHeaders);
   } catch (_e) {
     return c.json(
       { jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } },
@@ -303,7 +380,7 @@ app.get("/*", (c) => {
   return c.json(
     {
       name: "nctr-garden-mcp",
-      version: "2.0.0",
+      version: "2.1.0",
       status: "live",
       tools: TOOLS.map((t) => t.name),
       docs: "https://thegarden.nctr.live/for-agents",
