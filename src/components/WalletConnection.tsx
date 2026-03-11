@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 
 const WalletConnection = () => {
-  const { isConnected, address, connectWallet, disconnectWallet, loading } = useWallet();
+  const { isConnected, address, provider, connectWallet, disconnectWallet, loading } = useWallet();
   const { signInWithWallet, user } = useAuth();
   const { toast } = useToast();
   const [signingIn, setSigningIn] = useState(false);
