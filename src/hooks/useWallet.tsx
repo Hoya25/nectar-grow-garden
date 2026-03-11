@@ -18,7 +18,6 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 export const useWallet = () => {
   const context = useContext(WalletContext);
   if (!context) {
-    // Return default values instead of throwing error during initial load
     return {
       isConnected: false,
       address: null,
@@ -47,13 +46,11 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
 
-  // Initialize Coinbase Wallet SDK
   const coinbaseWallet = new CoinbaseWalletSDK({
     appName: 'NCTR Garden',
     appLogoUrl: '/favicon.ico'
   });
 
-  // Get current user from Supabase auth
   useEffect(() => {
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -69,12 +66,10 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Check for existing wallet connection when user changes
   useEffect(() => {
     if (currentUser) {
       checkExistingConnection();
     } else {
-      // Clear wallet state when user logs out
       setAddress(null);
       setIsConnected(false);
       setProvider(null);
@@ -85,7 +80,6 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
     if (!currentUser) return;
 
     try {
-      // Check if user has a wallet address in their profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('wallet_address')
@@ -93,7 +87,6 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
         .maybeSingle();
 
       if (profile?.wallet_address) {
-        // Try to reconnect to the wallet
         const ethereum = coinbaseWallet.makeWeb3Provider();
         const accounts = await ethereum.request({ method: 'eth_accounts' }) as string[];
         
@@ -113,7 +106,6 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
     try {
       const ethereum = coinbaseWallet.makeWeb3Provider();
       
-      // Request account access
       const accounts = await ethereum.request({ 
         method: 'eth_requestAccounts' 
       }) as string[];
@@ -124,25 +116,20 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
 
       const walletAddress = accounts[0];
       
-      // Switch to Base network (Chain ID: 8453)
+      // Switch to Base network
       try {
         await ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x2105' }], // Base mainnet,
+          params: [{ chainId: '0x2105' }],
         });
       } catch (switchError: any) {
-        // If network doesn't exist, add it
         if (switchError.code === 4902) {
           await ethereum.request({
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: '0x2105',
               chainName: 'Base',
-              nativeCurrency: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
-              },
+              nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
               rpcUrls: ['https://mainnet.base.org'],
               blockExplorerUrls: ['https://basescan.org'],
             }],
@@ -150,33 +137,12 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
         }
       }
 
-      // Set wallet state immediately (sign-in will happen via WalletConnection component)
       setAddress(walletAddress);
       setIsConnected(true);
       setProvider(new BrowserProvider(ethereum));
 
-      // Only update profile if user is authenticated
+      // Only update profile if user is authenticated — NO password changes
       if (currentUser) {
-        // Generate deterministic password for wallet
-        const encoder = new TextEncoder();
-        const data = encoder.encode(walletAddress.toLowerCase());
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        const deterministicPassword = `Wa11et${hashHex.slice(0, 26)}9X`;
-        
-        // Update user's password to the deterministic wallet password
-        // This allows them to sign in with either email+password OR wallet
-        const { error: passwordError } = await supabase.auth.updateUser({
-          password: deterministicPassword
-        });
-
-        if (passwordError) {
-          console.error('Error updating password for wallet:', passwordError);
-        } else {
-          console.log('✅ User password updated for wallet sign-in compatibility');
-        }
-
         // Update user profile with wallet address
         const { error: updateError } = await supabase
           .from('profiles')
@@ -214,7 +180,7 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
       toast({
         title: "Wallet Connected",
         description: currentUser 
-          ? `Wallet linked to your account! You can now sign in with either email or wallet.`
+          ? `Wallet linked to your account!`
           : `Connected to ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
       });
 
@@ -232,7 +198,6 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
 
   const disconnectWallet = async () => {
     try {
-      // Remove wallet address from user profile if logged in
       if (currentUser) {
         const { error } = await supabase
           .from('profiles')
@@ -245,12 +210,10 @@ export const WalletProvider = ({ children }: WalletProviderProps) => {
         if (error) throw error;
       }
 
-      // Clear wallet state
       setAddress(null);
       setIsConnected(false);
       setProvider(null);
 
-      // Disconnect from Coinbase Wallet
       const ethereum = coinbaseWallet.makeWeb3Provider();
       if (ethereum.disconnect) {
         await ethereum.disconnect();
