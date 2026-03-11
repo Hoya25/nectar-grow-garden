@@ -83,11 +83,12 @@ const WalletConnection = () => {
   };
 
   const handleSignInWithWallet = async () => {
-    if (!address) return;
+    if (!address || !provider) return;
 
     setSigningIn(true);
     try {
-      const { error } = await signInWithWallet(address);
+      const signer = await provider.getSigner();
+      const { error } = await signInWithWallet(address, signer);
       
       if (error) {
         toast({
