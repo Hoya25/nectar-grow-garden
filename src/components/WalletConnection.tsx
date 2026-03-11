@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 
 const WalletConnection = () => {
-  const { isConnected, address, connectWallet, disconnectWallet, loading } = useWallet();
+  const { isConnected, address, provider, connectWallet, disconnectWallet, loading } = useWallet();
   const { signInWithWallet, user } = useAuth();
   const { toast } = useToast();
   const [signingIn, setSigningIn] = useState(false);
@@ -17,15 +17,14 @@ const WalletConnection = () => {
   // Auto sign-in after wallet connection - only once per connection
   useEffect(() => {
     const handleAutoSignIn = async () => {
-      // Only attempt sign-in once per wallet connection
-      if (isConnected && address && !user && !signingIn && !hasAttemptedSignIn) {
+      if (isConnected && address && !user && !signingIn && !hasAttemptedSignIn && provider) {
         console.log('🔐 Auto sign-in triggered for wallet:', address);
         setSigningIn(true);
-        setHasAttemptedSignIn(true); // Prevent retries
+        setHasAttemptedSignIn(true);
         
         try {
-          console.log('📧 Calling signInWithWallet...');
-          const { error } = await signInWithWallet(address);
+          const signer = await provider.getSigner();
+          const { error } = await signInWithWallet(address, signer);
           
           if (error) {
             console.error('❌ Sign in failed:', error);
@@ -35,7 +34,6 @@ const WalletConnection = () => {
               variant: "destructive",
             });
           } else {
-            console.log('✅ Sign in successful!');
             toast({
               title: "Success!",
               description: "Signed in with your Base wallet",
@@ -55,7 +53,7 @@ const WalletConnection = () => {
     };
 
     handleAutoSignIn();
-  }, [isConnected, address, user, signInWithWallet, toast, signingIn, hasAttemptedSignIn]);
+  }, [isConnected, address, user, signInWithWallet, toast, signingIn, hasAttemptedSignIn, provider]);
 
   // Reset attempt flag when wallet disconnects
   useEffect(() => {
@@ -85,11 +83,12 @@ const WalletConnection = () => {
   };
 
   const handleSignInWithWallet = async () => {
-    if (!address) return;
+    if (!address || !provider) return;
 
     setSigningIn(true);
     try {
-      const { error } = await signInWithWallet(address);
+      const signer = await provider.getSigner();
+      const { error } = await signInWithWallet(address, signer);
       
       if (error) {
         toast({
