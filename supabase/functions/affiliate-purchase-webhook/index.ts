@@ -282,10 +282,10 @@ serve(async (req) => {
     }
 
     // Update affiliate link click stats if we have tracking info
+    let parsedTracking: { userId: string; brandId?: string } | null = null;
     if (payload.tracking_id) {
-      const parsedTracking = await parseTrackingId(payload.tracking_id, supabase);
+      parsedTracking = await parseTrackingId(payload.tracking_id, supabase);
       if (parsedTracking.brandId) {
-        // Try to find brand-specific tracking info
         console.log('📊 Found brand tracking info:', parsedTracking.brandId);
       }
     }
