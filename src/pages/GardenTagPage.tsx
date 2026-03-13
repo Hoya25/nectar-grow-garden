@@ -213,6 +213,9 @@ const GardenTagPage = () => {
       
       window.open(redirectUrl, '_blank');
 
+      // Cross-app analytics
+      track('first_shop_click', { brand_id: brandId, brand_name: brandData?.name ?? 'unknown' });
+
       toast({
         title: `✓ Shopping at ${brandData?.name || 'brand'}`,
         description: "Your NCTR earnings will be tracked automatically",
