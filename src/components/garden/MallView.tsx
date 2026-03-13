@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BrandDetailModal } from "./BrandDetailModal";
 import { InspirationWellnessEcosystem } from "./InspirationWellnessEcosystem";
+import { track } from "@/lib/track";
 
 const CATEGORY_LABELS: Record<string, string> = {
   "sports-outdoors": "Sports & Outdoors",
@@ -295,6 +296,11 @@ export const MallView = ({ userId, availableNctr, totalNctr }: MallViewProps) =>
       const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeId}&user=${userId || ''}&tracking=${trackingId}`;
       sessionStorage.setItem('garden_last_click_time', Date.now().toString());
       window.open(redirectUrl, '_blank');
+
+      // Cross-app analytics: track shop click
+      const brandMatch = [...(displayBrands || [])].find(b => b.id === brandId);
+      track('first_shop_click', { brand_id: brandId, brand_name: brandMatch?.name ?? 'unknown' });
+
       toast({
         title: "🛒 Happy Shopping!",
         description: "Your NCTR will be credited within 48 hours. More NCTR = higher Crescendo status = better rewards.",

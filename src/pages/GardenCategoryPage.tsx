@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { track } from "@/lib/track";
 import SEOHead from "@/components/SEOHead";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -263,6 +264,9 @@ const GardenCategoryPage = () => {
       const redirectUrl = `https://rndivcsonsojgelzewkb.supabase.co/functions/v1/loyalize-redirect?store=${loyalizeId}&user=${user?.id || ''}&tracking=${trackingId}`;
       
       window.open(redirectUrl, '_blank');
+
+      // Cross-app analytics
+      track('first_shop_click', { brand_id: brandId, brand_name: brandData?.name ?? 'unknown' });
 
       toast({
         title: `✓ Shopping at ${brandData?.name || 'brand'}`,

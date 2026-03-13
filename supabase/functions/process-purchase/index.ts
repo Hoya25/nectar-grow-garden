@@ -188,6 +188,33 @@ serve(async (req) => {
 
     console.log('🎖️ Status update:', statusUpdate)
 
+    // Cross-app analytics events (fire-and-forget)
+    try {
+      await supabase.from('analytics_events').insert([
+        {
+          event_name: 'first_purchase_confirmed',
+          source_app: 'garden',
+          user_id: user_id,
+          properties: {
+            brand_id: brand_id ?? null,
+            order_value_usd: purchase_amount,
+            bounty_usd: finalNCTR,
+          },
+        },
+        {
+          event_name: 'first_token_earned',
+          source_app: 'garden',
+          user_id: user_id,
+          properties: {
+            source: 'garden',
+            amount: finalNCTR,
+          },
+        },
+      ])
+    } catch (analyticsErr) {
+      console.warn('⚠️ Analytics insert failed (non-blocking):', analyticsErr)
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
