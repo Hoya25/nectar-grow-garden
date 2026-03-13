@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { track } from "@/lib/track";
 import SEOHead from "@/components/SEOHead";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
