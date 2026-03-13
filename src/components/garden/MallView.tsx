@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BrandDetailModal } from "./BrandDetailModal";
 import { InspirationWellnessEcosystem } from "./InspirationWellnessEcosystem";
+import { track } from "@/lib/track";
 
 const CATEGORY_LABELS: Record<string, string> = {
   "sports-outdoors": "Sports & Outdoors",
