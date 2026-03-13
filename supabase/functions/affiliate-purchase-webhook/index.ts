@@ -292,6 +292,33 @@ serve(async (req) => {
 
     console.log(`✅ Successfully processed affiliate purchase: ${nctrReward} NCTR awarded to user ${userId}`);
 
+    // Cross-app analytics events (fire-and-forget)
+    try {
+      await supabase.from('analytics_events').insert([
+        {
+          event_name: 'first_purchase_confirmed',
+          source_app: 'garden',
+          user_id: userId,
+          properties: {
+            brand_id: parsedTracking?.brandId ?? null,
+            order_value_usd: payload.total_amount,
+            bounty_usd: nctrReward,
+          },
+        },
+        {
+          event_name: 'first_token_earned',
+          source_app: 'garden',
+          user_id: userId,
+          properties: {
+            source: 'garden',
+            amount: nctrReward,
+          },
+        },
+      ]);
+    } catch (analyticsErr) {
+      console.warn('⚠️ Analytics insert failed (non-blocking):', analyticsErr);
+    }
+
     return new Response(JSON.stringify({
       success: true,
       message: 'Affiliate purchase processed successfully',
