@@ -1,3 +1,6 @@
+// App retired — redirect to new location immediately
+window.location.replace('https://bountyhunter.nctr.live/shop');
+
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
