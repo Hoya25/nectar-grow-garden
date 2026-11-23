@@ -1,5 +1,5 @@
-// App retired — redirect to new location immediately
-window.location.replace('https://bountyhunter.nctr.live/shop');
+// App retired — redirect to The Mall immediately
+window.location.replace('https://themall.nctr.live');
 
 import React from "react";
 import { createRoot } from "react-dom/client";
